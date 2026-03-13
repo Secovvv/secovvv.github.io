@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Avı - SECOVVV Speed Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } 100% { transform: translateX(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); color: #ff0000; } 100% { transform: scale(1); } }
+        @keyframes slideDownIn { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes fireFlow { 0% { background-position: 0% 0%; } 100% { background-position: 0% 100%; } }
+        
+        /* TEK SEFERLİK ALEV PATLAMASI (PUNCH) */
+        @keyframes seco-punch {
+            0% { transform: rotate(-10deg) scale(1); filter: drop-shadow(0 0 0px transparent); }
+            50% { transform: rotate(-15deg) scale(1.5); filter: drop-shadow(0 0 25px #ff4500); text-shadow: 0 0 15px #fff; }
+            100% { transform: rotate(-10deg) scale(1); filter: drop-shadow(0 0 5px #ff4500); }
+        }
+
+        .seco-ignite-action {
+            animation: seco-punch 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+
+        /* NEON EFEKTLERİ */
+        @keyframes neon-correct {
+            0% { box-shadow: 0 0 5px #2ecc71, 0 0 10px #2ecc71; border-color: #2ecc71; }
+            50% { box-shadow: 0 0 20px #2ecc71, 0 0 40px #2ecc71; border-color: #2ecc71; }
+            100% { box-shadow: 0 0 5px #2ecc71, 0 0 10px #2ecc71; border-color: #444; }
+        }
+
+        @keyframes neon-wrong {
+            0% { box-shadow: 0 0 5px #e74c3c, 0 0 10px #e74c3c; border-color: #e74c3c; }
+            50% { box-shadow: 0 0 20px #e74c3c, 0 0 40px #e74c3c; border-color: #e74c3c; }
+            100% { box-shadow: 0 0 5px #e74c3c, 0 0 10px #e74c3c; border-color: #444; }
+        }
+
+        .correct-neon { animation: neon-correct 0.5s ease-out; }
+        .wrong-neon { animation: neon-wrong 0.5s ease-out; }
+
+        @keyframes lightSpeedFlash {
+            0% { background: rgba(255, 255, 255, 0.8); filter: brightness(2); }
+            100% { background: transparent; filter: brightness(1); }
+        }
+        @keyframes zoomPunch {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .light-speed-active { animation: lightSpeedFlash 0.5s ease-out; }
+        .punch-active { animation: zoomPunch 0.3s ease-out; }
+
+        body { background: #000; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Segoe UI', sans-serif; transition: background 0.3s; }
+
+        .kozmik-nebula { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle, #1a0b2e 0%, #000 90%); }
+
+        #oyun-wrapper {
+            position: relative;
+            width: 600px;
+            height: 750px;
+            transform-origin: center center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #anaKapsayici {
+            background: rgba(15, 20, 45, 0.8);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(139, 92, 246, 0.4);
+            border-radius: 30px; 
+            padding: 70px 20px 20px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 15;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            overflow: visible; 
+        }
+
+        .seco-signature {
+            position: absolute; top: 20px; left: 15px; 
+            font-size: 22px; 
+            font-weight: bold; font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(0deg, #ff4500, #ff8c00, #ffd700, #ff8c00, #ff4500);
+            background-size: 100% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: fireFlow 1.5s infinite linear; transform: rotate(-10deg); pointer-events: none; z-index: 30;
+            transition: transform 0.2s;
+        }
+
+        .kozmik-saat {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%); 
+            font-size: 16px; font-weight: bold;
+            font-family: 'Courier New', Courier, monospace; color: #8b5cf6;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.6); z-index: 30;
+            background: rgba(255, 255, 255, 0.05); padding: 5px 15px; border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        
+        .oyuncu-bilgi {
+            position: absolute; top: 15px; right: 15px; 
+            font-size: 14px; font-weight: bold;
+            font-family: 'Segoe UI', sans-serif; color: #fff;
+            background: rgba(139, 92, 246, 0.2); padding: 5px 15px; border-radius: 10px;
+            border: 1px solid rgba(139, 92, 246, 0.4); z-index: 30;
+        }
+
+        .stats-panel { 
+            display: flex; justify-content: space-around; width: 100%; box-sizing: border-box;
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; margin-bottom: 15px; 
+        }
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-val { font-size: 28px; font-weight: bold; color: #f1c40f; }
+        .stat-label { font-size: 11px; color: #aaa; text-transform: uppercase; }
+
+        #karisik-kelime { 
+            font-size: 50px;
+            font-weight: bold; color: #f1c40f; 
+            margin: 10px 0 25px 0; 
+            letter-spacing: 2px; text-transform: lowercase;
+        }
+        
+        #tahmin {
+            background: rgba(0,0,0,0.5); color: #fff; border: 2px solid #444; border-radius: 15px;
+            padding: 15px; font-size: 20px; text-align: center; width: 100%; max-width: 400px; 
+            outline: none; transition: 0.3s; box-sizing: border-box;
+            z-index: 20;
+        }
+        #tahmin:focus { border-color: #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+
+        #hiz-alani { height: 60px; margin-top: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #hiz-gostergesi, #wpm-gostergesi { font-size: 20px; font-weight: bold; opacity: 0; transition: 0.2s; }
+        #wpm-gostergesi { color: #8b5cf6; margin-top: 5px; }
+        .hiz-aktif { animation: slideDownIn 0.4s ease-out forwards; opacity: 1 !important; }
+
+        #mesaj { height: 40px; margin-top: 5px; font-weight: bold; font-size: 22px; }
+
+        /* MÜZİK VE ALT KONTROLLER ALANI */
+        #alt-kontroller {
+            margin-top: 20px; display: flex; flex-direction: column; align-items: center; 
+            gap: 15px; 
+            width: 100%;
+        }
+
+        #muzik-paneli {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 10px 15px; border-radius: 15px; display: flex; align-items: center; justify-content: center;
+            gap: 10px; position: relative; width: fit-content; margin: 0 auto;
+        }
+
+        .m-btn {
+            background: rgba(139, 92, 246, 0.2); color: white; border: none; 
+            width: 35px; height: 35px; 
+            border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s;
+        }
+        .m-btn:hover { background: rgba(139, 92, 246, 0.5); }
+        .playing { background: #2ecc71 !important; box-shadow: 0 0 10px #2ecc71; }
+
+        #sarki-bilgi { font-size: 10px; color: #888; position: absolute; bottom: -18px; white-space: nowrap; }
+
+        /* YENİDEN BAŞLAT BUTONU TASARIMI */
+        .restart-game-btn {
+            background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4);
+            padding: 10px 20px; border-radius: 12px; font-size: 14px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
+        }
+        .restart-game-btn:hover {
+            background: rgba(52, 152, 219, 0.4); box-shadow: 0 0 15px rgba(52, 152, 219, 0.5); transform: scale(1.05);
+        }
+
+        .reset-btn {
+            background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); 
+            padding: 8px 16px; border-radius: 10px; font-size: 11px; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 10px;
+        }
+        .reset-btn:hover { background: rgba(231, 76, 60, 0.3); box-shadow: 0 0 10px rgba(231, 76, 60, 0.4); }
+
+        #game-over { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.96); z-index: 100; flex-direction: column; justify-content: center; 
+            align-items: center; border-radius: 30px; 
+        }
+
+        #over-title { color: #e74c3c; font-size: 40px; margin-bottom: 10px; text-align: center; }
+        #new-record-msg { font-size: 24px; }
+        #final-stats-container { background: rgba(255,255,255,0.08); padding: 20px; border-radius: 20px; width: 80%; max-width: 320px; }
+        #final-stats { font-size: 20px; line-height: 1.6; }
+        #tekrar-dene-btn { padding: 10px 20px; font-size: 16px; }
+
+        .panik { animation: pulse 0.5s infinite; }
+        .sarsil { animation: shake 0.3s; }
+
+        #animasyon-kedisi {
+            position: absolute; bottom: -50px; right: 0px; width: 80px; z-index: 50;
+            transition: bottom 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none;
+        }
+        .kedi-zipla { bottom: 270px !important; opacity: 1 !important; visibility: visible !important; }
+
+        /* GİRİŞ EKRANI */
+        #giris-ekrani {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 30px;
+            background: rgba(15, 20, 45, 0.98); z-index: 200; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+        }
+        #giris-ekrani h1 { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); letter-spacing: 2px; font-size: 32px; text-align: center; padding: 0 10px;}
+        #oyuncu-adi-input {
+            padding: 15px; font-size: 18px; border-radius: 15px; border: 2px solid #8b5cf6;
+            background: rgba(0,0,0,0.5); color: white; margin-bottom: 20px; text-align: center; outline: none; transition: 0.3s; width: 80%; max-width: 300px;
+        }
+        #oyuncu-adi-input:focus { box-shadow: 0 0 20px rgba(139, 92, 246, 0.6); }
+        #basla-btn {
+            padding: 12px 30px; font-size: 18px; background: #8b5cf6; color: white; font-weight: bold;
+            border: none; border-radius: 15px; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+        }
+        #basla-btn:hover { background: #9b6cf6; box-shadow: 0 0 20px #8b5cf6; transform: scale(1.05); }
+
+        /* ÖZEL UYARI MODALI */
+        #ozel-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); z-index: 999; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-kutu {
+            background: rgba(15, 20, 45, 0.95); padding: 30px; border-radius: 20px;
+            border: 2px solid #8b5cf6; text-align: center; width: 350px;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4); transform-origin: center center;
+        }
+        .modal-kutu h3 { color: #f1c40f; margin-top: 0; font-size: 24px; }
+        .modal-kutu p { color: #ddd; margin-bottom: 20px; font-size: 16px; }
+        #modal-input {
+            width: 80%; padding: 12px; border-radius: 10px; border: 1px solid #8b5cf6;
+            background: rgba(0,0,0,0.6); color: white; outline: none; text-align: center; margin-bottom: 20px; font-size: 16px;
+        }
+        #modal-input:focus { box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); }
+        .modal-btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.2s; margin: 0 5px; }
+        .btn-tamam { background: #8b5cf6; color: white; }
+        .btn-tamam:hover { background: #9b6cf6; box-shadow: 0 0 15px #8b5cf6; }
+        .btn-iptal { background: #e74c3c; color: white; }
+        .btn-iptal:hover { background: #ff5e4d; box-shadow: 0 0 15px #e74c3c; }
+    </style>
+</head>
+<body>
+
+<audio id="anaMuzik"></audio>
+<audio id="dogruSes"><source src="dogru.mp3" type="audio/mpeg"></audio>
+<audio id="yanlisSes"><source src="yanlis.mp3" type="audio/mpeg"></audio>
+
+<div class="kozmik-nebula"></div>
+
+<div id="ozel-modal">
+    <div class="modal-kutu">
+        <h3 id="modal-baslik">Uyarı</h3>
+        <p id="modal-mesaj"></p>
+        <input type="password" id="modal-input" placeholder="Şifre..." autocomplete="off">
+        <div>
+            <button id="modal-tamam" class="modal-btn btn-tamam">Tamam</button>
+            <button id="modal-iptal" class="modal-btn btn-iptal">İptal</button>
+        </div>
+    </div>
+</div>
+
+<div id="oyun-wrapper">
+    <img src="kedi.png" id="animasyon-kedisi">
+    
+    <div id="anaKapsayici">
+        <div id="giris-ekrani">
+            <h1>KELİME AVI'NA HOŞ GELDİN</h1>
+            <p style="color: #aaa; margin-bottom: 30px; text-align: center; padding: 0 10px; font-size: 16px;">Rekor kırmak için adını gir ve başla!</p>
+            <input type="text" id="oyuncu-adi-input" placeholder="Kullanıcı Adı..." autocomplete="off" autofocus>
+            <button onclick="oyunaGirisYap()" id="basla-btn">Oyuna Gir</button>
+        </div>
+
+        <div id="seco-logo" class="seco-signature">SECOVVV</div>
+        <div id="saat-kutusu" class="kozmik-saat">00:00:00</div>
+        <div class="oyuncu-bilgi">Oyuncu: <span id="aktif-oyuncu-adi" style="color:#f1c40f;">Belirsiz</span></div>
+
+        <div id="game-over">
+            <h1 id="over-title">SÜRE DOLDU!</h1>
+            <div id="new-record-msg" style="color: #f1c40f; font-weight: bold; display: none; margin-bottom: 10px;">🏆 YENİ REKOR! 🏆</div>
+            <div id="final-stats-container">
+                <p id="final-stats"></p>
+            </div>
+            <button id="tekrar-dene-btn" onclick="oyunuSifirla()" style="background:#2ecc71; color:white; border:none; border-radius:10px; cursor:pointer; margin-top:10px; font-weight:bold;">Tekrar Dene</button>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-box"><span id="stat-dogru" class="stat-val">0</span><span class="stat-label">Doğru</span></div>
+            <div class="stat-box"><span id="stat-yanlis" class="stat-val">0</span><span class="stat-label">Yanlış</span></div>
+            <div class="stat-box"><span id="genel-sure" class="stat-val" style="color: #e74c3c;">60</span><span class="stat-label">Saniye</span></div>
+        </div>
+
+        <div id="rekorlar" style="font-size: 14px; color: #888; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%;">
+            <div style="background: rgba(241, 196, 15, 0.1); padding: 5px 15px; border-radius: 10px; border: 1px solid rgba(241, 196, 15, 0.3); width: 100%; box-sizing: border-box;">
+                🏆 Doğru Rekortmeni: <span id="best-correct" style="color:#f1c40f; font-weight:bold;">0 (Yok)</span>
+            </div>
+            <div style="background: rgba(139, 92, 246, 0.1); padding: 5px 15px; border-radius: 10px; border: 1px solid rgba(139, 92, 246, 0.3); width: 100%; box-sizing: border-box;">
+                ⚡ WPM Rekortmeni: <span id="best-wpm" style="color:#8b5cf6; font-weight:bold;">0 (Yok)</span>
+            </div>
+        </div>
+
+        <div id="karisik-kelime">hazır ol!</div>
+        
+        <input type="text" id="tahmin" placeholder="Yazmaya Başla ve Başlat!" autocomplete="off" disabled>
+        
+        <div id="hiz-alani">
+            <div id="hiz-gostergesi"></div>
+            <div id="wpm-gostergesi"></div>
+        </div>
+
+        <div id="mesaj"></div>
+
+        <div id="alt-kontroller">
+            <button class="restart-game-btn" onclick="oyunuSifirla()">Oyunu Yeniden Başlat 🔄</button>
+
+            <div id="muzik-paneli">
+                <button class="m-btn" onclick="oncekiSarki()" title="Önceki">⏮</button>
+                <button id="play-pause-btn" class="m-btn" onclick="muzikKontrol()">▶</button>
+                <button class="m-btn" onclick="sonrakiSarki()" title="Sonraki">⏭</button>
+                <button class="m-btn" onclick="rastgeleSarki()" title="Karıştır">🔀</button>
+                <div id="sarki-bilgi">Müzik Durdu</div>
+            </div>
+            <button class="reset-btn" onclick="rekoruSifirla()">Rekorları Sıfırla 🔒</button>
+        </div>
+    </div>
+</div>
+
+<script src="kelimeler.js"></script>
+
+<script>
+    // Sayfa yüklendiğinde input'a odaklan
+    window.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("oyuncu-adi-input").focus();
+        ekranAyarla();
+    });
+
+    // RESPONSIVE ÖLÇEKLEME MANTIĞI
+    function ekranAyarla() {
+        const wrapper = document.getElementById("oyun-wrapper");
+        const modalKutu = document.querySelector(".modal-kutu");
+        const pencereGenislik = window.innerWidth;
+        const pencereYukseklik = window.innerHeight;
+
+        const scaleX = pencereGenislik / 650; 
+        const scaleY = pencereYukseklik / 800; 
+        
+        let scale = Math.min(scaleX, scaleY, 1);
+        
+        wrapper.style.transform = `scale(${scale})`;
+        if(modalKutu) {
+            modalKutu.style.transform = `scale(${scale})`;
+        }
+    }
+
+    window.addEventListener("resize", ekranAyarla);
+
+    // OYUN MANTIĞI
+    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
+    let secilenKelime = "", kelimeBaslangicZamani = 0;
+    let genelTimer;
+    let oyunBasladi = false;
+    let kelimeYazilmayaBaslandi = false;
+    let toplamKarakter = 0; 
+    let aktifOyuncu = "";
+
+    // REKORLARI YÜKLE
+    let bestCorrect = parseInt(localStorage.getItem("secoBestCorrect")) || 0;
+    let bestCorrectName = localStorage.getItem("secoBestCorrectName") || "Yok";
+    let bestWPM = parseInt(localStorage.getItem("secoBestWPM")) || 0;
+    let bestWPMName = localStorage.getItem("secoBestWPMName") || "Yok";
+    
+    document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
+    document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
+
+    // Enter'a basıldığında giriş yapma
+    document.getElementById("oyuncu-adi-input").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") oyunaGirisYap();
+    });
+
+    function oyunaGirisYap() {
+        let isimInput = document.getElementById("oyuncu-adi-input").value.trim();
+        if(isimInput === "") {
+            özelModalGoster("Hata", "Lütfen bir kullanıcı adı gir!", "hata");
+            return;
+        }
+        aktifOyuncu = isimInput;
+        document.getElementById("aktif-oyuncu-adi").innerText = aktifOyuncu;
+        document.getElementById("giris-ekrani").style.display = "none";
+        
+        let tahminInput = document.getElementById("tahmin");
+        tahminInput.disabled = false;
+        ilkHazirlik();
+    }
+
+    function saatiGuncelle() {
+        const simdi = new Date();
+        const s = String(simdi.getHours()).padStart(2, '0');
+        const d = String(simdi.getMinutes()).padStart(2, '0');
+        const sn = String(simdi.getSeconds()).padStart(2, '0');
+        document.getElementById("saat-kutusu").innerText = `${s}:${d}:${sn}`;
+    }
+    setInterval(saatiGuncelle, 1000);
+    saatiGuncelle();
+
+    function ilkHazirlik() {
+        if(typeof kelimeListesi !== 'undefined' && kelimeListesi.length > 0) {
+            secilenKelime = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
+            document.getElementById("karisik-kelime").innerText = secilenKelime.toLowerCase();
+        } else {
+            document.getElementById("karisik-kelime").innerText = "test"; 
+            secilenKelime = "test";
+        }
+        document.getElementById("tahmin").focus();
+    }
+
+    function oyunuBaslat() {
+        oyunBasladi = true;
+        toplamKarakter = 0;
+        genelTimer = setInterval(() => {
+            oyunSuresi--;
+            document.getElementById("genel-sure").innerText = oyunSuresi;
+            if(oyunSuresi <= 10) document.getElementById("genel-sure").classList.add("panik");
+            if(oyunSuresi <= 0) gameOver();
+        }, 1000);
+    }
+
+    function yeniSoru() {
+        if(oyunSuresi <= 0) return;
+        if(typeof kelimeListesi !== 'undefined' && kelimeListesi.length > 0) {
+            secilenKelime = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
+        } else {
+            secilenKelime = "test";
+        }
+        document.getElementById("karisik-kelime").innerText = secilenKelime.toLowerCase();
+        document.getElementById("tahmin").value = "";
+        kelimeYazilmayaBaslandi = false;
+    }
+
+    function kontrolEt() {
+        let inputAlani = document.getElementById("tahmin");
+        let logo = document.getElementById("seco-logo");
+        let tahmin = inputAlani.value.toLowerCase().trim();
+
+        if(tahmin === "") return;
+
+        if(tahmin === secilenKelime.toLowerCase()) {
+            inputAlani.classList.add("correct-neon");
+            setTimeout(() => inputAlani.classList.remove("correct-neon"), 500);
+
+            let bitisZamani = Date.now();
+            let gecenSure = (bitisZamani - kelimeBaslangicZamani) / 1000;
+            
+            toplamKarakter += secilenKelime.length + 1; 
+            let gecenToplamSureDakika = (60 - oyunSuresi) / 60;
+            let anlikWpm = Math.round((toplamKarakter / 5) / (gecenToplamSureDakika || 0.01));
+
+            hizGoster(gecenSure, anlikWpm);
+
+            if (gecenSure <= 0.5) { 
+                let kedi = document.getElementById("animasyon-kedisi");
+                if(kedi) {
+                    kedi.classList.add("kedi-zipla");
+                    kedi.style.transform = "rotate(-5deg) scale(1.1)"; 
+                    setTimeout(() => {
+                        kedi.classList.remove("kedi-zipla");
+                        kedi.style.transform = "rotate(0deg) scale(1)";
+                    }, 1500); 
+                }
+            }
+            
+            let yorum = "";
+            let yorumRenk = "";
+
+            if(gecenSure < 1.0) {
+                yorum = "IŞIK HIZI! ⚡🔥";
+                yorumRenk = "#f1c40f";
+                logo.classList.remove("seco-ignite-action");
+                void logo.offsetWidth;
+                logo.classList.add("seco-ignite-action");
+                triggerHyperSpeed();
+            } else {
+                yorum = gecenSure < 1.4 ? "Hızlısın! 🔥" : (gecenSure < 2.0 ? "Fena değil. 👍" : "Hızlan biraz! 🐢");
+                yorumRenk = gecenSure < 1.4 ? "#2ecc71" : (gecenSure < 2.0 ? "#3498db" : "#e67e22");
+            }
+
+            toplamDogru++;
+            document.getElementById("stat-dogru").innerText = toplamDogru;
+            document.getElementById("mesaj").innerHTML = `<span style="color:${yorumRenk}">${yorum}</span>`;
+            sesCal("dogruSes");
+            yeniSoru();
+        } else {
+            yanlisCevap();
+            yeniSoru();
+        }
+    }
+
+    function triggerHyperSpeed() {
+        document.body.classList.add("light-speed-active");
+        setTimeout(() => document.body.classList.remove("light-speed-active"), 500);
+        document.getElementById("anaKapsayici").classList.add("punch-active");
+        setTimeout(() => document.getElementById("anaKapsayici").classList.remove("punch-active"), 300);
+        confetti({ particleCount: 40, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors: ['#ff4500', '#ffd700', '#ffffff'] });
+        confetti({ particleCount: 40, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors: ['#ff4500', '#ffd700', '#ffffff'] });
+    }
+
+    function hizGoster(sure, wpm) {
+        let hg = document.getElementById("hiz-gostergesi");
+        let wg = document.getElementById("wpm-gostergesi");
+        
+        hg.innerText = "Son Hız: " + sure.toFixed(2) + " sn";
+        wg.innerText = "Anlık WPM: " + wpm;
+        
+        hg.classList.remove("hiz-aktif");
+        wg.classList.remove("hiz-aktif");
+        void hg.offsetWidth; 
+        hg.classList.add("hiz-aktif");
+        wg.classList.add("hiz-aktif");
+
+        if(sure < 1) hg.style.color = "#ff4500";
+        else if(sure < 2) hg.style.color = "#2ecc71";
+        else hg.style.color = "#3498db";
+    }
+
+    function yanlisCevap() {
+        let inputAlani = document.getElementById("tahmin");
+        inputAlani.classList.add("wrong-neon");
+        setTimeout(() => inputAlani.classList.remove("wrong-neon"), 500);
+        toplamYanlis++;
+        document.getElementById("stat-yanlis").innerText = toplamYanlis;
+        document.getElementById("mesaj").innerHTML = "<span style='color:#e74c3c'>HATA!</span>";
+        document.getElementById("anaKapsayici").classList.add("sarsil");
+        setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
+        sesCal("yanlisSes");
+    }
+
+    function gameOver() {
+        clearInterval(genelTimer);
+        let finalWpm = Math.round((toplamKarakter / 5) / 1); 
+        let isNew = false;
+
+        if (toplamDogru > bestCorrect) { 
+            localStorage.setItem("secoBestCorrect", toplamDogru); 
+            localStorage.setItem("secoBestCorrectName", aktifOyuncu); 
+            bestCorrect = toplamDogru;
+            bestCorrectName = aktifOyuncu;
+            document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
+            isNew = true; 
+        }
+
+        if (finalWpm > bestWPM) {
+            localStorage.setItem("secoBestWPM", finalWpm);
+            localStorage.setItem("secoBestWPMName", aktifOyuncu); 
+            bestWPM = finalWpm;
+            bestWPMName = aktifOyuncu;
+            document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
+            isNew = true;
+        }
+
+        document.getElementById("game-over").style.display = "flex";
+        if(isNew) {
+            document.getElementById("new-record-msg").style.display = "block";
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+        
+        let yuzde = Math.round((toplamDogru / (toplamDogru + toplamYanlis || 1)) * 100);
+
+        document.getElementById("final-stats").innerHTML = `
+            Oyuncu: <b style="color:#f1c40f;">${aktifOyuncu}</b><br><br>
+            Toplam Doğru: ${toplamDogru}<br>
+            Toplam Yanlış: ${toplamYanlis}<br>
+            İsabet Oranı: %${yuzde}<br>
+            <span style="color:#8b5cf6; font-size: 24px;">Ortalama WPM: ${finalWpm}</span>
+        `;
+    }
+
+    function oyunuSifirla() {
+        clearInterval(genelTimer); // CRITICAL: Sayaç bug'ını önlemek için eklendi!
+        toplamDogru = 0;
+        toplamYanlis = 0;
+        oyunSuresi = 60;
+        oyunBasladi = false;
+        kelimeYazilmayaBaslandi = false;
+        toplamKarakter = 0;
+        document.getElementById("stat-dogru").innerText = "0";
+        document.getElementById("stat-yanlis").innerText = "0";
+        document.getElementById("genel-sure").innerText = "60";
+        document.getElementById("genel-sure").classList.remove("panik");
+        document.getElementById("game-over").style.display = "none";
+        document.getElementById("new-record-msg").style.display = "none";
+        document.getElementById("hiz-gostergesi").classList.remove("hiz-aktif");
+        document.getElementById("wpm-gostergesi").classList.remove("hiz-aktif");
+        document.getElementById("mesaj").innerText = "";
+        ilkHazirlik();
+        document.getElementById("tahmin").value = "";
+        document.getElementById("tahmin").focus();
+    }
+
+    // --- ÖZEL MODAL FONKSİYONLARI ---
+    function özelModalGoster(baslik, mesaj, tip, callback) {
+        let modal = document.getElementById("ozel-modal");
+        let titleEl = document.getElementById("modal-baslik");
+        let msgEl = document.getElementById("modal-mesaj");
+        let inputEl = document.getElementById("modal-input");
+        let btnTamam = document.getElementById("modal-tamam");
+        let btnIptal = document.getElementById("modal-iptal");
+
+        titleEl.innerText = baslik;
+        msgEl.innerHTML = mesaj;
+        modal.style.display = "flex";
+
+        let yeniBtnTamam = btnTamam.cloneNode(true);
+        btnTamam.parentNode.replaceChild(yeniBtnTamam, btnTamam);
+        let yeniBtnIptal = btnIptal.cloneNode(true);
+        btnIptal.parentNode.replaceChild(yeniBtnIptal, btnIptal);
+
+        if(tip === "sifre") {
+            titleEl.style.color = "#f1c40f";
+            inputEl.style.display = "inline-block";
+            inputEl.value = "";
+            inputEl.focus();
+            yeniBtnIptal.style.display = "inline-block";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback(inputEl.value);
+            };
+            yeniBtnIptal.onclick = function() {
+                modal.style.display = "none";
+            };
+
+            inputEl.onkeypress = function(e) {
+                if(e.key === "Enter") yeniBtnTamam.click();
+            };
+
+        } else if (tip === "hata") {
+            titleEl.style.color = "#e74c3c"; 
+            inputEl.style.display = "none";
+            yeniBtnIptal.style.display = "none";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback();
+            };
+        } else if (tip === "basarili") {
+            titleEl.style.color = "#2ecc71"; 
+            inputEl.style.display = "none";
+            yeniBtnIptal.style.display = "none";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback();
+            };
+        }
+    }
+
+    function rekoruSifirla() {
+        özelModalGoster("Şifre Gerekli", "TÜM rekorları sıfırlamak için şifreyi girin:", "sifre", function(sifre) {
+            if (sifre === "780878") {
+                localStorage.removeItem("secoBestCorrect");
+                localStorage.removeItem("secoBestCorrectName");
+                localStorage.removeItem("secoBestWPM");
+                localStorage.removeItem("secoBestWPMName");
+                bestCorrect = 0;
+                bestCorrectName = "Yok";
+                bestWPM = 0;
+                bestWPMName = "Yok";
+                document.getElementById("best-correct").innerText = "0 (Yok)";
+                document.getElementById("best-wpm").innerText = "0 (Yok)";
+                özelModalGoster("Başarılı!", "Tüm rekorlar başarıyla sıfırlandı.", "basarili");
+            } else if (sifre !== "") {
+                özelModalGoster("Hatalı Şifre!", "Yanlış şifre girdiniz. İşlem iptal edildi.", "hata");
+            }
+        });
+    }
+
+    // Müzik Bölümü
+    const playlist = ["ozan.mp3"];
+    let suankiSarkiIndex = 0;
+    let isPlaying = false;
+    const player = document.getElementById("anaMuzik");
+    const playBtn = document.getElementById("play-pause-btn");
+
+    function muzikYukle(index) {
+        player.src = playlist[index];
+        document.getElementById("sarki-bilgi").innerText = "Çalıyor: Şarkı " + (index + 1);
+    }
+
+    function muzikKontrol() {
+        if (!player.src) muzikYukle(suankiSarkiIndex);
+        if (isPlaying) {
+            player.pause();
+            playBtn.innerText = "▶";
+            playBtn.classList.remove("playing");
+        } else {
+            player.play();
+            playBtn.innerText = "⏸";
+            playBtn.classList.add("playing");
+        }
+        isPlaying = !isPlaying;
+    }
+
+    function sonrakiSarki() {
+        suankiSarkiIndex = (suankiSarkiIndex + 1) % playlist.length;
+        muzikYukle(suankiSarkiIndex);
+        player.play();
+        isPlaying = true;
+        playBtn.innerText = "⏸";
+        playBtn.classList.add("playing");
+    }
+
+    function oncekiSarki() {
+        suankiSarkiIndex = (suankiSarkiIndex - 1 + playlist.length) % playlist.length;
+        muzikYukle(suankiSarkiIndex);
+        player.play();
+        isPlaying = true;
+        playBtn.innerText = "⏸";
+        playBtn.classList.add("playing");
+    }
+
+    function rastgeleSarki() {
+        suankiSarkiIndex = Math.floor(Math.random() * playlist.length);
+        muzikYukle(suankiSarkiIndex);
+        player.play();
+        isPlaying = true;
+        playBtn.innerText = "⏸";
+        playBtn.classList.add("playing");
+    }
+
+    function sesCal(id) { let s = document.getElementById(id); if(s){ s.currentTime = 0; s.play(); } }
+
+    document.getElementById("tahmin").addEventListener("input", (e) => {
+        if(!oyunBasladi) { oyunuBaslat(); }
+        if(!kelimeYazilmayaBaslandi && e.target.value.length > 0) {
+            kelimeYazilmayaBaslandi = true;
+            kelimeBaslangicZamani = Date.now();
+            document.getElementById("seco-logo").classList.remove("seco-ignite-action");
+        }
+    });
+
+    document.getElementById("tahmin").addEventListener("keypress", (e) => { 
+        if(e.key === "Enter") kontrolEt(); 
+    });
+
+</script>
+</body>
+</html>
