@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+    <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +9,7 @@
         :root {
             /* Cyberpunk / Neon Renk Paleti */
             --bg-color: #020617;
-            --panel-bg: rgba(15, 23, 42, 0.45);
+            --panel-bg: #0f172a;
             --text-main: #e2e8f0;
             --accent-color: #0ea5e9;
             --danger-color: #f43f5e;
@@ -21,50 +22,30 @@
         body {
             margin: 0;
             padding: 0;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
             color: var(--text-main);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden;
             position: relative;
         }
 
-        /* Arka Plan Uzay/Ağ Animasyonu */
-        body::before {
-            content: "";
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: rotate(-45deg);
-            animation: moveGrid 30s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes moveGrid {
-            0% { transform: rotate(-45deg) translateY(0); }
-            100% { transform: rotate(-45deg) translateY(50px); }
-        }
-
-        /* Oyun Paneli - Glassmorphism (Cam Efekti) */
+        /* Oyun Paneli - Sabit Ortalama ve Performanslı Arka Plan */
         #game-wrapper {
             width: 1000px;
             height: 650px;
             background-color: var(--panel-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             display: flex;
             flex-direction: column;
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             overflow: hidden;
             border: 1px solid rgba(0, 243, 255, 0.2);
-            transform-origin: center center;
-            transition: transform 0.1s ease-out;
+            /* Transform resizeGame fonksiyonu içinden yönetiliyor */
         }
 
         /* Üst Bilgi Çubuğu */
@@ -73,7 +54,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 25px;
-            background: linear-gradient(180deg, rgba(2, 6, 23, 0.8) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(2, 6, 23, 0.9) 0%, rgba(15, 23, 42, 1) 100%);
             border-bottom: 1px solid rgba(0, 243, 255, 0.15);
             z-index: 2;
             position: relative; 
@@ -110,84 +91,69 @@
             display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
         }
 
-        /* Kalan Hak (Kırmızı Neon Pulse) */
+        /* Kalan Hak (Efektsiz, Sade) */
         .lives-badge {
-            background-color: rgba(244, 63, 94, 0.15);
+            background-color: rgba(244, 63, 94, 0.2);
             color: #fff;
             font-size: 24px;
             font-weight: 900;
             padding: 4px 18px;
             border-radius: 10px;
             border: 1px solid var(--danger-color);
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
             text-align: center;
             min-width: 25px;
             font-variant-numeric: tabular-nums;
-            text-shadow: 0 0 8px var(--danger-color), 0 0 15px var(--danger-color);
-            animation: pulse-danger 2s infinite;
-        }
-
-        @keyframes pulse-danger {
-            0% { box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(244, 63, 94, 0.8); }
-            100% { box-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
         }
 
         /* Rekor Paneli */
         .bottom-left-record {
-            background-color: rgba(2, 6, 23, 0.65);
-            backdrop-filter: blur(4px);
+            background-color: rgba(2, 6, 23, 0.9);
             padding: 10px 15px;
             border-radius: 8px; 
             border: 1px solid rgba(255, 255, 255, 0.1); 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             display: flex; align-items: center;
         }
 
         /* Sağ Alt Köşe Seviye Paneli */
         .bottom-right-levels {
             position: absolute; bottom: 20px; right: 20px; z-index: 10;
-            background-color: rgba(2, 6, 23, 0.65); 
-            backdrop-filter: blur(4px);
+            background-color: rgba(2, 6, 23, 0.9); 
             padding: 8px 15px;
             border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             display: flex; align-items: center; gap: 12px;
         }
 
         .level-text {
             color: #94a3b8; font-size: 14px; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-transform: uppercase; letter-spacing: 2px;
         }
 
         .level-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .level-count { font-size: 11px; font-weight: bold; color: var(--neon-blue); font-variant-numeric: tabular-nums; text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);}
+        .level-count { font-size: 11px; font-weight: bold; color: var(--neon-blue); font-variant-numeric: tabular-nums;}
 
         .level-btn {
             width: 34px; height: 34px; border-radius: 50%;
             background-color: rgba(15, 23, 42, 0.8); color: #94a3b8;
             display: flex; justify-content: center; align-items: center;
             font-size: 15px; font-weight: 800; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease-out;
             border: 1px solid #334155;
-            user-select: none; box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            user-select: none;
         }
 
         .level-btn:hover { 
             background-color: #1e293b; 
             color: white; 
-            transform: scale(1.1);
             border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
         
         .level-btn.active {
-            background-color: rgba(16, 185, 129, 0.15); 
+            background-color: var(--success-color); 
             color: #fff;
-            border-color: var(--success-color); 
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(16, 185, 129, 0.3);
-            text-shadow: 0 0 5px #fff;
+            border-color: #fff; 
         }
 
         /* Secovvv Alevli Logo */
@@ -210,28 +176,27 @@
         }
 
         .stat-box { font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;}
-        .stat-value { color: var(--neon-blue); margin-left: 5px; font-variant-numeric: tabular-nums; text-shadow: 0 0 5px rgba(0, 243, 255, 0.4);}
+        .stat-value { color: var(--neon-blue); margin-left: 5px; font-variant-numeric: tabular-nums;}
         
         .player-box { font-size: 16px; color: #94a3b8; }
-        .player-value { color: #fff; margin-left: 5px; text-shadow: 0 0 8px rgba(255,255,255,0.5);}
+        .player-value { color: #fff; margin-left: 5px;}
         .record-box { font-size: 14px; color: #94a3b8; }
-        .record-value { color: var(--warning-color); font-weight: 800; font-size: 18px; text-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+        .record-value { color: var(--warning-color); font-weight: 800; font-size: 18px;}
         
         .header-buttons { display: flex; gap: 10px; }
 
-        /* Neon Butonlar */
+        /* Butonlar */
         .btn-small {
-            background: rgba(15, 23, 42, 0.5); color: #cbd5e1; 
+            background: rgba(15, 23, 42, 0.8); color: #cbd5e1; 
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 6px 14px; border-radius: 6px; cursor: pointer;
             font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
-            transition: all 0.2s; backdrop-filter: blur(4px);
+            transition: all 0.2s;
         }
         .btn-small:hover { 
-            background-color: rgba(255, 255, 255, 0.1); 
+            background-color: #334155; 
             color: #fff; 
             border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
         .btn-small:disabled {
             opacity: 0.5;
@@ -241,16 +206,15 @@
         
         .btn-small-warning { color: var(--warning-color); border-color: rgba(245, 158, 11, 0.4); }
         .btn-small-warning:hover { 
-            background-color: rgba(245, 158, 11, 0.15); 
+            background-color: rgba(245, 158, 11, 0.2); 
             color: var(--warning-color); 
             border-color: var(--warning-color); 
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
 
         /* Oyun Alanı */
         #game-area { flex-grow: 1; position: relative; width: 100%; overflow: hidden; }
 
-        /* Düşen Kelimeler - Sadece Yazı ve Neon Yeşil Gölge */
+        /* Düşen Kelimeler */
         .falling-word {
             position: absolute; 
             font-size: 33px; 
@@ -260,10 +224,8 @@
             background: transparent; 
             border: none; 
             white-space: nowrap;
-           
             text-transform: lowercase; 
-            /* Transition efekti sayesinde kelime yavaşça büyüyüp renk değiştirebilir */
-            transition: transform 0.1s ease-out, color 0.1s ease-out, text-shadow 0.1s ease-out; 
+            transition: transform 0.1s ease-out, color 0.1s ease-out; 
         }
 
         /* Patlama Efekti */
@@ -271,7 +233,6 @@
             position: absolute; width: 6px; height: 6px; border-radius: 50%;
             pointer-events: none; z-index: 100;
             animation: explode 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-            box-shadow: 0 0 10px currentColor; /* Renk parlaması */
         }
 
         @keyframes explode {
@@ -284,7 +245,6 @@
             position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
             font-size: 64px; font-weight: 900; color: var(--danger-color); 
             opacity: 0; pointer-events: none; z-index: 50; 
-            text-shadow: 0 0 20px rgba(244, 63, 94, 0.6); 
             text-transform: lowercase; text-align: center;
             white-space: nowrap;
         }
@@ -293,36 +253,32 @@
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
             20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
             80% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0px); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); filter: blur(10px); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); filter: blur(5px); }
         }
 
-        /* Alt Yazım Çubuğu - Lazer Çizgili Terminal */
+        /* Alt Yazım Çubuğu */
         #typing-area {
-            height: 120px; background-color: rgba(2, 6, 23, 0.85);
+            height: 120px; background-color: rgba(2, 6, 23, 0.95);
             border-top: 1px solid var(--neon-blue);
-            box-shadow: 0 -5px 25px rgba(0, 243, 255, 0.1);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 2; position: relative; transition: all 0.2s;
         }
         
         .flash-success { 
-            background-color: rgba(16, 185, 129, 0.15) !important; 
+            background-color: rgba(16, 185, 129, 0.2) !important; 
             border-top-color: var(--success-color) !important;
-            box-shadow: 0 -5px 30px rgba(16, 185, 129, 0.3) !important;
         }
         .typing-error-bg { 
-            background-color: rgba(244, 63, 94, 0.15) !important; 
+            background-color: rgba(244, 63, 94, 0.2) !important; 
             border-top-color: var(--danger-color) !important;
             animation: shake 0.3s ease-in-out; 
-            box-shadow: 0 -5px 30px rgba(244, 63, 94, 0.3) !important;
         }
 
         #feedback-container { position: absolute; top: -40px; width: 100%; display: flex; justify-content: center; pointer-events: none; }
-        #feedback-msg { font-size: 20px; font-weight: 800; opacity: 0; text-shadow: 0 0 10px currentColor; letter-spacing: 1px; }
+        #feedback-msg { font-size: 20px; font-weight: 800; opacity: 0; letter-spacing: 1px; }
         .feedback-success { color: var(--success-color); }
         .feedback-error { color: var(--danger-color); }
 
-        /* Yazının daha uzun süre ekranda kalmasını sağlayan animasyon */
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(10px); }
             70% { opacity: 1; transform: translateY(-10px); } 
@@ -334,7 +290,6 @@
             letter-spacing: 3px; min-height: 45px; min-width: 50%;
             text-align: center; border-bottom: 2px solid var(--neon-blue);
             text-transform: lowercase; transition: color 0.1s, border-color 0.1s;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8);
         }
         #instruction-text { font-size: 12px; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 2px;}
         #instruction-text strong { color: var(--neon-blue); }
@@ -345,39 +300,35 @@
             75% { transform: translateX(10px); }
         }
 
-        /* Özel Pencereler (Modals) - Cyber Aesthetic */
+        /* Özel Pencereler (Modals) */
         .modal-overlay {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px);
+            background-color: rgba(2, 6, 23, 0.95);
             display: flex; justify-content: center; align-items: center;
-            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
         }
         #settings-auth-modal, #settings-modal, #reset-modal, #reset-success-modal { z-index: 110; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
         
         .modal-content {
-            background-color: rgba(15, 23, 42, 0.9); padding: 40px; border-radius: 16px;
+            background-color: #0f172a; padding: 40px; border-radius: 16px;
             text-align: center; border: 1px solid rgba(0, 243, 255, 0.3);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 243, 255, 0.1); 
             max-width: 450px; width: 100%; position: relative; overflow: hidden;
         }
         
-        /* Modal tepesindeki parlama */
         .modal-content::before {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
             background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
         }
 
-        .modal-content h2 { margin-top: 0; color: #fff; font-size: 32px; margin-bottom: 20px; text-shadow: 0 0 15px currentColor; letter-spacing: 1px;}
+        .modal-content h2 { margin-top: 0; color: #fff; font-size: 32px; margin-bottom: 20px; letter-spacing: 1px;}
         
-        /* Otomatik Odaklanma İçin Autofocus eklendi */
         .custom-input {
-            width: 80%; padding: 14px; margin-bottom: 25px; background-color: rgba(2, 6, 23, 0.6);
+            width: 80%; padding: 14px; margin-bottom: 25px; background-color: rgba(2, 6, 23, 0.8);
             border: 1px solid #334155; color: #fff; border-radius: 8px; font-size: 18px;
-            text-align: center; outline: none; transition: all 0.3s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center; outline: none; transition: all 0.2s;
         }
-        .custom-input:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.2), inset 0 2px 4px rgba(0,0,0,0.5); }
+        .custom-input:focus { border-color: var(--neon-blue); }
         
         .btn {
             padding: 14px 28px; font-size: 15px; font-weight: 800; border: none; text-transform: uppercase; letter-spacing: 1px;
@@ -387,24 +338,23 @@
         
         .btn-primary { 
             background-color: var(--neon-blue); color: #020617; 
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
         }
-        .btn-primary:hover { background-color: #fff; box-shadow: 0 0 25px rgba(0, 243, 255, 0.8); }
+        .btn-primary:hover { background-color: #fff; }
         
         .btn-danger { background-color: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); }
-        .btn-danger:hover { background-color: var(--danger-color); color: #fff; box-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
+        .btn-danger:hover { background-color: var(--danger-color); color: #fff; }
         
         .btn-secondary { background-color: transparent; border: 1px solid #64748b; color: #cbd5e1; }
         .btn-secondary:hover { background-color: #334155; color: #fff; border-color: #94a3b8;}
         
         .btn-warning { background-color: transparent; border: 1px solid var(--warning-color); color: var(--warning-color); }
-        .btn-warning:hover { background-color: var(--warning-color); color: #020617; box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
+        .btn-warning:hover { background-color: var(--warning-color); color: #020617; }
 
-        /* Oyun Ortası Başla Butonu (Efektsiz) */
+        /* Oyun Ortası Başla Butonu */
         #center-start-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: none; }
         .btn-start { 
             font-size: 36px; padding: 25px 70px; border-radius: 50px; 
-            background: transparent; border: 2px solid var(--neon-blue); color: #fff;
+            background: rgba(15, 23, 42, 0.9); border: 2px solid var(--neon-blue); color: #fff;
         }
         .btn-start:hover { background: var(--neon-blue); color: #020617; }
 
@@ -417,7 +367,6 @@
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
             background: var(--neon-blue); cursor: pointer; margin-top: -10px;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
         }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
     </style>
@@ -498,7 +447,7 @@
                 <h2 style="color: var(--danger-color);">GAME OVER</h2>
                 <p id="game-over-reason" style="font-size: 16px; color: #94a3b8; margin-bottom: 25px;">Veri akışı sağlanamadı.</p>
                 <p style="font-size: 18px; color: #94a3b8;">Sistem Skoru:</p>
-                <p><strong id="final-score" style="color: #fff; font-size: 42px; text-shadow: 0 0 15px #fff;">0</strong></p>
+                <p><strong id="final-score" style="color: #fff; font-size: 42px;">0</strong></p>
                 <div style="margin-top: 20px;">
                     <button class="btn btn-secondary" onclick="showLeaderboard()">Record</button>
                     <button class="btn btn-primary" onclick="showStartScreen()">Tekrar Başlat</button>
@@ -590,9 +539,7 @@
 
                 lives = 100;
                 livesEl.innerText = lives;
-                livesEl.style.animation = "none";
                 livesEl.style.borderColor = "var(--neon-blue)";
-                livesEl.style.boxShadow = "0 0 15px var(--neon-blue)";
                 livesEl.style.color = "var(--neon-blue)";
                 showCenterFeedback("YÖNETİCİ MODU AKTİF");
                 
@@ -610,9 +557,7 @@
 
                 lives = 5;
                 livesEl.innerText = lives;
-                livesEl.style.animation = "pulse-danger 2s infinite";
                 livesEl.style.borderColor = "var(--danger-color)";
-                livesEl.style.boxShadow = "0 0 15px rgba(244, 63, 94, 0.5)";
                 livesEl.style.color = "#fff";
                 showCenterFeedback("NORMAL MOD AKTİF");
                 
@@ -635,8 +580,11 @@
             const scaleX = windowWidth / 1040; 
             const scaleY = windowHeight / 690; 
             
-            const scale = Math.min(scaleX, scaleY);
-            wrapper.style.transform = `scale(${scale})`;
+            // Ölçeği biraz daha küçültelim ki ekran kenarlarına yapışmasın
+            const scale = Math.min(scaleX, scaleY) * 0.98;
+            
+            // Translate ile mutlak merkezlemeyi koruyup scale uyguluyoruz
+            wrapper.style.transform = `translate(-50%, -50%) scale(${scale})`;
         }
         window.addEventListener('resize', resizeGame);
         resizeGame();
@@ -1917,7 +1865,6 @@
                     activeWords.splice(i, 1);
                     
                     wElem.style.color = "var(--success-color)";
-                    wElem.style.textShadow = "0 0 20px var(--success-color), 0 0 40px var(--success-color)";
                     wElem.style.transform = "scale(1.3)";
                     
                     setTimeout(() => {
@@ -2195,3 +2142,6 @@
     </script>
 </body>
 </html>
+   
+   
+  
