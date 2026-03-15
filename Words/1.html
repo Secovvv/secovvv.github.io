@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Avcısı - Öğretici Sürüm</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --accent-color: #38bdf8;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-wrapper {
+            width: 1000px;
+            height: 650px;
+            background-color: var(--panel-bg);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        /* Üst Bilgi Çubuğu */
+        #header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid #334155;
+            z-index: 2;
+            position: relative; 
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Sol Alt Köşe Rekor Paneli */
+        .bottom-left-record {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            background-color: rgba(15, 23, 42, 0.7);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Secovvv Alevli Logo - Alt Panele Taşındı, Boyutu Ayarlandı */
+        .logo-secovvv {
+            font-size: 26px;
+            font-weight: 900;
+            font-style: italic;
+            background: linear-gradient(to top, #dc2626, #f97316, #fbbf24);
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+            animation: firePulse 1.5s infinite alternate;
+            cursor: default;
+            user-select: none;
+            margin-bottom: 5px; /* Yazının hemen üstünde boşluk */
+        }
+
+        @keyframes firePulse {
+            0% { text-shadow: 0 0 5px rgba(239, 68, 68, 0.5), 0 -2px 10px rgba(245, 158, 11, 0.4); }
+            100% { text-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 -5px 20px rgba(251, 191, 36, 0.8), 0 -8px 25px rgba(245, 158, 11, 0.6); }
+        }
+
+        .stat-group { display: flex; gap: 15px; align-items: center;}
+        
+        .stat-box { font-size: 15px; font-weight: 600; letter-spacing: 0.5px; }
+        
+        .stat-value { color: var(--accent-color); margin-left: 3px; font-variant-numeric: tabular-nums; }
+        
+        /* Sol üstteki Oyuncu kısmı artık logonun yerine geçtiği için biraz büyüttük */
+        .player-box { font-size: 18px; color: var(--accent-color); }
+        .player-value { color: white; margin-left: 5px; }
+
+        /* Rekor kutusu için daha gösterişli bir yapı */
+        .record-box { font-size: 16px; color: #94a3b8; }
+        .lives-value { color: var(--danger-color); }
+        .record-value { color: var(--warning-color); font-weight: 800; font-size: 18px; text-shadow: 0 0 5px rgba(245, 158, 11, 0.5); }
+        
+        .header-buttons { display: flex; gap: 8px; }
+
+        .btn-small {
+            background: transparent; color: #94a3b8; border: 1px solid #475569;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+            font-size: 13px; transition: all 0.2s;
+        }
+        .btn-small:hover { background-color: #334155; color: white; }
+        
+        .btn-small-warning {
+            color: var(--warning-color);
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+        .btn-small-warning:hover {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+
+        /* Oyun Alanı */
+        #game-area {
+            flex-grow: 1; position: relative; width: 100%; overflow: hidden;
+        }
+
+        .falling-word {
+            position: absolute; font-size: 24px; font-weight: bold;
+            color: var(--warning-color); padding: 6px 16px;
+            background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 20px; white-space: nowrap;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); text-transform: lowercase; 
+            transition: transform 0.1s ease-out; 
+        }
+
+        /* Patlama Efekti (Parçacıklar) */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            animation: explode 0.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Merkezdeki Öğretici Kelime Animasyonu */
+        #center-feedback {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--success-color); 
+            opacity: 0;
+            pointer-events: none;
+            z-index: 50;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            text-transform: lowercase;
+        }
+
+        .center-anim {
+            animation: popCenter 1.5s ease-out forwards;
+        }
+
+        @keyframes popCenter {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        /* Alt Yazım Çubuğu ve Geri Bildirimler */
+        #typing-area {
+            height: 120px; 
+            background-color: rgba(15, 23, 42, 0.8);
+            border-top: 1px solid #334155; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 2;
+            position: relative; transition: background-color 0.2s;
+        }
+
+        .flash-success { background-color: rgba(16, 185, 129, 0.2) !important; }
+        
+        .typing-error-bg { 
+            background-color: rgba(239, 68, 68, 0.2) !important; 
+            animation: shake 0.3s ease-in-out;
+        }
+
+        #feedback-container {
+            position: absolute; top: -30px; width: 100%;
+            display: flex; justify-content: center; pointer-events: none;
+        }
+
+        #feedback-msg {
+            font-size: 18px; font-weight: bold; opacity: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .feedback-success { color: var(--success-color); }
+        .feedback-error { color: var(--danger-color); }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        #typed-text {
+            font-size: 32px; font-weight: 700; color: var(--success-color);
+            letter-spacing: 2px; min-height: 40px; min-width: 50%;
+            text-align: center; border-bottom: 2px solid var(--success-color);
+            text-transform: lowercase; transition: color 0.1s, border-color 0.1s;
+        }
+        
+        #instruction-text {
+            font-size: 12px; color: #64748b; margin-top: 5px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* Özel Pencereler (Modals) */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        
+        #settings-auth-modal, #settings-modal, #reset-modal {
+            z-index: 110;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background-color: var(--panel-bg); padding: 40px; border-radius: 12px;
+            text-align: center; border: 1px solid #475569;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); max-width: 450px; width: 100%;
+        }
+        .modal-content h2 { margin-top: 0; color: var(--accent-color); font-size: 28px; margin-bottom: 20px; }
+        .custom-input {
+            width: 80%; padding: 12px; margin-bottom: 20px; background-color: #0f172a;
+            border: 1px solid #475569; color: white; border-radius: 8px; font-size: 16px;
+            text-align: center; outline: none;
+        }
+        .custom-input:focus { border-color: var(--accent-color); }
+        .btn {
+            padding: 12px 24px; font-size: 16px; font-weight: 600; border: none;
+            border-radius: 8px; cursor: pointer; transition: transform 0.1s, background-color 0.2s; margin: 5px;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background-color: var(--accent-color); color: #0f172a; }
+        .btn-primary:hover { background-color: #0ea5e9; }
+        .btn-danger { background-color: var(--danger-color); color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+        .btn-secondary { background-color: #475569; color: white; }
+        .btn-secondary:hover { background-color: #64748b; }
+        .btn-warning { background-color: var(--warning-color); color: #0f172a; }
+        .btn-warning:hover { background-color: #d97706; }
+
+        /* Oyun Ortası Başla Butonu ve Animasyonu */
+        #center-start-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            display: none;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(56, 189, 248, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+        }
+        .btn-start {
+            font-size: 32px; padding: 20px 60px; border-radius: 15px;
+            animation: pulse 2s infinite; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; color: white; }
+        .leaderboard-table th, .leaderboard-table td { padding: 10px; border-bottom: 1px solid #334155; }
+        .leaderboard-table th { color: var(--accent-color); }
+
+        /* Slider Stili */
+        input[type=range] {
+            -webkit-appearance: none; width: 60%; background: transparent; vertical-align: middle;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -8px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer; background: #334155; border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-wrapper">
+        <div id="header-bar">
+            <div class="header-left">
+                <div class="stat-box player-box">Oyuncu: <span id="player-name-display" class="stat-value player-value">-</span></div>
+            </div>
+
+            <div class="header-right">
+                <div class="stat-group">
+                    <div class="stat-box">Skor: <span id="score" class="stat-value">0</span></div>
+                    <div class="stat-box">Kalan Hak: <span id="lives" class="stat-value lives-value">5</span></div>
+                </div>
+                <div class="header-buttons">
+                    <button class="btn-small btn-small-warning" onclick="showSettingsAuthModal()">⚙️ Hız</button>
+                    <button class="btn-small" onclick="showLeaderboard()">Rekorlar</button>
+                    <button class="btn-small" onclick="showStartScreen()">Yeniden Başla</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-area">
+            <div id="center-start-wrapper">
+                <button class="btn btn-primary btn-start" onclick="startGame()">▶ BAŞLA</button>
+            </div>
+        </div>
+        
+        <div id="center-feedback"></div>
+
+        <div id="typing-area">
+            <div id="feedback-container">
+                <div id="feedback-msg"></div>
+            </div>
+            <div class="logo-secovvv">Secovvv</div>
+            <div id="typed-text"></div>
+            <div id="instruction-text">Cevabı kontrol etmek için <strong>ENTER</strong> tuşuna bas</div>
+        </div>
+        
+        <div class="bottom-left-record">
+            <div class="stat-box record-box">Rekor: <span id="high-score-display" class="stat-value record-value">-</span></div>
+        </div>
+
+        <div id="login-modal" class="modal-overlay active">
+            <div class="modal-content">
+                <h2>Kelime Çevirmeni</h2>
+                <p style="color: #cbd5e1; margin-bottom: 20px;">Düşen İngilizce kelimenin Türkçe karşılığını yaz.</p>
+                <input type="text" id="player-input" class="custom-input" placeholder="Oyuncu Adı" autocomplete="off" onkeypress="handleLoginKey(event)">
+                <br>
+                <button class="btn btn-primary" onclick="registerAndReady()">Oyuna Gir</button>
+            </div>
+        </div>
+
+        <div id="game-over-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 style="color: var(--danger-color);">Oyun Bitti!</h2>
+                
+                <p id="game-over-reason" style="font-size: 18px; color: #cbd5e1; margin-bottom: 20px;">5 kelime yere düştü.</p>
+                
+                <p>Toplam Skorun: <strong id="final-score" style="color: white; font-size: 24px;">0</strong></p>
+                <button class="btn btn-secondary" onclick="showLeaderboard()">Rekorları Gör</button>
+                <button class="btn btn-primary" onclick="showStartScreen()">Tekrar Oyna</button>
+            </div>
+        </div>
+
+        <div id="leaderboard-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2>En İyiler (İlk 5)</h2>
+                <table class="leaderboard-table">
+                    <thead><tr><th>Sıra</th><th>Oyuncu</th><th>Skor</th></tr></thead>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
+                <button class="btn btn-danger" onclick="showResetPasswordModal()">Kayıtları Sıfırla</button>
+                <button class="btn btn-secondary" onclick="hideModal('leaderboard-modal')">Kapat</button>
+            </div>
+        </div>
+
+        <div id="reset-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 style="color: var(--danger-color);">Yetki Doğrulaması</h2>
+                <p style="color: #cbd5e1;">Rekorları sıfırlamak için yönetici şifresini girin.</p>
+                <input type="password" id="password-input" class="custom-input" placeholder="Şifre" autocomplete="off">
+                <br>
+                <button class="btn btn-secondary" onclick="hideModal('reset-modal')">İptal</button>
+                <button class="btn btn-danger" onclick="verifyAndReset()">Sıfırla</button>
+                <p id="password-error" style="color: var(--danger-color); margin-top: 10px; display: none;">Hatalı şifre!</p>
+            </div>
+        </div>
+
+        <div id="settings-auth-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 style="color: var(--warning-color);">Ayar Yetkilendirmesi</h2>
+                <p style="color: #cbd5e1;">Hız ayarlarını değiştirmek için yönetici şifresini girin.</p>
+                <input type="password" id="settings-password-input" class="custom-input" placeholder="Şifre" autocomplete="off">
+                <br>
+                <button class="btn btn-secondary" onclick="hideModal('settings-auth-modal')">İptal</button>
+                <button class="btn btn-warning" onclick="verifySettingsPassword()">Giriş</button>
+                <p id="settings-password-error" style="color: var(--danger-color); margin-top: 10px; display: none;">Hatalı şifre!</p>
+            </div>
+        </div>
+
+        <div id="settings-modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2 style="color: var(--accent-color);">Oyun Hızı Ayarı</h2>
+                <p style="color: #cbd5e1;">Kelimelerin temel düşüş hızını belirleyin.</p>
+                
+                <div style="margin: 30px 0; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: #94a3b8; font-size: 14px; margin-right: 15px;">Yavaş</span>
+                    <input type="range" id="speed-slider" min="0.1" max="2.0" step="0.1" value="0.4" oninput="updateSpeedDisplay(this.value)">
+                    <span style="color: #94a3b8; font-size: 14px; margin-left: 15px;">Hızlı</span>
+                </div>
+                
+                <p style="font-size: 18px; margin-bottom: 25px;">Geçerli Hız Değeri: <strong id="speed-display-text" style="color: var(--warning-color);">0.4</strong></p>
+                
+                <button class="btn btn-secondary" onclick="hideModal('settings-modal')">İptal</button>
+                <button class="btn btn-primary" onclick="saveSpeedSettings()">Kaydet</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Ses Motoru
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSuccessSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.4);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function playFailSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.type = 'sawtooth'; 
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        // Sözlük (50 Kelime)
+        const wordDictionary = [
+    // --- FİİLLER (v) - Toplam 35 Adet ---
+    {en: "to accept (v)", tr: "kabul etmek"}, {en: "to achieve (v)", tr: "başarmak"},
+    {en: "to admit (v)", tr: "itiraf etmek"}, {en: "to advertise (v)", tr: "ilan vermek"},
+    {en: "to afford (v)", tr: "parası yetmek"}, {en: "to allow (v)", tr: "izin vermek"},
+    {en: "to announce (v)", tr: "duyurmak"}, {en: "to appear (v)", tr: "görünmek"},
+    {en: "to arrange (v)", tr: "düzenlemek"}, {en: "to arrive (v)", tr: "varmak"},
+    {en: "to attend (v)", tr: "katılmak"}, {en: "to avoid (v)", tr: "kaçınmak"},
+    {en: "to believe (v)", tr: "inanmak"}, {en: "to belong (v)", tr: "ait olmak"},
+    {en: "to borrow (v)", tr: "ödünç almak"}, {en: "to celebrate (v)", tr: "kutlamak"},
+    {en: "to complain (v)", tr: "şikayet etmek"}, {en: "to confirm (v)", tr: "onaylamak"},
+    {en: "to continue (v)", tr: "devam etmek"}, {en: "to decide (v)", tr: "karar vermek"},
+    {en: "to describe (v)", tr: "tanımlamak"}, {en: "to discover (v)", tr: "keşfetmek"},
+    {en: "to discuss (v)", tr: "tartışmak"}, {en: "to encourage (v)", tr: "cesaretlendirmek"},
+    {en: "to expect (v)", tr: "ummak"}, {en: "to explain (v)", tr: "açıklamak"},
+    {en: "to forget (v)", tr: "unutmak"}, {en: "to guess (v)", tr: "tahmin etmek"},
+    {en: "to happen (v)", tr: "olmak"}, {en: "to imagine (v)", tr: "hayal etmek"},
+    {en: "to improve (v)", tr: "geliştirmek"}, {en: "to invite (v)", tr: "davet etmek"},
+    {en: "to manage (v)", tr: "yönetmek"}, {en: "to mention (v)", tr: "bahsetmek"},
+    {en: "to offer (v)", tr: "teklif etmek"},
+
+    // --- İSİMLER (n) - Toplam 35 Adet ---
+    {en: "adventure (n)", tr: "macera"}, {en: "advice (n)", tr: "tavsiye"},
+    {en: "amount (n)", tr: "miktar"}, {en: "appointment (n)", tr: "randevu"},
+    {en: "area (n)", tr: "alan"}, {en: "article (n)", tr: "makale"},
+    {en: "audience (n)", tr: "seyirci"}, {en: "behavior (n)", tr: "davranış"},
+    {en: "benefit (n)", tr: "fayda"}, {en: "bill (n)", tr: "fatura"},
+    {en: "century (n)", tr: "yüzyıl"}, {en: "character (n)", tr: "karakter"},
+    {en: "choice (n)", tr: "seçim"}, {en: "climate (n)", tr: "iklim"},
+    {en: "collection (n)", tr: "koleksiyon"}, {en: "comfort (n)", tr: "rahatlık"},
+    {en: "competition (n)", tr: "yarışma"}, {en: "condition (n)", tr: "durum"},
+    {en: "connection (n)", tr: "bağlantı"}, {en: "culture (n)", tr: "kültür"},
+    {en: "degree (n)", tr: "derece"}, {en: "delivery (n)", tr: "teslimat"},
+    {en: "detail (n)", tr: "detay"}, {en: "dictionary (n)", tr: "sözlük"},
+    {en: "direction (n)", tr: "yön"}, {en: "discovery (n)", tr: "keşif"},
+    {en: "distance (n)", tr: "mesafe"}, {en: "effort (n)", tr: "çaba"},
+    {en: "environment (n)", tr: "çevre"}, {en: "equipment (n)", tr: "ekipman"},
+    {en: "evidence (n)", tr: "kanıt"}, {en: "experience (n)", tr: "deneyim"},
+    {en: "factory (n)", tr: "fabrika"}, {en: "furniture (n)", tr: "mobilya"},
+    {en: "government (n)", tr: "hükümet"},
+
+    // --- SIFATLAR (adj) - Toplam 30 Adet ---
+    {en: "amazing (adj)", tr: "harika"}, {en: "anxious (adj)", tr: "endişeli"},
+    {en: "awful (adj)", tr: "berbat"}, {en: "boring (adj)", tr: "sıkıcı"},
+    {en: "brave (adj)", tr: "cesur"}, {en: "brilliant (adj)", tr: "zeki"},
+    {en: "careful (adj)", tr: "dikkatli"}, {en: "common (adj)", tr: "yaygın"},
+    {en: "crowded (adj)", tr: "kalabalık"}, {en: "dangerous (adj)", tr: "tehlikeli"},
+    {en: "delicious (adj)", tr: "lezzetli"}, {en: "difficult (adj)", tr: "zor"},
+    {en: "empty (adj)", tr: "boş"}, {en: "enormous (adj)", tr: "kocaman"},
+    {en: "excellent (adj)", tr: "mükemmel"}, {en: "expensive (adj)", tr: "pahalı"},
+    {en: "famous (adj)", tr: "ünlü"}, {en: "frightening (adj)", tr: "korkutucu"},
+    {en: "generous (adj)", tr: "cömert"}, {en: "healthy (adj)", tr: "sağlıklı"},
+    {en: "honest (adj)", tr: "dürüst"}, {en: "impossible (adj)", tr: "imkansız"},
+    {en: "intelligent (adj)", tr: "zeki"}, {en: "interesting (adj)", tr: "ilginç"},
+    {en: "modern (adj)", tr: "modern"}, {en: "nervous (adj)", tr: "gergin"},
+    {en: "ordinary (adj)", tr: "sıradan"}, {en: "polite (adj)", tr: "nazik"},
+    {en: "strange (adj)", tr: "tuhaf"}, {en: "useful (adj)", tr: "faydalı"},
+    // --- YENİ FİİLLER (v) - 35 Adet ---
+    {en: "to agree (v)", tr: "anlaşmak"}, {en: "to answer (v)", tr: "cevaplamak"},
+    {en: "to argue (v)", tr: "tartışmak"}, {en: "to become (v)", tr: "olmak"},
+    {en: "to begin (v)", tr: "başlamak"}, {en: "to build (v)", tr: "inşa etmek"},
+    {en: "to change (v)", tr: "değiştirmek"}, {en: "to choose (v)", tr: "seçmek"},
+    {en: "to complete (v)", tr: "tamamlamak"}, {en: "to contain (v)", tr: "içermek"},
+    {en: "to create (v)", tr: "yaratmak"}, {en: "to damage (v)", tr: "zarar vermek"},
+    {en: "to depend (v)", tr: "bağlı olmak"}, {en: "to design (v)", tr: "tasarlamak"},
+    {en: "to develop (v)", tr: "geliştirmek"}, {en: "to earn (v)", tr: "kazanmak"},
+    {en: "to enjoy (v)", tr: "zevk almak"}, {en: "to enter (v)", tr: "girmek"},
+    {en: "to fail (v)", tr: "başarısız olmak"}, {en: "to feel (v)", tr: "hissetmek"},
+    {en: "to fill (v)", tr: "doldurmak"}, {en: "to follow (v)", tr: "takip etmek"},
+    {en: "to hope (v)", tr: "umut etmek"}, {en: "to introduce (v)", tr: "tanıştırmak"},
+    {en: "to join (v)", tr: "katılmak"}, {en: "to laugh (v)", tr: "gülmek"},
+    {en: "to learn (v)", tr: "öğrenmek"}, {en: "to leave (v)", tr: "ayrılmak"},
+    {en: "to lend (v)", tr: "ödünç vermek"}, {en: "to lose (v)", tr: "kaybetmek"},
+    {en: "to mean (v)", tr: "anlamına gelmek"}, {en: "to move (v)", tr: "hareket etmek"},
+    {en: "to need (v)", tr: "ihtiyaç duymak"}, {en: "to organize (v)", tr: "düzenlemek"},
+    {en: "to paint (v)", tr: "boyamak"},
+
+    // --- YENİ İSİMLER (n) - 35 Adet ---
+    {en: "account (n)", tr: "hesap"}, {en: "activity (n)", tr: "aktivite"},
+    {en: "address (n)", tr: "adres"}, {en: "adult (n)", tr: "yetişkin"},
+    {en: "airport (n)", tr: "havaalanı"}, {en: "apartment (n)", tr: "daire"},
+    {en: "application (n)", tr: "uygulama"}, {en: "assistant (n)", tr: "asistan"},
+    {en: "background (n)", tr: "arka plan"}, {en: "beginner (n)", tr: "yeni başlayan"},
+    {en: "bridge (n)", tr: "köprü"}, {en: "building (n)", tr: "bina"},
+    {en: "business (n)", tr: "iş"}, {en: "calendar (n)", tr: "takvim"},
+    {en: "capital (n)", tr: "başkent"}, {en: "career (n)", tr: "kariyer"},
+    {en: "castle (n)", tr: "kale"}, {en: "chance (n)", tr: "şans"},
+    {en: "chemist (n)", tr: "eczacı"}, {en: "colleague (n)", tr: "meslektaş"},
+    {en: "conversation (n)", tr: "sohbet"}, {en: "corner (n)", tr: "köşe"},
+    {en: "country (n)", tr: "ülke"}, {en: "customer (n)", tr: "müşteri"},
+    {en: "dessert (n)", tr: "tatlı"}, {en: "document (n)", tr: "belge"},
+    {en: "dream (n)", tr: "rüyâ"}, {en: "education (n)", tr: "eğitim"},
+    {en: "electricity (n)", tr: "elektrik"}, {en: "employee (n)", tr: "çalışan"},
+    {en: "energy (n)", tr: "enerji"}, {en: "engine (n)", tr: "motor"},
+    {en: "exercise (n)", tr: "egzersiz"}, {en: "field (n)", tr: "alan"},
+    {en: "forest (n)", tr: "orman"},
+
+    // --- YENİ SIFATLAR (adj) - 30 Adet ---
+    {en: "afraid (adj)", tr: "korkmuş"}, {en: "alone (adj)", tr: "yalnız"},
+    {en: "angry (adj)", tr: "kızgın"}, {en: "attractive (adj)", tr: "çekici"},
+    {en: "available (adj)", tr: "müsait"}, {en: "cheap (adj)", tr: "ucuz"},
+    {en: "clear (adj)", tr: "açık"}, {en: "correct (adj)", tr: "doğru"},
+    {en: "crazy (adj)", tr: "çılgın"}, {en: "daily (adj)", tr: "günlük"},
+    {en: "dark (adj)", tr: "karanlık"}, {en: "dead (adj)", tr: "ölü"},
+    {en: "different (adj)", tr: "farklı"}, {en: "digital (adj)", tr: "dijital"},
+    {en: "dirty (adj)", tr: "kirli"}, {en: "early (adj)", tr: "erken"},
+    {en: "easy (adj)", tr: "kolay"}, {en: "electric (adj)", tr: "elektrikli"},
+    {en: "false (adj)", tr: "yanlış"}, {en: "fantastic (adj)", tr: "fantastik"},
+    {en: "fast (adj)", tr: "hızlı"}, {en: "favorite (adj)", tr: "favori"},
+    {en: "foreign (adj)", tr: "yabancı"}, {en: "fresh (adj)", tr: "taze"},
+    {en: "friendly (adj)", tr: "arkadaş canlısı"}, {en: "full (adj)", tr: "dolu"},
+    {en: "funny (adj)", tr: "komik"}, {en: "glad (adj)", tr: "memnun"},
+    {en: "great (adj)", tr: "harika"}, {en: "heavy (adj)", tr: "ağır"},
+    {en: "to prefer (v)", tr: "tercih etmek"}, {en: "to prepare (v)", tr: "hazırlamak"},
+    {en: "to protect (v)", tr: "korumak"}, {en: "to receive (v)", tr: "teslim almak"},
+    {en: "to reduce (v)", tr: "azaltmak"}, {en: "to relax (v)", tr: "rahatlamak"},
+    {en: "to remember (v)", tr: "hatırlamak"}, {en: "to repair (v)", tr: "tamir etmek"},
+    {en: "to repeat (v)", tr: "teklarlamak"}, {en: "to return (v)", tr: "geri dönmek"},
+    {en: "to save (v)", tr: "kaydetmek"}, {en: "to search (v)", tr: "aramak"},
+    {en: "to share (v)", tr: "paylaşmak"}, {en: "to smile (v)", tr: "gülümsemek"},
+    {en: "to solve (v)", tr: "çözmek"}, {en: "to spell (v)", tr: "hecelemek"},
+    {en: "to spend (v)", tr: "harcamak"}, {en: "to study (v)", tr: "çalışmak"},
+    {en: "to suggest (v)", tr: "önermek"}, {en: "to support (v)", tr: "desteklemek"},
+    {en: "to survive (v)", tr: "hayatta kalmak"}, {en: "to teach (v)", tr: "öğretmek"},
+    {en: "to touch (v)", tr: "dokunmak"}, {en: "to travel (v)", tr: "seyahat etmek"},
+    {en: "to understand (v)", tr: "anlamak"}, {en: "to wake (v)", tr: "uyanmak"},
+    {en: "to wash (v)", tr: "yıkamak"}, {en: "to watch (v)", tr: "izlemek"},
+    {en: "to win (v)", tr: "kazanmak"}, {en: "to wish (v)", tr: "dilemek"},
+    {en: "to worry (v)", tr: "endişelenmek"}, {en: "to shout (v)", tr: "bağırmak"},
+    {en: "to jump (v)", tr: "zıplamak"}, {en: "to kick (v)", tr: "tekmelemek"},
+    {en: "to lift (v)", tr: "kaldırmak"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "invitation (n)", tr: "davetiye"}, {en: "island (n)", tr: "ada"},
+    {en: "jewelry (n)", tr: "mücevher"}, {en: "journey (n)", tr: "yolculuk"},
+    {en: "knowledge (n)", tr: "bilgi"}, {en: "laptop (n)", tr: "dizüstü bilgisayar"},
+    {en: "leather (n)", tr: "deri"}, {en: "lesson (n)", tr: "ders"},
+    {en: "level (n)", tr: "seviye"}, {en: "light (n)", tr: "ışık"},
+    {en: "luggage (n)", tr: "bagaj"}, {en: "magazine (n)", tr: "dergi"},
+    {en: "member (n)", tr: "üye"}, {en: "memory (n)", tr: "hafıza"},
+    {en: "menu (n)", tr: "menü"}, {en: "message (n)", tr: "mesaj"},
+    {en: "mistake (n)", tr: "hata"}, {en: "mountain (n)", tr: "dağ"},
+    {en: "museum (n)", tr: "müze"}, {en: "nature (n)", tr: "doğa"},
+    {en: "news (n)", tr: "haber"}, {en: "notebook (n)", tr: "defter"},
+    {en: "object (n)", tr: "nesne"}, {en: "ocean (n)", tr: "okyanus"},
+    {en: "office (n)", tr: "ofis"}, {en: "opinion (n)", tr: "fikir"},
+    {en: "owner (n)", tr: "sahip"}, {en: "package (n)", tr: "paket"},
+    {en: "page (n)", tr: "sayfa"}, {en: "passenger (n)", tr: "yolcu"},
+    {en: "passport (n)", tr: "pasaport"}, {en: "photo (n)", tr: "fotoğraf"},
+    {en: "pilot (n)", tr: "pilot"}, {en: "plan (n)", tr: "plan"},
+    {en: "pocket (n)", tr: "cep"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "helpful (adj)", tr: "yardımsever"}, {en: "hungry (adj)", tr: "aç"},
+    {en: "important (adj)", tr: "önemli"}, {en: "kind (adj)", tr: "nazik"},
+    {en: "lucky (adj)", tr: "şanslı"}, {en: "main (adj)", tr: "ana"},
+    {en: "narrow (adj)", tr: "dar"}, {en: "necessary (adj)", tr: "gerekli"},
+    {en: "nice (adj)", tr: "hoş"}, {en: "noisy (adj)", tr: "gürültülü"},
+    {en: "normal (adj)", tr: "normal"}, {en: "obvious (adj)", tr: "bariz"},
+    {en: "official (adj)", tr: "resmi"}, {en: "old-fashioned (adj)", tr: "eski moda"},
+    {en: "opposite (adj)", tr: "zıt"}, {en: "own (adj)", tr: "kendi"},
+    {en: "patient (adj)", tr: "sabırlı"}, {en: "perfect (adj)", tr: "mükemmel"},
+    {en: "personal (adj)", tr: "kişisel"}, {en: "popular (adj)", tr: "popüler"},
+    {en: "positive (adj)", tr: "pozitif"}, {en: "possible (adj)", tr: "mümkün"},
+    {en: "private (adj)", tr: "özel"}, {en: "public (adj)", tr: "halka açık"},
+    {en: "quick (adj)", tr: "hızlı"}, {en: "quiet (adj)", tr: "sessiz"},
+    {en: "rich (adj)", tr: "zengin"}, {en: "safe (adj)", tr: "güvenli"},
+    {en: "serious (adj)", tr: "ciddi"}, {en: "simple (adj)", tr: "basit"},
+    {en: "to burn (v)", tr: "yanmak"}, {en: "to carry (v)", tr: "taşımak"},
+    {en: "to check (v)", tr: "kontrol etmek"}, {en: "to climb (v)", tr: "tırmanmak"},
+    {en: "to collect (v)", tr: "biriktirmek"}, {en: "to compare (v)", tr: "karşılaştırmak"},
+    {en: "to cook (v)", tr: "pişirmek"}, {en: "to count (v)", tr: "saymak"},
+    {en: "to cross (v)", tr: "karşıya geçmek"}, {en: "to cry (v)", tr: "ağlamak"},
+    {en: "to dance (v)", tr: "dans etmek"}, {en: "to die (v)", tr: "ölmek"},
+    {en: "to draw (v)", tr: "çizmek"}, {en: "to dress (v)", tr: "giyinmek"},
+    {en: "to drop (v)", tr: "düşürmek"}, {en: "to end (v)", tr: "bitirmek"},
+    {en: "to explore (v)", tr: "keşfetmek"}, {en: "to feed (v)", tr: "beslemek"},
+    {en: "to fight (v)", tr: "savaşmak"}, {en: "to fit (v)", tr: "uymak"},
+    {en: "to fly (v)", tr: "uçmak"}, {en: "to grow (v)", tr: "büyümek"},
+    {en: "to hang (v)", tr: "asmak"}, {en: "to hate (v)", tr: "nefret etmek"},
+    {en: "to hide (v)", tr: "gizlemek"}, {en: "to hit (v)", tr: "vurmak"},
+    {en: "to hold (v)", tr: "tutmak"}, {en: "to hunt (v)", tr: "avlamak"},
+    {en: "to hurt (v)", tr: "incitmek"}, {en: "to keep (v)", tr: "saklamak"},
+    {en: "to kill (v)", tr: "öldürmek"}, {en: "to kiss (v)", tr: "öpmek"},
+    {en: "to knock (v)", tr: "kapı çalmak"}, {en: "to lie (v)", tr: "yalan söylemek"},
+    {en: "to lock (v)", tr: "kilitlemek"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "price (n)", tr: "fiyat"}, {en: "project (n)", tr: "proje"},
+    {en: "promise (n)", tr: "söz"}, {en: "purpose (n)", tr: "amaç"},
+    {en: "quality (n)", tr: "kalite"}, {en: "quantity (n)", tr: "miktar"},
+    {en: "question (n)", tr: "soru"}, {en: "railway (n)", tr: "demiryolu"},
+    {en: "rain (n)", tr: "yağmur"}, {en: "range (n)", tr: "aralık"},
+    {en: "rate (n)", tr: "oran"}, {en: "reason (n)", tr: "sebep"},
+    {en: "record (n)", tr: "kayıt"}, {en: "relationship (n)", tr: "ilişki"},
+    {en: "reply (n)", tr: "cevap"}, {en: "report (n)", tr: "rapor"},
+    {en: "result (n)", tr: "sonuç"}, {en: "review (n)", tr: "inceleme"},
+    {en: "ring (n)", tr: "yüzük"}, {en: "risk (n)", tr: "risk"},
+    {en: "river (n)", tr: "nehir"}, {en: "road (n)", tr: "yol"},
+    {en: "rock (n)", tr: "kaya"}, {en: "role (n)", tr: "rol"},
+    {en: "roof (n)", tr: "çatı"}, {en: "room (n)", tr: "oda"},
+    {en: "root (n)", tr: "kök"}, {en: "rope (n)", tr: "ip"},
+    {en: "row (n)", tr: "sıra"}, {en: "rule (n)", tr: "kural"},
+    {en: "run (n)", tr: "koşu"}, {en: "salt (n)", tr: "tuz"},
+    {en: "sand (n)", tr: "kum"}, {en: "scene (n)", tr: "sahne"},
+    {en: "school (n)", tr: "okul"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "accurate (adj)", tr: "doğru"}, {en: "active (adj)", tr: "aktif"},
+    {en: "additional (adj)", tr: "ek"}, {en: "alternative (adj)", tr: "alternatif"},
+    {en: "asleep (adj)", tr: "uykuda"}, {en: "automatic (adj)", tr: "otomatik"},
+    {en: "average (adj)", tr: "ortalama"}, {en: "awake (adj)", tr: "uyanık"},
+    {en: "blind (adj)", tr: "kör"}, {en: "boiled (adj)", tr: "haşlanmış"},
+    {en: "bold (adj)", tr: "kalın"}, {en: "bored (adj)", tr: "sıkılmış"},
+    {en: "bottom (adj)", tr: "alt"}, {en: "bright (adj)", tr: "parlak"},
+    {en: "broken (adj)", tr: "kırık"}, {en: "busy (adj)", tr: "meşgul"},
+    {en: "calm (adj)", tr: "sakin"}, {en: "central (adj)", tr: "merkezi"},
+    {en: "chemical (adj)", tr: "kimyasal"}, {en: "chief (adj)", tr: "başlıca"},
+    {en: "circular (adj)", tr: "dairesel"}, {en: "classic (adj)", tr: "klasik"},
+    {en: "clean (adj)", tr: "temiz"}, {en: "close (adj)", tr: "yakın"},
+    {en: "cold (adj)", tr: "soğuk"}, {en: "comfortable (adj)", tr: "rahat"},
+    {en: "complete (adj)", tr: "tam"}, {en: "confident (adj)", tr: "kendinden emin"},
+    {en: "cool (adj)", tr: "serin"}, {en: "cruel (adj)", tr: "zalim"},
+    {en: "to order (v)", tr: "sipariş vermek"}, {en: "to serve (v)", tr: "servis etmek"},
+    {en: "to slice (v)", tr: "dilimlemek"}, {en: "to fry (v)", tr: "kızartmak"},
+    {en: "to boil (v)", tr: "haşlamak"}, {en: "to mix (v)", tr: "karıştırmak"},
+    {en: "to pour (v)", tr: "dökmek"}, {en: "to spill (v)", tr: "dökmek (kazara)"},
+    {en: "to taste (v)", tr: "tatmak"}, {en: "to chew (v)", tr: "çiğnemek"},
+    {en: "to swallow (v)", tr: "yutmak"}, {en: "to sneeze (v)", tr: "hapşırmak"},
+    {en: "to cough (v)", tr: "öksürmek"}, {en: "to bleed (v)", tr: "kanamak"},
+    {en: "to injure (v)", tr: "yaralamak"}, {en: "to recover (v)", tr: "iyileşmek"},
+    {en: "to cure (v)", tr: "tedavi etmek"}, {en: "to shave (v)", tr: "tıraş olmak"},
+    {en: "to brush (v)", tr: "fırçalamak"}, {en: "to comb (v)", tr: "taramak"},
+    {en: "to rent (v)", tr: "kiralamak"}, {en: "to sell (v)", tr: "satmak"},
+    {en: "to cost (v)", tr: "mal olmak"}, {en: "to pay (v)", tr: "ödemek"},
+    {en: "to charge (v)", tr: "şarj etmek"}, {en: "to owe (v)", tr: "borçlu olmak"},
+    {en: "to print (v)", tr: "yazdırmak"}, {en: "to type (v)", tr: "yazmak (klavye)"},
+    {en: "to download (v)", tr: "indirmek"}, {en: "to upload (v)", tr: "yüklemek"},
+    {en: "to install (v)", tr: "kurmak"}, {en: "to click (v)", tr: "tıklamak"},
+    {en: "to delete (v)", tr: "silmek"}, {en: "to save (v)", tr: "kaydetmek"},
+    {en: "to copy (v)", tr: "kopyalamak"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "flavor (n)", tr: "lezzet"}, {en: "recipe (n)", tr: "tarif"},
+    {en: "snack (n)", tr: "atıştırmalık"}, {en: "calorie (n)", tr: "kalori"},
+    {en: "pharmacy (n)", tr: "eczane"}, {en: "pain (n)", tr: "ağrı"},
+    {en: "flu (n)", tr: "grip"}, {en: "cold (n)", tr: "soğuk algınlığı"},
+    {en: "muscle (n)", tr: "kas"}, {en: "bone (n)", tr: "kemik"},
+    {en: "brain (n)", tr: "beyin"}, {en: "heart (n)", tr: "kalp"},
+    {en: "skin (n)", tr: "cilt"}, {en: "stomach (n)", tr: "mide"},
+    {en: "discount (n)", tr: "indirim"}, {en: "receipt (n)", tr: "fiş"},
+    {en: "cash (n)", tr: "nakit"}, {en: "wallet (n)", tr: "cüzdan"},
+    {en: "purse (n)", tr: "çanta (kadın)"}, {en: "market (n)", tr: "market"},
+    {en: "mall (n)", tr: "alışveriş merkezi"}, {en: "brand (n)", tr: "marka"},
+    {en: "screen (n)", tr: "ekran"}, {en: "keyboard (n)", tr: "klavye"},
+    {en: "mouse (n)", tr: "fare"}, {en: "battery (n)", tr: "batarya"},
+    {en: "signal (n)", tr: "sinyal"}, {en: "link (n)", tr: "bağlantı"},
+    {en: "folder (n)", tr: "klasör"}, {en: "file (n)", tr: "dosya"},
+    {en: "software (n)", tr: "yazılım"}, {en: "hardware (n)", tr: "donanım"},
+    {en: "competition (n)", tr: "rekabet"}, {en: "prize (n)", tr: "ödül"},
+    {en: "stadium (n)", tr: "stadyum"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "sour (adj)", tr: "ekşi"}, {en: "bitter (adj)", tr: "acı (tat)"},
+    {en: "salty (adj)", tr: "tuzlu"}, {en: "spicy (adj)", tr: "baharatlı"},
+    {en: "raw (adj)", tr: "çiğ"}, {en: "ripe (adj)", tr: "olgun"},
+    {en: "frozen (adj)", tr: "donmuş"}, {en: "organic (adj)", tr: "organik"},
+    {en: "dizzy (adj)", tr: "başı dönen"}, {en: "faint (adj)", tr: "baygın"},
+    {en: "sore (adj)", tr: "ağrılı"}, {en: "stiff (adj)", tr: "sert/tutulmuş"},
+    {en: "fit (adj)", tr: "formda"}, {en: "weak (adj)", tr: "güçsüz"},
+    {en: "strong (adj)", tr: "güçlü"}, {en: "casual (adj)", tr: "günlük"},
+    {en: "formal (adj)", tr: "resmi"}, {en: "trendy (adj)", tr: "moda"},
+    {en: "plain (adj)", tr: "sade"}, {en: "colorful (adj)", tr: "renkli"},
+    {en: "social (adj)", tr: "sosyal"}, {en: "lonely (adj)", tr: "yalnız"},
+    {en: "shy (adj)", tr: "utangaç"}, {en: "proud (adj)", tr: "gururlu"},
+    {en: "lazy (adj)", tr: "tembel"}, {en: "smart (adj)", tr: "akıllı"},
+    {en: "stupid (adj)", tr: "aptal"}, {en: "crazy (adj)", tr: "çılgın"},
+    {en: "lucky (adj)", tr: "şanslı"}, {en: "unlucky (adj)", tr: "şanssız"},
+    {en: "to act (v)", tr: "rol yapmak"}, {en: "to apologize (v)", tr: "özür dilemek"},
+    {en: "to apply (v)", tr: "başvurmak"}, {en: "to arrest (v)", tr: "tutuklamak"},
+    {en: "to attack (v)", tr: "saldırmak"}, {en: "to bake (v)", tr: "fırında pişirmek"},
+    {en: "to beat (v)", tr: "yenmek"}, {en: "to behave (v)", tr: "davranmak"},
+    {en: "to bend (v)", tr: "bükmek"}, {en: "to blow (v)", tr: "üflemek"},
+    {en: "to book (v)", tr: "rezervasyon yapmak"}, {en: "to bounce (v)", tr: "zıplamak"},
+    {en: "to brake (v)", tr: "fren yapmak"}, {en: "to breathe (v)", tr: "nefes almak"},
+    {en: "to bury (v)", tr: "gömmek"}, {en: "to calculate (v)", tr: "hesaplamak"},
+    {en: "to camp (v)", tr: "kamp yapmak"}, {en: "to cancel (v)", tr: "iptal etmek"},
+    {en: "to clap (v)", tr: "alkışlamak"}, {en: "to cycle (v)", tr: "bisiklet sürmek"},
+    {en: "to decorate (v)", tr: "dekore etmek"}, {en: "to deliver (v)", tr: "teslim etmek"},
+    {en: "to dial (v)", tr: "numara çevirmek"}, {en: "to dream (v)", tr: "rüya görmek"},
+    {en: "to dust (v)", tr: "toz almak"}, {en: "to escape (v)", tr: "kaçmak"},
+    {en: "to examine (v)", tr: "muayene etmek"}, {en: "to exercise (v)", tr: "egzersiz yapmak"},
+    {en: "to fasten (v)", tr: "bağlamak (kemer vb.)"}, {en: "to fetch (v)", tr: "gidip getirmek"},
+    {en: "to fold (v)", tr: "katlamak"}, {en: "to forgive (v)", tr: "affetmek"},
+    {en: "to invite (v)", tr: "davet etmek"}, {en: "to join (v)", tr: "katılmak"},
+    {en: "to knit (v)", tr: "örgü örmek"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "actor (n)", tr: "erkek oyuncu"}, {en: "actress (n)", tr: "kadın oyuncu"},
+    {en: "ambulance (n)", tr: "ambulans"}, {en: "anniversary (n)", tr: "yıl dönümü"},
+    {en: "architect (n)", tr: "mimar"}, {en: "artist (n)", tr: "sanatçı"},
+    {en: "athlete (n)", tr: "atlet"}, {en: "author (n)", tr: "yazar"},
+    {en: "balcony (n)", tr: "balkon"}, {en: "balloon (n)", tr: "balon"},
+    {en: "bandage (n)", tr: "bandaj"}, {en: "barbecue (n)", tr: "mangal"},
+    {en: "basement (n)", tr: "bodrum katı"}, {en: "basket (n)", tr: "sepet"},
+    {en: "battle (n)", tr: "savaş"}, {en: "belt (n)", tr: "kemer"},
+    {en: "blanket (n)", tr: "battaniye"}, {en: "blouse (n)", tr: "bluz"},
+    {en: "board (n)", tr: "tahta"}, {en: "boat (n)", tr: "tekne"},
+    {en: "bomb (n)", tr: "bomba"}, {en: "boot (n)", tr: "bot"},
+    {en: "border (n)", tr: "sınır"}, {en: "bracelet (n)", tr: "bilezik"},
+    {en: "brick (n)", tr: "tuğla"}, {en: "brush (n)", tr: "fırça"},
+    {en: "bucket (n)", tr: "kova"}, {en: "button (n)", tr: "düğme"},
+    {en: "cabinet (n)", tr: "dolap"}, {en: "camera (n)", tr: "kamera"},
+    {en: "candle (n)", tr: "mum"}, {en: "carpet (n)", tr: "halı"},
+    {en: "cathedral (n)", tr: "katedral"}, {en: "ceiling (n)", tr: "tavan"},
+    {en: "chain (n)", tr: "zincir"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "annoyed (adj)", tr: "rahatsız olmuş"}, {en: "annoying (adj)", tr: "sinir bozucu"},
+    {en: "ashamed (adj)", tr: "utanmış"}, {en: "attractive (adj)", tr: "çekici"},
+    {en: "automatic (adj)", tr: "otomatik"}, {en: "average (adj)", tr: "ortalama"},
+    {en: "awful (adj)", tr: "berbat"}, {en: "basic (adj)", tr: "temel"},
+    {en: "blank (adj)", tr: "boş"}, {en: "bossy (adj)", tr: "emretmeyi seven"},
+    {en: "brave (adj)", tr: "cesur"}, {en: "brief (adj)", tr: "kısa/öz"},
+    {en: "bright (adj)", tr: "parlak"}, {en: "brilliant (adj)", tr: "zeki/parlak"},
+    {en: "broad (adj)", tr: "geniş"}, {en: "calm (adj)", tr: "sakin"},
+    {en: "careful (adj)", tr: "dikkatli"}, {en: "careless (adj)", tr: "dikkatsiz"},
+    {en: "certain (adj)", tr: "emin/kesin"}, {en: "cheerful (adj)", tr: "neşeli"},
+    {en: "clever (adj)", tr: "zeki"}, {en: "common (adj)", tr: "yaygın"},
+    {en: "convenient (adj)", tr: "uygun/elverişli"}, {en: "curly (adj)", tr: "kıvırcık"},
+    {en: "deep (adj)", tr: "derin"}, {en: "delighted (adj)", tr: "çok memnun"},
+    {en: "double (adj)", tr: "çift"}, {en: "dry (adj)", tr: "kuru"},
+    {en: "elderly (adj)", tr: "yaşlıca"}, {en: "embarrassed (adj)", tr: "mahcup"},
+    {en: "to admire (v)", tr: "hayran olmak"}, {en: "to advise (v)", tr: "tavsiye vermek"},
+    {en: "to amuse (v)", tr: "eğlendirmek"}, {en: "to attract (v)", tr: "çekmek (ilgi vb.)"},
+    {en: "to bless (v)", tr: "kutsamak"}, {en: "to bother (v)", tr: "rahatsız etmek"},
+    {en: "to cause (v)", tr: "sebep olmak"}, {en: "to cure (v)", tr: "iyileştirmek"},
+    {en: "to delight (v)", tr: "sevindirmek"}, {en: "to deserve (v)", tr: "hak etmek"},
+    {en: "to destroy (v)", tr: "yok etmek"}, {en: "to detect (v)", tr: "tespit etmek"},
+    {en: "to divide (v)", tr: "bölmek"}, {en: "to drag (v)", tr: "sürüklemek"},
+    {en: "to employ (v)", tr: "işe almak"}, {en: "to enable (v)", tr: "olanak sağlamak"},
+    {en: "to exchange (v)", tr: "takas etmek"}, {en: "to exist (v)", tr: "var olmak"},
+    {en: "to expand (v)", tr: "genişletmek"}, {en: "to fix (v)", tr: "tamir etmek/sabitlemek"},
+    {en: "to guide (v)", tr: "rehberlik etmek"}, {en: "to handle (v)", tr: "ele almak/çözmek"},
+    {en: "to increase (v)", tr: "artırmak"}, {en: "to inform (v)", tr: "bilgilendirmek"},
+    {en: "to intend (v)", tr: "niyet etmek"}, {en: "to land (v)", tr: "iniş yapmak"},
+    {en: "to last (v)", tr: "sürmek (zaman)"}, {en: "to notice (v)", tr: "fark etmek"},
+    {en: "to park (v)", tr: "park etmek"}, {en: "to pass (v)", tr: "geçmek"},
+    {en: "to perform (v)", tr: "performans sergilemek"}, {en: "to permit (v)", tr: "izin vermek"},
+    {en: "to pick (v)", tr: "seçmek/toplamak"}, {en: "to plant (v)", tr: "dikmek (bitki)"},
+    {en: "to point (v)", tr: "işaret etmek"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "audience (n)", tr: "izleyici"}, {en: "background (n)", tr: "arka plan"},
+    {en: "benefit (n)", tr: "fayda"}, {en: "bill (n)", tr: "fatura"},
+    {en: "blood (n)", tr: "kan"}, {en: "branch (n)", tr: "dal/şube"},
+    {en: "breast (n)", tr: "göğüs"}, {en: "bridge (n)", tr: "köprü"},
+    {en: "cabbage (n)", tr: "lahana"}, {en: "ceremony (n)", tr: "tören"},
+    {en: "champion (n)", tr: "şampiyon"}, {en: "channel (n)", tr: "kanal"},
+    {en: "charity (n)", tr: "hayır kurumu"}, {en: "cheek (n)", tr: "yanak"},
+    {en: "chin (n)", tr: "çene"}, {en: "circle (n)", tr: "daire/çember"},
+    {en: "cliff (n)", tr: "uçurum"}, {en: "coast (n)", tr: "sahil"},
+    {en: "coin (n)", tr: "madeni para"}, {en: "collar (n)", tr: "yaka"},
+    {en: "column (n)", tr: "sütun"}, {en: "command (n)", tr: "komut"},
+    {en: "community (n)", tr: "topluluk"}, {en: "company (n)", tr: "şirket"},
+    {en: "continent (n)", tr: "kıta"}, {en: "contrast (n)", tr: "zıtlık"},
+    {en: "cookie (n)", tr: "kurabiye"}, {en: "cottage (n)", tr: "kulübe"},
+    {en: "cotton (n)", tr: "pamuk"}, {en: "court (n)", tr: "mahkeme/kort"},
+    {en: "cousin (n)", tr: "kuzen"}, {en: "cowboy (n)", tr: "kovboy"},
+    {en: "crew (n)", tr: "mürettebat"}, {en: "crime (n)", tr: "suç"},
+    {en: "crowd (n)", tr: "kalabalık"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "greedy (adj)", tr: "açgözlü"}, {en: "guilty (adj)", tr: "suçlu"},
+    {en: "handsome (adj)", tr: "yakışıklı"}, {en: "high (adj)", tr: "yüksek"},
+    {en: "hollow (adj)", tr: "içi boş"}, {en: "huge (adj)", tr: "kocaman"},
+    {en: "icy (adj)", tr: "buzlu"}, {en: "ill (adj)", tr: "hasta"},
+    {en: "innocent (adj)", tr: "masum"}, {en: "internal (adj)", tr: "içsel"},
+    {en: "jealous (adj)", tr: "kıskanç"}, {en: "jolly (adj)", tr: "neşeli"},
+    {en: "juicy (adj)", tr: "sulu"}, {en: "keen (adj)", tr: "istekli"},
+    {en: "large (adj)", tr: "geniş/büyük"}, {en: "late (adj)", tr: "geç"},
+    {en: "legal (adj)", tr: "yasal"}, {en: "loose (adj)", tr: "gevşek"},
+    {en: "loud (adj)", tr: "yüksek sesli"}, {en: "low (adj)", tr: "düşük"},
+    {en: "mad (adj)", tr: "deli/kızgın"}, {en: "magic (adj)", tr: "sihirli"},
+    {en: "male (adj)", tr: "erkek"}, {en: "married (adj)", tr: "evli"},
+    {en: "mean (adj)", tr: "kaba/cimri"}, {en: "mental (adj)", tr: "zihinsel"},
+    {en: "middle (adj)", tr: "orta"}, {en: "mild (adj)", tr: "hafif/yumuşak"},
+    {en: "missing (adj)", tr: "kayıp"}, {en: "mixed (adj)", tr: "karışık"},
+    {en: "to prevent (v)", tr: "önlemek"}, {en: "to produce (v)", tr: "üretmek"},
+    {en: "to promise (v)", tr: "söz vermek"}, {en: "to prove (v)", tr: "kanıtlamak"},
+    {en: "to provide (v)", tr: "sağlamak"}, {en: "to publish (v)", tr: "yayınlamak"},
+    {en: "to pull (v)", tr: "çekmek"}, {en: "to push (v)", tr: "itmek"},
+    {en: "to reach (v)", tr: "ulaşmak"}, {en: "to realize (v)", tr: "fark etmek"},
+    {en: "to recognize (v)", tr: "tanımak"}, {en: "to record (v)", tr: "kaydetmek"},
+    {en: "to refuse (v)", tr: "reddetmek"}, {en: "to remain (v)", tr: "kalmak (bir durumda)"},
+    {en: "to remove (v)", tr: "kaldırmak/çıkarmak"}, {en: "to reply (v)", tr: "cevap vermek"},
+    {en: "to report (v)", tr: "rapor etmek"}, {en: "to request (v)", tr: "rica etmek"},
+    {en: "to rest (v)", tr: "dinlenmek"}, {en: "to sail (v)", tr: "yelken açmak"},
+    {en: "to satisfy (v)", tr: "tatmin etmek"}, {en: "to scream (v)", tr: "çığlık atmak"},
+    {en: "to select (v)", tr: "seçmek"}, {en: "to shake (v)", tr: "sallamak"},
+    {en: "to shop (v)", tr: "alışveriş yapmak"}, {en: "to sign (v)", tr: "imzalamak"},
+    {en: "to sing (v)", tr: "şarkı söylemek"}, {en: "to sink (v)", tr: "batmak"},
+    {en: "to sit (v)", tr: "oturmak"}, {en: "to skate (v)", tr: "paten kaymak"},
+    {en: "to ski (v)", tr: "kayak yapmak"}, {en: "to skip (v)", tr: "atlamak"},
+    {en: "to smell (v)", tr: "koklamak"}, {en: "to smoke (v)", tr: "sigara içmek"},
+    {en: "to snow (v)", tr: "kar yağmak"},
+
+    // --- İSİMLER (n) - 35 Adet ---
+    {en: "curtain (n)", tr: "perde"}, {en: "cushion (n)", tr: "yastık (dekoratif)"},
+    {en: "cycle (n)", tr: "döngü/bisiklet"}, {en: "database (n)", tr: "veri tabanı"},
+    {en: "debate (n)", tr: "münazara"}, {en: "decision (n)", tr: "karar"},
+    {en: "definition (n)", tr: "tanım"}, {en: "delivery (n)", tr: "teslimat"},
+    {en: "department (n)", tr: "bölüm"}, {en: "description (n)", tr: "tanımlama"},
+    {en: "design (n)", tr: "tasarım"}, {en: "desk (n)", tr: "sıra/masa"},
+    {en: "destination (n)", tr: "varış noktası"}, {en: "detail (n)", tr: "detay"},
+    {en: "detective (n)", tr: "dedektif"}, {en: "development (n)", tr: "gelişim"},
+    {en: "device (n)", tr: "cihaz"}, {en: "diagram (n)", tr: "diyagram"},
+    {en: "dialogue (n)", tr: "diyalog"}, {en: "diamond (n)", tr: "elmas"},
+    {en: "diary (n)", tr: "günlük"}, {en: "dictionary (n)", tr: "sözlük"},
+    {en: "diet (n)", tr: "diyet"}, {en: "difference (n)", tr: "fark"},
+    {en: "difficulty (n)", tr: "zorluk"}, {en: "dinner (n)", tr: "akşam yemeği"},
+    {en: "dinosaur (n)", tr: "dinozor"}, {en: "direction (n)", tr: "yön"},
+    {en: "director (n)", tr: "yönetmen"}, {en: "dirt (n)", tr: "kir"},
+    {en: "disadvantage (n)", tr: "dezavantaj"}, {en: "discovery (n)", tr: "keşif"},
+    {en: "discussion (n)", tr: "tartışma"}, {en: "disease (n)", tr: "hastalık"},
+    {en: "dish (n)", tr: "tabak/yemek"},
+
+    // --- SIFATLAR (adj) - 30 Adet ---
+    {en: "monthly (adj)", tr: "aylık"}, {en: "moral (adj)", tr: "ahlaki"},
+    {en: "multiple (adj)", tr: "çoklu"}, {en: "national (adj)", tr: "ulusal"},
+    {en: "natural (adj)", tr: "doğal"}, {en: "near (adj)", tr: "yakın"},
+    {en: "negative (adj)", tr: "negatif"}, {en: "nervous (adj)", tr: "gergin"},
+    {en: "next (adj)", tr: "sonraki"}, {en: "noble (adj)", tr: "asil"},
+    {en: "northern (adj)", tr: "kuzeyli"}, {en: "official (adj)", tr: "resmi"},
+    {en: "ordinary (adj)", tr: "sıradan"}, {en: "original (adj)", tr: "orijinal"},
+    {en: "other (adj)", tr: "diğer"}, {en: "outdoor (adj)", tr: "açık hava"},
+    {en: "outer (adj)", tr: "dış"}, {en: "parallel (adj)", tr: "paralel"},
+    {en: "partial (adj)", tr: "kısmi"}, {en: "particular (adj)", tr: "belirli/özel"},
+    {en: "past (adj)", tr: "geçmiş"}, {en: "peaceful (adj)", tr: "huzurlu"},
+    {en: "perfect (adj)", tr: "mükemmel"}, {en: "permanent (adj)", tr: "kalıcı"},
+    {en: "personal (adj)", tr: "kişisel"}, {en: "physical (adj)", tr: "fiziksel"},
+    {en: "plain (adj)", tr: "sade"}, {en: "pleasant (adj)", tr: "hoş"},
+    {en: "poor (adj)", tr: "fakir/zavallı"}, {en: "popular (adj)", tr: "popüler"},
+    {en: "to throw (v)", tr: "atmak"}, {en: "to tie (v)", tr: "bağlamak"},
+    {en: "to tidy (v)", tr: "toparlamak"}, {en: "to touch (v)", tr: "dokunmak"},
+    {en: "to train (v)", tr: "eğitmek"}, {en: "to translate (v)", tr: "çevirmek"},
+    {en: "to trust (v)", tr: "güvenmek"}, {en: "to try (v)", tr: "denemek"},
+    {en: "to turn (v)", tr: "dönmek"}, {en: "to unite (v)", tr: "birleşmek"},
+    {en: "to use (v)", tr: "kullanmak"}, {en: "to value (v)", tr: "değer vermek"},
+    {en: "to visit (v)", tr: "ziyaret etmek"}, {en: "to wait (v)", tr: "beklemek"},
+    {en: "to walk (v)", tr: "yürümek"}, {en: "to want (v)", tr: "istemek"},
+    {en: "to warn (v)", tr: "uyarmak"}, {en: "to waste (v)", tr: "israf etmek"},
+    {en: "to wave (v)", tr: "el sallamak"}, {en: "to wear (v)", tr: "giymek"},
+    {en: "to weigh (v)", tr: "tartmak"}, {en: "to welcome (v)", tr: "karşılamak"},
+    {en: "to whisper (v)", tr: "fısıldamak"}, {en: "to whistle (v)", tr: "ıslık çalmak"},
+    {en: "to wipe (v)", tr: "silmek (bezle vb.)"}, {en: "to wonder (v)", tr: "merak etmek"},
+    {en: "to work (v)", tr: "çalışmak"}, {en: "to worry (v)", tr: "endişelenmek"},
+    {en: "to wrap (v)", tr: "sarmak/paketlemek"}, {en: "to write (v)", tr: "yazmak"},
+    {en: "to yawn (v)", tr: "esnemek"}, {en: "to yell (v)", tr: "bağırmak"},
+    {en: "to zoom (v)", tr: "yakınlaştırmak"}, {en: "to attend (v)", tr: "katılmak"},
+    {en: "to advice (v)", tr: "tavsiye vermek"},
+
+    // --- SON İSİMLER (n) - 35 Adet ---
+    {en: "ghost (n)", tr: "hayalet"}, {en: "gift (n)", tr: "hediye"},
+    {en: "giraffe (n)", tr: "zürafa"}, {en: "glass (n)", tr: "bardak/cam"},
+    {en: "glasses (n)", tr: "gözlük"}, {en: "glove (n)", tr: "eldiven"},
+    {en: "glue (n)", tr: "yapıştırıcı"}, {en: "goal (n)", tr: "hedef/kale"},
+    {en: "gold (n)", tr: "altın"}, {en: "golf (n)", tr: "golf"},
+    {en: "guitar (n)", tr: "gitar"}, {en: "gum (n)", tr: "sakız"},
+    {en: "gun (n)", tr: "tabanca"}, {en: "habit (n)", tr: "alışkanlık"},
+    {en: "hair (n)", tr: "saç"}, {en: "haircut (n)", tr: "saç kesimi"},
+    {en: "hall (n)", tr: "hol/salon"}, {en: "ham (n)", tr: "jambon"},
+    {en: "hammer (n)", tr: "çekiç"}, {en: "hand (n)", tr: "el"},
+    {en: "handbag (n)", tr: "el çantası"}, {en: "handle (n)", tr: "sap/kol"},
+    {en: "harbor (n)", tr: "liman"}, {en: "hat (n)", tr: "şapka"},
+    {en: "headache (n)", tr: "baş ağrısı"}, {en: "health (n)", tr: "sağlık"},
+    {en: "hearing (n)", tr: "işitme"}, {en: "heat (n)", tr: "ısı/sıcaklık"},
+    {en: "heaven (n)", tr: "cennet"}, {en: "height (n)", tr: "yükseklik/boy"},
+    {en: "helicopter (n)", tr: "helikopter"}, {en: "helmet (n)", tr: "kask"},
+    {en: "help (n)", tr: "yardım"}, {en: "hero (n)", tr: "kahraman"},
+    {en: "hill (n)", tr: "tepe"},
+
+    // --- SON SIFATLAR (adj) - 30 Adet ---
+    {en: "shiny (adj)", tr: "parlak"}, {en: "short (adj)", tr: "kısa"},
+    {en: "shy (adj)", tr: "utangaç"}, {en: "sick (adj)", tr: "hasta"},
+    {en: "silent (adj)", tr: "sessiz"}, {en: "silver (adj)", tr: "gümüş"},
+    {en: "single (adj)", tr: "bekar/tek"}, {en: "skillful (adj)", tr: "yetenekli"},
+    {en: "sleepy (adj)", tr: "uykulu"}, {en: "slim (adj)", tr: "ince/zayıf"},
+    {en: "slow (adj)", tr: "yavaş"}, {en: "small (adj)", tr: "küçük"},
+    {en: "smart (adj)", tr: "akıllı"}, {en: "smooth (adj)", tr: "pürüzsüz"},
+    {en: "soft (adj)", tr: "yumuşak"}, {en: "solid (adj)", tr: "katı"},
+    {en: "some (adj)", tr: "bazı"}, {en: "special (adj)", tr: "özel"},
+    {en: "spicy (adj)", tr: "baharatlı"}, {en: "square (adj)", tr: "kare"},
+    {en: "steady (adj)", tr: "sabit/istikrarlı"}, {en: "steep (adj)", tr: "dik"},
+    {en: "sticky (adj)", tr: "yapışkan"}, {en: "stiff (adj)", tr: "sert"},
+    {en: "still (adj)", tr: "hareketsiz"}, {en: "straight (adj)", tr: "düz"},
+    {en: "strange (adj)", tr: "tuhaf"}, {en: "strong (adj)", tr: "güçlü"},
+    {en: "sudden (adj)", tr: "ani"}, {en: "sweet (adj)", tr: "tatlı"}
+];
+
+        const gameArea = document.getElementById('game-area');
+        const typedTextEl = document.getElementById('typed-text');
+        const scoreEl = document.getElementById('score');
+        const livesEl = document.getElementById('lives');
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const finalScoreEl = document.getElementById('final-score');
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        const typingAreaContainer = document.getElementById('typing-area');
+        const feedbackMsg = document.getElementById('feedback-msg');
+        const centerFeedbackEl = document.getElementById('center-feedback');
+        const centerStartWrapper = document.getElementById('center-start-wrapper');
+        const highScoreDisplay = document.getElementById('high-score-display'); 
+
+        let activeWords = [];
+        let score = 0;
+        let lives = 5;
+        let currentTypedText = "";
+        let isGameOver = true; 
+        let animationFrameId;
+        
+        let lastSpawnTime = 0;
+        let spawnDelay = 800; 
+        
+        // Hız ayarını LocalStorage'dan çekiyoruz, yoksa varsayılan olarak 0.4 kullanıyoruz
+        let baseFallSpeed = parseFloat(localStorage.getItem('wordGameSpeed')) || 0.4; 
+        let fallSpeed = baseFallSpeed;     
+        
+        let currentPlayer = "Misafir";
+        let leaderboard = JSON.parse(localStorage.getItem('wordGameLeaderboard')) || [];
+
+        // Oyun Yüklendiğinde Rekor Ekranını Güncelle
+        function updateHighScoreDisplay() {
+            if (leaderboard && leaderboard.length > 0) {
+                highScoreDisplay.innerText = `${leaderboard[0].name} (${leaderboard[0].score})`;
+            } else {
+                highScoreDisplay.innerText = "-";
+            }
+        }
+        updateHighScoreDisplay();
+
+        // Patlama Efekti Fonksiyonu (Parçacık Üretici)
+        function createExplosion(x, y) {
+            const colors = ['#10b981', '#34d399', '#f59e0b', '#fbbf24']; 
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 60 + 20; 
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                
+                gameArea.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 500);
+            }
+        }
+
+        // KLAVYE KONTROLLERİ
+        window.addEventListener('keydown', (e) => {
+            if (isGameOver) return;
+
+            if (e.key === 'Enter') {
+                e.preventDefault(); 
+                if(currentTypedText.trim() !== "") {
+                    checkWordMatch();
+                }
+            } else if (e.key.length === 1 && e.key.match(/[a-zçğıöşü ]/i)) {
+                currentTypedText += e.key.toLowerCase();
+            } else if (e.key === 'Backspace') {
+                currentTypedText = currentTypedText.slice(0, -1);
+            } else if (e.key === 'Escape') {
+                currentTypedText = ""; 
+            }
+            
+            updateTypedTextUI();
+        });
+
+        function updateTypedTextUI() {
+            typedTextEl.innerText = currentTypedText;
+        }
+
+        function showFeedback(msg, type) {
+            feedbackMsg.innerText = msg;
+            feedbackMsg.className = type === 'success' ? 'feedback-success' : 'feedback-error';
+            feedbackMsg.style.animation = 'none';
+            feedbackMsg.offsetHeight; 
+            feedbackMsg.style.animation = 'floatUp 1.5s ease-out forwards';
+        }
+
+        function showCenterFeedback(text) {
+            centerFeedbackEl.innerText = text;
+            centerFeedbackEl.classList.remove('center-anim');
+            void centerFeedbackEl.offsetWidth; 
+            centerFeedbackEl.classList.add('center-anim');
+        }
+
+        function checkWordMatch() {
+            let matched = false;
+
+            for (let i = 0; i < activeWords.length; i++) {
+                if (activeWords[i].data.tr === currentTypedText.trim()) {
+                    playSuccessSound(); 
+                    score += currentTypedText.length * 10;
+                    scoreEl.innerText = score;
+                    
+                    const wElem = activeWords[i].element;
+                    const centerX = wElem.offsetLeft + wElem.offsetWidth / 2;
+                    const centerY = wElem.offsetTop + wElem.offsetHeight / 2;
+                    createExplosion(centerX, centerY);
+
+                    wElem.remove();
+                    activeWords.splice(i, 1);
+                    currentTypedText = ""; 
+                    increaseDifficulty();
+                    
+                    showFeedback("Doğru Çeviri! 🎉", "success");
+                    typingAreaContainer.classList.add('flash-success');
+                    setTimeout(() => typingAreaContainer.classList.remove('flash-success'), 200);
+                    
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                playFailSound(); 
+                typingAreaContainer.classList.add('typing-error-bg');
+                setTimeout(() => typingAreaContainer.classList.remove('typing-error-bg'), 300);
+                
+                currentTypedText = ""; 
+                updateTypedTextUI();
+            }
+        }
+
+        function increaseDifficulty() {
+            if (score > 0 && score % 100 === 0) {
+                fallSpeed += 0.1; 
+            }
+        }
+
+        function spawnWord(timestamp) {
+            if (activeWords.length === 0) {
+                if (timestamp - lastSpawnTime > spawnDelay) {
+                    const randomObj = wordDictionary[Math.floor(Math.random() * wordDictionary.length)];
+                    const wordEl = document.createElement('div');
+                    wordEl.classList.add('falling-word');
+                    wordEl.innerText = randomObj.en; 
+                    
+                    const areaWidth = gameArea.clientWidth;
+                    const maxLeft = areaWidth - (randomObj.en.length * 15) - 40; 
+                    const randomX = Math.floor(Math.random() * maxLeft) + 20;
+                    
+                    wordEl.style.left = `${randomX}px`;
+                    wordEl.style.top = `-40px`; 
+                    
+                    gameArea.insertBefore(wordEl, centerStartWrapper);
+                    activeWords.push({ data: randomObj, element: wordEl, y: -40 });
+                    lastSpawnTime = timestamp; 
+                }
+            } else {
+                lastSpawnTime = timestamp;
+            }
+        }
+
+        function gameLoop(timestamp) {
+            if (isGameOver) return;
+
+            spawnWord(timestamp);
+            const areaHeight = gameArea.clientHeight;
+
+            for (let i = 0; i < activeWords.length; i++) {
+                let wordObj = activeWords[i];
+                wordObj.y += fallSpeed;
+                wordObj.element.style.top = `${wordObj.y}px`;
+
+                if (wordObj.y > areaHeight - 40) {
+                    playFailSound(); 
+                    
+                    showCenterFeedback(wordObj.data.tr.toLowerCase());
+                    
+                    wordObj.element.remove();
+                    activeWords.splice(i, 1);
+                    i--; 
+                    
+                    lives--;
+                    livesEl.innerText = lives;
+                    
+                    currentTypedText = "";
+                    updateTypedTextUI();
+
+                    if (lives <= 0) {
+                        endGame(wordObj.data);
+                        return;
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function handleLoginKey(e) {
+            if(e.key === 'Enter') registerAndReady();
+        }
+
+        function registerAndReady() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const inputVal = document.getElementById('player-input').value.trim();
+            if (inputVal !== "") { currentPlayer = inputVal; }
+            playerNameDisplay.innerText = currentPlayer;
+            hideModal('login-modal');
+            
+            centerStartWrapper.style.display = 'block';
+        }
+
+        function showStartScreen() {
+            // BURASI EKLENDİ: Arka planda çalışan oyun varsa tamamen durdur!
+            isGameOver = true;
+            cancelAnimationFrame(animationFrameId);
+
+            hideModal('game-over-modal');
+            hideModal('leaderboard-modal');
+            
+            const words = document.querySelectorAll('.falling-word');
+            words.forEach(w => w.remove());
+            activeWords = [];
+            currentTypedText = "";
+            updateTypedTextUI();
+            
+            centerStartWrapper.style.display = 'block';
+        }
+
+        function startGame() {
+            centerStartWrapper.style.display = 'none';
+            
+            isGameOver = false;
+            score = 0;
+            lives = 5;
+            currentTypedText = "";
+            fallSpeed = baseFallSpeed;
+            
+            scoreEl.innerText = score;
+            livesEl.innerText = lives;
+            updateTypedTextUI();
+            
+            const words = document.querySelectorAll('.falling-word');
+            words.forEach(w => w.remove());
+            activeWords = [];
+
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
+
+            lastSpawnTime = performance.now();
+            animationFrameId = requestAnimationFrame(gameLoop);
+            
+            window.focus();
+        }
+
+        function endGame(lastMissedData) {
+            isGameOver = true;
+            cancelAnimationFrame(animationFrameId);
+            
+            if (score > 0) {
+                leaderboard.push({ name: currentPlayer, score: score });
+                leaderboard.sort((a, b) => b.score - a.score);
+                leaderboard = leaderboard.slice(0, 5);
+                localStorage.setItem('wordGameLeaderboard', JSON.stringify(leaderboard));
+                
+                updateHighScoreDisplay();
+            }
+
+            finalScoreEl.innerText = score;
+            
+            const reasonEl = document.getElementById('game-over-reason');
+            if (lastMissedData) {
+                reasonEl.innerHTML = `Son kaçırdığın kelime: <strong style="color: var(--warning-color);">${lastMissedData.en}</strong> (<span style="color: var(--success-color);">${lastMissedData.tr}</span>)`;
+            } else {
+                reasonEl.innerText = "Canın tükendi.";
+            }
+
+            showModal('game-over-modal');
+        }
+
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { 
+            document.getElementById(id).classList.remove('active'); 
+            document.getElementById('password-error').style.display = 'none';
+            document.getElementById('settings-password-error').style.display = 'none';
+        }
+
+        function showLeaderboard() {
+            leaderboardBody.innerHTML = "";
+            if (leaderboard.length === 0) {
+                leaderboardBody.innerHTML = "<tr><td colspan='3'>Henüz kayıt yok.</td></tr>";
+            } else {
+                leaderboard.forEach((entry, index) => {
+                    const row = `<tr><td>${index + 1}</td><td>${entry.name}</td><td style="color: var(--success-color); font-weight: bold;">${entry.score}</td></tr>`;
+                    leaderboardBody.innerHTML += row;
+                });
+            }
+            if(!isGameOver) { cancelAnimationFrame(animationFrameId); }
+            showModal('leaderboard-modal');
+        }
+
+        function showResetPasswordModal() {
+            document.getElementById('password-input').value = "";
+            showModal('reset-modal');
+        }
+
+        function verifyAndReset() {
+            const passInput = document.getElementById('password-input').value;
+            if (passInput === "780878") {
+                leaderboard = [];
+                localStorage.setItem('wordGameLeaderboard', JSON.stringify(leaderboard));
+                updateHighScoreDisplay(); 
+                hideModal('reset-modal');
+                showLeaderboard(); 
+            } else {
+                document.getElementById('password-error').style.display = 'block';
+            }
+        }
+
+        function showSettingsAuthModal() {
+            document.getElementById('settings-password-input').value = "";
+            showModal('settings-auth-modal');
+        }
+
+        function verifySettingsPassword() {
+            const passInput = document.getElementById('settings-password-input').value;
+            if (passInput === "780878") {
+                hideModal('settings-auth-modal');
+                document.getElementById('speed-slider').value = baseFallSpeed;
+                document.getElementById('speed-display-text').innerText = baseFallSpeed.toFixed(1);
+                showModal('settings-modal');
+            } else {
+                document.getElementById('settings-password-error').style.display = 'block';
+            }
+        }
+
+        function updateSpeedDisplay(val) {
+            document.getElementById('speed-display-text').innerText = parseFloat(val).toFixed(1);
+        }
+
+        function saveSpeedSettings() {
+            const newSpeed = parseFloat(document.getElementById('speed-slider').value);
+            baseFallSpeed = newSpeed;
+            fallSpeed = newSpeed; 
+            
+            // Ayarlanan yeni hızı LocalStorage'a kaydediyoruz
+            localStorage.setItem('wordGameSpeed', newSpeed);
+            
+            hideModal('settings-modal');
+            
+            if (!isGameOver) window.focus();
+        }
+    </script>
+</body>
+</html>
