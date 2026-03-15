@@ -81,19 +81,17 @@
 
         .header-left { display: flex; align-items: center; }
         
-        /* Merkeze Alınmış Dev Skor - Siber Kapsül */
+        /* Merkeze Alınmış Dev Skor - Siber Kapsül (Efektsiz) */
         .header-center {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             align-items: center;
-            background: rgba(2, 6, 23, 0.6);
-            backdrop-filter: blur(8px);
+            background: rgba(2, 6, 23, 0.9);
             padding: 5px 25px;
             border-radius: 30px;
             border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
         }
 
         .score-box { font-size: 16px; font-weight: 700; color: #94a3b8; letter-spacing: 2px; text-transform: uppercase;}
@@ -102,7 +100,6 @@
             font-weight: 900; 
             color: #fff; 
             margin-left: 12px; 
-            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue); 
         }
 
         .header-right { display: flex; align-items: center; gap: 20px; }
@@ -403,21 +400,13 @@
         .btn-warning { background-color: transparent; border: 1px solid var(--warning-color); color: var(--warning-color); }
         .btn-warning:hover { background-color: var(--warning-color); color: #020617; box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
 
-        /* Oyun Ortası Başla Butonu */
+        /* Oyun Ortası Başla Butonu (Efektsiz) */
         #center-start-wrapper { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: none; }
-        @keyframes pulse-start {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(0, 243, 255, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); }
-        }
         .btn-start { 
             font-size: 36px; padding: 25px 70px; border-radius: 50px; 
-            animation: pulse-start 2s infinite; 
             background: transparent; border: 2px solid var(--neon-blue); color: #fff;
-            text-shadow: 0 0 10px var(--neon-blue);
-            backdrop-filter: blur(5px);
         }
-        .btn-start:hover { background: var(--neon-blue); color: #020617; text-shadow: none; }
+        .btn-start:hover { background: var(--neon-blue); color: #020617; }
 
         .leaderboard-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; color: #f8fafc; font-size: 16px;}
         .leaderboard-table th, .leaderboard-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
