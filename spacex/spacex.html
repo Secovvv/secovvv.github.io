@@ -1,0 +1,3184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive UFO - Real Planetary Scale & Toggleable HUD</title>
+    <style>
+        /* index.html'deki Dinamik Ölçeklendirme Değişkenleri */
+        :root {
+            --z: 1;
+            --u: calc(1vw * var(--z));
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Sağ Üst Çözünürlük Kutusu */
+        #resolution-container {
+            position: fixed;
+            top: calc(0.8 * var(--u));
+            right: calc(0.8 * var(--u));
+            padding: calc(0.35 * var(--u)) calc(0.8 * var(--u));
+            background-color: rgba(5, 10, 15, 0.82);
+            color: lawngreen;
+            border: calc(0.08 * var(--u)) solid rgba(124, 252, 0, 0.5);
+            font-size: calc(0.85 * var(--u));
+            font-weight: 600;
+            border-radius: calc(0.4 * var(--u));
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Sol Üst Panel Aç/Kapat ve Duraklat Butonları */
+        #hudToggleBtn, #pauseToggleBtn {
+            position: fixed;
+            top: calc(0.8 * var(--u));
+            z-index: 15;
+            background: rgba(5, 12, 20, 0.9);
+            color: lawngreen;
+            border: calc(0.08 * var(--u)) solid lawngreen;
+            border-radius: calc(0.3 * var(--u));
+            padding: calc(0.25 * var(--u)) calc(0.65 * var(--u));
+            font-size: calc(0.75 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 calc(0.5 * var(--u)) rgba(0, 0, 0, 0.8);
+        }
+
+        #hudToggleBtn {
+            left: calc(0.8 * var(--u));
+        }
+
+        #pauseToggleBtn {
+            left: calc(10.8 * var(--u));
+            color: #00f2ff;
+            border-color: #00f2ff;
+        }
+
+        #hudToggleBtn:hover {
+            background: lawngreen;
+            color: #000;
+            box-shadow: 0 0 calc(0.8 * var(--u)) lawngreen;
+        }
+
+        #pauseToggleBtn:hover {
+            background: #00f2ff;
+            color: #000;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #00f2ff;
+        }
+
+        /* KOMPAKT TAKTİKSEL KOKPİT PANELİ */
+        #hud {
+            position: fixed;
+            top: calc(2.7 * var(--u));
+            left: calc(0.8 * var(--u));
+            color: lawngreen;
+            font-size: calc(0.85 * var(--u));
+            font-weight: 600;
+            z-index: 5;
+            background: rgba(5, 10, 15, 0.85);
+            padding: calc(0.6 * var(--u)) calc(0.85 * var(--u));
+            border: calc(0.08 * var(--u)) solid rgba(124, 252, 0, 0.6);
+            border-left: calc(0.22 * var(--u)) solid lawngreen;
+            border-radius: calc(0.35 * var(--u));
+            box-shadow: 0 0 calc(0.8 * var(--u)) rgba(0, 0, 0, 0.8);
+            width: calc(32.5 * var(--u));
+            line-height: 1.35;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        #hud.hud-hidden {
+            opacity: 0;
+            transform: translateY(calc(-1 * var(--u)));
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        #hud span {
+            color: #fff;
+        }
+
+        .hud-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: calc(0.6 * var(--u));
+            margin-bottom: calc(0.25 * var(--u));
+        }
+
+        .hud-wave-label {
+            font-size: calc(0.75 * var(--u));
+            color: #aaa;
+        }
+
+        /* Gaz / Sürat (Throttle) Gösterge Çubuğu */
+        #throttleContainer {
+            display: flex;
+            align-items: center;
+            gap: calc(0.5 * var(--u));
+            margin: calc(0.35 * var(--u)) 0;
+            padding: calc(0.25 * var(--u)) calc(0.4 * var(--u));
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: calc(0.25 * var(--u));
+        }
+
+        .throttle-title {
+            min-width: calc(6.2 * var(--u));
+            font-size: calc(0.78 * var(--u));
+            color: lawngreen;
+        }
+
+        .throttle-hint {
+            font-size: calc(0.68 * var(--u));
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        #throttleBarBg {
+            flex: 1;
+            height: calc(0.55 * var(--u));
+            background: #222;
+            border-radius: calc(0.25 * var(--u));
+            overflow: hidden;
+            border: calc(0.07 * var(--u)) solid #444;
+        }
+
+        #throttleBarFill {
+            width: 20%;
+            height: 100%;
+            background: linear-gradient(90deg, lawngreen, #00f2ff, #ff9900);
+            transition: width 0.05s linear;
+        }
+
+        #telemetryBar {
+            font-size: calc(0.78 * var(--u));
+            color: #00f2ff;
+            border-top: calc(0.07 * var(--u)) solid rgba(255, 255, 255, 0.12);
+            padding-top: calc(0.25 * var(--u));
+            margin-top: calc(0.15 * var(--u));
+        }
+
+        #statusHud {
+            margin-top: calc(0.35 * var(--u));
+            font-size: calc(0.72 * var(--u));
+            display: flex;
+            gap: calc(0.4 * var(--u));
+            border-top: calc(0.07 * var(--u)) solid rgba(255, 255, 255, 0.12);
+            padding-top: calc(0.35 * var(--u));
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: calc(0.15 * var(--u)) calc(0.4 * var(--u));
+            border-radius: calc(0.2 * var(--u));
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        #hudLog {
+            margin-top: calc(0.35 * var(--u));
+            padding: calc(0.25 * var(--u)) calc(0.45 * var(--u));
+            font-size: calc(0.75 * var(--u));
+            color: #00f2ff;
+            background: rgba(0, 242, 255, 0.08);
+            border-left: calc(0.15 * var(--u)) solid #00f2ff;
+            border-radius: calc(0.15 * var(--u));
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s ease;
+        }
+
+        /* DALGA BAŞLANGICI VE 12 SN RAHATLAMA EVRESİ SİNEMATİK EKRAN BAŞLIĞI */
+        #stageAnnouncement {
+            position: fixed;
+            top: 22%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+            pointer-events: none;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            background: rgba(5, 10, 18, 0.78);
+            padding: calc(0.9 * var(--u)) calc(2.2 * var(--u));
+            border-radius: calc(0.65 * var(--u));
+            border-top: calc(0.15 * var(--u)) solid #00f2ff;
+            border-bottom: calc(0.15 * var(--u)) solid #00f2ff;
+            box-shadow: 0 0 calc(1.6 * var(--u)) rgba(0, 242, 255, 0.3);
+        }
+
+        #stageMainTitle {
+            font-size: calc(2.2 * var(--u));
+            font-weight: 800;
+            color: #00f2ff;
+            letter-spacing: calc(0.12 * var(--u));
+            text-shadow: 0 0 calc(1.1 * var(--u)) rgba(0, 242, 255, 0.9);
+            margin-bottom: calc(0.25 * var(--u));
+        }
+
+        #stageSubTitle {
+            font-size: calc(1.05 * var(--u));
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: calc(0.04 * var(--u));
+        }
+
+        /* DURAKLATMA (PAUSE) EKRANI */
+        #pauseScreen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            background: rgba(6, 12, 22, 0.94);
+            border: calc(0.15 * var(--u)) solid #00f2ff;
+            padding: calc(2.0 * var(--u)) calc(3.0 * var(--u));
+            border-radius: calc(0.8 * var(--u));
+            text-align: center;
+            display: none;
+            z-index: 12;
+            box-shadow: 0 0 calc(2.5 * var(--u)) rgba(0, 242, 255, 0.45);
+            min-width: calc(27 * var(--u));
+            backdrop-filter: blur(4px);
+        }
+
+        #pauseTitle {
+            color: #00f2ff;
+            font-size: calc(2.1 * var(--u));
+            font-weight: 800;
+            letter-spacing: calc(0.1 * var(--u));
+            margin-bottom: calc(0.5 * var(--u));
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(0, 242, 255, 0.8);
+        }
+
+        #pauseSub {
+            font-size: calc(0.95 * var(--u));
+            color: #ccc;
+            margin-bottom: calc(1.1 * var(--u));
+        }
+
+        #pauseStatsBox {
+            background: rgba(255, 255, 255, 0.05);
+            border: calc(0.07 * var(--u)) solid rgba(0, 242, 255, 0.25);
+            border-radius: calc(0.4 * var(--u));
+            padding: calc(0.7 * var(--u)) calc(1.0 * var(--u));
+            margin-bottom: calc(1.2 * var(--u));
+            font-size: calc(0.9 * var(--u));
+            line-height: 1.6;
+            color: lawngreen;
+        }
+
+        #resumeBtn {
+            padding: calc(0.6 * var(--u)) calc(1.6 * var(--u));
+            font-size: calc(1.0 * var(--u));
+            background-color: #00f2ff;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: calc(0.4 * var(--u));
+            transition: 0.2s;
+        }
+
+        #resumeBtn:hover {
+            background-color: lawngreen;
+            box-shadow: 0 0 calc(1 * var(--u)) lawngreen;
+            transform: scale(1.05);
+        }
+
+        /* Oyun Sonu ve Rekortmen Ekranı */
+        #gameOverScreen {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            background: rgba(10, 12, 18, 0.95);
+            border: calc(0.15 * var(--u)) solid #ff3333;
+            padding: calc(2.2 * var(--u)) calc(3.2 * var(--u));
+            border-radius: calc(0.8 * var(--u));
+            text-align: center;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 0 calc(2.2 * var(--u)) rgba(255, 0, 0, 0.6);
+            min-width: calc(28 * var(--u));
+        }
+
+        #gameOverTitle {
+            color: #ff3333;
+            font-size: calc(2.3 * var(--u));
+            font-weight: bold;
+            margin-bottom: calc(0.65 * var(--u));
+            text-shadow: 0 0 calc(1 * var(--u)) #ff0000;
+        }
+
+        #gameOverSubtitle {
+            font-size: calc(1.05 * var(--u));
+            color: #00f2ff;
+            margin-bottom: calc(0.9 * var(--u));
+        }
+
+        .score-info {
+            font-size: calc(1.4 * var(--u));
+            margin: calc(0.65 * var(--u)) 0;
+        }
+
+        .champion-info {
+            font-size: calc(1.3 * var(--u));
+            color: gold;
+            margin: calc(1 * var(--u)) 0;
+            text-shadow: 0 0 calc(0.65 * var(--u)) rgba(255, 215, 0, 0.7);
+        }
+
+        #newRecordBox {
+            display: none;
+            margin: calc(1 * var(--u)) 0;
+        }
+
+        #playerNameInput {
+            padding: calc(0.5 * var(--u)) calc(0.8 * var(--u));
+            font-size: calc(1.05 * var(--u));
+            border-radius: calc(0.35 * var(--u));
+            border: calc(0.08 * var(--u)) solid lawngreen;
+            background: #111;
+            color: lawngreen;
+            outline: none;
+            text-align: center;
+        }
+
+        #saveRecordBtn {
+            padding: calc(0.5 * var(--u)) calc(1.05 * var(--u));
+            font-size: calc(1.05 * var(--u));
+            background-color: gold;
+            color: black;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: calc(0.35 * var(--u));
+            margin-left: calc(0.35 * var(--u));
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: calc(1 * var(--u));
+            margin-top: calc(1.4 * var(--u));
+        }
+
+        #restartBtn {
+            padding: calc(0.65 * var(--u)) calc(1.8 * var(--u));
+            font-size: calc(1.05 * var(--u));
+            background-color: lawngreen;
+            color: black;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: calc(0.4 * var(--u));
+            transition: 0.2s;
+        }
+
+        #restartBtn:hover {
+            background-color: #7cfc00;
+            box-shadow: 0 0 calc(1 * var(--u)) lawngreen;
+            transform: scale(1.05);
+        }
+
+        /* GERÇEK ASTRONOMİK ORANLARA GÖRE ÖLÇEKLENDİRİLMİŞ GEZEGENLER (Dünya = 3.20u baz alındı) */
+        .planet {
+            position: fixed;
+            top: 50%;
+            left: -5000px;
+            transform: translateY(-50%);
+            height: auto;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+            z-index: -1;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Güneş: Gezegenleri yanında cüce bırakan devasa yıldız ölçeği */
+        #sun     { width: calc(115.00 * var(--u)); }
+        /* Merkür: 0.38 x Dünya */
+        #mercure { width: calc(1.22 * var(--u)); }
+        /* Venüs: 0.95 x Dünya */
+        #venus   { width: calc(3.04 * var(--u)); }
+        /* Dünya: 1.00 x Referans */
+        #earth   { width: calc(3.20 * var(--u)); }
+        /* Mars: 0.53 x Dünya */
+        #mars    { width: calc(1.70 * var(--u)); }
+        /* Jüpiter: 10.97 x Dünya (En büyük gezegen) */
+        #jupiter { width: calc(35.10 * var(--u)); }
+        /* Satürn: 9.14 x Dünya (Halka genişliği dahil edildiğinde küresi Jüpiter'den biraz küçüktür) */
+        #saturn  { 
+            width: calc(62.00 * var(--u)); 
+            aspect-ratio: auto;
+        }
+        /* Uranüs: 3.98 x Dünya */
+        #uranus  { width: calc(12.74 * var(--u)); }
+        /* Neptün: 3.86 x Dünya */
+        #neptune { width: calc(12.35 * var(--u)); }
+    </style>
+</head>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
+    <!-- Sağ Üst Çözünürlük Bilgisi -->
+    <div id="resolution-container"></div>
+
+    <!-- Sol Üst Kokpit Paneli Aç/Kapat ve Duraklat Butonları -->
+    <button id="hudToggleBtn" onclick="toggleHudPanel()" style="opacity: 0.65;">📊 PANELİ AÇ [H]</button>
+    <button id="pauseToggleBtn" onclick="togglePause()">⏸ DURAKLAT [P]</button>
+
+    <!-- Sol Üst Kompakt Taktiksel Kokpit Paneli -->
+    <div id="hud" class="hud-hidden">
+        <div class="hud-row">
+            <div>SKOR: <span id="currentScore">0</span> | REKOR: <span id="hudHighScore">0</span> (<span id="hudChampion">Yok</span>)</div>
+            <div class="hud-wave-label">DALGA: <span id="phaseName" style="color:#00f2ff;">1 - GÜNEŞ SİSTEMİ</span></div>
+        </div>
+
+        <div id="throttleContainer">
+            <div class="throttle-title">🚀 SÜRAT: %<span id="throttleVal">20</span></div>
+            <div id="throttleBarBg"><div id="throttleBarFill"></div></div>
+            <div class="throttle-hint">[D: Hızlan (İleri) | A: Yavaşla/Geri]</div>
+        </div>
+
+        <div id="telemetryBar">
+            📡 GÜNEŞ MESAFESİ: <span id="distVal">35</span> M.KM (<span id="auVal">0.23</span> AU) | HEDEF: <span id="nextTarget" style="color:gold;">GÜNEŞ MERKEZİ</span>
+        </div>
+        <div id="statusHud">
+            <div class="status-badge" id="shieldBadge" style="color: #888;">🛡️ KALKAN: %0</div>
+            <div class="status-badge" id="hullBadge" style="color: lawngreen;">🔧 GÖVDE: %100</div>
+            <div class="status-badge" id="weaponBadge" style="color: #888;">🔥 LAZER: TEKLİ</div>
+            <div class="status-badge" id="dropCounterBadge" style="color: gold;">🎯 KAPSÜL: 0/7</div>
+            <div class="status-badge" id="comboBadge" style="color: #888;">⚡ SERİ: 1x (0)</div>
+            <div class="status-badge" id="gravityBadge" style="color: #888;">🌌 ÇEKİM: YOK</div>
+        </div>
+        <div id="hudLog">🚀 [H] Paneli Gizle | [P / ESC] Oyunu Duraklat | Soldan sağa Güneş'e ilerliyorsun...</div>
+    </div>
+
+    <div id="stageAnnouncement">
+        <div id="stageMainTitle">1. DALGA</div>
+        <div id="stageSubTitle">GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI</div>
+    </div>
+
+    <!-- Duraklatma (Pause) Ekranı -->
+    <div id="pauseScreen">
+        <div id="pauseTitle">⏸ OYUN DURAKLATILDI</div>
+        <div id="pauseSub">Tüm zamanlayıcılar, lazer süreleri ve kalkan sayaçları donduruldu.</div>
+        <div id="pauseStatsBox">
+            <div>AKTİF DALGA: <span id="pauseWaveVal" style="color:#fff;">1</span> | SKOR: <span id="pauseScoreVal" style="color:#fff;">0</span></div>
+            <div>GÖVDE CANI: <span id="pauseHullVal" style="color:#00f2ff;">%100</span> | SERİ ÇARPANI: <span id="pauseComboVal" style="color:gold;">1x</span></div>
+        </div>
+        <div class="action-buttons">
+            <button id="resumeBtn" onclick="togglePause()">▶ DEVAM ET [P / ESC]</button>
+        </div>
+    </div>
+
+    <div id="gameOverScreen">
+        <div id="gameOverTitle">MEKİK İNFLAK ETTİ!</div>
+        <div id="gameOverSubtitle">Ulaşılan Dalga: <span id="finalWave">1</span> | İmha Edilen Boss: <span id="bossKillCount">0</span></div>
+        <div class="score-info">Senin Skorun: <strong id="finalScore" style="color: lawngreen;">0</strong></div>
+        <div class="champion-info">🏆 Rekortmen: <span id="championName">Yok</span> (<span id="highScoreVal">0</span> Puan)</div>
+        
+        <div id="newRecordBox">
+            <div style="color: lawngreen; font-weight: bold; margin-bottom: calc(0.5 * var(--u));">🎉 YENİ REKOR! İSMİNİ YAZ:</div>
+            <input type="text" id="playerNameInput" placeholder="Kaptan Adı..." maxlength="15" />
+            <button id="saveRecordBtn" onclick="saveNewRecord()">KAYDET</button>
+        </div>
+
+        <div class="action-buttons">
+            <button id="restartBtn" onclick="location.reload()">🔄 YENİDEN BAŞLA</button>
+        </div>
+    </div>
+
+    <canvas id="ufoCanvas"></canvas>
+    <img id="sun" class="planet" src="sun.gif" alt="Sun" />
+    <img id="mercure" class="planet" src="mercure.gif" alt="Mercure" />
+    <img id="earth" class="planet" src="earth.gif" alt="Earth" />
+    <img id="venus" class="planet" src="venus.gif" alt="Venus" />
+    <img id="mars" class="planet" src="mars.gif" alt="Mars" />
+    <img id="jupiter" class="planet" src="jupiter.gif" alt="Jupiter" />
+    <img id="saturn" class="planet" src="saturn.gif" alt="Saturn" />
+    <img id="uranus" class="planet" src="uranus.gif" alt="Uranus" />
+    <img id="neptune" class="planet" src="neptune.gif" alt="Neptune" />
+
+    <audio id="sunPatlaSound" src="sunpatla.mp3"></audio>
+    <audio id="astopatla" src="astopatla.mp3"></audio>
+    <audio id="laserSound" src="laser.mp3"></audio>
+    
+    <script>
+        // Sol Üst Bilgi Panelini (HUD) Açıp Kapatma Fonksiyonu
+        function toggleHudPanel() {
+            const hud = document.getElementById('hud');
+            const btn = document.getElementById('hudToggleBtn');
+            hud.classList.toggle('hud-hidden');
+
+            if (hud.classList.contains('hud-hidden')) {
+                btn.innerText = '📊 PANELİ AÇ [H]';
+                btn.style.opacity = '0.65';
+            } else {
+                btn.innerText = '✖ PANELİ GİZLE [H]';
+                btn.style.opacity = '1';
+            }
+            btn.blur();
+        }
+
+        // --- TAM KAPSAMLI DURAKLATMA (PAUSE) SİSTEMİ ---
+        let isPaused = false;
+        let pauseStartTime = 0;
+
+        function togglePause(forceState = null) {
+            if (window.ufo && ufo.isDestroyed) return;
+
+            const targetState = forceState !== null ? forceState : !isPaused;
+            if (targetState === isPaused) return;
+
+            isPaused = targetState;
+            const pauseScreen = document.getElementById('pauseScreen');
+            const pauseBtn = document.getElementById('pauseToggleBtn');
+
+            if (isPaused) {
+                pauseStartTime = Date.now();
+                resetAllKeys();
+
+                if (window.ufo) {
+                    document.getElementById('pauseWaveVal').innerText = currentWave;
+                    document.getElementById('pauseScoreVal').innerText = score;
+                    document.getElementById('pauseHullVal').innerText = `%${ufo.hullHp}`;
+                    document.getElementById('pauseComboVal').innerText = `${comboMultiplier}x (${killStreak})`;
+                }
+
+                pauseScreen.style.display = 'block';
+                if (pauseBtn) {
+                    pauseBtn.innerText = '▶ DEVAM ET [P]';
+                    pauseBtn.style.background = '#00f2ff';
+                    pauseBtn.style.color = '#000';
+                }
+            } else {
+                const pausedDuration = Date.now() - pauseStartTime;
+
+                // Duraklatma süresince geçen zamanı tüm aktif zamanlayıcılara ekle (hiçbir sayaç erimez)
+                if (isReliefPhase && reliefUntil > 0) {
+                    reliefUntil += pausedDuration;
+                }
+                if (window.ufo) {
+                    if (ufo.invulnerableUntil > pauseStartTime) {
+                        ufo.invulnerableUntil += pausedDuration;
+                    }
+                    ufo.lastFrameTime = Date.now();
+                }
+
+                pauseScreen.style.display = 'none';
+                if (pauseBtn) {
+                    pauseBtn.innerText = '⏸ DURAKLAT [P]';
+                    pauseBtn.style.background = 'rgba(5, 12, 20, 0.9)';
+                    pauseBtn.style.color = '#00f2ff';
+                }
+            }
+
+            if (pauseBtn) pauseBtn.blur();
+        }
+
+        // 1. Çözünürlük ve Orantılı Ölçeklendirme Sistemi (--z, --u ve Canvas için S katsayısı)
+        const BASE_REF_WIDTH = 1536;
+        let baseDPR = window.devicePixelRatio || 1;
+        let zoomFactor = 1;
+        let S = 1;
+        let prevWinW = window.innerWidth || BASE_REF_WIDTH;
+        let prevWinH = window.innerHeight || 864;
+
+        const canvas = document.getElementById('ufoCanvas');
+
+        function updateResolution() {
+            const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            const currentDPR = window.devicePixelRatio || 1;
+            zoomFactor = currentDPR / baseDPR;
+
+            document.documentElement.style.setProperty('--z', zoomFactor);
+            const resEl = document.getElementById('resolution-container');
+            if (resEl) {
+                resEl.textContent = 'Resolution: ' + width + 'x' + height;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            S = (width / BASE_REF_WIDTH) * zoomFactor;
+
+            const ratioX = prevWinW > 0 ? (width / prevWinW) : 1;
+            const ratioY = prevWinH > 0 ? (height / prevWinH) : 1;
+
+            if (window.ufo) {
+                ufo.rescale(ratioX, ratioY);
+            }
+
+            if (window.stars) {
+                for (let st of window.stars) {
+                    st.x *= ratioX;
+                    st.y *= ratioY;
+                }
+            }
+
+            prevWinW = width;
+            prevWinH = height;
+        }
+
+        let score = 0;
+        let currentWave = 1;
+        let bossesDefeated = 0;
+        let deepSpaceEventsActive = false;
+        let asteroidBeltActive = false;
+        let kuiperBeltActive = false;
+
+        let isReliefPhase = false;
+        let reliefUntil = 0;
+        let waveBossSpawned = false;
+        let waveStartDist = 0;
+        const WAVE_COMBAT_DISTANCE = 6500;
+
+        // Gezegenlerin ekranda çok hızlı akmasını önleyen derinlik (paralaks) çarpanı
+        const PLANET_PARALLAX = 0.25;
+
+        let travelDistance = 0; 
+        const SUN_CENTER_DIST = 6000;
+        const ASTEROID_BELT_START = 21500;
+        const ASTEROID_BELT_END = 26000;
+        const KUIPER_START_DIST = 55500;
+        const KUIPER_END_DIST = 62000;
+        let deepSpaceStartDist = 62000;
+
+        let highScore = localStorage.getItem('space_highscore') ? parseInt(localStorage.getItem('space_highscore')) : 0;
+        let champion = localStorage.getItem('space_champion') ? localStorage.getItem('space_champion') : 'Yok';
+
+        document.getElementById('hudHighScore').innerText = highScore;
+        document.getElementById('hudChampion').innerText = champion;
+
+        const astronomicalSchedule = [
+            { id: 'sun',     name: 'GÜNEŞ',   au: 0.00,  mKm: 0,    centerDist: 6000,  color: '#ffcc00', gLabel: 'DEVASA (GÜNEŞ)', announced: false },
+            { id: 'mercure', name: 'MERKÜR',  au: 0.39,  mKm: 58,   centerDist: 11000, color: '#aaaaaa', gLabel: 'ÇOK DÜŞÜK',      announced: false },
+            { id: 'venus',   name: 'VENÜS',   au: 0.72,  mKm: 108,  centerDist: 14000, color: '#ff9900', gLabel: 'ORTA',           announced: false },
+            { id: 'earth',   name: 'DÜNYA',   au: 1.00,  mKm: 150,  centerDist: 17000, color: '#00bfff', gLabel: 'NORMAL (1G)',    announced: false },
+            { id: 'mars',    name: 'MARS',    au: 1.52,  mKm: 228,  centerDist: 20000, color: '#ff3300', gLabel: 'ZAYIF (0.38G)',  announced: false },
+            { id: 'jupiter', name: 'JÜPİTER', au: 5.20,  mKm: 778,  centerDist: 28500, color: '#ff6600', gLabel: 'ÇOK YÜKSEK',     announced: false },
+            { id: 'saturn',  name: 'SATÜRN',  au: 9.58,  mKm: 1430, centerDist: 37000, color: '#ffd700', gLabel: 'YÜKSEK',         announced: false },
+            { id: 'uranus',  name: 'ÜRANÜS',  au: 19.20, mKm: 2870, centerDist: 45500, color: '#00ffff', gLabel: 'ORTA-YÜKSEK',    announced: false },
+            { id: 'neptune', name: 'NEPTÜN',  au: 30.05, mKm: 4500, centerDist: 53500, color: '#3366ff', gLabel: 'ORTA-YÜKSEK',    announced: false }
+        ];
+
+        // --- MERKEZ ODAKLI HİPER LAZER VE SERİ ÇARPANI ---
+        let killStreak = 0;
+        let comboMultiplier = 1;
+
+        function getSpreadBeamCount(waveNum) {
+            if (waveNum >= 8) return 6;
+            if (waveNum >= 4) return 5;
+            return 3;
+        }
+
+        function getSpreadWeaponLabel(waveNum) {
+            const cnt = getSpreadBeamCount(waveNum);
+            if (cnt === 6) return "6'LI HİPER LAZER";
+            if (cnt === 5) return "5'Lİ HİPER LAZER";
+            return "3'LÜ LAZER";
+        }
+
+        function registerKillStreak() {
+            killStreak++;
+            const prevMult = comboMultiplier;
+            if (killStreak >= 10) comboMultiplier = 3;
+            else if (killStreak >= 5) comboMultiplier = 2;
+            else comboMultiplier = 1;
+
+            if (comboMultiplier > prevMult && window.ufo && !ufo.isDestroyed) {
+                ufo.floatingTexts.push(new FloatingText(ufo.x, ufo.y - 35 * S, `⚡ ${comboMultiplier}X SERİ ÇARPANI AKTİF!`, 'gold'));
+                showBanner(`⚡ Kusursuz Pilotaj! Hasarsız ${killStreak} imha ile ${comboMultiplier}x Puan Çarpanına ulaştın!`, 'gold');
+            }
+        }
+
+        function resetKillStreak() {
+            if (comboMultiplier > 1) {
+                showBanner(`💥 Hasar alındı! ${comboMultiplier}x Seri Çarpanı sıfırlandı.`, '#ff6600');
+            }
+            killStreak = 0;
+            comboMultiplier = 1;
+        }
+
+        function addScore(points, useMultiplier = true) {
+            const finalPts = useMultiplier ? Math.round(points * comboMultiplier) : points;
+            score += finalPts;
+            document.getElementById('currentScore').innerText = score;
+            return finalPts;
+        }
+
+        function showBanner(text, color = '#00f2ff') {
+            const hudLog = document.getElementById('hudLog');
+            const cleanText = text.replace(/\n/g, ' - ');
+            hudLog.innerText = cleanText;
+            hudLog.style.color = color;
+            hudLog.style.borderLeftColor = color;
+            hudLog.style.background = 'rgba(255, 255, 255, 0.12)';
+            setTimeout(() => {
+                hudLog.style.background = 'rgba(0, 242, 255, 0.06)';
+            }, 600);
+        }
+
+        let stageTimeout = null;
+        function showStageAnnouncement(mainText, subText, color = '#00f2ff', duration = 3500) {
+            const box = document.getElementById('stageAnnouncement');
+            const mainEl = document.getElementById('stageMainTitle');
+            const subEl = document.getElementById('stageSubTitle');
+
+            if (stageTimeout) clearTimeout(stageTimeout);
+
+            mainEl.innerText = mainText;
+            mainEl.style.color = color;
+            mainEl.style.textShadow = `0 0 calc(1.1 * var(--u)) ${color}`;
+            subEl.innerText = subText;
+
+            box.style.borderTopColor = color;
+            box.style.borderBottomColor = color;
+            box.style.boxShadow = `0 0 calc(1.6 * var(--u)) ${color}44`;
+            box.style.opacity = '1';
+
+            if (duration > 0) {
+                stageTimeout = setTimeout(() => {
+                    if (!isReliefPhase) {
+                        box.style.opacity = '0';
+                    }
+                }, duration);
+            }
+        }
+
+        function saveNewRecord() {
+            const nameInput = document.getElementById('playerNameInput').value.trim();
+            const finalName = nameInput !== "" ? nameInput : "Gizemli Pilot";
+            highScore = score;
+            champion = finalName;
+            localStorage.setItem('space_highscore', highScore);
+            localStorage.setItem('space_champion', champion);
+
+            document.getElementById('championName').innerText = finalName;
+            document.getElementById('highScoreVal').innerText = score;
+            document.getElementById('hudHighScore').innerText = score;
+            document.getElementById('hudChampion').innerText = finalName;
+            document.getElementById('newRecordBox').style.display = 'none';
+        }
+
+        function hidePlanetOffscreen(el) {
+            if (!el) return;
+            el.style.display = 'none';
+            el.style.left = '-5000px';
+        }
+
+        function getWaveDescription(waveNum) {
+            if (waveNum === 1) return "GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI";
+            if (waveNum === 2) return "KUİPER ÖTESİ: AVCI İHA SEKTÖRÜ";
+            if (waveNum === 3) return "ZIRHLI KRUVAZÖR VE KARADELİK KUŞAĞI";
+            if (waveNum === 4) return "OMEGA SEKTÖRÜ (🔥 5'Lİ HİPER LAZER & ÇİFTLİ SİLAH AKTİF!)";
+            if (waveNum === 8) return "APEX SEKTÖRÜ (🔥 MAKSİMUM 6'LI HİPER LAZER TERFİSİ AKTİF!)";
+            return `DERİN EVREN TAKTİK SEKTÖRÜ (SEVİYE ${waveNum} - ${getSpreadWeaponLabel(waveNum)})`;
+        }
+
+        function spawnWaveBoss(waveNum) {
+            if (waveBossSpawned || !window.ufo || ufo.isDestroyed) return;
+            waveBossSpawned = true;
+            deepSpaceEventsActive = true;
+            asteroidBeltActive = false;
+            kuiperBeltActive = false;
+
+            const boss = new SectorBoss(waveNum);
+            ufo.motherships.push(boss);
+
+            const phaseEl = document.getElementById('phaseName');
+            phaseEl.innerText = `${waveNum}. DALGA BOSS: ${boss.title}`;
+            phaseEl.style.color = boss.color;
+
+            showStageAnnouncement(`🚨 ${waveNum}. DALGA BOSS SAVAŞI`, boss.title, boss.color, 3200);
+            showBanner(`🚨 ${waveNum}. DALGA BOSS SAVAŞI: ${boss.title} sağdan sahneye indi! (Reaktif Zırh Aktif)`, boss.color);
+        }
+
+        function triggerReliefPhase() {
+            isReliefPhase = true;
+            reliefUntil = Date.now() + 12000;
+
+            if (window.ufo) {
+                for (let d of ufo.alienDrones) {
+                    for (let p = 0; p < 12; p++) {
+                        ufo.explosionParticles.push(new ExplosionParticle(d.x, d.y, ['#00ff88', '#ffffff']));
+                    }
+                }
+                for (let a of ufo.asteroids) {
+                    if (a.x > 0 && a.x < window.innerWidth) {
+                        for (let p = 0; p < 4; p++) {
+                            ufo.explosionParticles.push(new ExplosionParticle(a.x, a.y, ['#aaaaaa', '#ffffff']));
+                        }
+                    }
+                    a.x = window.innerWidth + (200 + Math.random() * 300) * S;
+                }
+                ufo.alienDrones = [];
+                ufo.planetPlasmas = [];
+                ufo.blackHoles = [];
+            }
+
+            const phaseEl = document.getElementById('phaseName');
+            phaseEl.innerText = `🌿 NEFES ALMA EVRESİ (12 SN)`;
+            phaseEl.style.color = 'lawngreen';
+
+            if (currentWave === 3) {
+                showBanner(`🎉 3. DALGA GEÇİLDİ! Gövde +%30 Onarıldı | Çiftli Standart Lazer & 5'li Hiper Lazer Açıldı!`, 'gold');
+            } else if (currentWave === 7) {
+                showBanner(`🎉 7. DALGA GEÇİLDİ! Gövde +%30 Onarıldı | 8. Dalgada 6'lı Hiper Lazer Açılıyor!`, 'gold');
+            } else {
+                showBanner(`🌿 ${currentWave}. DALGA TAMAMLANDI! Gövde +%30 Onarıldı & Lazer Sayacı Donduruldu ❄️.`, 'lawngreen');
+            }
+        }
+
+        function startNextWave(waveNum) {
+            isReliefPhase = false;
+            waveBossSpawned = false;
+            currentWave = waveNum;
+            deepSpaceEventsActive = true;
+            asteroidBeltActive = false;
+            kuiperBeltActive = false;
+            waveStartDist = travelDistance;
+
+            const phaseEl = document.getElementById('phaseName');
+            phaseEl.innerText = `${currentWave}. DALGA (DERİN UZAY)`;
+            phaseEl.style.color = '#00f2ff';
+
+            const isUpgradeWave = (currentWave === 4 || currentWave === 8);
+            if (isUpgradeWave && window.ufo && !ufo.isDestroyed) {
+                ufo.spreadHits = 3;
+                ufo.spreadRemainingMs = 18000;
+            }
+
+            showStageAnnouncement(`${currentWave}. DALGA`, getWaveDescription(currentWave), isUpgradeWave ? 'gold' : '#00f2ff', 4000);
+            showBanner(`⚔️ ${currentWave}. DALGA BAŞLADI! ${getWaveDescription(currentWave)}`, isUpgradeWave ? 'gold' : '#00f2ff');
+
+            if (window.ufo && !ufo.isDestroyed) {
+                const tier = currentWave >= 3 ? 2 : 1;
+                ufo.alienDrones.push(new AlienDrone(tier, currentWave));
+            }
+        }
+
+        function updateWorldPlanetsAndTelemetry() {
+            const distEl = document.getElementById('distVal');
+            const auEl = document.getElementById('auVal');
+            const nextEl = document.getElementById('nextTarget');
+            const phaseEl = document.getElementById('phaseName');
+
+            if (isReliefPhase) {
+                const remSec = Math.max(0, Math.ceil((reliefUntil - Date.now()) / 1000));
+                phaseEl.innerText = `🌿 DİNLENME EVRESİ (${remSec}s)`;
+                nextEl.innerText = `${currentWave + 1}. DALGA HAZIRLIĞI (${remSec}s)`;
+
+                const upgradeNote = currentWave === 3
+                    ? " | 🔥 4. DALGADA 5'Lİ HİPER LAZER AKTİF OLACAK!"
+                    : (currentWave === 7 ? " | 🔥 8. DALGADA 6'LI HİPER LAZER!" : "");
+                showStageAnnouncement(
+                    `🌿 ${currentWave}. DALGA TAMAMLANDI!`,
+                    `NEFES ALMA & ONARIM EVRESİ: ${remSec} SANİYE (Sonraki: ${currentWave + 1}. Dalga${upgradeNote})`,
+                    'lawngreen',
+                    0
+                );
+
+                if (Date.now() >= reliefUntil) {
+                    startNextWave(currentWave + 1);
+                }
+                return;
+            }
+
+            if (currentWave === 1 && !waveBossSpawned) {
+                for (let p of astronomicalSchedule) {
+                    const el = document.getElementById(p.id);
+                    if (!el) continue;
+
+                    // Soldan sağa ilerleyiş: Gezegenler ekranın sağından doğup sola doğru süzülür
+                    const offsetFromCenter = (p.centerDist - travelDistance) * PLANET_PARALLAX * (window.innerWidth / BASE_REF_WIDTH);
+                    const screenCenterX = (window.innerWidth * 0.5) + offsetFromCenter;
+
+                    const visibilityMargin = p.id === 'sun' ? window.innerWidth * 1.4 : window.innerWidth * 0.8;
+
+                    if (screenCenterX > -visibilityMargin && screenCenterX < window.innerWidth + visibilityMargin) {
+                        if (el.style.display !== 'block') {
+                            el.style.display = 'block';
+                        }
+                        const rectWidth = el.offsetWidth || (window.innerWidth * 0.2);
+                        const planetLeft = screenCenterX - rectWidth / 2;
+                        el.style.left = `${planetLeft}px`;
+
+                        if (!p.announced && planetLeft < window.innerWidth - 30 * S) {
+                            p.announced = true;
+                            if (p.id === 'sun') {
+                                showBanner(`☀️ Devasa Güneş göründü! [A] ile yavaşlayıp manzarayı izleyebilir veya [D] ile geçebilirsin!`, '#ffcc00');
+                            } else {
+                                showBanner(`🪐 ${p.name} (${p.au} AU) | Kütleçekimi: ${p.gLabel} — Gerçek ölçekli görünüm!`, p.color);
+                            }
+                        }
+                    } else {
+                        hidePlanetOffscreen(el);
+                    }
+                }
+
+                // Mekiğin ekrandaki gerçek X konumunu hesaba katan hassas hizalama mesafesi (Soldan sağa)
+                const ufoCenterX = window.ufo ? (ufo.x + ufo.width / 2) : (window.innerWidth * 0.5);
+                const shipScreenOffset = (ufoCenterX - (window.innerWidth * 0.5)) / (PLANET_PARALLAX * (window.innerWidth / BASE_REF_WIDTH));
+                const shipVisualDist = travelDistance + shipScreenOffset;
+
+                if (shipVisualDist >= ASTEROID_BELT_START && shipVisualDist <= ASTEROID_BELT_END) {
+                    if (!asteroidBeltActive) {
+                        asteroidBeltActive = true;
+                        phaseEl.innerText = `1. DALGA - ASTEROİT KUŞAĞI`;
+                        phaseEl.style.color = '#ff9900';
+                        showBanner(`☄️ ANA ASTEROİT KUŞAĞI (2.2 - 3.2 AU)! Göktaşı yoğunluğu arttı.`, '#ff9900');
+                    }
+                } 
+                else if (shipVisualDist >= KUIPER_START_DIST && shipVisualDist < KUIPER_END_DIST) {
+                    asteroidBeltActive = false;
+                    if (!kuiperBeltActive) {
+                        kuiperBeltActive = true;
+                        phaseEl.innerText = `1. DALGA - KUİPER KUŞAĞI`;
+                        phaseEl.style.color = '#00f2ff';
+                        showStageAnnouncement(`❄️ KUİPER KUŞAĞI (30 - 48 AU)`, `Buzul Göktaşı Kuşağı Geçiliyor... Kuşak Sonunda 1. Dalga Boss'u Bekliyor!`, '#00f2ff', 3500);
+                        showBanner(`❄️ NEPTÜN GEÇİLDİ: Kuiper Kuşağı'na girildi (30 - 48 AU)! Kuşak sonunda 1. Dalga biter.`, '#00f2ff');
+                    }
+                } 
+                else {
+                    if (asteroidBeltActive) {
+                        asteroidBeltActive = false;
+                        phaseEl.innerText = `1. DALGA - DIŞ GÜNEŞ SİSTEMİ`;
+                        phaseEl.style.color = '#ffcc00';
+                    } else if (shipVisualDist >= SUN_CENTER_DIST && shipVisualDist < ASTEROID_BELT_START) {
+                        phaseEl.innerText = `1. DALGA - İÇ GÜNEŞ SİSTEMİ`;
+                        phaseEl.style.color = '#00f2ff';
+                    }
+                }
+
+                // 1) Güneş Merkezine Yaklaşım Evresi (35 M.KM -> 0 M.KM)
+                if (shipVisualDist < SUN_CENTER_DIST) {
+                    const remainingRatio = Math.max(0, (SUN_CENTER_DIST - shipVisualDist) / SUN_CENTER_DIST);
+                    const approachMKm = Math.round(35 * remainingRatio);
+                    const approachAu = (0.23 * remainingRatio).toFixed(2);
+
+                    distEl.innerText = approachMKm;
+                    auEl.innerText = approachAu;
+                    nextEl.innerText = approachMKm === 0 ? "GÜNEŞ MERKEZİ (0 KM)!" : "GÜNEŞ MERKEZİ";
+                    return;
+                }
+
+                // 2) Güneş Merkez Çekirdeği
+                const SUN_CORE_HALF_SPAN = 450;
+                if (shipVisualDist >= SUN_CENTER_DIST && shipVisualDist <= SUN_CENTER_DIST + SUN_CORE_HALF_SPAN) {
+                    distEl.innerText = "0";
+                    auEl.innerText = "0.00";
+                    nextEl.innerText = "GÜNEŞ MERKEZİ (0 KM)!";
+                    return;
+                }
+
+                const neptuneObj = astronomicalSchedule[astronomicalSchedule.length - 1];
+                if (shipVisualDist >= neptuneObj.centerDist) {
+                    const kuiperProgress = Math.min(1, (shipVisualDist - neptuneObj.centerDist) / (KUIPER_END_DIST - neptuneObj.centerDist));
+                    const curAu = (30.05 + kuiperProgress * 17.95).toFixed(2);
+                    distEl.innerText = Math.floor(curAu * 149.6).toLocaleString('tr-TR');
+                    auEl.innerText = curAu;
+
+                    const remKuiperPct = Math.max(0, Math.ceil(100 - kuiperProgress * 100));
+                    nextEl.innerText = `KUİPER KUŞAĞI ÇIKIŞI (%${remKuiperPct})`;
+
+                    if (shipVisualDist >= KUIPER_END_DIST && !waveBossSpawned) {
+                        deepSpaceStartDist = travelDistance;
+                        spawnWaveBoss(1);
+                    }
+                    return;
+                }
+
+                let prev = astronomicalSchedule[0];
+                let next = neptuneObj;
+
+                for (let i = 1; i < astronomicalSchedule.length; i++) {
+                    if (shipVisualDist < astronomicalSchedule[i].centerDist) {
+                        next = astronomicalSchedule[i];
+                        prev = astronomicalSchedule[i - 1];
+                        break;
+                    }
+                }
+
+                const prevStartDist = prev.id === 'sun' ? (prev.centerDist + SUN_CORE_HALF_SPAN) : prev.centerDist;
+                const span = next.centerDist - prevStartDist;
+                const progress = span > 0 ? Math.max(0, (shipVisualDist - prevStartDist) / span) : 1;
+                const curAu = (prev.au + (next.au - prev.au) * progress).toFixed(2);
+                const curMKm = Math.floor(prev.mKm + (next.mKm - prev.mKm) * progress);
+
+                distEl.innerText = curMKm.toLocaleString('tr-TR');
+                auEl.innerText = curAu;
+                nextEl.innerText = `${next.name} (${next.au} AU)`;
+                return;
+            }
+
+            const extraDist = Math.max(0, travelDistance - deepSpaceStartDist);
+            const currentAu = (48.0 + (extraDist / 2500)).toFixed(2);
+            const currentMKm = Math.floor(currentAu * 149.6);
+            distEl.innerText = currentMKm.toLocaleString('tr-TR');
+            auEl.innerText = currentAu;
+
+            if (!waveBossSpawned) {
+                const distInWave = travelDistance - waveStartDist;
+                const remainingPct = Math.max(0, Math.ceil(100 - (distInWave / WAVE_COMBAT_DISTANCE) * 100));
+                nextEl.innerText = `${currentWave}. DALGA BOSS'UNA %${remainingPct} MESAFE`;
+
+                if (distInWave >= WAVE_COMBAT_DISTANCE) {
+                    spawnWaveBoss(currentWave);
+                }
+            } else {
+                nextEl.innerText = `⚔️ ${currentWave}. DALGA BOSS SAVAŞI!`;
+            }
+        }
+
+        const keys = { w: false, a: false, s: false, d: false };
+
+        function resetAllKeys() {
+            keys.w = false;
+            keys.a = false;
+            keys.s = false;
+            keys.d = false;
+            if (window.ufo) {
+                ufo.vx = 0;
+                ufo.vy = 0;
+            }
+        }
+
+        window.stars = [];
+        for (let i = 0; i < 55; i++) {
+            window.stars.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                baseSize: Math.random() * 2 + 0.8,
+                depth: Math.random() * 0.7 + 0.3
+            });
+        }
+
+        // Yıldızlar mekik sağa ilerledikçe sağdan sola doğru akar
+        function drawAndUpdateStars(ctx, shipSpeed) {
+            ctx.save();
+            ctx.fillStyle = '#ffffff';
+            for (let s of window.stars) {
+                const moveX = (0.06 + shipSpeed * 0.18) * s.depth * S;
+                s.x -= moveX;
+                if (s.x < 0) {
+                    s.x = window.innerWidth;
+                    s.y = Math.random() * window.innerHeight;
+                }
+                ctx.globalAlpha = 0.3 + s.depth * 0.5;
+                const scaledSize = Math.max(0.8, s.baseSize * S);
+                const stretch = Math.max(scaledSize, shipSpeed * s.depth * 0.8 * S);
+                ctx.fillRect(s.x, s.y, stretch, scaledSize);
+            }
+            ctx.restore();
+        }
+
+        class ExplosionParticle {
+            constructor(x, y, customColors = null) {
+                this.x = x;
+                this.y = y;
+                this.baseRadius = Math.random() * 6 + 2;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = (Math.random() * 9 + 2) * S;
+                this.dx = Math.cos(angle) * speed;
+                this.dy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                const colors = customColors || ['#ff0000', '#ff6600', '#ffff00', '#ff3300'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+                this.alpha -= 0.016;
+            }
+
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(1, this.baseRadius * S), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Motor ve gövde yangını parçacıkları mekik sağa ilerlediği için sola (geriye) doğru savrulur
+        class HullFireParticle {
+            constructor(x, y, isSmoke = false, isEngine = true) {
+                this.x = x + (Math.random() * 6 - 3) * S;
+                this.y = y + (Math.random() * 6 - 3) * S;
+                this.isSmoke = isSmoke;
+                const backwardPush = -(isEngine ? (Math.random() * 2.2 + 0.8) : (Math.random() * 1.4 + 0.3));
+
+                if (isSmoke) {
+                    this.baseRadius = Math.random() * 4.5 + 3.5;
+                    this.dx = backwardPush * S;
+                    this.dy = -(Math.random() * 1.2 + 0.4) * S;
+                    this.alpha = 0.55;
+                    const grays = ['#222222', '#3a3a3a', '#555555'];
+                    this.color = grays[Math.floor(Math.random() * grays.length)];
+                } else {
+                    this.baseRadius = Math.random() * 3.8 + 2.2;
+                    this.dx = backwardPush * 0.85 * S;
+                    this.dy = (Math.random() * 1.4 - 0.7) * S;
+                    this.alpha = 0.95;
+                    const fireColors = ['#ffffff', '#ffff00', '#ff9900', '#ff4400', '#ff0000'];
+                    this.color = fireColors[Math.floor(Math.random() * fireColors.length)];
+                }
+            }
+
+            update(shipSpeed) {
+                this.x += this.dx - shipSpeed * 0.3 * S;
+                this.y += this.dy;
+                if (this.isSmoke) {
+                    this.baseRadius += 0.14;
+                    this.alpha -= 0.024;
+                } else {
+                    this.baseRadius = Math.max(0.5, this.baseRadius - 0.12);
+                    this.alpha -= 0.055;
+                }
+            }
+
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                if (!this.isSmoke) {
+                    ctx.shadowColor = '#ff5500';
+                    ctx.shadowBlur = 10 * S;
+                }
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(0.5, this.baseRadius * S), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class FloatingText {
+            constructor(x, y, text, color) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.alpha = 1;
+            }
+            update() {
+                this.y -= 1.4 * S;
+                this.alpha -= 0.018;
+            }
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 8 * S;
+                ctx.font = `bold ${Math.max(10, Math.round(18 * S))}px Arial`;
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        // Güçlendirme kapsülleri sağdan sola doğru (oyuncuya doğru) süzülür
+        class PowerUp {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type;
+                this.baseRadius = 16;
+                this.baseSpeedX = 1.2;
+                this.angle = 0;
+            }
+
+            get radius() {
+                return this.baseRadius * S;
+            }
+
+            update(shipSpeed) {
+                this.x -= (this.baseSpeedX + shipSpeed * 0.25) * S;
+                this.angle += 0.08;
+                this.y += Math.sin(this.angle) * 0.9 * S;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                const r = this.radius;
+                const isHyperWeapon = this.type === 'spread' && currentWave >= 4;
+                const beamCount = getSpreadBeamCount(currentWave);
+                const mainColor = this.type === 'shield' ? '#00f2ff' : (isHyperWeapon ? '#ffd700' : '#ff1e56');
+                ctx.shadowColor = mainColor;
+                ctx.shadowBlur = 18 * S;
+
+                ctx.strokeStyle = mainColor;
+                ctx.lineWidth = Math.max(1.2, 2.5 * S);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, r + Math.sin(this.angle * 2) * 3 * S, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = mainColor;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(4, r - 4 * S), 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#000';
+                ctx.font = `bold ${Math.max(9, Math.round(13 * S))}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.type === 'shield' ? 'S' : (isHyperWeapon ? `${beamCount}X` : '3X'), this.x, this.y + 1 * S);
+                ctx.restore();
+            }
+        }
+
+        class PlanetPlasma {
+            constructor(x, y, targetX, targetY, color, customAngle = null, customSpeed = 5.2, forceArmored = null) {
+                this.x = x;
+                this.y = y;
+                this.isArmored = forceArmored !== null ? forceArmored : (currentWave >= 4 && Math.random() < 0.14);
+                this.hp = this.isArmored ? 2 : 1;
+                this.baseRadius = this.isArmored ? 13 : 11;
+                this.baseSpeed = customSpeed;
+                this.color = this.isArmored ? '#ff0044' : (color || '#ff5500');
+                this.angle = customAngle !== null ? customAngle : Math.atan2(targetY - y, targetX - x);
+                this.trail = [];
+                this.grazed = false;
+                this.wasClose = false;
+                this.spinAngle = 0;
+            }
+
+            get radius() {
+                return this.baseRadius * S;
+            }
+
+            update() {
+                this.trail.push({ x: this.x, y: this.y, r: this.radius });
+                if (this.trail.length > 10) this.trail.shift();
+
+                const step = this.baseSpeed * S;
+                this.x += Math.cos(this.angle) * step;
+                this.y += Math.sin(this.angle) * step;
+                if (this.isArmored) this.spinAngle += 0.16;
+            }
+
+            draw(ctx) {
+                const r = this.radius;
+                ctx.save();
+                for (let i = 0; i < this.trail.length; i++) {
+                    const t = this.trail[i];
+                    const ratio = (i + 1) / this.trail.length;
+                    ctx.fillStyle = this.isArmored ? '#ff0044' : this.color;
+                    ctx.globalAlpha = ratio * (this.isArmored ? 0.55 : 0.45);
+                    ctx.beginPath();
+                    ctx.arc(t.x, t.y, t.r * ratio, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.globalAlpha = 1;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = (this.isArmored ? 24 : 20) * S;
+
+                if (this.isArmored) {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.spinAngle);
+                    ctx.strokeStyle = this.hp === 2 ? '#ffd700' : '#ff9900';
+                    ctx.lineWidth = Math.max(1.8, 2.8 * S);
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const rad = i % 2 === 0 ? r * 1.2 : r * 0.65;
+                        const a = (i * Math.PI) / 4;
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.45, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                } else {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, r * 0.55, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = Math.max(1.5, 4 * S);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+        }
+
+        // İHA'lar ekranın sağ kenarından doğup sağ tarafta konuşlanır
+        class AlienDrone {
+            constructor(tier = 1, waveNum = 2) {
+                this.tier = tier;
+                this.baseRadius = tier === 2 ? 32 : 22;
+                this.x = window.innerWidth + 50 * S;
+                this.y = Math.random() * (window.innerHeight - 180 * S) + 90 * S;
+                const bonusHp = Math.floor((waveNum - 1) * 0.6);
+                this.hp = (tier === 2 ? 4 : 2) + bonusHp;
+                this.maxHp = this.hp;
+                this.baseSpeed = (tier === 2 ? 1.7 : 2.3) + Math.min(1.6, waveNum * 0.12);
+                this.angle = 0;
+                this.shootCooldown = Math.random() * 50 + 55;
+                this.color = tier === 2 ? '#ff6600' : '#ff0055';
+            }
+
+            get radius() {
+                return this.baseRadius * S;
+            }
+
+            update(ufo) {
+                this.angle += 0.08;
+                const targetX = ufo.x + ufo.width / 2;
+                const targetY = ufo.y + ufo.height / 2;
+                const speed = this.baseSpeed * S;
+
+                if (this.x > window.innerWidth - 260 * S) {
+                    this.x -= speed + ufo.getShipSpeed() * 0.25 * S;
+                } else {
+                    this.x += Math.sin(this.angle * 0.5) * 1.5 * S;
+                }
+
+                const dy = targetY - this.y;
+                this.y += Math.sign(dy) * Math.min(Math.abs(dy), speed * 0.85) + Math.sin(this.angle) * 1.1 * S;
+
+                this.shootCooldown--;
+                if (this.shootCooldown <= 0 && !ufo.isDestroyed) {
+                    this.shootCooldown = Math.max(45, (this.tier === 2 ? 95 : 110) - currentWave * 4.5);
+                    const baseAngle = Math.atan2(targetY - this.y, targetX - this.x);
+                    const pSpeed = Math.min(7.8, 5.0 + currentWave * 0.16);
+
+                    if (this.tier === 2) {
+                        for (let offset of [-0.2, 0, 0.2]) {
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, targetX, targetY, this.color, baseAngle + offset, pSpeed));
+                        }
+                    } else {
+                        ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, targetX, targetY, this.color, baseAngle, pSpeed));
+                    }
+                }
+            }
+
+            draw(ctx) {
+                const r = this.radius;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 15 * S;
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = Math.max(1.5, 3 * S);
+
+                if (this.tier === 2) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        const a = (i * Math.PI) / 3 + this.angle * 0.3;
+                        const px = Math.cos(a) * r;
+                        const py = Math.sin(a) * r;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -r);
+                    ctx.lineTo(r, 0);
+                    ctx.lineTo(0, r);
+                    ctx.lineTo(-r, 0);
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, Math.max(2, (7 + Math.sin(this.angle * 2) * 2) * S), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Boss'lar ekranın sağından girip sağ bölgede konuşlanır
+        class SectorBoss {
+            constructor(waveNum) {
+                this.waveNum = waveNum;
+                this.bossType = ((waveNum - 1) % 4) + 1;
+                this.x = window.innerWidth + 100 * S;
+                this.y = window.innerHeight / 2;
+                this.angle = 0;
+
+                this.maxHp = Math.round(24 + (waveNum - 1) * 14 + Math.pow(waveNum, 1.45) * 2);
+                this.hp = this.maxHp;
+
+                this.lastHitSalvoId = -1;
+                this.supply65Dropped = false;
+                this.supply30Dropped = false;
+
+                this.isEnraged = false;
+                this.telegraphTimer = 0;
+                this.telegraphAngle = 0;
+
+                if (this.bossType === 1) {
+                    this.title = "KORSAN FIRKATEYNİ (VANGUARD)";
+                    this.color = "#ff0055";
+                    this.baseRadius = 56;
+                    this.speedYFactor = 1.25;
+                    this.baseShootCooldown = Math.max(38, 78 - waveNum * 3);
+                } else if (this.bossType === 2) {
+                    this.title = "ZIRHLI DREADNOUGHT";
+                    this.color = "#ffcc00";
+                    this.baseRadius = 68;
+                    this.speedYFactor = 0.75;
+                    this.baseShootCooldown = Math.max(42, 88 - waveNum * 3);
+                } else if (this.bossType === 3) {
+                    this.title = "TEKİLLİK GEMİSİ (SINGULARITY)";
+                    this.color = "#b829ff";
+                    this.baseRadius = 64;
+                    this.speedYFactor = 0.90;
+                    this.baseShootCooldown = Math.max(38, 80 - waveNum * 3);
+                } else {
+                    this.title = "OMEGA ANA GEMİSİ (OVERLORD)";
+                    this.color = "#00ff88";
+                    this.baseRadius = 74;
+                    this.speedYFactor = 0.65;
+                    this.baseShootCooldown = Math.max(44, 92 - waveNum * 3);
+                }
+
+                this.shootTimer = 80;
+            }
+
+            get radius() {
+                return this.baseRadius * S;
+            }
+
+            update(ufo, ctx) {
+                if (this.x > window.innerWidth - 220 * S) {
+                    this.x -= 1.6 * S;
+                }
+
+                const ufoCX = ufo.x + ufo.width / 2;
+                const ufoCY = ufo.y + ufo.height / 2;
+
+                if (!this.isEnraged && this.hp <= this.maxHp * 0.35) {
+                    this.isEnraged = true;
+                    this.telegraphTimer = 55;
+                    this.telegraphAngle = Math.atan2(ufoCY - this.y, ufoCX - this.x);
+                    showBanner(`⚡ DİKKAT: ${this.title} ÖFKE EVRESİNE GİRDİ! Nişan hattından sıyrıl!`, '#ff2222');
+                }
+
+                const enrageSpeedMult = this.isEnraged ? 1.22 : 1.0;
+                this.angle += 0.045 * this.speedYFactor * enrageSpeedMult;
+                this.y = (window.innerHeight / 2) + Math.sin(this.angle * 0.85) * (window.innerHeight * 0.30);
+
+                if (this.telegraphTimer > 0 && !ufo.isDestroyed) {
+                    this.telegraphTimer--;
+                    if (this.telegraphTimer > 24) {
+                        this.telegraphAngle = Math.atan2(ufoCY - this.y, ufoCX - this.x);
+                    }
+
+                    ctx.save();
+                    const warnAlpha = (this.telegraphTimer % 6 < 3) ? 0.9 : 0.35;
+                    ctx.strokeStyle = '#ff0044';
+                    ctx.shadowColor = '#ff0044';
+                    ctx.shadowBlur = 14 * S;
+                    ctx.globalAlpha = warnAlpha;
+                    ctx.lineWidth = Math.max(1.8, 3.2 * S);
+                    ctx.setLineDash([14 * S, 8 * S]);
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(
+                        this.x + Math.cos(this.telegraphAngle) * window.innerWidth * 1.2,
+                        this.y + Math.sin(this.telegraphAngle) * window.innerWidth * 1.2
+                    );
+                    ctx.stroke();
+                    ctx.restore();
+
+                    if (this.telegraphTimer === 0) {
+                        const fastSpeed = Math.min(8.4, 6.0 + this.waveNum * 0.2);
+                        for (let offset of [-0.13, 0, 0.13]) {
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, '#ff0044', this.telegraphAngle + offset, fastSpeed, offset === 0));
+                        }
+                    }
+                }
+
+                // Tekillik Boss'unun çekim kuvveti
+                if (this.bossType === 3 && !ufo.isDestroyed && this.x < window.innerWidth - 100 * S) {
+                    const dx = this.x - ufoCX;
+                    const dy = this.y - ufoCY;
+                    const dist = Math.hypot(dx, dy);
+                    const pullRange = 760 * S;
+                    if (dist < pullRange && dist > 30 * S) {
+                        const pullRatio = Math.pow(1 - dist / pullRange, 0.85);
+                        ufo.gx += (dx / dist) * pullRatio * 5.8 * S;
+                        ufo.gy += (dy / dist) * pullRatio * 5.8 * S;
+                        ufo.activeGravitySource = { name: "TEKİLLİK BOSS", level: "ÇOK YÜKSEK", color: "#b829ff" };
+
+                        ctx.save();
+                        ctx.strokeStyle = '#b829ff';
+                        ctx.globalAlpha = pullRatio * 0.75;
+                        ctx.lineWidth = Math.max(2, 3.8 * S);
+                        ctx.setLineDash([8 * S, 6 * S]);
+                        ctx.beginPath();
+                        ctx.moveTo(ufoCX, ufoCY);
+                        ctx.lineTo(this.x, this.y);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+
+                this.shootTimer--;
+                if (this.shootTimer <= 0 && !ufo.isDestroyed) {
+                    this.shootTimer = this.isEnraged ? Math.max(30, Math.floor(this.baseShootCooldown * 0.82)) : this.baseShootCooldown;
+                    const baseAngle = Math.atan2(ufoCY - this.y, ufoCX - this.x);
+                    const plasmaSpeed = Math.min(8.0, 5.2 + this.waveNum * 0.2);
+
+                    if (this.isEnraged && this.telegraphTimer === 0 && Math.random() < 0.38) {
+                        this.telegraphTimer = 52;
+                        this.telegraphAngle = baseAngle;
+                    }
+
+                    if (this.bossType === 1) {
+                        for (let offset of [-0.14, 0, 0.14]) {
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, this.color, baseAngle + offset, plasmaSpeed + 0.8));
+                        }
+                    } else if (this.bossType === 2) {
+                        for (let offset of [-0.36, -0.18, 0, 0.18, 0.36]) {
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, this.color, baseAngle + offset, plasmaSpeed));
+                        }
+                    } else if (this.bossType === 3) {
+                        for (let i = 0; i < 6; i++) {
+                            const spiralAngle = this.angle * 2 + (i * Math.PI) / 3;
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, '#00f2ff', spiralAngle, plasmaSpeed * 0.9));
+                        }
+                        ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, this.color, baseAngle, plasmaSpeed + 0.5));
+                    } else {
+                        for (let offset of [-0.25, -0.08, 0.08, 0.25]) {
+                            ufo.planetPlasmas.push(new PlanetPlasma(this.x, this.y, ufoCX, ufoCY, this.color, baseAngle + offset, plasmaSpeed));
+                        }
+                        if (ufo.alienDrones.length < 1 && Math.random() < 0.32) {
+                            const escort = new AlienDrone(1, this.waveNum);
+                            escort.x = this.x - 20 * S;
+                            escort.y = this.y;
+                            ufo.alienDrones.push(escort);
+                        }
+                    }
+                }
+            }
+
+            draw(ctx) {
+                const r = this.radius;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                const barW = 155 * S;
+                const barH = 10 * S;
+                ctx.fillStyle = 'rgba(0,0,0,0.85)';
+                ctx.fillRect(-barW / 2 - 2 * S, -r - 28 * S, barW + 4 * S, barH + 4 * S);
+                ctx.fillStyle = this.isEnraged ? '#ff0044' : this.color;
+                ctx.shadowColor = this.isEnraged ? '#ff0044' : this.color;
+                ctx.shadowBlur = 10 * S;
+                ctx.fillRect(-barW / 2, -r - 26 * S, barW * (Math.max(0, this.hp) / this.maxHp), barH);
+
+                // %65 ve %30 Kapsül Eşik Çizgileri
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(-barW / 2 + barW * 0.65, -r - 27 * S, 2 * S, barH + 2 * S);
+                ctx.fillRect(-barW / 2 + barW * 0.30, -r - 27 * S, 2 * S, barH + 2 * S);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = `bold ${Math.max(9, Math.round(11.5 * S))}px Arial`;
+                ctx.textAlign = 'center';
+                const rageTag = this.isEnraged ? " [ÖFKE!]" : "";
+                ctx.fillText(`${this.title}${rageTag} (${Math.ceil(this.hp)}/${this.maxHp})`, 0, -r - 33 * S);
+
+                ctx.rotate(this.angle);
+                ctx.strokeStyle = this.isEnraged ? '#ff0044' : this.color;
+                ctx.shadowColor = this.isEnraged ? '#ff0044' : this.color;
+                ctx.shadowBlur = (this.isEnraged ? 24 : 18) * S;
+                ctx.lineWidth = Math.max(2, 4 * S);
+
+                if (this.bossType === 1) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const rad = i % 2 === 0 ? r : r * 0.38;
+                        const a = (i * Math.PI) / 4;
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                } else if (this.bossType === 2) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const a = (i * Math.PI) / 4;
+                        if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+                        else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                } else if (this.bossType === 3) {
+                    ctx.setLineDash([16 * S, 10 * S]);
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    ctx.strokeStyle = '#00f2ff';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, r * 0.68, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else {
+                    ctx.beginPath();
+                    for (let i = 0; i < 12; i++) {
+                        const rad = i % 2 === 0 ? r : r * 0.62;
+                        const a = (i * Math.PI) / 6;
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = this.isEnraged ? '#ff0044' : this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.38, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Karadelikler ekranın sağından doğup sola doğru ilerler
+        class BlackHole {
+            constructor() {
+                this.baseRadius = 42;
+                this.x = window.innerWidth + 60 * S;
+                this.y = Math.random() * (window.innerHeight - 240 * S) + 120 * S;
+                this.baseSpeedX = 0.38;
+                this.angle = 0;
+                this.hp = 4 + Math.floor(currentWave / 3);
+                this.maxHp = this.hp;
+                this.basePullRange = 680;
+                this.basePullStrength = 9.5;
+                this.playerEnteredDeepPull = false;
+                this.pilotBonusAwarded = false;
+            }
+
+            get radius() {
+                return this.baseRadius * S;
+            }
+
+            update(ufo, ctx) {
+                this.x -= (this.baseSpeedX + ufo.getShipSpeed() * 0.28) * S;
+                this.angle += 0.09;
+
+                const pullRange = this.basePullRange * S;
+                if (!ufo.isDestroyed && this.x > 10 * S && this.x < window.innerWidth - 10 * S) {
+                    const ufoCX = ufo.x + ufo.width / 2;
+                    const ufoCY = ufo.y + ufo.height / 2;
+                    const dx = this.x - ufoCX;
+                    const dy = this.y - ufoCY;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist < pullRange && dist > 15 * S) {
+                        const pullRatio = Math.pow(1 - (dist / pullRange), 0.75);
+                        const coreBoost = dist < 240 * S ? 1.35 : 1.0;
+                        const pullForce = pullRatio * this.basePullStrength * coreBoost * S;
+                        ufo.gx += (dx / dist) * pullForce;
+                        ufo.gy += (dy / dist) * pullForce;
+                        ufo.activeGravitySource = { name: "KARADELİK VAKUMU", level: "ÖLÜMCÜL", color: "#b829ff" };
+
+                        if (dist < 260 * S) {
+                            this.playerEnteredDeepPull = true;
+                        } else if (this.playerEnteredDeepPull && !this.pilotBonusAwarded && dist > 340 * S) {
+                            this.pilotBonusAwarded = true;
+                            ufo.awardPilotBonus(ufoCX, ufoCY, "KARADELİKTEN KAÇIŞ");
+                        }
+
+                        ctx.save();
+                        ctx.strokeStyle = '#b829ff';
+                        ctx.shadowColor = '#b829ff';
+                        ctx.shadowBlur = 12 * S;
+                        ctx.globalAlpha = Math.min(0.95, pullRatio * 0.9);
+                        ctx.lineWidth = Math.max(2, 4.5 * S);
+                        ctx.setLineDash([8 * S, 5 * S]);
+                        ctx.beginPath();
+                        ctx.moveTo(ufoCX, ufoCY);
+                        ctx.lineTo(this.x, this.y);
+                        ctx.stroke();
+                        ctx.restore();
+                    } else if (this.playerEnteredDeepPull && !this.pilotBonusAwarded && dist >= pullRange) {
+                        this.pilotBonusAwarded = true;
+                        ufo.awardPilotBonus(ufoCX, ufoCY, "KARADELİKTEN KAÇIŞ");
+                    }
+                }
+            }
+
+            draw(ctx) {
+                const r = this.radius;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+
+                ctx.rotate(this.angle);
+                ctx.shadowColor = '#b829ff';
+                ctx.shadowBlur = 28 * S;
+                ctx.strokeStyle = '#b829ff';
+                ctx.lineWidth = Math.max(2.5, 4.5 * S);
+                ctx.setLineDash([20 * S, 12 * S]);
+                ctx.beginPath();
+                ctx.arc(0, 0, r + 12 * S, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#00f2ff';
+                ctx.lineWidth = Math.max(1.5, 2.5 * S);
+                ctx.setLineDash([10 * S, 15 * S]);
+                ctx.beginPath();
+                ctx.arc(0, 0, r + 3 * S, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(0, 0, Math.max(5, r - 5 * S), 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class UFO {
+            constructor() {
+                this.baseWidth = 150;
+                this.baseHeight = 60;
+                // Mekik başlangıçta sol-orta bölgede yer alır ve sağa doğru bakar
+                this.x = window.innerWidth * 0.22 - (this.baseWidth * S) / 2;
+                this.y = window.innerHeight / 2 - (this.baseHeight * S) / 2;
+                this.ufoImage = new Image();
+                this.ufoImage.src = 'ufo.png';
+                
+                this.throttle = 20;         
+                this.maxWorldSpeed = 4.5;  
+
+                this.vx = 0;
+                this.vy = 0;
+                this.gx = 0;
+                this.gy = 0;
+                this.baseAccelX = 0.72;
+                this.baseAccelY = 0.68;
+                this.friction = 0.83;
+                this.baseMaxSpeedX = 6.5;
+                this.baseMaxSpeedY = 4.8;
+
+                this.bullets = [];
+                this.asteroids = [];
+                this.powerUps = [];
+                this.planetPlasmas = [];
+                this.alienDrones = [];
+                this.motherships = [];
+                this.blackHoles = [];
+                this.explosionParticles = [];
+                this.hullFireParticles = [];
+                this.floatingTexts = [];
+                this.isDestroyed = false;
+
+                // 100 Gövde Canı (Hull HP) ve Kalkan Sistemi
+                this.hullHp = 100;
+                this.maxHullHp = 100;
+                this.shieldHits = 0;
+                this.hullDamage = 0;
+                this.spreadHits = 0;
+                this.spreadRemainingMs = 0;
+                this.lastFrameTime = Date.now();
+                this.salvoCounter = 0;
+
+                this.asteroidsDestroyedCount = 0;
+                this.nextCapsuleType = 'shield';
+                this.shieldAngle = 0;
+                this.invulnerableUntil = 0;
+                this.activeGravitySource = null;
+                this.muzzleFlashAlpha = 0;
+
+                this.planetConfigs = [
+                    { id: 'sun',     pull: 2.85, range: 680, lineW: 4.5, level: 'DEVASA',      color: '#ffcc00', name: 'GÜNEŞ' },
+                    { id: 'mercure', pull: 0.20, range: 220, lineW: 1.0, level: 'ÇOK ZAYIF',   color: '#aaaaaa', name: 'MERKÜR' },
+                    { id: 'venus',   pull: 0.75, range: 320, lineW: 1.6, level: 'ORTA',        color: '#ff9900', name: 'VENÜS' },
+                    { id: 'earth',   pull: 0.90, range: 350, lineW: 2.0, level: 'NORMAL (1G)', color: '#00bfff', name: 'DÜNYA' },
+                    { id: 'mars',    pull: 0.38, range: 260, lineW: 1.2, level: 'ZAYIF',       color: '#ff3300', name: 'MARS' },
+                    { id: 'jupiter', pull: 2.25, range: 580, lineW: 3.5, level: 'ÇOK YÜKSEK',  color: '#ff6600', name: 'JÜPİTER' },
+                    { id: 'saturn',  pull: 1.80, range: 520, lineW: 2.8, level: 'YÜKSEK',      color: '#ffd700', name: 'SATÜRN' },
+                    { id: 'uranus',  pull: 1.25, range: 420, lineW: 2.2, level: 'ORTA-YÜKSEK', color: '#00ffff', name: 'ÜRANÜS' },
+                    { id: 'neptune', pull: 1.35, range: 440, lineW: 2.4, level: 'ORTA-YÜKSEK', color: '#3366ff', name: 'NEPTÜN' }
+                ];
+            }
+
+            get width() {
+                return this.baseWidth * S;
+            }
+
+            get height() {
+                return this.baseHeight * S;
+            }
+
+            syncHullDamageVisuals() {
+                if (this.hullHp >= 85) {
+                    this.hullDamage = 0;
+                } else if (this.hullHp >= 55) {
+                    this.hullDamage = 1;
+                } else if (this.hullHp >= 30) {
+                    this.hullDamage = 2;
+                } else {
+                    this.hullDamage = 3;
+                }
+            }
+
+            repairHull(amount) {
+                this.hullHp = Math.min(this.maxHullHp, this.hullHp + amount);
+                this.syncHullDamageVisuals();
+            }
+
+            awardPilotBonus(x, y, reason = "TEĞET GEÇİŞ") {
+                const pts = addScore(50);
+                if (this.isSpreadActive()) {
+                    this.spreadRemainingMs = Math.min(22000, this.spreadRemainingMs + 1000);
+                    this.floatingTexts.push(new FloatingText(x - 50 * S, y - 22 * S, `+${pts} PİLOTAJ BONUSU! (+1 SN LAZER)`, '#00ff88'));
+                } else {
+                    this.floatingTexts.push(new FloatingText(x - 45 * S, y - 22 * S, `+${pts} PİLOTAJ BONUSU! (${reason})`, '#00ff88'));
+                }
+            }
+
+            rescale(ratioX, ratioY) {
+                this.x *= ratioX;
+                this.y *= ratioY;
+                for (let a of this.asteroids) { a.x *= ratioX; a.y *= ratioY; }
+                for (let b of this.bullets) { b.x *= ratioX; b.y *= ratioY; }
+                for (let p of this.powerUps) { p.x *= ratioX; p.y *= ratioY; }
+                for (let pl of this.planetPlasmas) { pl.x *= ratioX; pl.y *= ratioY; }
+                for (let d of this.alienDrones) { d.x *= ratioX; d.y *= ratioY; }
+                for (let m of this.motherships) { m.x *= ratioX; m.y *= ratioY; }
+                for (let bh of this.blackHoles) { bh.x *= ratioX; bh.y *= ratioY; }
+                this.handleScreenEdge();
+            }
+
+            getShipSpeed() {
+                if (this.isDestroyed) return 0;
+                return (this.throttle / 100) * this.maxWorldSpeed;
+            }
+
+            getPercentage(hits) {
+                if (hits === 3) return 100;
+                if (hits === 2) return 66;
+                if (hits === 1) return 33;
+                return 0;
+            }
+
+            tickSpreadTimer() {
+                const now = Date.now();
+                const dt = Math.min(100, now - this.lastFrameTime);
+                this.lastFrameTime = now;
+
+                if (this.spreadHits > 0 && this.spreadRemainingMs > 0) {
+                    if (!isReliefPhase) {
+                        this.spreadRemainingMs = Math.max(0, this.spreadRemainingMs - dt);
+                        if (this.spreadRemainingMs === 0) {
+                            this.spreadHits = 0;
+                        }
+                    }
+                }
+            }
+
+            isSpreadActive() {
+                return this.spreadHits > 0 && this.spreadRemainingMs > 0;
+            }
+
+            getRequiredKillsForDrop() {
+                return this.isSpreadActive() ? 10 : 7;
+            }
+
+            createAsteroids() {
+                this.asteroids = [];
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const asteroid = new Asteroid();
+                        this.asteroids.push(asteroid);
+                    }, i * 750);
+                }
+
+                const scheduleNextWaveSpawn = () => {
+                    const dynamicDelay = Math.max(2400, 4800 - currentWave * 190);
+                    setTimeout(() => {
+                        // Oyun duraklatılmışsa (isPaused) yeni İHA veya Karadelik üretmez
+                        if (!isPaused && !this.isDestroyed && !isReliefPhase && deepSpaceEventsActive && currentWave > 1) {
+                            const maxDrones = waveBossSpawned ? 1 : Math.min(4, 2 + Math.floor(currentWave / 3));
+                            if (this.alienDrones.length < maxDrones) {
+                                const tierChance = Math.min(0.72, (currentWave - 1) * 0.20);
+                                const tier = (currentWave >= 3 && Math.random() < tierChance) ? 2 : 1;
+                                this.alienDrones.push(new AlienDrone(tier, currentWave));
+                            }
+
+                            if (!waveBossSpawned && currentWave >= 3 && this.blackHoles.length < 1 && Math.random() < 0.42 && this.throttle > 10) {
+                                this.blackHoles.push(new BlackHole());
+                                showBanner("⚠️ DİKKAT: Ölümcül Karadelik vakumu yaklaşıyor! [A] ile geri çekil veya hızla vurarak patlat!", "#b829ff");
+                            }
+                        }
+                        if (!this.isDestroyed) {
+                            scheduleNextWaveSpawn();
+                        }
+                    }, dynamicDelay);
+                };
+
+                scheduleNextWaveSpawn();
+            }
+
+            drawAsteroids() {
+                if (isReliefPhase) return;
+                const currentShipSpeed = this.getShipSpeed();
+
+                for (let i = 0; i < this.asteroids.length; i++) {
+                    this.asteroids[i].update(currentShipSpeed);
+                    this.asteroids[i].draw();
+
+                    if (this.asteroids[i].x < -30 * S - this.asteroids[i].size) {
+                        this.asteroids[i].reset();
+                    }
+                }
+            }
+
+            triggerDamage() {
+                if (this.isDestroyed || isReliefPhase) return;
+                const now = Date.now();
+                if (now < this.invulnerableUntil) return;
+
+                resetKillStreak();
+
+                const centerX = this.x + this.width / 2;
+                const centerY = this.y + this.height / 2;
+
+                if (this.isSpreadActive()) {
+                    this.spreadHits--;
+                    if (this.spreadHits <= 0) {
+                        this.spreadRemainingMs = 0;
+                    }
+                    const wPct = this.getPercentage(this.spreadHits);
+                    const weaponTitle = getSpreadWeaponLabel(currentWave);
+                    const msg = wPct > 0 ? `🔥 ${weaponTitle}: %${wPct}` : `🔥 ${weaponTitle} KAPANDI!`;
+                    this.floatingTexts.push(new FloatingText(centerX - 60 * S, centerY + 35 * S, msg, "#ff1e56"));
+                }
+
+                // 1) Kalkan Varken Darbe Sönümleme: Kalkan 1 kademe düşer, Gövde Canı sadece %10 azalır
+                if (this.shieldHits > 0) {
+                    this.shieldHits--;
+                    this.hullHp = Math.max(0, this.hullHp - 10);
+                    this.syncHullDamageVisuals();
+                    this.invulnerableUntil = now + 1250;
+
+                    const astopatla = document.getElementById('astopatla');
+                    astopatla.currentTime = 0;
+                    astopatla.play();
+
+                    for (let i = 0; i < 35; i++) {
+                        this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#00f2ff', '#ff6600', '#ffff00']));
+                    }
+
+                    if (this.hullHp <= 0) {
+                        this.explode();
+                        return;
+                    }
+
+                    const sPct = this.getPercentage(this.shieldHits);
+                    this.floatingTexts.push(new FloatingText(centerX - 85 * S, centerY - 30 * S, `🛡️ KALKAN %${sPct} | 🔧 GÖVDE -%10 (%${this.hullHp})`, "#ffcc00"));
+                    showBanner(`⚠️ Kalkan darbeyi sönümledi! Kalkan: %${sPct} | Gövde Canı: %${this.hullHp}`, "#ffcc00");
+                    return;
+                }
+
+                // 2) Kalkansız Dayanıklılık: Kalkan %0 iken anında patlamaz, Gövde Canı %25 azalır
+                this.hullHp = Math.max(0, this.hullHp - 25);
+                this.syncHullDamageVisuals();
+                this.invulnerableUntil = now + 1350;
+
+                const astopatla = document.getElementById('astopatla');
+                astopatla.currentTime = 0;
+                astopatla.play();
+
+                for (let i = 0; i < 42; i++) {
+                    this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#ff2222', '#ff6600', '#ffff00']));
+                }
+
+                if (this.hullHp <= 0) {
+                    this.explode();
+                    return;
+                }
+
+                this.floatingTexts.push(new FloatingText(centerX - 85 * S, centerY - 30 * S, `🚨 GÖVDE HASARI -%25! (KALAN: %${this.hullHp})`, "#ff2222"));
+                showBanner(`🚨 KALKANSIZ İSABET! Gövde Canı %${this.hullHp}'e düştü! Kalkan Kapsülü (S) topla!`, "#ff2222");
+            }
+
+            // İtici alevler mekiğin sol arkasından (kuyruğundan) sola doğru uzar
+            drawDualThrusters(ctx) {
+                if (this.throttle <= 0 && !keys.d) return;
+
+                const tailX = this.x + 10 * S;
+                const upperEngineY = this.y + this.height * 0.36;
+                const lowerEngineY = this.y + this.height * 0.68;
+                const baseFlameLen = ((Math.max(15, this.throttle) / 100) * 62) * S;
+
+                const engines = [
+                    { y: upperEngineY, isBurning: this.hullDamage >= 1 },
+                    { y: lowerEngineY, isBurning: this.hullDamage >= 2 }
+                ];
+
+                for (let eng of engines) {
+                    const flameLength = baseFlameLen + Math.random() * 12 * S;
+
+                    ctx.save();
+                    const grad = ctx.createLinearGradient(tailX, eng.y, tailX - flameLength, eng.y);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.28, '#00f2ff');
+                    grad.addColorStop(0.7, '#0066ff');
+                    grad.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = grad;
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 14 * S;
+                    ctx.beginPath();
+                    ctx.moveTo(tailX, eng.y - 5.5 * S);
+                    ctx.lineTo(tailX - flameLength, eng.y);
+                    ctx.lineTo(tailX, eng.y + 5.5 * S);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    if (eng.isBurning) {
+                        const fireLen = flameLength * (0.65 + Math.random() * 0.45);
+                        const fireGrad = ctx.createLinearGradient(tailX, eng.y, tailX - fireLen, eng.y);
+                        fireGrad.addColorStop(0, '#ffff00');
+                        fireGrad.addColorStop(0.4, '#ff5500');
+                        fireGrad.addColorStop(0.8, '#ff0000');
+                        fireGrad.addColorStop(1, 'transparent');
+
+                        ctx.fillStyle = fireGrad;
+                        ctx.shadowColor = '#ff4400';
+                        ctx.shadowBlur = 12 * S;
+                        ctx.beginPath();
+                        ctx.moveTo(tailX, eng.y - 4.5 * S);
+                        ctx.lineTo(tailX - fireLen, eng.y + (Math.random() * 6 - 3) * S);
+                        ctx.lineTo(tailX, eng.y + 4.5 * S);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    ctx.restore();
+                }
+            }
+
+            // Gövde hasar noktaları: sol arka motorlar ve sağ ön kokpit/burun
+            drawProgressiveHullDamage(ctx) {
+                if (this.hullDamage <= 0 || this.isDestroyed) return;
+
+                const damageSpots = [
+                    { rx: 12 * S,              ry: this.height * 0.36, isEngine: true },
+                    { rx: 12 * S,              ry: this.height * 0.68, isEngine: true },
+                    { rx: this.width - 22 * S, ry: this.height * 0.48, isEngine: false }
+                ];
+
+                const activeSpotsCount = Math.min(3, this.hullDamage);
+
+                ctx.save();
+                if (this.hullDamage >= 3) {
+                    ctx.strokeStyle = `rgba(255, 30, 0, ${Math.sin(Date.now() * 0.02) * 0.4 + 0.5})`;
+                    ctx.lineWidth = Math.max(1.5, 2.5 * S);
+                    ctx.beginPath();
+                    ctx.ellipse(this.x + this.width / 2, this.y + this.height / 2, this.width / 2 + 6 * S, this.height / 2 + 6 * S, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                for (let i = 0; i < activeSpotsCount; i++) {
+                    const spot = damageSpots[i];
+                    const spotX = this.x + spot.rx;
+                    const spotY = this.y + spot.ry;
+
+                    ctx.fillStyle = 'rgba(15, 10, 10, 0.85)';
+                    ctx.beginPath();
+                    ctx.arc(spotX, spotY, 5.5 * S, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const flicker = Math.sin(Date.now() * 0.045 + i * 2) * 3 * S;
+                    const radius = Math.max(2, (spot.isEngine ? 11 : 15) * S + flicker);
+                    const grad = ctx.createRadialGradient(spotX, spotY, 1, spotX, spotY, radius);
+                    grad.addColorStop(0, '#ffffff');
+                    grad.addColorStop(0.3, '#ffff00');
+                    grad.addColorStop(0.65, '#ff4400');
+                    grad.addColorStop(1, 'transparent');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(spotX, spotY, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    if (Math.random() < 0.65) {
+                        this.hullFireParticles.push(new HullFireParticle(spotX, spotY, false, spot.isEngine));
+                    }
+                    if (Math.random() < 0.45) {
+                        this.hullFireParticles.push(new HullFireParticle(spotX, spotY - 3 * S, true, spot.isEngine));
+                    }
+
+                    if ((i === 2 || this.hullDamage >= 2) && Math.random() < 0.28) {
+                        ctx.strokeStyle = Math.random() < 0.5 ? '#00f2ff' : '#ffff00';
+                        ctx.lineWidth = Math.max(1, 1.5 * S);
+                        ctx.shadowColor = '#00f2ff';
+                        ctx.shadowBlur = 8 * S;
+                        ctx.beginPath();
+                        ctx.moveTo(spotX, spotY);
+                        ctx.lineTo(spotX + (Math.random() * 22 - 11) * S, spotY + (Math.random() * 20 - 10) * S);
+                        ctx.lineTo(spotX + (Math.random() * 28 - 14) * S, spotY + (Math.random() * 22 - 11) * S);
+                        ctx.stroke();
+                    }
+                }
+                ctx.restore();
+            }
+
+            explode() {
+                if (this.isDestroyed) return;
+                if (isPaused) togglePause(false);
+                this.isDestroyed = true;
+                this.hullHp = 0;
+                this.throttle = 0;
+
+                const astopatla = document.getElementById('astopatla');
+                astopatla.currentTime = 0;
+                astopatla.play();
+
+                const centerX = this.x + this.width / 2;
+                const centerY = this.y + this.height / 2;
+
+                for (let i = 0; i < 65; i++) {
+                    this.explosionParticles.push(new ExplosionParticle(centerX, centerY));
+                }
+
+                const screen = document.getElementById('gameOverScreen');
+                document.getElementById('finalWave').innerText = currentWave;
+                document.getElementById('bossKillCount').innerText = bossesDefeated;
+                document.getElementById('finalScore').innerText = score;
+                document.getElementById('championName').innerText = champion;
+                document.getElementById('highScoreVal').innerText = highScore;
+
+                if (score > highScore) {
+                    document.getElementById('newRecordBox').style.display = 'block';
+                }
+
+                screen.style.display = 'block';
+            }
+
+            handlePlanetGravityOnly(ctx) {
+                this.activeGravitySource = null;
+                this.gx = 0;
+                this.gy = 0;
+
+                if (this.isDestroyed || deepSpaceEventsActive) return;
+
+                const ufoCenterX = this.x + this.width / 2;
+                const ufoCenterY = this.y + this.height / 2;
+
+                for (let p of this.planetConfigs) {
+                    const el = document.getElementById(p.id);
+                    if (!el || el.style.display === 'none') continue;
+
+                    const rect = el.getBoundingClientRect();
+                    const planetCenterX = rect.left + rect.width / 2;
+                    const planetCenterY = rect.top + rect.height / 2;
+
+                    if (
+                        rect.right > 40 * S && 
+                        rect.left < window.innerWidth - 40 * S && 
+                        planetCenterY > 0 && 
+                        planetCenterY < window.innerHeight
+                    ) {
+                        const dx = planetCenterX - ufoCenterX;
+                        const dy = planetCenterY - ufoCenterY;
+                        const dist = Math.hypot(dx, dy);
+                        const effectiveRange = p.range * S + Math.min(rect.width * 0.25, 220 * S);
+
+                        if (dist < effectiveRange && dist > 25 * S) {
+                            const pullRatio = Math.pow(1 - (dist / effectiveRange), 1.15);
+                            const pullForce = pullRatio * p.pull * S;
+
+                            this.gx += (dx / dist) * pullForce;
+                            this.gy += (dy / dist) * pullForce;
+
+                            this.activeGravitySource = { name: p.name, level: p.level, color: p.color };
+
+                            ctx.save();
+                            ctx.strokeStyle = p.color;
+                            ctx.shadowColor = p.color;
+                            ctx.shadowBlur = p.lineW * 3 * S;
+                            ctx.globalAlpha = Math.min(0.75, pullRatio * 0.65);
+                            ctx.lineWidth = Math.max(1, p.lineW * S);
+                            ctx.setLineDash([10 * S, 6 * S]);
+                            ctx.beginPath();
+                            ctx.moveTo(ufoCenterX, ufoCenterY);
+                            ctx.lineTo(planetCenterX, planetCenterY);
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                }
+            }
+
+            checkUFOCollisions() {
+                if (this.isDestroyed) return;
+
+                const padX = 18 * S;
+                const padY = 12 * S;
+                const ufoLeft = this.x + padX;
+                const ufoRight = this.x + this.width - padX;
+                const ufoTop = this.y + padY;
+                const ufoBottom = this.y + this.height - padY;
+                const ufoCenterX = this.x + this.width / 2;
+                const ufoCenterY = this.y + this.height / 2;
+
+                for (let i = 0; i < this.powerUps.length; i++) {
+                    const pu = this.powerUps[i];
+                    const dist = Math.hypot(ufoCenterX - pu.x, ufoCenterY - pu.y);
+
+                    if (dist < pu.radius + 45 * S) {
+                        if (pu.type === 'shield') {
+                            if (this.shieldHits === 3 && this.hullHp >= 100) {
+                                addScore(150, false);
+                                this.floatingTexts.push(new FloatingText(pu.x, pu.y, "+150 TAM KAPASİTE BONUSU!", "gold"));
+                            } else {
+                                this.shieldHits = 3;
+                                this.repairHull(15);
+                                addScore(50, false);
+                                this.floatingTexts.push(new FloatingText(pu.x, pu.y, `🛡️ KALKAN %100 & GÖVDE +%15 (%${this.hullHp})!`, "#00f2ff"));
+                                showBanner(`🔧 Kalkan %100 şarj edildi ve Gövde +%15 onarıldı (Gövde: %${this.hullHp})!`, "#00f2ff");
+                            }
+                        } else if (pu.type === 'spread') {
+                            this.spreadHits = 3;
+                            const baseDuration = currentWave >= 4 ? 18000 : 12000;
+                            this.spreadRemainingMs = baseDuration;
+                            addScore(50, false);
+                            const labelName = currentWave >= 4 ? `🔥 ${getSpreadWeaponLabel(currentWave)} (18 SN)` : "🔥 3'LÜ LAZER (12 SN)";
+                            const msg = isReliefPhase ? `${labelName} (DONDURULDU ❄️)!` : `${labelName}!`;
+                            this.floatingTexts.push(new FloatingText(pu.x - 40 * S, pu.y, msg, currentWave >= 4 ? "gold" : "#ff1e56"));
+                        }
+                        this.powerUps.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                if (isReliefPhase) return;
+
+                for (let i = 0; i < this.asteroids.length; i++) {
+                    const a = this.asteroids[i];
+                    if (
+                        ufoLeft < a.x + a.size &&
+                        ufoRight > a.x &&
+                        ufoTop < a.y + a.size &&
+                        ufoBottom > a.y
+                    ) {
+                        a.reset();
+                        this.triggerDamage();
+                        return;
+                    }
+                }
+
+                for (let i = 0; i < this.planetPlasmas.length; i++) {
+                    const pl = this.planetPlasmas[i];
+                    if (
+                        ufoLeft < pl.x + pl.radius &&
+                        ufoRight > pl.x - pl.radius &&
+                        ufoTop < pl.y + pl.radius &&
+                        ufoBottom > pl.y - pl.radius
+                    ) {
+                        this.planetPlasmas.splice(i, 1);
+                        this.triggerDamage();
+                        return;
+                    }
+
+                    // Teğet Geçiş (Pilotaj) Bonusu
+                    if (pl.isArmored && !pl.grazed) {
+                        const distToCenter = Math.hypot(pl.x - ufoCenterX, pl.y - ufoCenterY);
+                        if (distToCenter < 95 * S) {
+                            pl.wasClose = true;
+                        } else if (pl.wasClose && distToCenter > 110 * S) {
+                            pl.grazed = true;
+                            this.awardPilotBonus(ufoCenterX, ufoCenterY, "AĞIR PLAZMA TEĞET");
+                        }
+                    }
+                }
+
+                for (let i = 0; i < this.alienDrones.length; i++) {
+                    const d = this.alienDrones[i];
+                    if (
+                        ufoLeft < d.x + d.radius &&
+                        ufoRight > d.x - d.radius &&
+                        ufoTop < d.y + d.radius &&
+                        ufoBottom > d.y - d.radius
+                    ) {
+                        this.alienDrones.splice(i, 1);
+                        this.triggerDamage();
+                        return;
+                    }
+                }
+
+                for (let i = 0; i < this.motherships.length; i++) {
+                    const ms = this.motherships[i];
+                    if (
+                        ufoLeft < ms.x + ms.radius &&
+                        ufoRight > ms.x - ms.radius &&
+                        ufoTop < ms.y + ms.radius &&
+                        ufoBottom > ms.y - ms.radius
+                    ) {
+                        this.triggerDamage();
+                        return;
+                    }
+                }
+
+                for (let i = 0; i < this.blackHoles.length; i++) {
+                    const bh = this.blackHoles[i];
+                    if (
+                        ufoLeft < bh.x + bh.radius &&
+                        ufoRight > bh.x - bh.radius &&
+                        ufoTop < bh.y + bh.radius &&
+                        ufoBottom > bh.y - bh.radius
+                    ) {
+                        this.triggerDamage();
+                        return;
+                    }
+                }
+            }
+
+            // Mermiler mekiğin sağ ön burnundan sağa doğru (0 radyan açıyla) ateşlenir
+            shoot() {
+                if (this.isDestroyed || isPaused) return;
+
+                this.salvoCounter++;
+                const currentSalvoId = this.salvoCounter;
+
+                const bulletSpeed = 14.5;
+                const noseX = this.x + this.width - 4 * S;
+                const noseY = this.y + this.height * 0.54;
+                const straightRightAngle = 0;
+
+                this.muzzleFlashAlpha = 1.0;
+
+                if (this.isSpreadActive()) {
+                    const beamCount = getSpreadBeamCount(currentWave);
+                    if (beamCount === 6) {
+                        const angles6 = [-0.24, -0.13, -0.025, 0.025, 0.13, 0.24];
+                        for (let idx = 0; idx < angles6.length; idx++) {
+                            const col = idx % 2 === 0 ? '#ffd700' : '#ff1e56';
+                            this.bullets.push(new Bullet(noseX, noseY, bulletSpeed + 1, straightRightAngle + angles6[idx], col, currentSalvoId));
+                        }
+                    } else if (beamCount === 5) {
+                        const angles5 = [-0.22, -0.10, 0, 0.10, 0.22];
+                        for (let idx = 0; idx < angles5.length; idx++) {
+                            const col = idx % 2 === 0 ? '#ffd700' : '#ff1e56';
+                            this.bullets.push(new Bullet(noseX, noseY, bulletSpeed + 0.8, straightRightAngle + angles5[idx], col, currentSalvoId));
+                        }
+                    } else {
+                        const spreadAngles = [-0.14, 0, 0.14];
+                        for (let offset of spreadAngles) {
+                            this.bullets.push(new Bullet(noseX, noseY, bulletSpeed, straightRightAngle + offset, '#ff1e56', currentSalvoId));
+                        }
+                    }
+                } else {
+                    if (currentWave >= 4) {
+                        this.bullets.push(new Bullet(noseX, noseY - 5 * S, bulletSpeed, straightRightAngle, '#00f2ff', currentSalvoId));
+                        this.bullets.push(new Bullet(noseX, noseY + 5 * S, bulletSpeed, straightRightAngle, 'lawngreen', currentSalvoId));
+                    } else {
+                        this.bullets.push(new Bullet(noseX, noseY, bulletSpeed, straightRightAngle, 'lawngreen', currentSalvoId));
+                    }
+                }
+
+                const laserSound = document.getElementById('laserSound');
+                if (laserSound) {
+                    laserSound.currentTime = 0;
+                    laserSound.play().catch(() => {});
+                }
+            }
+
+            updateHudBadges() {
+                const roundedThrottle = Math.round(this.throttle);
+                document.getElementById('throttleVal').innerText = roundedThrottle;
+                document.getElementById('throttleBarFill').style.width = `${roundedThrottle}%`;
+
+                const shieldBadge = document.getElementById('shieldBadge');
+                const hullBadge = document.getElementById('hullBadge');
+                const weaponBadge = document.getElementById('weaponBadge');
+                const dropCounterBadge = document.getElementById('dropCounterBadge');
+                const comboBadge = document.getElementById('comboBadge');
+                const gravityBadge = document.getElementById('gravityBadge');
+
+                const sPct = this.getPercentage(this.shieldHits);
+                if (sPct > 0) {
+                    shieldBadge.innerText = `🛡️ KALKAN: %${sPct} (${this.shieldHits}/3)`;
+                    shieldBadge.style.color = sPct === 33 ? "#ffcc00" : "#00f2ff";
+                } else {
+                    shieldBadge.innerText = "🛡️ KALKAN: %0";
+                    shieldBadge.style.color = "#888";
+                }
+
+                if (this.hullHp >= 75) {
+                    hullBadge.innerText = `🔧 GÖVDE: %${this.hullHp}`;
+                    hullBadge.style.color = "lawngreen";
+                } else if (this.hullHp >= 40) {
+                    hullBadge.innerText = `🔥 GÖVDE: %${this.hullHp}`;
+                    hullBadge.style.color = "#ffcc00";
+                } else {
+                    hullBadge.innerText = `🚨 GÖVDE: %${this.hullHp} (KRİTİK!)`;
+                    hullBadge.style.color = "#ff2222";
+                }
+
+                if (this.isSpreadActive()) {
+                    const wPct = this.getPercentage(this.spreadHits);
+                    const remSec = Math.ceil(this.spreadRemainingMs / 1000);
+                    const modeLabel = getSpreadWeaponLabel(currentWave);
+                    if (isReliefPhase) {
+                        weaponBadge.innerText = `🔥 ${modeLabel}: %${wPct} | ❄️ ${remSec}s (DONDURULDU)`;
+                        weaponBadge.style.color = "#00f2ff";
+                    } else {
+                        weaponBadge.innerText = `🔥 ${modeLabel}: %${wPct} | ${remSec}s`;
+                        weaponBadge.style.color = currentWave >= 4 ? "gold" : ((wPct === 33 || remSec <= 3) ? "#ff9900" : "#ff1e56");
+                    }
+                } else {
+                    weaponBadge.innerText = currentWave >= 4 ? "🔥 LAZER: ÇİFTLİ (KALICI)" : "🔥 LAZER: TEKLİ";
+                    weaponBadge.style.color = currentWave >= 4 ? "#00f2ff" : "#888";
+                }
+
+                const spreadFull = this.isSpreadActive() && this.spreadHits === 3;
+                if (this.shieldHits === 3 && spreadFull && this.hullHp >= 100) {
+                    dropCounterBadge.innerText = "🎯 SİSTEMLER TAM";
+                    dropCounterBadge.style.color = "lawngreen";
+                } else if (this.powerUps.length > 0) {
+                    dropCounterBadge.innerText = "🎯 KAPSÜL SAHNEDE";
+                    dropCounterBadge.style.color = "#00f2ff";
+                } else {
+                    const req = this.getRequiredKillsForDrop();
+                    dropCounterBadge.innerText = `🎯 KAPSÜL: ${this.asteroidsDestroyedCount}/${req}`;
+                    dropCounterBadge.style.color = "gold";
+                }
+
+                if (comboBadge) {
+                    comboBadge.innerText = `⚡ SERİ: ${comboMultiplier}x (${killStreak})`;
+                    comboBadge.style.color = comboMultiplier === 3 ? "gold" : (comboMultiplier === 2 ? "#00ff88" : "#888");
+                }
+
+                if (this.activeGravitySource) {
+                    gravityBadge.innerText = `🌌 ÇEKİM: ${this.activeGravitySource.name} (${this.activeGravitySource.level})`;
+                    gravityBadge.style.color = this.activeGravitySource.color;
+                } else {
+                    gravityBadge.innerText = "🌌 ÇEKİM: YOK";
+                    gravityBadge.style.color = "#888";
+                }
+            }
+
+            draw(ctx) {
+                const currentShipSpeed = this.getShipSpeed();
+
+                for (let i = 0; i < this.blackHoles.length; i++) {
+                    this.blackHoles[i].update(this, ctx);
+                    this.blackHoles[i].draw(ctx);
+                    if (this.blackHoles[i].x < -100 * S) {
+                        this.blackHoles.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                for (let i = 0; i < this.motherships.length; i++) {
+                    this.motherships[i].update(this, ctx);
+                    this.motherships[i].draw(ctx);
+                }
+
+                for (let i = 0; i < this.alienDrones.length; i++) {
+                    this.alienDrones[i].update(this);
+                    this.alienDrones[i].draw(ctx);
+                }
+
+                for (let i = 0; i < this.powerUps.length; i++) {
+                    this.powerUps[i].update(currentShipSpeed);
+                    this.powerUps[i].draw(ctx);
+                    if (this.powerUps[i].x < -50 * S) {
+                        this.powerUps.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                for (let i = 0; i < this.planetPlasmas.length; i++) {
+                    const pl = this.planetPlasmas[i];
+                    pl.update();
+                    pl.draw(ctx);
+                    if (pl.x < -50 * S || pl.x > window.innerWidth + 50 * S || pl.y < -50 * S || pl.y > window.innerHeight + 50 * S) {
+                        this.planetPlasmas.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                if (!this.isDestroyed) {
+                    this.drawDualThrusters(ctx);
+
+                    // ufo.png görseli yatay çevrilerek (scale(-1, 1)) mekiğin burnu sağa bakacak şekilde çizilir
+                    ctx.save();
+                    if (Date.now() < this.invulnerableUntil) {
+                        ctx.globalAlpha = Math.sin(Date.now() * 0.03) * 0.4 + 0.6;
+                    }
+                    ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(this.ufoImage, -this.width / 2, -this.height / 2, this.width, this.height);
+                    ctx.restore();
+
+                    this.drawProgressiveHullDamage(ctx);
+
+                    for (let i = 0; i < this.hullFireParticles.length; i++) {
+                        this.hullFireParticles[i].update(currentShipSpeed);
+                        this.hullFireParticles[i].draw(ctx);
+                        if (this.hullFireParticles[i].alpha <= 0) {
+                            this.hullFireParticles.splice(i, 1);
+                            i--;
+                        }
+                    }
+
+                    if (this.muzzleFlashAlpha > 0) {
+                        const noseX = this.x + this.width - 4 * S;
+                        const noseY = this.y + this.height * 0.54;
+                        const flashColor = this.isSpreadActive() ? (currentWave >= 4 ? '#ffd700' : '#ff1e56') : 'lawngreen';
+
+                        ctx.save();
+                        ctx.globalAlpha = this.muzzleFlashAlpha;
+                        ctx.fillStyle = '#ffffff';
+                        ctx.shadowColor = flashColor;
+                        ctx.shadowBlur = 15 * S;
+                        ctx.beginPath();
+                        ctx.arc(noseX, noseY, Math.max(2, 7 * S), 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+
+                        this.muzzleFlashAlpha -= 0.25;
+                    }
+
+                    if (this.shieldHits > 0) {
+                        this.shieldAngle += 0.05;
+                        const cx = this.x + this.width / 2;
+                        const cy = this.y + this.height / 2;
+                        const shieldColor = this.shieldHits === 1 ? '#ffcc00' : '#00f2ff';
+
+                        ctx.save();
+                        ctx.strokeStyle = shieldColor;
+                        ctx.shadowColor = shieldColor;
+                        ctx.shadowBlur = 6 * this.shieldHits * S;
+                        ctx.lineWidth = Math.max(1, 1.2 * this.shieldHits * S);
+                        ctx.globalAlpha = 0.35 + (this.shieldHits * 0.2);
+                        ctx.beginPath();
+                        ctx.ellipse(cx, cy, this.width / 2 + 12 * S, this.height / 2 + 14 * S, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.lineWidth = Math.max(1, 1.5 * S);
+                        ctx.setLineDash([18 * S, 12 * S]);
+                        ctx.lineDashOffset = -this.shieldAngle * 20 * S;
+                        ctx.beginPath();
+                        ctx.ellipse(cx, cy, this.width / 2 + 16 * S, this.height / 2 + 18 * S, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+
+                for (let i = 0; i < this.explosionParticles.length; i++) {
+                    this.explosionParticles[i].update();
+                    this.explosionParticles[i].draw(ctx);
+                    if (this.explosionParticles[i].alpha <= 0) {
+                        this.explosionParticles.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                for (let i = 0; i < this.bullets.length; i++) {
+                    this.bullets[i].update();
+                    this.bullets[i].draw();
+
+                    if (
+                        this.bullets[i].x < 0 ||
+                        this.bullets[i].x > window.innerWidth ||
+                        this.bullets[i].y < 0 ||
+                        this.bullets[i].y > window.innerHeight
+                    ) {
+                        this.bullets.splice(i, 1);
+                        i--;
+                    }
+                }
+
+                for (let i = 0; i < this.floatingTexts.length; i++) {
+                    this.floatingTexts[i].update();
+                    this.floatingTexts[i].draw(ctx);
+                    if (this.floatingTexts[i].alpha <= 0) {
+                        this.floatingTexts.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            // Soldan sağa uçuş kontrolleri: D (Sağ) hızlandırır ve ileri götürür, A (Sol) yavaşlatır ve geri çeker
+            handleMovement() {
+                if (this.isDestroyed) return;
+
+                const accelX = this.baseAccelX * S;
+                const accelY = this.baseAccelY * S;
+                const maxSpeedX = this.baseMaxSpeedX * S;
+                const maxSpeedY = this.baseMaxSpeedY * S;
+
+                if (keys.d) {
+                    this.vx += accelX;
+                    this.throttle = Math.min(100, this.throttle + 0.85);
+                }
+
+                if (keys.a) {
+                    this.vx -= accelX;
+                    this.throttle = Math.max(0, this.throttle - 0.75);
+                }
+
+                if (keys.w) this.vy -= accelY;
+                if (keys.s) this.vy += accelY;
+
+                if (!isReliefPhase) {
+                    travelDistance += this.getShipSpeed();
+                }
+
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+
+                if (!keys.a && !keys.d && Math.abs(this.vx) < 0.15 * S) this.vx = 0;
+                if (!keys.w && !keys.s && Math.abs(this.vy) < 0.15 * S) this.vy = 0;
+
+                this.vx = Math.max(-maxSpeedX, Math.min(maxSpeedX, this.vx));
+                this.vy = Math.max(-maxSpeedY, Math.min(maxSpeedY, this.vy));
+
+                this.x += this.vx + this.gx;
+                this.y += this.vy + this.gy;
+
+                this.handleScreenEdge();
+            }
+
+            update() {
+                const ctx = canvas.getContext('2d');
+
+                this.tickSpreadTimer();
+                drawAndUpdateStars(ctx, this.getShipSpeed());
+                updateWorldPlanetsAndTelemetry();
+                this.handlePlanetGravityOnly(ctx);
+                this.handleMovement();
+                this.draw(ctx);
+                this.drawAsteroids();
+                this.checkUFOCollisions();
+                this.checkBulletAsteroidCollisions();
+                this.updateHudBadges();
+            }
+
+            handleScreenEdge() {
+                if (this.x < 0) { this.x = 0; this.vx = 0; }
+                if (this.x > window.innerWidth - this.width) { this.x = window.innerWidth - this.width; this.vx = 0; }
+                if (this.y < 0) { this.y = 0; this.vy = 0; }
+                if (this.y > window.innerHeight - this.height) { this.y = window.innerHeight - this.height; this.vy = 0; }
+            }
+
+            checkBulletAsteroidCollisions() {
+                for (let i = 0; i < this.bullets.length; i++) {
+                    const bullet = this.bullets[i];
+                    let bulletRemoved = false;
+
+                    for (let k = 0; k < this.planetPlasmas.length; k++) {
+                        const pl = this.planetPlasmas[k];
+                        if (Math.hypot(bullet.x - pl.x, bullet.y - pl.y) < pl.radius + bullet.size + 4 * S) {
+                            pl.hp--;
+                            this.bullets.splice(i, 1);
+                            i--;
+                            bulletRemoved = true;
+
+                            if (pl.hp <= 0) {
+                                const pts = addScore(pl.isArmored ? 30 : 15);
+                                this.floatingTexts.push(new FloatingText(pl.x, pl.y, pl.isArmored ? `+${pts} AĞIR PLAZMA KIRILDI!` : `+${pts} PLAZMA`, pl.isArmored ? "#00ff88" : "#ffcc00"));
+                                this.planetPlasmas.splice(k, 1);
+                            } else {
+                                for (let s = 0; s < 4; s++) {
+                                    this.explosionParticles.push(new ExplosionParticle(pl.x, pl.y, ['#ffd700', '#ff0044']));
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    if (bulletRemoved) continue;
+
+                    for (let dIdx = 0; dIdx < this.alienDrones.length; dIdx++) {
+                        const drone = this.alienDrones[dIdx];
+                        if (Math.hypot(bullet.x - drone.x, bullet.y - drone.y) < drone.radius + bullet.size) {
+                            drone.hp--;
+                            this.bullets.splice(i, 1);
+                            i--;
+                            bulletRemoved = true;
+
+                            if (drone.hp <= 0) {
+                                registerKillStreak();
+                                const basePts = drone.tier === 2 ? 150 : 75;
+                                const earnedPts = addScore(basePts);
+                                const label = drone.tier === 2 ? `+${earnedPts} KRUVAZÖR!` : `+${earnedPts} AVCI İHA!`;
+
+                                if (this.isSpreadActive()) {
+                                    this.spreadRemainingMs = Math.min(22000, this.spreadRemainingMs + 2000);
+                                    this.floatingTexts.push(new FloatingText(drone.x, drone.y - 22 * S, "⏱️ +2 SN LAZER!", "gold"));
+                                }
+
+                                this.floatingTexts.push(new FloatingText(drone.x, drone.y, label, drone.color));
+                                document.getElementById('astopatla').play();
+                                for (let p = 0; p < 25; p++) {
+                                    this.explosionParticles.push(new ExplosionParticle(drone.x, drone.y, [drone.color, '#ffffff', '#ff9900']));
+                                }
+                                this.alienDrones.splice(dIdx, 1);
+                            } else {
+                                this.floatingTexts.push(new FloatingText(drone.x, drone.y, "İSABET!", "#ffffff"));
+                            }
+                            break;
+                        }
+                    }
+                    if (bulletRemoved) continue;
+
+                    for (let mIdx = 0; mIdx < this.motherships.length; mIdx++) {
+                        const ms = this.motherships[mIdx];
+                        if (Math.hypot(bullet.x - ms.x, bullet.y - ms.y) < ms.radius + bullet.size) {
+                            const isPrimarySalvoHit = (bullet.salvoId !== ms.lastHitSalvoId);
+                            if (isPrimarySalvoHit) {
+                                ms.lastHitSalvoId = bullet.salvoId;
+                                ms.hp = Math.max(0, +(ms.hp - 1.0).toFixed(2));
+                                if (this.isSpreadActive()) {
+                                    this.spreadRemainingMs = Math.min(22000, this.spreadRemainingMs + 200);
+                                }
+                            } else {
+                                ms.hp = Math.max(0, +(ms.hp - 0.3).toFixed(2));
+                            }
+
+                            this.bullets.splice(i, 1);
+                            i--;
+                            bulletRemoved = true;
+
+                            const hpRatio = ms.hp / ms.maxHp;
+                            if (!ms.supply65Dropped && hpRatio <= 0.65 && ms.hp > 0) {
+                                ms.supply65Dropped = true;
+                                const supplyType = (this.shieldHits < 2 || this.hullHp <= 60) ? 'shield' : (!this.isSpreadActive() ? 'spread' : 'shield');
+                                this.powerUps.push(new PowerUp(ms.x - 20 * S, ms.y, supplyType));
+                                showBanner("🎁 Boss Zırhı %65'e İndi: 1. Destek Kapsülü Koptu!", "gold");
+                            } else if (!ms.supply30Dropped && hpRatio <= 0.30 && ms.hp > 0) {
+                                ms.supply30Dropped = true;
+                                const supplyType = (this.shieldHits < 2 || this.hullHp <= 70) ? 'shield' : (!this.isSpreadActive() ? 'spread' : 'shield');
+                                this.powerUps.push(new PowerUp(ms.x - 20 * S, ms.y, supplyType));
+                                showBanner("🎁 Boss Zırhı %30'a İndi: Son Destek Kapsülü Koptu!", "gold");
+                            }
+
+                            if (ms.hp <= 0) {
+                                bossesDefeated++;
+                                registerKillStreak();
+                                const bossBonus = addScore(800 + currentWave * 200);
+                                this.floatingTexts.push(new FloatingText(ms.x - 60 * S, ms.y, `+${bossBonus} ${ms.title} İMHA!`, "gold"));
+                                document.getElementById('astopatla').play();
+                                const bossX = ms.x;
+                                const bossY = ms.y;
+                                this.motherships.splice(mIdx, 1);
+
+                                for (let p = 0; p < 85; p++) {
+                                    this.explosionParticles.push(new ExplosionParticle(bossX, bossY, [ms.color, '#ffcc00', '#00f2ff', '#ffffff']));
+                                }
+
+                                this.repairHull(30);
+                                if (this.shieldHits < 3) {
+                                    this.shieldHits++;
+                                    const newPct = this.getPercentage(this.shieldHits);
+                                    this.floatingTexts.push(new FloatingText(this.x, this.y - 25 * S, `🛡️ BOSS ÖDÜLÜ: KALKAN %${newPct} & GÖVDE +%30 (%${this.hullHp})!`, "#00f2ff"));
+                                } else {
+                                    addScore(250, false);
+                                    this.floatingTexts.push(new FloatingText(this.x, this.y - 25 * S, `+250 TAM KALKAN BONUSU & GÖVDE %${this.hullHp}!`, "#00f2ff"));
+                                }
+
+                                const spreadFull = this.isSpreadActive() && this.spreadHits === 3;
+                                const lootType = !spreadFull ? 'spread' : 'shield';
+                                this.powerUps.push(new PowerUp(bossX, bossY, lootType));
+
+                                triggerReliefPhase();
+                            } else if (isPrimarySalvoHit) {
+                                const armorPts = addScore(30);
+                                this.floatingTexts.push(new FloatingText(bullet.x, bullet.y, `+${armorPts} ZIRH`, ms.color));
+                            }
+                            break;
+                        }
+                    }
+                    if (bulletRemoved) continue;
+
+                    for (let bIdx = 0; bIdx < this.blackHoles.length; bIdx++) {
+                        const bh = this.blackHoles[bIdx];
+                        if (Math.hypot(bullet.x - bh.x, bullet.y - bh.y) < bh.radius + bullet.size) {
+                            bh.hp--;
+                            this.bullets.splice(i, 1);
+                            i--;
+                            bulletRemoved = true;
+
+                            if (bh.hp <= 0) {
+                                registerKillStreak();
+                                const bhPts = addScore(300);
+                                this.floatingTexts.push(new FloatingText(bh.x, bh.y, `+${bhPts} KARADELİK ÇÖKTÜ!`, "#b829ff"));
+                                document.getElementById('astopatla').play();
+                                for (let p = 0; p < 35; p++) {
+                                    this.explosionParticles.push(new ExplosionParticle(bh.x, bh.y, ['#b829ff', '#00f2ff', '#ffffff']));
+                                }
+                                this.blackHoles.splice(bIdx, 1);
+                            } else {
+                                const hitPts = addScore(20);
+                                this.floatingTexts.push(new FloatingText(bh.x, bh.y, `+${hitPts} ANOMALİ (${bh.hp}/${bh.maxHp})`, "#b829ff"));
+                            }
+                            break;
+                        }
+                    }
+                    if (bulletRemoved) continue;
+
+                    if (!isReliefPhase) {
+                        for (let j = 0; j < this.asteroids.length; j++) {
+                            const asteroid = this.asteroids[j];
+
+                            if (
+                                bullet.x < asteroid.x + asteroid.size &&
+                                bullet.x + bullet.size > asteroid.x &&
+                                bullet.y < asteroid.y + asteroid.size &&
+                                bullet.y + bullet.size > asteroid.y
+                            ) {
+                                registerKillStreak();
+                                const astPts = addScore(10);
+                                this.floatingTexts.push(new FloatingText(asteroid.x, asteroid.y, `+${astPts}`, "lawngreen"));
+
+                                const spreadActiveAndFull = this.isSpreadActive() && this.spreadHits === 3;
+                                const bothFull = (this.shieldHits === 3 && spreadActiveAndFull && this.hullHp >= 100);
+
+                                if (this.powerUps.length === 0 && !bothFull) {
+                                    this.asteroidsDestroyedCount++;
+                                    const reqKills = this.getRequiredKillsForDrop();
+
+                                    if (this.asteroidsDestroyedCount >= reqKills) {
+                                        this.asteroidsDestroyedCount = 0;
+
+                                        let dropType = this.nextCapsuleType;
+                                        if (this.shieldHits === 3 && this.hullHp >= 100 && !spreadActiveAndFull) {
+                                            dropType = 'spread';
+                                        } else if (spreadActiveAndFull && (this.shieldHits < 3 || this.hullHp < 100)) {
+                                            dropType = 'shield';
+                                        } else {
+                                            this.nextCapsuleType = this.nextCapsuleType === 'shield' ? 'spread' : 'shield';
+                                        }
+
+                                        this.powerUps.push(new PowerUp(asteroid.x, asteroid.y, dropType));
+                                    }
+                                }
+
+                                this.bullets.splice(i, 1);
+                                i--;
+                                bulletRemoved = true;
+                                const astopatla = document.getElementById('astopatla');
+                                astopatla.currentTime = 0;
+                                astopatla.play();
+                                asteroid.reset();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        class Bullet {
+            constructor(x, y, speed, angle, color = 'lawngreen', salvoId = 0) {
+                this.x = x;
+                this.y = y;
+                this.baseSpeed = speed;
+                this.baseSize = 6;
+                this.color = color;
+                this.angle = angle;
+                this.salvoId = salvoId;
+            }
+
+            get size() {
+                return this.baseSize * S;
+            }
+
+            draw() {
+                const ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = this.color;
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 12 * S;
+                ctx.fillRect(-11 * S, -2.5 * S, 22 * S, 5 * S);
+                ctx.restore();
+            }
+
+            update() {
+                const step = this.baseSpeed * S;
+                this.x += step * Math.cos(this.angle);
+                this.y += step * Math.sin(this.angle);
+            }
+        }
+
+        // Bölgeye Göre Şekil ve Renk Değiştiren Dinamik Göktaşı Sınıfı
+        class Asteroid {
+            constructor() {
+                this.initShape();
+                this.x = window.innerWidth + this.baseSize * S;
+                this.y = Math.random() * window.innerHeight;
+            }
+
+            initShape() {
+                this.baseSize = Math.random() * 16 + 9;
+                this.baseSpeed = (Math.random() * 1.4 + 1.8) * 0.5;
+                this.angle = Math.random() * Math.PI * 2;
+                this.rotSpeed = (Math.random() - 0.5) * 0.07;
+
+                // Her göktaşı için girintili çıkıntılı rastgele köşe oranları üret
+                this.vertexRatios = [];
+                for (let i = 0; i < 8; i++) {
+                    this.vertexRatios.push(0.68 + Math.random() * 0.35);
+                }
+            }
+
+            get size() {
+                return this.baseSize * S;
+            }
+
+            draw() {
+                const ctx = canvas.getContext('2d');
+                const r = this.size / 2;
+                const cx = this.x + r;
+                const cy = this.y + r;
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(this.angle);
+
+                if (kuiperBeltActive) {
+                    // 1) KUİPER KUŞAĞI: Parlak Buz Mavisi Sivri Kristal / Buzul Kütlesi
+                    ctx.fillStyle = 'rgba(0, 225, 255, 0.78)';
+                    ctx.strokeStyle = '#e0ffff';
+                    ctx.lineWidth = Math.max(1.2, 2 * S);
+                    ctx.shadowColor = '#00f2ff';
+                    ctx.shadowBlur = 12 * S;
+
+                    ctx.beginPath();
+                    const spikes = 6;
+                    for (let i = 0; i < spikes; i++) {
+                        const a = (i * Math.PI * 2) / spikes;
+                        const rad = (i % 2 === 0 ? r * 1.25 : r * 0.62);
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // İç kristal yansıma çizgisi
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = Math.max(0.8, 1 * S);
+                    ctx.beginPath();
+                    ctx.moveTo(-r * 0.5, 0);
+                    ctx.lineTo(r * 0.5, 0);
+                    ctx.stroke();
+
+                } else if (asteroidBeltActive) {
+                    // 2) ANA ASTEROİT KUŞAĞI: Kızıl-Bronz Köşeli Demir/Kayaç Göktaşı
+                    ctx.fillStyle = '#9e4716';
+                    ctx.strokeStyle = '#ff9933';
+                    ctx.lineWidth = Math.max(1.2, 1.8 * S);
+                    ctx.shadowColor = '#ff6600';
+                    ctx.shadowBlur = 8 * S;
+
+                    ctx.beginPath();
+                    const sides = 7;
+                    for (let i = 0; i < sides; i++) {
+                        const a = (i * Math.PI * 2) / sides;
+                        const rad = r * this.vertexRatios[i];
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Metalik cevher krateri
+                    ctx.fillStyle = '#5c2406';
+                    ctx.beginPath();
+                    ctx.arc(r * 0.2, -r * 0.15, r * 0.25, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else {
+                    // 3) NORMAL UZAY: Girintili Çıkıntılı Gri Kayaç Meteor
+                    ctx.fillStyle = '#6e737b';
+                    ctx.strokeStyle = '#9aa0a6';
+                    ctx.lineWidth = Math.max(1, 1.4 * S);
+
+                    ctx.beginPath();
+                    const sides = 7;
+                    for (let i = 0; i < sides; i++) {
+                        const a = (i * Math.PI * 2) / sides;
+                        const rad = r * this.vertexRatios[i];
+                        if (i === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                        else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Küçük yüzey krateri
+                    ctx.fillStyle = '#4a4e54';
+                    ctx.beginPath();
+                    ctx.arc(-r * 0.22, r * 0.18, r * 0.22, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            update(shipSpeed) {
+                const beltMultiplier = (asteroidBeltActive || kuiperBeltActive) ? 1.45 : 1;
+                const waveScale = 1 + (currentWave - 1) * 0.06;
+                this.x -= (this.baseSpeed + shipSpeed * 0.325) * beltMultiplier * waveScale * S;
+                this.angle += this.rotSpeed * beltMultiplier;
+            }
+
+            reset() {
+                this.initShape();
+                this.x = window.innerWidth + this.size + Math.random() * 60 * S;
+                this.y = Math.random() * window.innerHeight;
+            }
+        }
+
+        updateResolution();
+        window.addEventListener('resize', updateResolution);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateResolution);
+        }
+
+        window.ufo = new UFO();
+        ufo.createAsteroids();
+
+        showStageAnnouncement("1. DALGA", "GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI", "#00f2ff", 4000);
+
+        window.addEventListener('mousedown', (event) => {
+            if (
+                event.target.id === 'hudToggleBtn' ||
+                event.target.id === 'pauseToggleBtn' ||
+                event.target.id === 'resumeBtn' ||
+                event.target.id === 'restartBtn' || 
+                event.target.id === 'saveRecordBtn' || 
+                event.target.id === 'playerNameInput'
+            ) return;
+
+            if (isPaused) return;
+            ufo.shoot();
+        });
+
+        window.addEventListener('keydown', (event) => {
+            if (document.activeElement && document.activeElement.id === 'playerNameInput') {
+                if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+                    saveNewRecord();
+                }
+                return;
+            }
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter', 'NumpadEnter', 'Escape'].includes(event.code)) {
+                event.preventDefault();
+            }
+
+            // [H] Tuşu ile Sol Üst Bilgi Panelini (HUD) Aç / Kapat
+            if (event.code === 'KeyH' && !event.repeat) {
+                toggleHudPanel();
+                return;
+            }
+
+            // [P] veya [ESC] Tuşu ile Oyunu Duraklat / Devam Ettir
+            if ((event.code === 'KeyP' || event.code === 'Escape') && !event.repeat) {
+                togglePause();
+                return;
+            }
+
+            if (isPaused) return;
+
+            if ((event.code === 'Space' || event.code === 'Enter' || event.code === 'NumpadEnter') && !event.repeat) {
+                ufo.shoot();
+            }
+
+            switch (event.code) {
+                case 'KeyA': case 'ArrowLeft': keys.a = true; break;
+                case 'KeyD': case 'ArrowRight': keys.d = true; break;
+                case 'KeyW': case 'ArrowUp': keys.w = true; break;
+                case 'KeyS': case 'ArrowDown': keys.s = true; break;
+            }
+        });
+
+        window.addEventListener('keyup', (event) => {
+            switch (event.code) {
+                case 'KeyA': case 'ArrowLeft': keys.a = false; break;
+                case 'KeyD': case 'ArrowRight': keys.d = false; break;
+                case 'KeyW': case 'ArrowUp': keys.w = false; break;
+                case 'KeyS': case 'ArrowDown': keys.s = false; break;
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            resetAllKeys();
+        });
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            resetAllKeys();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                resetAllKeys();
+                if (window.ufo && !ufo.isDestroyed && !isPaused) {
+                    togglePause(true);
+                }
+            }
+        });
+
+        function animateUFO() {
+            if (!isPaused) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ufo.update();
+            }
+
+            requestAnimationFrame(animateUFO);
+        }
+
+        animateUFO();
+    </script>
+</body>
+</html>
