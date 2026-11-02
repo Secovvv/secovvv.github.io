@@ -523,6 +523,14 @@
     <audio id="laserSound" src="laser.mp3"></audio>
     
     <script>
+        function playSoundSafe(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.currentTime = 0;
+                el.play().catch(() => {});
+            }
+        }
+
         // Sol Üst Bilgi Panelini (HUD) Açıp Kapatma Fonksiyonu
         function toggleHudPanel() {
             const hud = document.getElementById('hud');
@@ -573,7 +581,6 @@
             } else {
                 const pausedDuration = Date.now() - pauseStartTime;
 
-                // Duraklatma süresince geçen zamanı tüm aktif zamanlayıcılara ekle (hiçbir sayaç erimez)
                 if (isReliefPhase && reliefUntil > 0) {
                     reliefUntil += pausedDuration;
                 }
@@ -653,7 +660,6 @@
         let waveStartDist = 0;
         const WAVE_COMBAT_DISTANCE = 6500;
 
-        // Gezegenlerin ekranda çok hızlı akmasını önleyen derinlik (paralaks) çarpanı
         const PLANET_PARALLAX = 0.25;
 
         let travelDistance = 0; 
@@ -682,7 +688,6 @@
             { id: 'neptune', name: 'NEPTÜN',  au: 30.05, mKm: 4500, centerDist: 53500, color: '#3366ff', gLabel: 'ORTA-YÜKSEK',    announced: false }
         ];
 
-        // --- MERKEZ ODAKLI HİPER LAZER VE SERİ ÇARPANI ---
         let killStreak = 0;
         let comboMultiplier = 1;
 
@@ -910,7 +915,6 @@
                     const el = document.getElementById(p.id);
                     if (!el) continue;
 
-                    // Soldan sağa ilerleyiş: Gezegenler ekranın sağından doğup sola doğru süzülür
                     const offsetFromCenter = (p.centerDist - travelDistance) * PLANET_PARALLAX * (window.innerWidth / BASE_REF_WIDTH);
                     const screenCenterX = (window.innerWidth * 0.5) + offsetFromCenter;
 
@@ -937,7 +941,6 @@
                     }
                 }
 
-                // Mekiğin ekrandaki gerçek X konumunu hesaba katan hassas hizalama mesafesi (Soldan sağa)
                 const ufoCenterX = window.ufo ? (ufo.x + ufo.width / 2) : (window.innerWidth * 0.5);
                 const shipScreenOffset = (ufoCenterX - (window.innerWidth * 0.5)) / (PLANET_PARALLAX * (window.innerWidth / BASE_REF_WIDTH));
                 const shipVisualDist = travelDistance + shipScreenOffset;
@@ -971,7 +974,6 @@
                     }
                 }
 
-                // 1) Güneş Merkezine Yaklaşım Evresi (35 M.KM -> 0 M.KM)
                 if (shipVisualDist < SUN_CENTER_DIST) {
                     const remainingRatio = Math.max(0, (SUN_CENTER_DIST - shipVisualDist) / SUN_CENTER_DIST);
                     const approachMKm = Math.round(35 * remainingRatio);
@@ -983,7 +985,6 @@
                     return;
                 }
 
-                // 2) Güneş Merkez Çekirdeği
                 const SUN_CORE_HALF_SPAN = 450;
                 if (shipVisualDist >= SUN_CENTER_DIST && shipVisualDist <= SUN_CENTER_DIST + SUN_CORE_HALF_SPAN) {
                     distEl.innerText = "0";
@@ -1074,7 +1075,6 @@
             });
         }
 
-        // Yıldızlar mekik sağa ilerledikçe sağdan sola doğru akar
         function drawAndUpdateStars(ctx, shipSpeed) {
             ctx.save();
             ctx.fillStyle = '#ffffff';
@@ -1125,7 +1125,6 @@
             }
         }
 
-        // Motor ve gövde yangını parçacıkları mekik sağa ilerlediği için sola (geriye) doğru savrulur
         class HullFireParticle {
             constructor(x, y, isSmoke = false, isEngine = true) {
                 this.x = x + (Math.random() * 6 - 3) * S;
@@ -1203,7 +1202,6 @@
             }
         }
 
-        // Güçlendirme kapsülleri sağdan sola doğru (oyuncuya doğru) süzülür
         class PowerUp {
             constructor(x, y, type) {
                 this.x = x;
@@ -1338,7 +1336,6 @@
             }
         }
 
-        // İHA'lar ekranın sağ kenarından doğup sağ tarafta konuşlanır
         class AlienDrone {
             constructor(tier = 1, waveNum = 2) {
                 this.tier = tier;
@@ -1428,7 +1425,6 @@
             }
         }
 
-        // Boss'lar ekranın sağından girip sağ bölgede konuşlanır
         class SectorBoss {
             constructor(waveNum) {
                 this.waveNum = waveNum;
@@ -1531,7 +1527,6 @@
                     }
                 }
 
-                // Tekillik Boss'unun çekim kuvveti
                 if (this.bossType === 3 && !ufo.isDestroyed && this.x < window.innerWidth - 100 * S) {
                     const dx = this.x - ufoCX;
                     const dy = this.y - ufoCY;
@@ -1609,7 +1604,6 @@
                 ctx.shadowBlur = 10 * S;
                 ctx.fillRect(-barW / 2, -r - 26 * S, barW * (Math.max(0, this.hp) / this.maxHp), barH);
 
-                // %65 ve %30 Kapsül Eşik Çizgileri
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(-barW / 2 + barW * 0.65, -r - 27 * S, 2 * S, barH + 2 * S);
                 ctx.fillRect(-barW / 2 + barW * 0.30, -r - 27 * S, 2 * S, barH + 2 * S);
@@ -1681,7 +1675,6 @@
             }
         }
 
-        // Karadelikler ekranın sağından doğup sola doğru ilerler
         class BlackHole {
             constructor() {
                 this.baseRadius = 42;
@@ -1781,7 +1774,6 @@
             constructor() {
                 this.baseWidth = 150;
                 this.baseHeight = 60;
-                // Mekik başlangıçta sol-orta bölgede yer alır ve sağa doğru bakar
                 this.x = window.innerWidth * 0.22 - (this.baseWidth * S) / 2;
                 this.y = window.innerHeight / 2 - (this.baseHeight * S) / 2;
                 this.ufoImage = new Image();
@@ -1812,7 +1804,6 @@
                 this.floatingTexts = [];
                 this.isDestroyed = false;
 
-                // 100 Gövde Canı (Hull HP) ve Kalkan Sistemi
                 this.hullHp = 100;
                 this.maxHullHp = 100;
                 this.shieldHits = 0;
@@ -1937,7 +1928,6 @@
                 const scheduleNextWaveSpawn = () => {
                     const dynamicDelay = Math.max(2400, 4800 - currentWave * 190);
                     setTimeout(() => {
-                        // Oyun duraklatılmışsa (isPaused) yeni İHA veya Karadelik üretmez
                         if (!isPaused && !this.isDestroyed && !isReliefPhase && deepSpaceEventsActive && currentWave > 1) {
                             const maxDrones = waveBossSpawned ? 1 : Math.min(4, 2 + Math.floor(currentWave / 3));
                             if (this.alienDrones.length < maxDrones) {
@@ -1995,16 +1985,13 @@
                     this.floatingTexts.push(new FloatingText(centerX - 60 * S, centerY + 35 * S, msg, "#ff1e56"));
                 }
 
-                // 1) Kalkan Varken Darbe Sönümleme: Kalkan 1 kademe düşer, Gövde Canı sadece %10 azalır
                 if (this.shieldHits > 0) {
                     this.shieldHits--;
                     this.hullHp = Math.max(0, this.hullHp - 10);
                     this.syncHullDamageVisuals();
                     this.invulnerableUntil = now + 1250;
 
-                    const astopatla = document.getElementById('astopatla');
-                    astopatla.currentTime = 0;
-                    astopatla.play();
+                    playSoundSafe('astopatla');
 
                     for (let i = 0; i < 35; i++) {
                         this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#00f2ff', '#ff6600', '#ffff00']));
@@ -2021,14 +2008,11 @@
                     return;
                 }
 
-                // 2) Kalkansız Dayanıklılık: Kalkan %0 iken anında patlamaz, Gövde Canı %25 azalır
                 this.hullHp = Math.max(0, this.hullHp - 25);
                 this.syncHullDamageVisuals();
                 this.invulnerableUntil = now + 1350;
 
-                const astopatla = document.getElementById('astopatla');
-                astopatla.currentTime = 0;
-                astopatla.play();
+                playSoundSafe('astopatla');
 
                 for (let i = 0; i < 42; i++) {
                     this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#ff2222', '#ff6600', '#ffff00']));
@@ -2043,7 +2027,6 @@
                 showBanner(`🚨 KALKANSIZ İSABET! Gövde Canı %${this.hullHp}'e düştü! Kalkan Kapsülü (S) topla!`, "#ff2222");
             }
 
-            // İtici alevler mekiğin sol arkasından (kuyruğundan) sola doğru uzar
             drawDualThrusters(ctx) {
                 if (this.throttle <= 0 && !keys.d) return;
 
@@ -2099,7 +2082,6 @@
                 }
             }
 
-            // Gövde hasar noktaları: sol arka motorlar ve sağ ön kokpit/burun
             drawProgressiveHullDamage(ctx) {
                 if (this.hullDamage <= 0 || this.isDestroyed) return;
 
@@ -2172,9 +2154,7 @@
                 this.hullHp = 0;
                 this.throttle = 0;
 
-                const astopatla = document.getElementById('astopatla');
-                astopatla.currentTime = 0;
-                astopatla.play();
+                playSoundSafe('astopatla');
 
                 const centerX = this.x + this.width / 2;
                 const centerY = this.y + this.height / 2;
@@ -2323,7 +2303,6 @@
                         return;
                     }
 
-                    // Teğet Geçiş (Pilotaj) Bonusu
                     if (pl.isArmored && !pl.grazed) {
                         const distToCenter = Math.hypot(pl.x - ufoCenterX, pl.y - ufoCenterY);
                         if (distToCenter < 95 * S) {
@@ -2376,7 +2355,6 @@
                 }
             }
 
-            // Mermiler mekiğin sağ ön burnundan sağa doğru (0 radyan açıyla) ateşlenir
             shoot() {
                 if (this.isDestroyed || isPaused) return;
 
@@ -2419,11 +2397,7 @@
                     }
                 }
 
-                const laserSound = document.getElementById('laserSound');
-                if (laserSound) {
-                    laserSound.currentTime = 0;
-                    laserSound.play().catch(() => {});
-                }
+                playSoundSafe('laserSound');
             }
 
             updateHudBadges() {
@@ -2545,14 +2519,20 @@
                 if (!this.isDestroyed) {
                     this.drawDualThrusters(ctx);
 
-                    // ufo.png görseli yatay çevrilerek (scale(-1, 1)) mekiğin burnu sağa bakacak şekilde çizilir
                     ctx.save();
                     if (Date.now() < this.invulnerableUntil) {
                         ctx.globalAlpha = Math.sin(Date.now() * 0.03) * 0.4 + 0.6;
                     }
                     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
                     ctx.scale(-1, 1);
-                    ctx.drawImage(this.ufoImage, -this.width / 2, -this.height / 2, this.width, this.height);
+                    if (this.ufoImage.complete && this.ufoImage.naturalWidth > 0) {
+                        ctx.drawImage(this.ufoImage, -this.width / 2, -this.height / 2, this.width, this.height);
+                    } else {
+                        ctx.fillStyle = '#00f2ff';
+                        ctx.beginPath();
+                        ctx.ellipse(0, 0, this.width / 2, this.height / 3, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
                     ctx.restore();
 
                     this.drawProgressiveHullDamage(ctx);
@@ -2645,7 +2625,6 @@
                 }
             }
 
-            // Soldan sağa uçuş kontrolleri: D (Sağ) hızlandırır ve ileri götürür, A (Sol) yavaşlatır ve geri çeker
             handleMovement() {
                 if (this.isDestroyed) return;
 
@@ -2755,7 +2734,7 @@
                                 }
 
                                 this.floatingTexts.push(new FloatingText(drone.x, drone.y, label, drone.color));
-                                document.getElementById('astopatla').play();
+                                playSoundSafe('astopatla');
                                 for (let p = 0; p < 25; p++) {
                                     this.explosionParticles.push(new ExplosionParticle(drone.x, drone.y, [drone.color, '#ffffff', '#ff9900']));
                                 }
@@ -2804,7 +2783,7 @@
                                 registerKillStreak();
                                 const bossBonus = addScore(800 + currentWave * 200);
                                 this.floatingTexts.push(new FloatingText(ms.x - 60 * S, ms.y, `+${bossBonus} ${ms.title} İMHA!`, "gold"));
-                                document.getElementById('astopatla').play();
+                                playSoundSafe('astopatla');
                                 const bossX = ms.x;
                                 const bossY = ms.y;
                                 this.motherships.splice(mIdx, 1);
@@ -2849,7 +2828,7 @@
                                 registerKillStreak();
                                 const bhPts = addScore(300);
                                 this.floatingTexts.push(new FloatingText(bh.x, bh.y, `+${bhPts} KARADELİK ÇÖKTÜ!`, "#b829ff"));
-                                document.getElementById('astopatla').play();
+                                playSoundSafe('astopatla');
                                 for (let p = 0; p < 35; p++) {
                                     this.explosionParticles.push(new ExplosionParticle(bh.x, bh.y, ['#b829ff', '#00f2ff', '#ffffff']));
                                 }
@@ -2903,9 +2882,7 @@
                                 this.bullets.splice(i, 1);
                                 i--;
                                 bulletRemoved = true;
-                                const astopatla = document.getElementById('astopatla');
-                                astopatla.currentTime = 0;
-                                astopatla.play();
+                                playSoundSafe('astopatla');
                                 asteroid.reset();
                                 break;
                             }
@@ -2949,7 +2926,6 @@
             }
         }
 
-        // Bölgeye Göre Şekil ve Renk Değiştiren Dinamik Göktaşı Sınıfı
         class Asteroid {
             constructor() {
                 this.initShape();
@@ -2963,7 +2939,6 @@
                 this.angle = Math.random() * Math.PI * 2;
                 this.rotSpeed = (Math.random() - 0.5) * 0.07;
 
-                // Her göktaşı için girintili çıkıntılı rastgele köşe oranları üret
                 this.vertexRatios = [];
                 for (let i = 0; i < 8; i++) {
                     this.vertexRatios.push(0.68 + Math.random() * 0.35);
@@ -2985,7 +2960,6 @@
                 ctx.rotate(this.angle);
 
                 if (kuiperBeltActive) {
-                    // 1) KUİPER KUŞAĞI: Parlak Buz Mavisi Sivri Kristal / Buzul Kütlesi
                     ctx.fillStyle = 'rgba(0, 225, 255, 0.78)';
                     ctx.strokeStyle = '#e0ffff';
                     ctx.lineWidth = Math.max(1.2, 2 * S);
@@ -3004,7 +2978,6 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // İç kristal yansıma çizgisi
                     ctx.strokeStyle = '#ffffff';
                     ctx.lineWidth = Math.max(0.8, 1 * S);
                     ctx.beginPath();
@@ -3013,7 +2986,6 @@
                     ctx.stroke();
 
                 } else if (asteroidBeltActive) {
-                    // 2) ANA ASTEROİT KUŞAĞI: Kızıl-Bronz Köşeli Demir/Kayaç Göktaşı
                     ctx.fillStyle = '#9e4716';
                     ctx.strokeStyle = '#ff9933';
                     ctx.lineWidth = Math.max(1.2, 1.8 * S);
@@ -3032,14 +3004,12 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // Metalik cevher krateri
                     ctx.fillStyle = '#5c2406';
                     ctx.beginPath();
                     ctx.arc(r * 0.2, -r * 0.15, r * 0.25, 0, Math.PI * 2);
                     ctx.fill();
 
                 } else {
-                    // 3) NORMAL UZAY: Girintili Çıkıntılı Gri Kayaç Meteor
                     ctx.fillStyle = '#6e737b';
                     ctx.strokeStyle = '#9aa0a6';
                     ctx.lineWidth = Math.max(1, 1.4 * S);
@@ -3056,7 +3026,6 @@
                     ctx.fill();
                     ctx.stroke();
 
-                    // Küçük yüzey krateri
                     ctx.fillStyle = '#4a4e54';
                     ctx.beginPath();
                     ctx.arc(-r * 0.22, r * 0.18, r * 0.22, 0, Math.PI * 2);
@@ -3117,13 +3086,11 @@
                 event.preventDefault();
             }
 
-            // [H] Tuşu ile Sol Üst Bilgi Panelini (HUD) Aç / Kapat
             if (event.code === 'KeyH' && !event.repeat) {
                 toggleHudPanel();
                 return;
             }
 
-            // [P] veya [ESC] Tuşu ile Oyunu Duraklat / Devam Ettir
             if ((event.code === 'KeyP' || event.code === 'Escape') && !event.repeat) {
                 togglePause();
                 return;
