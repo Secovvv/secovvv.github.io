@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Avı - SECOVVV Speed Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --z: 1;
+            /* Hem genişlik hem yüksekliğe göre taşmayı önleyen dinamik ölçek birimi */
+            --u: calc(min(1vw, 1.12vh) * var(--z));
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes shake { 
+            0% { transform: translateX(0); } 
+            25% { transform: translateX(calc(-1 * var(--u))); } 
+            50% { transform: translateX(calc(1 * var(--u))); } 
+            75% { transform: translateX(calc(-1 * var(--u))); } 
+            100% { transform: translateX(0); } 
+        }
+        @keyframes pulse { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.1); color: #ff0000; } 
+            100% { transform: scale(1); } 
+        }
+        @keyframes slideDownIn { 
+            0% { opacity: 0; transform: translateY(calc(-1.5 * var(--u))); } 
+            100% { opacity: 1; transform: translateY(0); } 
+        }
+        @keyframes fireFlow { 
+            0% { background-position: 0% 0%; } 
+            100% { background-position: 0% 100%; } 
+        }
+        
+        /* TEK SEFERLİK ALEV PATLAMASI (PUNCH) */
+        @keyframes seco-punch {
+            0% { transform: rotate(-10deg) scale(1); filter: drop-shadow(0 0 0px transparent); }
+            50% { transform: rotate(-15deg) scale(1.45); filter: drop-shadow(0 0 calc(2.5 * var(--u)) #ff4500); text-shadow: 0 0 calc(1.5 * var(--u)) #fff; }
+            100% { transform: rotate(-10deg) scale(1); filter: drop-shadow(0 0 calc(0.5 * var(--u)) #ff4500); }
+        }
+
+        .seco-ignite-action {
+            animation: seco-punch 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+
+        /* NEON EFEKTLERİ */
+        @keyframes neon-correct {
+            0% { box-shadow: 0 0 calc(0.5 * var(--u)) #2ecc71, 0 0 calc(1 * var(--u)) #2ecc71; border-color: #2ecc71; }
+            50% { box-shadow: 0 0 calc(2 * var(--u)) #2ecc71, 0 0 calc(4 * var(--u)) #2ecc71; border-color: #2ecc71; }
+            100% { box-shadow: 0 0 calc(0.5 * var(--u)) #2ecc71, 0 0 calc(1 * var(--u)) #2ecc71; border-color: #444; }
+        }
+
+        @keyframes neon-wrong {
+            0% { box-shadow: 0 0 calc(0.5 * var(--u)) #e74c3c, 0 0 calc(1 * var(--u)) #e74c3c; border-color: #e74c3c; }
+            50% { box-shadow: 0 0 calc(2 * var(--u)) #e74c3c, 0 0 calc(4 * var(--u)) #e74c3c; border-color: #e74c3c; }
+            100% { box-shadow: 0 0 calc(0.5 * var(--u)) #e74c3c, 0 0 calc(1 * var(--u)) #e74c3c; border-color: #444; }
+        }
+
+        .correct-neon { animation: neon-correct 0.5s ease-out; }
+        .wrong-neon { animation: neon-wrong 0.5s ease-out; }
+
+        /* CANLI HARF KONTROLÜ RENKLERİ */
+        .typing-match {
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(46, 204, 113, 0.45) !important;
+            color: #2ecc71 !important;
+        }
+        .typing-mismatch {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 calc(1.8 * var(--u)) rgba(231, 76, 60, 0.65) !important;
+            color: #ff6b6b !important;
+            background: rgba(231, 76, 60, 0.12) !important;
+        }
+
+        @keyframes lightSpeedFlash {
+            0% { background: rgba(255, 255, 255, 0.8); filter: brightness(2); }
+            100% { background: transparent; filter: brightness(1); }
+        }
+        @keyframes zoomPunch {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .light-speed-active { animation: lightSpeedFlash 0.5s ease-out; }
+        .punch-active { animation: zoomPunch 0.3s ease-out; }
+
+        html, body { 
+            background: #000; 
+            margin: 0; 
+            padding: 0;
+            width: 100%;
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-family: 'Segoe UI', sans-serif; 
+            transition: background 0.3s; 
+        }
+
+        .kozmik-nebula { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+            background: radial-gradient(circle, #1a0b2e 0%, #000 90%); 
+        }
+
+        #oyun-wrapper {
+            position: relative;
+            width: calc(56 * var(--u));
+            max-width: 95vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        #anaKapsayici {
+            background: rgba(15, 20, 45, 0.85);
+            backdrop-filter: blur(calc(2 * var(--u)));
+            border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.4);
+            border-radius: calc(3 * var(--u)); 
+            padding: calc(6 * var(--u)) calc(2.5 * var(--u)) calc(2.2 * var(--u)) calc(2.5 * var(--u));
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 15;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden; 
+            box-shadow: 0 0 calc(5 * var(--u)) rgba(139, 92, 246, 0.15);
+        }
+
+        .seco-signature {
+            position: absolute; 
+            top: calc(1.8 * var(--u)); 
+            left: calc(1.8 * var(--u)); 
+            font-size: calc(2.1 * var(--u)); 
+            font-weight: bold; 
+            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(0deg, #ff4500, #ff8c00, #ffd700, #ff8c00, #ff4500);
+            background-size: 100% 300%; 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            animation: fireFlow 1.5s infinite linear; 
+            transform: rotate(-10deg); 
+            pointer-events: none; 
+            z-index: 30;
+            transition: transform 0.2s;
+        }
+
+        .kozmik-saat {
+            position: absolute; 
+            top: calc(1.5 * var(--u)); 
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: calc(1.5 * var(--u)); 
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace; 
+            color: #8b5cf6;
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(139, 92, 246, 0.6); 
+            z-index: 30;
+            background: rgba(255, 255, 255, 0.05); 
+            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(1 * var(--u));
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.2);
+            white-space: nowrap;
+        }
+        
+        .oyuncu-bilgi {
+            position: absolute; 
+            top: calc(1.5 * var(--u)); 
+            right: calc(1.8 * var(--u)); 
+            font-size: calc(1.35 * var(--u)); 
+            font-weight: bold;
+            font-family: 'Segoe UI', sans-serif; 
+            color: #fff;
+            background: rgba(139, 92, 246, 0.2); 
+            padding: calc(0.5 * var(--u)) calc(1.3 * var(--u)); 
+            border-radius: calc(1 * var(--u));
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.4); 
+            z-index: 30;
+            max-width: calc(18 * var(--u));
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stats-panel { 
+            display: flex; 
+            justify-content: space-around; 
+            width: 100%; 
+            background: rgba(255,255,255,0.05); 
+            padding: calc(1.1 * var(--u)); 
+            border-radius: calc(1.8 * var(--u)); 
+            margin-bottom: calc(1 * var(--u)); 
+        }
+        .stat-box { display: flex; flex-direction: column; }
+        .stat-val { font-size: calc(2.6 * var(--u)); font-weight: bold; color: #f1c40f; }
+        .stat-label { font-size: calc(1.05 * var(--u)); color: #aaa; text-transform: uppercase; }
+
+        #rekorlar {
+            font-size: calc(1.3 * var(--u)); 
+            color: #888; 
+            margin-bottom: calc(1 * var(--u)); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: calc(0.5 * var(--u)); 
+            width: 100%;
+        }
+
+        .rekor-satir-gold {
+            background: rgba(241, 196, 15, 0.1); 
+            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(1 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.3); 
+            width: 100%;
+        }
+
+        .rekor-satir-purple {
+            background: rgba(139, 92, 246, 0.1); 
+            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(1 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.3); 
+            width: 100%;
+        }
+
+        #karisik-kelime { 
+            font-size: calc(4.6 * var(--u));
+            font-weight: bold; 
+            color: #f1c40f; 
+            margin: calc(0.6 * var(--u)) 0 calc(1.4 * var(--u)) 0; 
+            letter-spacing: calc(0.2 * var(--u)); 
+            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.35);
+            min-height: calc(5.5 * var(--u));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #tahmin {
+            background: rgba(0,0,0,0.55); 
+            color: #fff; 
+            border: calc(0.2 * var(--u)) solid #444; 
+            border-radius: calc(1.4 * var(--u));
+            padding: calc(1.2 * var(--u)); 
+            font-size: calc(2 * var(--u)); 
+            text-align: center; 
+            width: 100%; 
+            max-width: calc(40 * var(--u)); 
+            outline: none; 
+            transition: 0.2s; 
+            z-index: 20;
+        }
+        #tahmin:focus { 
+            border-color: #8b5cf6; 
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(139, 92, 246, 0.4); 
+        }
+
+        #hiz-alani { 
+            min-height: calc(4.8 * var(--u)); 
+            margin-top: calc(1 * var(--u)); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #hiz-gostergesi, #wpm-gostergesi { 
+            font-size: calc(1.75 * var(--u)); 
+            font-weight: bold; 
+            opacity: 0; 
+            transition: 0.2s; 
+        }
+        #wpm-gostergesi { 
+            color: #8b5cf6; 
+            margin-top: calc(0.25 * var(--u)); 
+        }
+        .hiz-aktif { 
+            animation: slideDownIn 0.4s ease-out forwards; 
+            opacity: 1 !important; 
+        }
+
+        #mesaj { 
+            min-height: calc(3 * var(--u)); 
+            margin-top: calc(0.3 * var(--u)); 
+            font-weight: bold; 
+            font-size: calc(1.9 * var(--u)); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* MÜZİK VE ALT KONTROLLER ALANI */
+        #alt-kontroller {
+            margin-top: calc(1 * var(--u)); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: calc(1.1 * var(--u)); 
+            width: 100%;
+        }
+
+        .ust-aksiyon-satiri {
+            display: flex;
+            gap: calc(0.8 * var(--u));
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        #muzik-paneli {
+            background: rgba(255, 255, 255, 0.05); 
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.3);
+            padding: calc(0.8 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(1.4 * var(--u)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: calc(0.9 * var(--u)); 
+            position: relative; 
+            width: fit-content; 
+            margin: 0 auto calc(1.1 * var(--u)) auto;
+        }
+
+        .m-btn {
+            background: rgba(139, 92, 246, 0.2); 
+            color: white; 
+            border: none; 
+            width: calc(3.2 * var(--u)); 
+            height: calc(3.2 * var(--u)); 
+            border-radius: calc(0.8 * var(--u)); 
+            cursor: pointer; 
+            font-size: calc(1.4 * var(--u)); 
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .m-btn:hover { background: rgba(139, 92, 246, 0.5); }
+        .playing { background: #2ecc71 !important; box-shadow: 0 0 calc(1 * var(--u)) #2ecc71; }
+
+        #sarki-bilgi { 
+            font-size: calc(1 * var(--u)); 
+            color: #999; 
+            position: absolute; 
+            bottom: calc(-1.6 * var(--u)); 
+            white-space: nowrap; 
+        }
+
+        .restart-game-btn {
+            background: rgba(52, 152, 219, 0.2); 
+            color: #3498db; 
+            border: calc(0.1 * var(--u)) solid rgba(52, 152, 219, 0.4);
+            padding: calc(0.8 * var(--u)) calc(1.5 * var(--u)); 
+            border-radius: calc(1 * var(--u)); 
+            font-size: calc(1.15 * var(--u)); 
+            cursor: pointer; 
+            transition: 0.3s;
+            text-transform: uppercase; 
+            font-weight: bold; 
+            letter-spacing: calc(0.06 * var(--u));
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .restart-game-btn:hover {
+            background: rgba(52, 152, 219, 0.4); 
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(52, 152, 219, 0.5); 
+            transform: scale(1.04);
+        }
+
+        .nav-mode-btn {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.4);
+            padding: calc(0.8 * var(--u)) calc(1.4 * var(--u));
+            border-radius: calc(1 * var(--u));
+            font-size: calc(1.15 * var(--u));
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-mode-btn:hover {
+            background: rgba(241, 196, 15, 0.35);
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.4);
+            transform: scale(1.04);
+        }
+
+        .alt-nav-satiri {
+            display: flex;
+            gap: calc(1 * var(--u));
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reset-btn {
+            background: rgba(231, 76, 60, 0.1); 
+            color: #e74c3c; 
+            border: calc(0.1 * var(--u)) solid rgba(231, 76, 60, 0.3); 
+            padding: calc(0.7 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(0.9 * var(--u)); 
+            font-size: calc(1.05 * var(--u)); 
+            cursor: pointer; 
+            transition: 0.3s;
+            text-transform: uppercase; 
+            letter-spacing: calc(0.08 * var(--u)); 
+            text-decoration: none;
+        }
+        .reset-btn:hover { 
+            background: rgba(231, 76, 60, 0.3); 
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(231, 76, 60, 0.4); 
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ccc;
+            border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.2);
+            padding: calc(0.7 * var(--u)) calc(1.4 * var(--u));
+            border-radius: calc(0.9 * var(--u));
+            font-size: calc(1.05 * var(--u));
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        #game-over { 
+            display: none; 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(5, 8, 20, 0.97); 
+            z-index: 100; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: calc(3 * var(--u)); 
+            padding: calc(2 * var(--u));
+        }
+
+        #over-title { 
+            color: #e74c3c; 
+            font-size: calc(4 * var(--u)); 
+            margin: 0 0 calc(1 * var(--u)) 0; 
+            text-align: center; 
+        }
+        #new-record-msg { 
+            font-size: calc(2.3 * var(--u)); 
+            color: #f1c40f; 
+            font-weight: bold; 
+            display: none; 
+            margin-bottom: calc(1 * var(--u)); 
+        }
+        #final-stats-container { 
+            background: rgba(255,255,255,0.08); 
+            padding: calc(2 * var(--u)); 
+            border-radius: calc(2 * var(--u)); 
+            width: 85%; 
+            max-width: calc(36 * var(--u)); 
+        }
+        #final-stats { 
+            font-size: calc(1.9 * var(--u)); 
+            line-height: 1.6; 
+            margin: 0;
+        }
+        #tekrar-dene-btn { 
+            padding: calc(1.2 * var(--u)) calc(2.8 * var(--u)); 
+            font-size: calc(1.8 * var(--u)); 
+            background: #2ecc71; 
+            color: white; 
+            border: none; 
+            border-radius: calc(1 * var(--u)); 
+            cursor: pointer; 
+            margin-top: calc(1.8 * var(--u)); 
+            font-weight: bold;
+            outline: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        #tekrar-dene-btn:hover, #tekrar-dene-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(46, 204, 113, 0.7);
+        }
+
+        .panik { animation: pulse 0.5s infinite; }
+        .sarsil { animation: shake 0.3s; }
+
+        #animasyon-kedisi {
+            position: absolute; 
+            bottom: calc(-10 * var(--u)); 
+            right: calc(1.5 * var(--u)); 
+            width: calc(8 * var(--u)); 
+            z-index: 50;
+            opacity: 0;
+            transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; 
+            pointer-events: none;
+        }
+        .kedi-zipla { 
+            bottom: calc(24 * var(--u)) !important; 
+            opacity: 1 !important; 
+        }
+
+        /* GİRİŞ EKRANI */
+        #giris-ekrani {
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            border-radius: calc(3 * var(--u));
+            background: rgba(15, 20, 45, 0.98); 
+            z-index: 200; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            padding: calc(2.5 * var(--u));
+        }
+        #giris-ekrani h1 { 
+            color: #f1c40f; 
+            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.5); 
+            letter-spacing: calc(0.2 * var(--u)); 
+            font-size: calc(3.1 * var(--u)); 
+            text-align: center; 
+            margin: 0 0 calc(1 * var(--u)) 0;
+        }
+        .giris-alt-yazi {
+            color: #aaa; 
+            margin-bottom: calc(2.8 * var(--u)); 
+            text-align: center; 
+            font-size: calc(1.55 * var(--u));
+        }
+        #oyuncu-adi-input {
+            padding: calc(1.4 * var(--u)); 
+            font-size: calc(1.8 * var(--u)); 
+            border-radius: calc(1.4 * var(--u)); 
+            border: calc(0.2 * var(--u)) solid #8b5cf6;
+            background: rgba(0,0,0,0.5); 
+            color: white; 
+            margin-bottom: calc(2 * var(--u)); 
+            text-align: center; 
+            outline: none; 
+            transition: 0.3s; 
+            width: 82%; 
+            max-width: calc(32 * var(--u));
+        }
+        #oyuncu-adi-input:focus { box-shadow: 0 0 calc(2 * var(--u)) rgba(139, 92, 246, 0.6); }
+        #basla-btn {
+            padding: calc(1.2 * var(--u)) calc(3 * var(--u)); 
+            font-size: calc(1.8 * var(--u)); 
+            background: #8b5cf6; 
+            color: white; 
+            font-weight: bold;
+            border: none; 
+            border-radius: calc(1.4 * var(--u)); 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+        }
+        #basla-btn:hover { 
+            background: #9b6cf6; 
+            box-shadow: 0 0 calc(2 * var(--u)) #8b5cf6; 
+            transform: scale(1.05); 
+        }
+
+        /* ÖZEL UYARI MODALI */
+        #ozel-modal {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); 
+            z-index: 999; 
+            justify-content: center; 
+            align-items: center;
+            backdrop-filter: blur(calc(0.5 * var(--u)));
+        }
+        .modal-kutu {
+            background: rgba(15, 20, 45, 0.95); 
+            padding: calc(2.8 * var(--u)); 
+            border-radius: calc(2 * var(--u));
+            border: calc(0.2 * var(--u)) solid #8b5cf6; 
+            text-align: center; 
+            width: calc(36 * var(--u));
+            max-width: 90vw;
+            box-shadow: 0 0 calc(3 * var(--u)) rgba(139, 92, 246, 0.4);
+        }
+        .modal-kutu h3 { color: #f1c40f; margin-top: 0; font-size: calc(2.3 * var(--u)); }
+        .modal-kutu p { color: #ddd; margin-bottom: calc(2 * var(--u)); font-size: calc(1.55 * var(--u)); }
+        #modal-input {
+            width: 85%; 
+            padding: calc(1.1 * var(--u)); 
+            border-radius: calc(1 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid #8b5cf6;
+            background: rgba(0,0,0,0.6); 
+            color: white; 
+            outline: none; 
+            text-align: center; 
+            margin-bottom: calc(2 * var(--u)); 
+            font-size: calc(1.6 * var(--u));
+        }
+        #modal-input:focus { box-shadow: 0 0 calc(1 * var(--u)) rgba(139, 92, 246, 0.5); }
+        .modal-btn { 
+            padding: calc(1 * var(--u)) calc(2 * var(--u)); 
+            border: none; 
+            border-radius: calc(1 * var(--u)); 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: calc(1.5 * var(--u)); 
+            transition: 0.2s; 
+            margin: 0 calc(0.5 * var(--u)); 
+        }
+        .btn-tamam { background: #8b5cf6; color: white; }
+        .btn-tamam:hover { background: #9b6cf6; box-shadow: 0 0 calc(1.5 * var(--u)) #8b5cf6; }
+        .btn-iptal { background: #e74c3c; color: white; }
+        .btn-iptal:hover { background: #ff5e4d; box-shadow: 0 0 calc(1.5 * var(--u)) #e74c3c; }
+    </style>
+</head>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
+
+<audio id="anaMuzik" preload="auto"></audio>
+<audio id="dogruSes" src="dogruonparmak.mp3" preload="auto"></audio>
+<audio id="yanlisSes" src="yanlisonparmak.mp3" preload="auto"></audio>
+
+<div class="kozmik-nebula"></div>
+
+<div id="ozel-modal">
+    <div class="modal-kutu">
+        <h3 id="modal-baslik">Uyarı</h3>
+        <p id="modal-mesaj"></p>
+        <input type="password" id="modal-input" placeholder="Şifre..." autocomplete="off">
+        <div>
+            <button id="modal-tamam" class="modal-btn btn-tamam">Tamam</button>
+            <button id="modal-iptal" class="modal-btn btn-iptal">İptal</button>
+        </div>
+    </div>
+</div>
+
+<div id="oyun-wrapper">
+    <div id="anaKapsayici">
+        <img src="kedi.png" id="animasyon-kedisi" alt="Kedi">
+
+        <div id="giris-ekrani">
+            <h1>10 PARMAK HIZ ANALİZİ</h1>
+            <p class="giris-alt-yazi">WPM rekoru kırmak için adını gir ve başla!</p>
+            <input type="text" id="oyuncu-adi-input" placeholder="Kullanıcı Adı..." maxlength="16" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
+            <button onclick="oyunaGirisYap()" id="basla-btn">Oyuna Gir</button>
+        </div>
+
+        <div id="seco-logo" class="seco-signature">SECOVVV</div>
+        <div id="saat-kutusu" class="kozmik-saat">00:00:00</div>
+        <div class="oyuncu-bilgi">Oyuncu: <span id="aktif-oyuncu-adi" style="color:#f1c40f;">Belirsiz</span></div>
+
+        <div id="game-over">
+            <h1 id="over-title">SÜRE DOLDU!</h1>
+            <div id="new-record-msg">🏆 YENİ REKOR! 🏆</div>
+            <div id="final-stats-container">
+                <p id="final-stats"></p>
+            </div>
+            <button id="tekrar-dene-btn" onclick="oyunuSifirla()">Tekrar Dene 🔄 (Enter)</button>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-box"><span id="stat-dogru" class="stat-val">0</span><span class="stat-label">Doğru</span></div>
+            <div class="stat-box"><span id="stat-yanlis" class="stat-val">0</span><span class="stat-label">Yanlış</span></div>
+            <div class="stat-box"><span id="genel-sure" class="stat-val" style="color: #e74c3c;">60</span><span class="stat-label">Saniye</span></div>
+        </div>
+
+        <div id="rekorlar">
+            <div class="rekor-satir-gold">
+                🏆 Doğru Rekortmeni: <span id="best-correct" style="color:#f1c40f; font-weight:bold;">0 (Yok)</span>
+            </div>
+            <div class="rekor-satir-purple">
+                ⚡ WPM Rekortmeni: <span id="best-wpm" style="color:#8b5cf6; font-weight:bold;">0 (Yok)</span>
+            </div>
+        </div>
+
+        <div id="karisik-kelime">hazır ol!</div>
+        
+        <input type="text" id="tahmin" placeholder="Yazmaya Başla! (Enter veya Space)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="return false" ondrop="return false" disabled>
+        
+        <div id="hiz-alani">
+            <div id="hiz-gostergesi"></div>
+            <div id="wpm-gostergesi"></div>
+        </div>
+
+        <div id="mesaj"></div>
+
+        <div id="alt-kontroller">
+            <div class="ust-aksiyon-satiri">
+                <button class="restart-game-btn" onclick="oyunuSifirla()">🔄 Yeniden Başlat</button>
+                <a href="kelimeyibul.html" class="nav-mode-btn">🧩 Kelimeyi Bul</a>
+            </div>
+
+            <div id="muzik-paneli">
+                <button class="m-btn" onclick="oncekiSarki()" title="Önceki Şarkı">⏮</button>
+                <button id="play-pause-btn" class="m-btn" onclick="muzikKontrol()" title="Başlat / Durdur">▶</button>
+                <button class="m-btn" onclick="sonrakiSarki()" title="Sonraki Şarkı">⏭</button>
+                <button class="m-btn" onclick="rastgeleSarki()" title="Rastgele Şarkı">🔀</button>
+                <div id="sarki-bilgi">Müzik Durdu</div>
+            </div>
+
+            <div class="alt-nav-satiri">
+                <a href="index.html" class="home-btn">🏠 Ana Sayfa</a>
+                <button class="reset-btn" onclick="rekoruSifirla()">Rekorları Sıfırla 🔒</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="kelimeler.js"></script>
+
+<script>
+    // 1. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme (index.html standardı)
+    var baseDPR = window.devicePixelRatio || 1;
+
+    function updateResolution() {
+        var currentDPR = window.devicePixelRatio || 1;
+        var zoomFactor = currentDPR / baseDPR;
+        document.documentElement.style.setProperty('--z', zoomFactor);
+    }
+    updateResolution();
+    window.addEventListener('resize', updateResolution);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateResolution);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("oyuncu-adi-input").focus();
+    });
+
+    // 2. OYUN MANTIĞI
+    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
+    let secilenKelime = "", oncekiKelime = "";
+    let kelimeBaslangicZamani = 0, oyunBaslangicZamani = 0;
+    let genelTimer;
+    let oyunBasladi = false;
+    let oyunBittiMi = false;
+    let yenidenBaslatHazirMi = false;
+    let toplamKarakter = 0; 
+    let aktifOyuncu = "";
+
+    // REKORLARI YÜKLE
+    let bestCorrect = parseInt(localStorage.getItem("secoBestCorrect")) || 0;
+    let bestCorrectName = localStorage.getItem("secoBestCorrectName") || "Yok";
+    let bestWPM = parseInt(localStorage.getItem("secoBestWPM")) || 0;
+    let bestWPMName = localStorage.getItem("secoBestWPMName") || "Yok";
+    
+    document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
+    document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
+
+    document.getElementById("oyuncu-adi-input").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") oyunaGirisYap();
+    });
+
+    function oyunaGirisYap() {
+        let isimInput = document.getElementById("oyuncu-adi-input").value.trim();
+        if(isimInput === "") {
+            özelModalGoster("Hata", "Lütfen bir kullanıcı adı gir!", "hata", () => {
+                document.getElementById("oyuncu-adi-input").focus();
+            });
+            return;
+        }
+        aktifOyuncu = isimInput;
+        document.getElementById("aktif-oyuncu-adi").innerText = aktifOyuncu;
+        document.getElementById("giris-ekrani").style.display = "none";
+        
+        // Oyuna girerken ses motorunu hazırla
+        let dSes = document.getElementById("dogruSes");
+        let ySes = document.getElementById("yanlisSes");
+        if (dSes) dSes.load();
+        if (ySes) ySes.load();
+
+        let tahminInput = document.getElementById("tahmin");
+        tahminInput.disabled = false;
+        ilkHazirlik();
+    }
+
+    function saatiGuncelle() {
+        const simdi = new Date();
+        const s = String(simdi.getHours()).padStart(2, '0');
+        const d = String(simdi.getMinutes()).padStart(2, '0');
+        const sn = String(simdi.getSeconds()).padStart(2, '0');
+        document.getElementById("saat-kutusu").innerText = `${s}:${d}:${sn}`;
+    }
+    setInterval(saatiGuncelle, 1000);
+    saatiGuncelle();
+
+    function rastgeleKelimeGetir() {
+        if(typeof kelimeListesi !== 'undefined' && kelimeListesi.length > 0) {
+            let aday = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
+            if (kelimeListesi.length > 1) {
+                while (aday === oncekiKelime) {
+                    aday = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
+                }
+            }
+            oncekiKelime = aday;
+            return aday;
+        }
+        return "test";
+    }
+
+    function canliHarfTemizle() {
+        let inputAlani = document.getElementById("tahmin");
+        inputAlani.classList.remove("typing-match", "typing-mismatch");
+    }
+
+    function ilkHazirlik() {
+        secilenKelime = rastgeleKelimeGetir();
+        document.getElementById("karisik-kelime").innerText = secilenKelime.toLocaleLowerCase('tr-TR');
+        canliHarfTemizle();
+        document.getElementById("tahmin").focus();
+    }
+
+    function oyunuBaslat() {
+        oyunBasladi = true;
+        oyunBittiMi = false;
+        toplamKarakter = 0;
+        oyunBaslangicZamani = Date.now();
+        kelimeBaslangicZamani = Date.now();
+
+        genelTimer = setInterval(() => {
+            oyunSuresi--;
+            document.getElementById("genel-sure").innerText = oyunSuresi;
+            if(oyunSuresi <= 10 && oyunSuresi > 0) {
+                document.getElementById("genel-sure").classList.add("panik");
+            }
+            if(oyunSuresi <= 0) {
+                oyunSuresi = 0;
+                document.getElementById("genel-sure").innerText = "0";
+                gameOver();
+            }
+        }, 1000);
+    }
+
+    function yeniSoru() {
+        if(oyunSuresi <= 0 || oyunBittiMi) return;
+        secilenKelime = rastgeleKelimeGetir();
+        document.getElementById("karisik-kelime").innerText = secilenKelime.toLocaleLowerCase('tr-TR');
+        document.getElementById("tahmin").value = "";
+        canliHarfTemizle();
+        kelimeBaslangicZamani = Date.now();
+    }
+
+    function kontrolEt() {
+        if (oyunBittiMi || oyunSuresi <= 0) return;
+
+        let inputAlani = document.getElementById("tahmin");
+        let logo = document.getElementById("seco-logo");
+        let tahmin = inputAlani.value.toLocaleLowerCase('tr-TR').trim();
+
+        if(tahmin === "") return;
+
+        canliHarfTemizle();
+
+        if(tahmin === secilenKelime.toLocaleLowerCase('tr-TR')) {
+            inputAlani.classList.add("correct-neon");
+            setTimeout(() => inputAlani.classList.remove("correct-neon"), 500);
+
+            let bitisZamani = Date.now();
+            let gecenSure = Math.max(0.05, (bitisZamani - kelimeBaslangicZamani) / 1000);
+            
+            toplamKarakter += secilenKelime.length + 1; 
+            let gecenToplamSureDakika = Math.max(0.02, (bitisZamani - oyunBaslangicZamani) / 60000);
+            let anlikWpm = Math.round((toplamKarakter / 5) / gecenToplamSureDakika);
+
+            hizGoster(gecenSure, anlikWpm);
+
+            if (gecenSure <= 0.65) { 
+                let kedi = document.getElementById("animasyon-kedisi");
+                if(kedi) {
+                    kedi.classList.add("kedi-zipla");
+                    kedi.style.transform = "rotate(-5deg) scale(1.1)"; 
+                    setTimeout(() => {
+                        kedi.classList.remove("kedi-zipla");
+                        kedi.style.transform = "rotate(0deg) scale(1)";
+                    }, 1400); 
+                }
+            }
+            
+            let yorum = "";
+            let yorumRenk = "";
+
+            if(gecenSure < 1.0) {
+                yorum = "IŞIK HIZI! ⚡🔥";
+                yorumRenk = "#f1c40f";
+                logo.classList.remove("seco-ignite-action");
+                void logo.offsetWidth;
+                logo.classList.add("seco-ignite-action");
+                triggerHyperSpeed();
+            } else {
+                yorum = gecenSure < 1.4 ? "Hızlısın! 🔥" : (gecenSure < 2.0 ? "Fena değil. 👍" : "Hızlan biraz! 🐢");
+                yorumRenk = gecenSure < 1.4 ? "#2ecc71" : (gecenSure < 2.0 ? "#3498db" : "#e67e22");
+            }
+
+            toplamDogru++;
+            document.getElementById("stat-dogru").innerText = toplamDogru;
+            document.getElementById("mesaj").innerHTML = `<span style="color:${yorumRenk}">${yorum}</span>`;
+            sesCal("dogruSes");
+            yeniSoru();
+        } else {
+            yanlisCevap();
+            yeniSoru();
+        }
+    }
+
+    function triggerHyperSpeed() {
+        document.body.classList.add("light-speed-active");
+        setTimeout(() => document.body.classList.remove("light-speed-active"), 500);
+        document.getElementById("anaKapsayici").classList.add("punch-active");
+        setTimeout(() => document.getElementById("anaKapsayici").classList.remove("punch-active"), 300);
+        confetti({ particleCount: 40, angle: 60, spread: 60, origin: { x: 0, y: 0.5 }, colors: ['#ff4500', '#ffd700', '#ffffff'] });
+        confetti({ particleCount: 40, angle: 120, spread: 60, origin: { x: 1, y: 0.5 }, colors: ['#ff4500', '#ffd700', '#ffffff'] });
+    }
+
+    function hizGoster(sure, wpm) {
+        let hg = document.getElementById("hiz-gostergesi");
+        let wg = document.getElementById("wpm-gostergesi");
+        
+        hg.innerText = "Son Hız: " + sure.toFixed(2) + " sn";
+        wg.innerText = "Anlık WPM: " + wpm;
+        
+        hg.classList.remove("hiz-aktif");
+        wg.classList.remove("hiz-aktif");
+        void hg.offsetWidth; 
+        hg.classList.add("hiz-aktif");
+        wg.classList.add("hiz-aktif");
+
+        if(sure < 1) hg.style.color = "#ff4500";
+        else if(sure < 2) hg.style.color = "#2ecc71";
+        else hg.style.color = "#3498db";
+    }
+
+    function yanlisCevap() {
+        let inputAlani = document.getElementById("tahmin");
+        inputAlani.classList.add("wrong-neon");
+        setTimeout(() => inputAlani.classList.remove("wrong-neon"), 500);
+        toplamYanlis++;
+        document.getElementById("stat-yanlis").innerText = toplamYanlis;
+        document.getElementById("mesaj").innerHTML = "<span style='color:#e74c3c'>HATA!</span>";
+        document.getElementById("anaKapsayici").classList.add("sarsil");
+        setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
+        sesCal("yanlisSes");
+    }
+
+    function gameOver() {
+        oyunBittiMi = true;
+        yenidenBaslatHazirMi = false;
+        clearInterval(genelTimer);
+
+        let inputAlani = document.getElementById("tahmin");
+        canliHarfTemizle();
+        inputAlani.disabled = true;
+        inputAlani.blur();
+
+        let finalWpm = Math.round((toplamKarakter / 5) / 1); 
+        let isNew = false;
+
+        if (toplamDogru > bestCorrect) { 
+            localStorage.setItem("secoBestCorrect", toplamDogru); 
+            localStorage.setItem("secoBestCorrectName", aktifOyuncu); 
+            bestCorrect = toplamDogru;
+            bestCorrectName = aktifOyuncu;
+            document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
+            isNew = true; 
+        }
+
+        if (finalWpm > bestWPM) {
+            localStorage.setItem("secoBestWPM", finalWpm);
+            localStorage.setItem("secoBestWPMName", aktifOyuncu); 
+            bestWPM = finalWpm;
+            bestWPMName = aktifOyuncu;
+            document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
+            isNew = true;
+        }
+
+        document.getElementById("game-over").style.display = "flex";
+        if(isNew) {
+            document.getElementById("new-record-msg").style.display = "block";
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
+        
+        let yuzde = Math.round((toplamDogru / (toplamDogru + toplamYanlis || 1)) * 100);
+
+        document.getElementById("final-stats").innerHTML = `
+            Oyuncu: <b style="color:#f1c40f;">${aktifOyuncu}</b><br><br>
+            Toplam Doğru: <b style="color:#2ecc71;">${toplamDogru}</b><br>
+            Toplam Yanlış: <b style="color:#e74c3c;">${toplamYanlis}</b><br>
+            İsabet Oranı: <b style="color:#f1c40f;">%${yuzde}</b><br>
+            <span style="color:#8b5cf6; font-size: calc(2.2 * var(--u)); font-weight:bold;">Ortalama WPM: ${finalWpm}</span>
+        `;
+
+        setTimeout(() => {
+            yenidenBaslatHazirMi = true;
+            document.getElementById("tekrar-dene-btn").focus();
+        }, 400);
+    }
+
+    function oyunuSifirla() {
+        clearInterval(genelTimer);
+        yenidenBaslatHazirMi = false;
+        toplamDogru = 0;
+        toplamYanlis = 0;
+        oyunSuresi = 60;
+        oyunBasladi = false;
+        oyunBittiMi = false;
+        toplamKarakter = 0;
+        document.getElementById("stat-dogru").innerText = "0";
+        document.getElementById("stat-yanlis").innerText = "0";
+        document.getElementById("genel-sure").innerText = "60";
+        document.getElementById("genel-sure").classList.remove("panik");
+        document.getElementById("game-over").style.display = "none";
+        document.getElementById("new-record-msg").style.display = "none";
+        document.getElementById("hiz-gostergesi").classList.remove("hiz-aktif");
+        document.getElementById("wpm-gostergesi").classList.remove("hiz-aktif");
+        document.getElementById("mesaj").innerText = "";
+        
+        let inputAlani = document.getElementById("tahmin");
+        inputAlani.disabled = false;
+        inputAlani.value = "";
+        ilkHazirlik();
+    }
+
+    // --- ÖZEL MODAL FONKSİYONLARI ---
+    function özelModalGoster(baslik, mesaj, tip, callback) {
+        let modal = document.getElementById("ozel-modal");
+        let titleEl = document.getElementById("modal-baslik");
+        let msgEl = document.getElementById("modal-mesaj");
+        let inputEl = document.getElementById("modal-input");
+        let btnTamam = document.getElementById("modal-tamam");
+        let btnIptal = document.getElementById("modal-iptal");
+
+        titleEl.innerText = baslik;
+        msgEl.innerHTML = mesaj;
+        modal.style.display = "flex";
+
+        let yeniBtnTamam = btnTamam.cloneNode(true);
+        btnTamam.parentNode.replaceChild(yeniBtnTamam, btnTamam);
+        let yeniBtnIptal = btnIptal.cloneNode(true);
+        btnIptal.parentNode.replaceChild(yeniBtnIptal, btnIptal);
+
+        if(tip === "sifre") {
+            titleEl.style.color = "#f1c40f";
+            inputEl.style.display = "inline-block";
+            inputEl.value = "";
+            inputEl.focus();
+            yeniBtnIptal.style.display = "inline-block";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback(inputEl.value);
+            };
+            yeniBtnIptal.onclick = function() {
+                modal.style.display = "none";
+            };
+
+            inputEl.onkeypress = function(e) {
+                if(e.key === "Enter") yeniBtnTamam.click();
+            };
+
+        } else if (tip === "hata") {
+            titleEl.style.color = "#e74c3c"; 
+            inputEl.style.display = "none";
+            yeniBtnIptal.style.display = "none";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback();
+            };
+        } else if (tip === "basarili") {
+            titleEl.style.color = "#2ecc71"; 
+            inputEl.style.display = "none";
+            yeniBtnIptal.style.display = "none";
+            
+            yeniBtnTamam.onclick = function() {
+                modal.style.display = "none";
+                if(callback) callback();
+            };
+        }
+    }
+
+    function rekoruSifirla() {
+        özelModalGoster("Şifre Gerekli", "TÜM rekorları sıfırlamak için şifreyi girin:", "sifre", function(sifre) {
+            if (sifre === "780878") {
+                localStorage.removeItem("secoBestCorrect");
+                localStorage.removeItem("secoBestCorrectName");
+                localStorage.removeItem("secoBestWPM");
+                localStorage.removeItem("secoBestWPMName");
+                bestCorrect = 0;
+                bestCorrectName = "Yok";
+                bestWPM = 0;
+                bestWPMName = "Yok";
+                document.getElementById("best-correct").innerText = "0 (Yok)";
+                document.getElementById("best-wpm").innerText = "0 (Yok)";
+                özelModalGoster("Başarılı!", "Tüm rekorlar başarıyla sıfırlandı.", "basarili");
+            } else if (sifre !== "") {
+                özelModalGoster("Hatalı Şifre!", "Yanlış şifre girdiniz. İşlem iptal edildi.", "hata");
+            }
+        });
+    }
+
+    // Müzik Bölümü (Çoklu Şarkı + Eksik Dosya Korumalı)
+    // İstediğin kadar şarkı ismini buraya yazabilirsin; klasörde olmayanları otomatik atlar!
+    const playlist = ["ozan.mp3", "sarki2.mp3", "sarki3.mp3"];
+    let suankiSarkiIndex = 0;
+    let isPlaying = false;
+    let hataliSarkiSayaci = 0;
+    const player = document.getElementById("anaMuzik");
+    const playBtn = document.getElementById("play-pause-btn");
+
+    // Şarkı bitince otomatik sıradakine geç
+    player.addEventListener("ended", sonrakiSarki);
+
+    // Şarkı başarıyla çalmaya başlayınca hata sayacını sıfırla
+    player.addEventListener("playing", () => {
+        hataliSarkiSayaci = 0;
+    });
+
+    // Şarkı klasörde veya GitHub'da yoksa çökmez, sıradaki şarkıya atlar
+    player.addEventListener("error", () => {
+        hataliSarkiSayaci++;
+        if (hataliSarkiSayaci < playlist.length) {
+            sonrakiSarki();
+        } else {
+            isPlaying = false;
+            playBtn.innerText = "▶";
+            playBtn.classList.remove("playing");
+            document.getElementById("sarki-bilgi").innerText = "Müzik Bulunamadı";
+        }
+    });
+
+    function muzikYukle(index) {
+        player.src = playlist[index];
+        document.getElementById("sarki-bilgi").style.color = "#999";
+        document.getElementById("sarki-bilgi").innerText = `🎵 Çalıyor (${index + 1}/${playlist.length}): ${playlist[index]}`;
+    }
+
+    function muzikKontrol() {
+        if (!player.src) muzikYukle(suankiSarkiIndex);
+        if (isPlaying) {
+            player.pause();
+            isPlaying = false;
+            playBtn.innerText = "▶";
+            playBtn.classList.remove("playing");
+            document.getElementById("sarki-bilgi").innerText = "⏸ Müzik Duraklatıldı";
+        } else {
+            hataliSarkiSayaci = 0;
+            player.play().then(() => {
+                isPlaying = true;
+                playBtn.innerText = "⏸";
+                playBtn.classList.add("playing");
+                document.getElementById("sarki-bilgi").style.color = "#999";
+                document.getElementById("sarki-bilgi").innerText = `🎵 Çalıyor (${suankiSarkiIndex + 1}/${playlist.length}): ${playlist[suankiSarkiIndex]}`;
+            }).catch(e => console.warn("Müzik çalınamadı:", e));
+        }
+    }
+
+    function sonrakiSarki() {
+        suankiSarkiIndex = (suankiSarkiIndex + 1) % playlist.length;
+        muzikYukle(suankiSarkiIndex);
+        player.currentTime = 0;
+        player.play().then(() => {
+            isPlaying = true;
+            playBtn.innerText = "⏸";
+            playBtn.classList.add("playing");
+        }).catch(e => console.warn("Müzik geçiş hatası:", e));
+    }
+
+    function oncekiSarki() {
+        hataliSarkiSayaci = 0;
+        suankiSarkiIndex = (suankiSarkiIndex - 1 + playlist.length) % playlist.length;
+        muzikYukle(suankiSarkiIndex);
+        player.currentTime = 0;
+        player.play().then(() => {
+            isPlaying = true;
+            playBtn.innerText = "⏸";
+            playBtn.classList.add("playing");
+        }).catch(e => console.warn("Müzik geçiş hatası:", e));
+    }
+
+    function rastgeleSarki() {
+        hataliSarkiSayaci = 0;
+        suankiSarkiIndex = Math.floor(Math.random() * playlist.length);
+        muzikYukle(suankiSarkiIndex);
+        player.currentTime = 0;
+        player.play().then(() => {
+            isPlaying = true;
+            playBtn.innerText = "⏸";
+            playBtn.classList.add("playing");
+        }).catch(e => console.warn("Müzik geçiş hatası:", e));
+    }
+
+    // Güçlendirilmiş Ses Çalma ve Dosya Bulunamadı Kontrolü
+    function sesCal(id) { 
+        let s = document.getElementById(id); 
+        if (s) { 
+            s.currentTime = 0; 
+            let playPromise = s.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn("Ses çalınamadı (" + id + "):", err);
+                    document.getElementById("sarki-bilgi").innerText = "⚠️ Ses dosyası bulunamadı: " + s.getAttribute("src");
+                    document.getElementById("sarki-bilgi").style.color = "#e74c3c";
+                });
+            }
+        } 
+    }
+
+    // CANLI HARF KONTROLÜ VE İLK HARFTE OYUNU BAŞLATMA
+    document.getElementById("tahmin").addEventListener("input", (e) => {
+        let deger = e.target.value;
+        if(!oyunBasladi && !oyunBittiMi && deger.trim().length > 0) { 
+            oyunuBaslat(); 
+        }
+
+        let yazilan = deger.toLocaleLowerCase('tr-TR');
+        let hedef = secilenKelime.toLocaleLowerCase('tr-TR');
+
+        if (yazilan.length === 0) {
+            canliHarfTemizle();
+        } else if (hedef.startsWith(yazilan)) {
+            e.target.classList.add("typing-match");
+            e.target.classList.remove("typing-mismatch");
+        } else {
+            e.target.classList.add("typing-mismatch");
+            e.target.classList.remove("typing-match");
+        }
+    });
+
+    // 10 Parmak standartlarına uygun olarak hem Enter hem Space ile kelime gönderme
+    document.getElementById("tahmin").addEventListener("keydown", (e) => { 
+        if(e.key === "Enter" || e.code === "Space" || e.key === " ") {
+            e.preventDefault();
+            kontrolEt(); 
+        }
+    });
+
+    // Oyun bittiğinde Enter ile direkt yeniden başlatma
+    window.addEventListener("keydown", (e) => {
+        if (oyunBittiMi && yenidenBaslatHazirMi && document.getElementById("game-over").style.display === "flex") {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                oyunuSifirla();
+            }
+        }
+    });
+</script>
+</body>
+</html>
