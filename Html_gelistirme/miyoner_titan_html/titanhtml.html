@@ -2,14 +2,28 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MİLYONER TİTAN FULL HD - SHOW EDITION</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;700&display=swap');
 
-        body {
+        :root {
+            --z: 1;
+            /* Hem genişlik hem yüksekliğe göre taşmayı önleyen dinamik ölçek birimi */
+            --u: calc(min(0.95vw, 1.22vh) * var(--z));
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100vh;
             background-color: #000033;
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,14 +31,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
         }
 
         #bgCanvas, #particleCanvas {
-            position: absolute;
+            position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 0;
         }
 
         #particleCanvas { z-index: 100; pointer-events: none; }
@@ -41,25 +54,25 @@
         }
 
         #app {
-            width: 1024px;
-            height: 768px;
-            max-width: 95vw;
-            max-height: 95vh;
+            width: calc(96 * var(--u));
+            height: calc(74 * var(--u));
+            max-width: 96vw;
+            max-height: 96vh;
             background: rgba(0, 0, 51, 0.85);
-            border-radius: 15px;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+            backdrop-filter: blur(calc(1.5 * var(--u)));
+            border-radius: calc(1.5 * var(--u));
+            box-shadow: 0 0 calc(4 * var(--u)) rgba(0, 255, 255, 0.3);
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
+            padding: calc(1.8 * var(--u));
             position: relative;
-            border: 1px solid rgba(0, 255, 255, 0.1);
-            transform-origin: center;
-            transition: transform 0.2s ease-out;
+            z-index: 10;
+            border: calc(0.12 * var(--u)) solid rgba(0, 255, 255, 0.15);
+            overflow: hidden;
         }
 
         .secovvv-logo {
-            font-size: 32px;
+            font-size: calc(2.8 * var(--u));
             font-weight: bold;
             font-style: italic;
             text-align: center;
@@ -77,21 +90,23 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
-            100% { transform: scale(1.05); text-shadow: 0 0 20px rgba(255,69,0,0.8); }
+            0% { transform: scale(1); text-shadow: 0 0 calc(1 * var(--u)) rgba(255,215,0,0.5); }
+            100% { transform: scale(1.05); text-shadow: 0 0 calc(2 * var(--u)) rgba(255,69,0,0.8); }
         }
 
         .header-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: calc(0.8 * var(--u));
             background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            padding: calc(0.9 * var(--u)) calc(1.6 * var(--u));
+            border-radius: calc(1 * var(--u));
+            margin-bottom: calc(1.4 * var(--u));
+            font-size: calc(1.3 * var(--u));
             font-weight: bold;
-            border-bottom: 2px solid #1a1a4d;
+            border-bottom: calc(0.2 * var(--u)) solid #1a1a4d;
         }
 
         .header-panel span { color: #00FFFF; }
@@ -100,43 +115,45 @@
 
         .kaynak-secici { 
             display: flex; 
-            gap: 15px; 
+            gap: calc(1.2 * var(--u)); 
             align-items: center; 
             background: rgba(0,0,0,0.5); 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            border: 1px solid #333;
+            padding: calc(0.5 * var(--u)) calc(1.1 * var(--u)); 
+            border-radius: calc(2 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid #333;
         }
         .secenek { 
             display: flex; 
             align-items: center; 
-            gap: 6px; 
+            gap: calc(0.5 * var(--u)); 
             cursor: pointer; 
         }
         .secenek label {
             cursor: pointer;
             color: #ddd;
             transition: color 0.3s;
-            font-size: 13px;
+            font-size: calc(1.2 * var(--u));
         }
         .secenek:hover label { color: #fff; }
         .buton {
-            width: 12px; height: 12px;
+            width: calc(1.1 * var(--u)); 
+            height: calc(1.1 * var(--u));
             border-radius: 50%;
             background-color: #444;
-            border: 2px solid #aaa;
+            border: calc(0.2 * var(--u)) solid #aaa;
             transition: all 0.3s ease;
         }
         .buton.active {
             background-color: #00FF00;
             border-color: #00FF00;
-            box-shadow: 0 0 8px #00FF00;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #00FF00;
         }
 
         .main-content {
             display: flex;
             flex: 1;
-            gap: 20px;
+            gap: calc(1.8 * var(--u));
+            min-height: 0;
         }
 
         .game-area {
@@ -144,145 +161,167 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: space-between;
+            min-height: 0;
         }
 
         .jokers {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: calc(1 * var(--u));
+            margin-bottom: calc(1 * var(--u));
         }
 
         .joker-btn, .action-btn {
             background: #1a1a4d;
             color: #FFD700;
-            border: 2px solid #333;
-            padding: 10px 20px;
-            font-size: 16px;
+            border: calc(0.18 * var(--u)) solid #333;
+            padding: calc(0.8 * var(--u)) calc(1.5 * var(--u));
+            font-size: calc(1.35 * var(--u));
             font-weight: bold;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: calc(0.8 * var(--u));
             transition: 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .joker-btn:hover:not(:disabled) { background: #FFD700; color: black; }
         .joker-btn:disabled { background: #111; color: #444; cursor: not-allowed; border-color: #000; }
         
         .action-btn.restart { background: #005500; color: white; }
+        .action-btn.restart:hover { background: #007700; }
         .action-btn.reset { background: #440000; color: white; }
+        .action-btn.reset:hover { background: #660000; }
+        .action-btn.home { background: rgba(0, 255, 255, 0.15); color: #00FFFF; border-color: rgba(0, 255, 255, 0.4); }
+        .action-btn.home:hover { background: rgba(0, 255, 255, 0.35); color: #fff; }
 
         .timer {
-            font-size: 36px;
+            font-size: calc(3.2 * var(--u));
             font-weight: bold;
             color: #00FF00;
-            margin: 20px 0;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            margin: calc(0.8 * var(--u)) 0;
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(0, 255, 0, 0.5);
         }
 
         .question-box {
-            font-size: 24px;
+            font-size: calc(2.1 * var(--u));
             font-weight: bold;
             text-align: center;
             background: #00001a;
-            padding: 30px;
-            border-radius: 10px;
-            border: 2px solid #5555ff;
+            padding: calc(2.2 * var(--u));
+            border-radius: calc(1 * var(--u));
+            border: calc(0.2 * var(--u)) solid #5555ff;
             width: 100%;
-            margin-bottom: 30px;
-            min-height: 100px;
+            margin-bottom: calc(1.8 * var(--u));
+            min-height: calc(10 * var(--u));
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: inset 0 0 20px rgba(0, 0, 255, 0.2);
+            box-shadow: inset 0 0 calc(2 * var(--u)) rgba(0, 0, 255, 0.2);
+            line-height: 1.35;
         }
 
         .answers {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: calc(1.3 * var(--u));
             width: 100%;
         }
 
         .answer-btn {
             background: #050550;
             color: white;
-            border: 2px solid #333;
-            padding: 20px;
-            font-size: 18px;
+            border: calc(0.2 * var(--u)) solid #333;
+            padding: calc(1.6 * var(--u)) calc(1.2 * var(--u));
+            font-size: calc(1.65 * var(--u));
             font-weight: bold;
             cursor: pointer;
-            border-radius: 30px;
+            border-radius: calc(3 * var(--u));
             transition: all 0.2s;
             position: relative;
             overflow: hidden;
+            min-height: calc(5.8 * var(--u));
         }
 
         .answer-btn:hover:not(:disabled) {
             background: #FFD700;
             color: black;
             transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(255, 215, 0, 0.4);
         }
 
         .alt-panel {
             margin-top: auto;
+            padding-top: calc(1 * var(--u));
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            padding-bottom: 10px;
+            gap: calc(1 * var(--u));
+            padding-bottom: calc(0.5 * var(--u));
         }
 
         .money-tree {
             flex: 1;
             background: #00001a;
-            border-radius: 10px;
-            padding: 10px;
+            border-radius: calc(1 * var(--u));
+            padding: calc(0.9 * var(--u));
             display: flex;
             flex-direction: column-reverse;
             justify-content: space-between;
-            border: 1px solid #1a1a4d;
+            border: calc(0.1 * var(--u)) solid #1a1a4d;
+            min-width: calc(18 * var(--u));
         }
 
         .money-item {
-            padding: 5px 10px;
+            padding: calc(0.35 * var(--u)) calc(0.9 * var(--u));
             text-align: right;
             font-weight: bold;
             color: white;
-            border-radius: 5px;
+            border-radius: calc(0.5 * var(--u));
             transition: 0.3s;
-            font-size: 13px;
+            font-size: calc(1.25 * var(--u));
+            white-space: nowrap;
         }
 
-        .money-item.active { background: #FFD700; color: black; box-shadow: 0 0 10px gold; }
+        .money-item.active { background: #FFD700; color: black; box-shadow: 0 0 calc(1 * var(--u)) gold; }
         .money-item.passed { color: #555; }
         
         #modal, #inputModal {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             background: linear-gradient(135deg, rgba(0, 0, 51, 0.98), rgba(0, 0, 100, 0.98));
-            border: 3px solid #00FFFF;
-            padding: 40px;
-            border-radius: 20px;
+            border: calc(0.3 * var(--u)) solid #00FFFF;
+            padding: calc(3.2 * var(--u));
+            border-radius: calc(2 * var(--u));
             text-align: center;
             z-index: 1000;
-            box-shadow: 0 0 100px rgba(0, 0, 0, 0.9);
-            min-width: 450px;
+            box-shadow: 0 0 calc(10 * var(--u)) rgba(0, 0, 0, 0.9);
+            width: calc(44 * var(--u));
+            max-width: 90vw;
         }
         
-        #modal h2, #inputModal h2 { margin-top: 0; color: #FFD700; font-size: 32px; text-transform: uppercase; }
+        #modal h2, #inputModal h2 { 
+            margin-top: 0; 
+            color: #FFD700; 
+            font-size: calc(2.8 * var(--u)); 
+            text-transform: uppercase; 
+        }
         
-        /* Özel Input Stilleri */
         #inputModal input {
-            width: 80%;
-            padding: 15px;
-            margin: 25px 0;
+            width: 85%;
+            padding: calc(1.3 * var(--u));
+            margin: calc(2 * var(--u)) 0;
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #00FFFF;
-            border-radius: 10px;
+            border: calc(0.2 * var(--u)) solid #00FFFF;
+            border-radius: calc(1 * var(--u));
             color: white;
-            font-size: 20px;
+            font-size: calc(1.8 * var(--u));
             text-align: center;
             outline: none;
             transition: 0.3s;
@@ -290,61 +329,70 @@
         
         #inputModal input:focus {
             background: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(0, 255, 255, 0.6);
         }
 
         .modal-btn-group {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
+            gap: calc(1.4 * var(--u));
+            margin-top: calc(1 * var(--u));
         }
 
         #modal button, .input-modal-btn {
-            padding: 15px 40px;
-            font-size: 20px;
+            padding: calc(1.2 * var(--u)) calc(3.2 * var(--u));
+            font-size: calc(1.7 * var(--u));
             background: #FFD700;
             color: black;
             border: none;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 50px;
+            border-radius: calc(5 * var(--u));
             transition: 0.3s;
         }
         
-        #modal button:hover, .input-modal-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); }
+        #modal button:hover, .input-modal-btn:hover { 
+            transform: translateY(calc(-0.3 * var(--u))); 
+            box-shadow: 0 calc(0.5 * var(--u)) calc(1.5 * var(--u)) rgba(255, 215, 0, 0.4); 
+        }
         
         .input-modal-btn.cancel {
             background: #8B0000;
             color: white;
         }
         .input-modal-btn.cancel:hover {
-            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.6);
+            box-shadow: 0 calc(0.5 * var(--u)) calc(1.5 * var(--u)) rgba(139, 0, 0, 0.6);
         }
 
         .result-card {
             background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 1px dashed #00FFFF;
+            padding: calc(1.8 * var(--u));
+            border-radius: calc(1 * var(--u));
+            margin: calc(1.8 * var(--u)) 0;
+            border: calc(0.1 * var(--u)) dashed #00FFFF;
         }
-        .result-line { font-size: 20px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
+        .result-line { 
+            font-size: calc(1.8 * var(--u)); 
+            margin: calc(0.9 * var(--u)) 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         .result-val { color: #00FF00; font-weight: bold; }
 
         .custom-alert {
-            position: absolute;
-            top: -100px;
+            position: fixed;
+            top: calc(-10 * var(--u));
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 30, 0.95);
-            border: 2px solid #00FFFF;
+            border: calc(0.2 * var(--u)) solid #00FFFF;
             color: #FFD700;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 18px;
+            padding: calc(1.3 * var(--u)) calc(2.6 * var(--u));
+            border-radius: calc(1 * var(--u));
+            font-size: calc(1.6 * var(--u));
             font-weight: bold;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(0, 255, 255, 0.5);
             z-index: 1500;
             opacity: 0;
             visibility: hidden;
@@ -356,11 +404,11 @@
         .custom-alert.show {
             opacity: 1;
             visibility: visible;
-            top: 40px;
+            top: calc(3.5 * var(--u));
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
 
 <canvas id="bgCanvas"></canvas>
 <canvas id="particleCanvas"></canvas>
@@ -391,6 +439,7 @@
     <div class="main-content">
         <div class="game-area">
             <div class="jokers">
+                <a href="https://secovvv.github.io/" class="action-btn home">🏠 ANA SAYFA</a>
                 <button class="joker-btn" id="btnCift" onclick="kullanCift()">⚡ 2x</button>
                 <button class="joker-btn" id="btnYari" onclick="kullanYari()">⚖️ %50</button>
                 <button class="joker-btn" id="btnTelefon" onclick="kullanTelefon()">☎️ Ara</button>
@@ -446,8 +495,22 @@
 </div>
 
 <script>
+    // 1. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme (Diğer oyunlarla birebir aynı standart)
+    var baseDPR = window.devicePixelRatio || 1;
+
+    function updateResolution() {
+        var currentDPR = window.devicePixelRatio || 1;
+        var zoomFactor = currentDPR / baseDPR;
+        document.documentElement.style.setProperty('--z', zoomFactor);
+    }
+    updateResolution();
+    window.addEventListener('resize', updateResolution);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', updateResolution);
+    }
+
+    // 2. TÜM SORULAR HAVUZU
     const butunSorular = [
-    // 👇👇👇 DİKKAT: ESKİ DOSYANDAKİ 1000 SORULUK LİSTENİ BURAYA YAPIŞTIR 👇👇👇
     // --- BAŞLANGIÇ SORULARI (SENİN SORULARIN) ---
     { soru: "Yazılım dünyasında 'Bug' kelimesinin Türkçe karşılığı genellikle nedir?", siklar: ["Böcek", "Hata", "Özellik", "Virüs"], cevap: 1 },
     { soru: "Hangi programlama dili adını bir komedi grubundan almıştır?", siklar: ["Java", "C++", "Python", "Ruby"], cevap: 2 },
@@ -802,7 +865,7 @@
     { soru: "Tarihteki ilk Türk anayasası olan Teşkilat-ı Esasiye hangi yıl kabul edildi?", siklar: ["1920", "1921", "1924", "1961"], cevap: 1 },
     { soru: "Bilgisayarda 'RAID' teknolojisi ne için kullanılır?", siklar: ["Hız aşırtma", "Disk yedekleme ve performans", "Ekran çözünürlüğü", "Fan kontrolü"], cevap: 1 },
 
-    // Kolay (301-325)
+    // Kolay (301-325 Tekrar Paketi)
     { soru: "Bilgisayarda tüm dosyaları seçmek için kullanılan kısayol hangisidir?", siklar: ["Ctrl+S", "Ctrl+A", "Ctrl+C", "Ctrl+V"], cevap: 1 },
     { soru: "Türkiye'nin başkenti neresidir?", siklar: ["İstanbul", "İzmir", "Ankara", "Bursa"], cevap: 2 },
     { soru: "Hangi meyve Apple şirketinin logosudur?", siklar: ["Muz", "Elma", "Portakal", "Çilek"], cevap: 1 },
@@ -829,7 +892,7 @@
     { soru: "Bilgisayarda 'Caps Lock' tuşu ne işe yarar?", siklar: ["Bilgisayarı kilitler", "Büyük harf yazar", "Ekranı karartır", "Sesi kapatır"], cevap: 1 },
     { soru: "Tarihte parayı ilk bulan uygarlık hangisidir?", siklar: ["Hititler", "Lidyalılar", "Sümerler", "Frigler"], cevap: 1 },
 
-    // Orta (326-375)
+    // Orta (326-375 Tekrar Paketi)
     { soru: "Linux tabanlı, Türkiye tarafından geliştirilen işletim sistemi hangisidir?", siklar: ["Windows Türk", "Pardus", "Anadolu OS", "Selçuklu"], cevap: 1 },
     { soru: "Fatih Sultan Mehmet'in İstanbul'u fethettiği yaş kaçtır?", siklar: ["18", "21", "25", "30"], cevap: 1 },
     { soru: "NBA'de 'Air Jordan' lakabıyla bilinen efsane basketbolcu kimdir?", siklar: ["LeBron James", "Kobe Bryant", "Michael Jordan", "Shaq"], cevap: 2 },
@@ -856,7 +919,7 @@
     { soru: "Olimpiyatlarda maraton koşusunun kökeni hangi ülkeye dayanır?", siklar: ["İtalya", "Yunanistan", "Mısır", "İran"], cevap: 1 },
     { soru: "Hangisi bir 'Veri Sıkıştırma' formatıdır?", siklar: [".docx", ".exe", ".zip", ".mp4"], cevap: 2 },
 
-    // Zor (376-400)
+    // Zor (376-400 Tekrar Paketi)
     { soru: "Dünyanın ilk şifreli mesajlaşma makinesi olan Enigma'yı hangi ülke kullanmıştır?", siklar: ["İngiltere", "Almanya", "ABD", "Japonya"], cevap: 1 },
     { soru: "Osmanlı Devleti'nde 'Vaka-i Hayriye' olarak bilinen olay nedir?", siklar: ["İstanbul'un Fethi", "Yeniçeri Ocağı'nın kaldırılması", "Cumhuriyetin ilanı", "Meşrutiyet"], cevap: 1 },
     { soru: "NBA tarihinde en çok sayı atan oyuncu (tüm zamanlar) kimdir?", siklar: ["Kareem Abdul-Jabbar", "Karl Malone", "Michael Jordan", "LeBron James"], cevap: 3 },
@@ -1287,7 +1350,6 @@
     { soru: "Hangi coğrafi terim, akarsuların taşıdığı alüvyonların deniz kıyısında birikmesiyle oluşur?", siklar: ["Kanyon", "Delta", "Falez", "Sirk"], cevap: 1 },
     { soru: "Havacılıkta 'QNH' değeri neyi ifade eder?", siklar: ["Hız", "Deniz seviyesindeki hava basıncı", "Rüzgar yönü", "Yükseklik sınırı"], cevap: 1 },
     { soru: "Python'da 'None' veri tipi Java'daki hangi değere karşılık gelir?", siklar: ["Void", "Null", "Static", "Final"], cevap: 1 },
-
     // Kolay (901-925)
     { soru: "Havacılıkta uçağın iki yanındaki uzantılara ne denir?", siklar: ["Kuyruk", "Gövde", "Kanat", "Tekerlek"], cevap: 2 },
     { soru: "Bilgisayarda 'Ctrl + N' kısayolu genellikle ne işe yarar?", siklar: ["Kapatır", "Yeni dosya açar", "Kaydeder", "Siler"], cevap: 1 },
@@ -1716,7 +1778,7 @@
     { soru: "Bilgisayarın toplam performansını ölçen test yazılımlarına genel olarak ne ad verilir?", siklar: ["Antivirüs", "Benchmark", "Office", "Player"], cevap: 1 },
     { soru: "Milyoner Titan Donanım Finali: Bir byte kaç bitten oluşur?", siklar: ["2", "4", "8", "16"], cevap: 2 },
 
-     // --- PERFORMANS & YAZILIM MIX (1151-1200) ---
+    // --- PERFORMANS & YAZILIM MIX (1151-1200) ---
     { soru: "Havacılıkta 'Vne' hızı neyi temsil eder?", siklar: ["En ekonomik hız", "Asla aşılmaması gereken hız", "İniş hızı", "Kalkış hızı"], cevap: 1 },
     { soru: "JavaScript'te bir değişkenin değerini değiştiremediğiniz tür hangisidir?", siklar: ["var", "let", "const", "global"], cevap: 2 },
     { soru: "Hangi havalimanı pistinin ortasından aktif bir karayolu geçmektedir?", siklar: ["İstanbul", "Cebelitarık", "Londra", "Tokyo"], cevap: 1 },
@@ -1796,7 +1858,7 @@
     { soru: "Bir ineğin toplamda kaç mide bölümü vardır?", siklar: ["1", "2", "3", "4"], cevap: 3 },
     { soru: "Köpeklerin terlediği ana bölgeler neresidir?", siklar: ["Sırtları", "Pati altları ve dilleri", "Kulakları", "Kuyrukları"], cevap: 1 },
     { soru: "Hangi memeli hayvan yumurtlayarak çoğalır?", siklar: ["Yarasa", "Ornitorenk", "Balina", "Kirpi"], cevap: 1 },
-    { soru: "Filler birbirleriyle iletişim kurarken insanların duyamayacağı hangi ses dalgalarını kullanır?", siklar: ["Ultrasonik", "İnfrasonik (Düşük frekans)", "Radyo dalgası", "Mikrodalga"], cevap: 1 },
+    { soru: "Filler birbirleriyle iletişim kurarken insanların duyamayacağı hangi ses dalgalarını kullanır?", siklar: ["Ultrasonik", "İnfrasonik (Dükük frekans)", "Radyo dalgası", "Mikrodalga"], cevap: 1 },
     { soru: "Pandaların temel besin kaynağı nedir?", siklar: ["Et", "Bambu", "Balık", "Meyve"], cevap: 1 },
     { soru: "Kutup ayılarının derisinin rengi aslında hangisidir?", siklar: ["Beyaz", "Siyah", "Pembe", "Gri"], cevap: 1 },
     { soru: "Atlar ve zebralar uyurken genellikle hangi pozisyonu tercih ederler?", siklar: ["Sırt üstü", "Ayakta", "Yan yatarak", "Kıvrılarak"], cevap: 1 },
@@ -1872,8 +1934,7 @@
     { soru: "Yazılımcıların favori sayısı olan 2'nin 10. kuvveti ($2^{10}$) kaçtır?", siklar: ["512", "1024", "2048", "4096"], cevap: 1 },
     { soru: "Milyoner Titan Bilim Finali: İnsan beyninin yüzde kaçı sudur?", siklar: ["%10", "%75", "%50", "%95"], cevap: 1 },
 
-
-// --- POPÜLER KÜLTÜR & SİNEMA PAKETİ (1351-1400) ---
+    // --- POPÜLER KÜLTÜR & SİNEMA PAKETİ (1351-1400) ---
     { soru: "Hangi efsanevi müzik grubu 'Fab Four' (Muhteşem Dörtlü) olarak bilinir?", siklar: ["Rolling Stones", "The Beatles", "Pink Floyd", "Queen"], cevap: 1 },
     { soru: "Sinema tarihinde 'Baba' (The Godfather) filminde Don Corleone karakterini canlandıran aktör kimdir?", siklar: ["Al Pacino", "Marlon Brando", "Robert De Niro", "Dustin Hoffman"], cevap: 1 },
     { soru: "Dünyanın en çok satan müzik albümü olan 'Thriller' hangi sanatçıya aittir?", siklar: ["Elvis Presley", "Michael Jackson", "Prince", "Madonna"], cevap: 1 },
@@ -1971,7 +2032,8 @@
     { soru: "Dünya kupasını en çok kazanan ülke hangisidir?", siklar: ["Almanya", "Brezilya", "İtalya", "Arjantin"], cevap: 1 },
     { soru: "Havacılıkta 'Zulu Time' (Z) hangi saat dilimine göredir?", siklar: ["Türkiye saati", "UTC (Koordineli Evrensel Zaman)", "ABD saati", "Japonya saati"], cevap: 1 },
     { soru: "Milyoner Titan Karma Final: Bir asır kaç yıldır?", siklar: ["10", "50", "100", "1000"], cevap: 2 },
-// --- DÜNYA ÜLKELERİ PAKETİ (1451-1500) ---
+
+    // --- DÜNYA ÜLKELERİ PAKETİ (1451-1500) ---
     { soru: "Yüzölçümü bakımından dünyanın en büyük ülkesi hangisidir?", siklar: ["Kanada", "Rusya", "Çin", "ABD"], cevap: 1 },
     { soru: "Kanguruların anavatanı olan kıta ülkesi hangisidir?", siklar: ["Yeni Zelanda", "Avustralya", "Güney Afrika", "Brezilya"], cevap: 1 },
     { soru: "Hangi ülke toprakları üzerinde en fazla zaman dilimi (saat farkı) bulundurur?", siklar: ["Rusya", "Fransa (Deniz aşırı toprakları nedeniyle)", "Çin", "ABD"], cevap: 1 },
@@ -2332,7 +2394,7 @@
     { soru: "Hangi marka dünyanın ilk taşınabilir müzik çaları olan 'Walkman'i üretmiştir?", siklar: ["Apple", "Sony", "Philips", "Toshiba"], cevap: 1 },
     { soru: "Pringles cipslerinin mucidinin vasiyeti üzerine külleri neyin içine gömülmüştür?", siklar: ["Denize döküldü", "Pringles kutusuna", "Bir ağacın dibine", "Uzaya gönderildi"], cevap: 1 },
     { soru: "Asus markasının ismi mitolojideki hangi kanatlı attan gelmektedir?", siklar: ["Phoenix", "Pegasus", "Griffin", "Centaur"], cevap: 1 },
-    { soru: "Milyoner Titan Markalar Finali: Audi'nin amlemindeki 4 halka neyi temsil eder?", siklar: ["4 tekerleği", "Birleşen 4 otomobil şirketini", "4 kıtayı", "4 mevsimi"], cevap: 1 },
+    { soru: "Milyoner Titan Markalar Finali: Audi'nin amblemindeki 4 halka neyi temsil eder?", siklar: ["4 tekerleği", "Birleşen 4 otomobil şirketini", "4 kıtayı", "4 mevsimi"], cevap: 1 },
     { soru: "Kapanış: Dünyanın en değerli markası sıralamasında genellikle zirvede olan teknoloji devi?", siklar: ["Microsoft", "Apple", "Google", "Amazon"], cevap: 1 },
 
     // --- GİZEMLER, UZAY & DOĞA PAKETİ (1801-1850) ---
@@ -2649,8 +2711,6 @@
     { soru: "Bonus Sinema: Beşiktaş taraftarı olan, 'Zübük' ve 'Bekçiler Kralı' filmlerinin unutulmaz oyuncusu?", siklar: ["Şener Şen", "Kemal Sunal", "İlyas Salman", "Metin Akpınar"], cevap: 1 },
     { soru: "Final: Secovvv'un en sevdiği oyun türlerinden olan, sinemadan uyarlanan 'Word Hunt' projesinin temeli?", siklar: ["Resim", "Kelime", "Sayı", "Müzik"], cevap: 1 },
     { soru: "Güle Güle: Sinemanın ilk halkası olan 'Lumiere Kardeşler' hangi ülkelidir?", siklar: ["Almanya", "Fransa", "ABD", "İngiltere"], cevap: 1 }
-    // DİĞER SORULARINI KOPYALAYIP ALT ALTA BURAYA EKLEMEYE DEVAM ET...
-    // 👆👆👆 DİKKAT: ESKİ DOSYANDAKİ 1000 SORULUK LİSTENİ BURAYA YAPIŞTIR 👆👆👆
     ];
 
     const oduller = [
@@ -2685,16 +2745,18 @@
             kazandi: new Audio('https://www.myinstants.com/media/sounds/tada.mp3')
         },
         disari: {
-             dogru: new Audio('./firem1.mp3'), 
-             yanlis: new Audio('./failm1.mp3'),
+            dogru: new Audio('./firem1.mp3'), 
+            yanlis: new Audio('./failm1.mp3'),
             kazandi: new Audio('./interstellar.mp3')
         }
     };
 
     function sesCal(durum) {
         let ses = sesDosyalari[aktifSesTuru][durum];
-        ses.currentTime = 0; 
-        ses.play().catch(e => console.log("Ses oynatma engellendi: ", e));
+        if (ses) {
+            ses.currentTime = 0; 
+            ses.play().catch(e => console.log("Ses oynatma engellendi: ", e));
+        }
     }
 
     function sesTuruDegistir(tur) {
@@ -2704,24 +2766,6 @@
         document.getElementById('disSesBtn').classList.toggle('active', tur === 'disari');
         oyunaOzelBildirim(tur === 'windows' ? "🔊 Ses Kaynağı: Windows" : "🎵 Ses Kaynağı: Dışarıdan", 2000);
     }
-
-    function ekraniOlcekle() {
-        const app = document.getElementById('app');
-        if(!app) return;
-        const pencereGenislik = window.innerWidth * 0.95;
-        const pencereYukseklik = window.innerHeight * 0.95;
-        
-        const anaGenislik = 1024;
-        const anaYukseklik = 768;
-        
-        const oranGenislik = pencereGenislik / anaGenislik;
-        const oranYukseklik = pencereYukseklik / anaYukseklik;
-        
-        const olcek = Math.min(oranGenislik, oranYukseklik); 
-        app.style.transform = `scale(${olcek})`;
-    }
-
-    window.addEventListener('resize', ekraniOlcekle);
 
     // --- ÖZEL İNPUT MODAL SİSTEMİ ---
     let inputCallback = null;
@@ -2756,21 +2800,18 @@
         if(inputCallback) inputCallback(null);
     });
 
-    // Klavyeden Enter'a basınca otomatik onaylama
     document.getElementById("inputField").addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
             document.getElementById("inputConfirmBtn").click();
         }
     });
-    // ---------------------------------
 
     window.onload = () => {
-        ekraniOlcekle(); 
+        updateResolution(); 
         rekorYukle();
         baslatArkaPlan();
-        paraAgaciniOlustur(); // Arka planda dursun
+        paraAgaciniOlustur();
 
-        // Tarayıcı prompt'u yerine yeni neon modülü kullanıyoruz:
         ozelPencereGoster("TİTAN GİRİŞİ", "Adınızı Yazın (Örn: Secovvv)", "text", false, (isim) => {
             if(isim && isim.trim() !== "") {
                 oyuncuAdi = isim.trim().toUpperCase();
@@ -2952,7 +2993,7 @@
                     
                     setTimeout(() => {
                         soruIndex++;
-                        if(soruIndex < 15) {
+                        if(soruIndex < secilenSorular.length) {
                             soruYukle();
                         } else {
                             oyunBitir("EFSANEVİ TİTAN! 🌟", true);
@@ -3043,9 +3084,9 @@
             const dogruIndex = secilenSorular[soruIndex].cevap;
             const dogruMetin = secilenSorular[soruIndex].siklar[dogruIndex];
             kartHtml += `
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #555;">
-                <div style="color: #FF4500; font-size: 16px; margin-bottom: 5px;">DOĞRU CEVAP:</div>
-                <div style="color: #00FF00; font-size: 20px; font-weight: bold;">${dogruMetin}</div>
+            <div style="margin-top: calc(1.4 * var(--u)); padding-top: calc(1.4 * var(--u)); border-top: 1px dashed #555;">
+                <div style="color: #FF4500; font-size: calc(1.5 * var(--u)); margin-bottom: calc(0.4 * var(--u));">DOĞRU CEVAP:</div>
+                <div style="color: #00FF00; font-size: calc(1.8 * var(--u)); font-weight: bold;">${dogruMetin}</div>
             </div>`;
         }
         
@@ -3090,7 +3131,8 @@
     function rekorSifirla() {
         ozelPencereGoster("GÜVENLİK ŞİFRESİ", "Şifreyi girin...", "password", true, (sifre) => {
             if(sifre === "780878") {
-                localStorage.clear();
+                localStorage.removeItem("milyonerRekor");
+                localStorage.removeItem("milyonerRekorSahibi");
                 rekorYukle();
                 oyunaOzelBildirim("🗑️ Sistem hafızası başarıyla sıfırlandı.", 3000);
             } else if (sifre !== null) {
