@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Avı - SECOVVV Action Edition</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --z: 1;
+            /* Hem genişlik hem yüksekliğe göre taşmayı önleyen dinamik ölçek birimi */
+            --u: calc(min(1vw, 1.12vh) * var(--z));
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(calc(-1 * var(--u))); }
+            50% { transform: translateX(calc(1 * var(--u))); }
+            75% { transform: translateX(calc(-1 * var(--u))); }
+            100% { transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); color: #ff3b3b; border-color: #ff3b3b; }
+            100% { transform: scale(1); }
+        }
+        @keyframes flashExplosion {
+            0% { text-shadow: 0 0 0px #fff; transform: scale(1); }
+            50% { text-shadow: 0 0 calc(3 * var(--u)) #fff, 0 0 calc(5 * var(--u)) #2ecc71; transform: scale(1.08); }
+            100% { text-shadow: 0 0 0px #fff; transform: scale(1); }
+        }
+        
+        @keyframes roketYorungeDonus {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            10% { transform: translate(calc(25 * var(--u)), 0) rotate(90deg) scale(1.2); }
+            25% { transform: translate(calc(25 * var(--u)), calc(35 * var(--u))) rotate(180deg) scale(1.2); }
+            40% { transform: translate(calc(-25 * var(--u)), calc(35 * var(--u))) rotate(270deg) scale(1.2); }
+            55% { transform: translate(calc(-25 * var(--u)), 0) rotate(360deg) scale(1.2); }
+            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+        }
+
+        @keyframes floatRocket {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(calc(-0.8 * var(--u))); }
+        }
+
+        .roket-yorunge { 
+            animation: roketYorungeDonus 3s ease-in-out; 
+            display: inline-block; 
+            position: relative;
+            z-index: 20; 
+        }
+        
+        .parla { animation: flashExplosion 0.5s ease-out; }
+        .sarsil { animation: shake 0.3s; }
+        .panik { animation: pulse 0.5s infinite; color: #ff3b3b !important; }
+
+        .seco-signature {
+            position: absolute;
+            top: calc(3 * var(--u));
+            left: calc(-0.3 * var(--u));
+            font-size: calc(2 * var(--u));
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            background: linear-gradient(0deg, #ff4500, #ff8c00, #ffd700, #ff8c00, #ff4500);
+            background-size: 100% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fireFlow 1.5s infinite linear;
+            transform: rotate(-45deg);
+            pointer-events: none;
+            z-index: 30;
+        }
+        @keyframes fireFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 0% 100%; }
+        }
+
+        /* Özel Nick / Başlangıç Ekranı */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(18, 24, 48, 0.96) 0%, rgba(5, 8, 18, 0.99) 100%);
+            backdrop-filter: blur(calc(2 * var(--u)));
+            z-index: 25;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: calc(2.5 * var(--u));
+            padding: calc(3 * var(--u));
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .start-icon {
+            font-size: calc(5.5 * var(--u));
+            margin-bottom: calc(1 * var(--u));
+            animation: floatRocket 2.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 calc(1.5 * var(--u)) rgba(0, 255, 255, 0.5));
+        }
+
+        .start-title {
+            color: #ffffff;
+            font-size: calc(3.6 * var(--u));
+            font-weight: 800;
+            margin: 0 0 calc(0.6 * var(--u)) 0;
+            letter-spacing: calc(0.15 * var(--u));
+            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(139, 92, 246, 0.7);
+        }
+
+        .start-subtitle {
+            color: #00FFFF;
+            font-size: calc(1.4 * var(--u));
+            margin: 0 0 calc(2.2 * var(--u)) 0;
+            letter-spacing: calc(0.06 * var(--u));
+            opacity: 0.9;
+        }
+
+        #nickInput {
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            border: calc(0.2 * var(--u)) solid rgba(0, 255, 255, 0.4);
+            border-radius: calc(1.2 * var(--u));
+            padding: calc(1.3 * var(--u)) calc(1.8 * var(--u));
+            font-size: calc(2.1 * var(--u));
+            text-align: center;
+            outline: none;
+            width: 82%;
+            margin-bottom: calc(1 * var(--u));
+            transition: all 0.3s;
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(0, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        #nickInput:focus {
+            border-color: #00FFFF;
+            box-shadow: 0 0 calc(2.5 * var(--u)) rgba(0, 255, 255, 0.4);
+        }
+
+        #nickInput.input-error {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 calc(2.5 * var(--u)) rgba(231, 76, 60, 0.6) !important;
+        }
+
+        #nickUyari {
+            color: #ff6b6b;
+            font-size: calc(1.4 * var(--u));
+            font-weight: bold;
+            height: calc(2 * var(--u));
+            margin-bottom: calc(1.2 * var(--u));
+        }
+
+        .start-btn {
+            padding: calc(1.3 * var(--u)) calc(3.5 * var(--u));
+            font-size: calc(2 * var(--u));
+            font-weight: bold;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: calc(1.2 * var(--u));
+            cursor: pointer;
+            box-shadow: 0 calc(0.5 * var(--u)) calc(2 * var(--u)) rgba(139, 92, 246, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: calc(0.1 * var(--u));
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 calc(0.6 * var(--u)) calc(2.5 * var(--u)) rgba(0, 255, 255, 0.6);
+        }
+
+        /* Üst Oyuncu ve Doğru/Yanlış İsabet Satırı */
+        .player-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.1);
+            border-radius: calc(1.2 * var(--u));
+            padding: calc(0.8 * var(--u)) calc(1.6 * var(--u));
+            margin-bottom: calc(1.2 * var(--u));
+        }
+
+        #oyuncuIsimGosterge {
+            font-size: calc(1.7 * var(--u)); 
+            color: #00FFFF; 
+            font-weight: bold; 
+            text-shadow: 0 0 calc(0.8 * var(--u)) rgba(0, 255, 255, 0.4);
+        }
+
+        .accuracy-badge {
+            display: flex;
+            align-items: center;
+            gap: calc(0.7 * var(--u));
+            font-size: calc(1.4 * var(--u));
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.4);
+            padding: calc(0.4 * var(--u)) calc(0.9 * var(--u));
+            border-radius: calc(0.8 * var(--u));
+            border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.08);
+        }
+
+        .acc-dogru { color: #2ecc71; }
+        .acc-yanlis { color: #ff6b6b; }
+        .acc-pas { color: #f39c12; }
+        .acc-oran { color: #f1c40f; }
+
+        /* Sadeleştirilmiş 2x2 Gösterge Paneli (HUD) */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: calc(1 * var(--u));
+            margin-bottom: calc(1.2 * var(--u));
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: calc(0.12 * var(--u)) solid rgba(255, 255, 255, 0.08);
+            border-radius: calc(1.2 * var(--u));
+            padding: calc(0.9 * var(--u)) calc(1.2 * var(--u));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 calc(1.5 * var(--u)) rgba(255, 255, 255, 0.02);
+        }
+
+        .stat-card.gold { border-bottom: calc(0.3 * var(--u)) solid #f1c40f; }
+        .stat-card.amber { border-bottom: calc(0.3 * var(--u)) solid #e67e22; }
+        .stat-card.blue { border-bottom: calc(0.3 * var(--u)) solid #3498db; }
+        .stat-card.green { border-bottom: calc(0.3 * var(--u)) solid #2ecc71; }
+
+        .stat-label {
+            font-size: calc(1.05 * var(--u));
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: calc(0.1 * var(--u));
+            margin-bottom: calc(0.3 * var(--u));
+            font-weight: bold;
+        }
+
+        .stat-value {
+            font-size: calc(2.3 * var(--u));
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .stat-sub {
+            font-size: calc(1.15 * var(--u));
+            color: rgba(255, 255, 255, 0.75);
+            margin-top: calc(0.25 * var(--u));
+            font-weight: 600;
+        }
+
+        #toplamPuan {
+            color: #f1c40f;
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(241, 196, 15, 0.4);
+        }
+
+        #rekorSkor {
+            color: #ff9f43;
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(255, 159, 67, 0.4);
+        }
+
+        #aktifSeri {
+            color: #38ada9;
+        }
+
+        #carpanDeger {
+            color: #2ecc71;
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(46, 204, 113, 0.4);
+        }
+        
+        /* Oyun Sonu Rapor Ekranı */
+        #game-over { 
+            display: none; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(5, 8, 18, 0.97); 
+            z-index: 20; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: calc(2.5 * var(--u)); 
+            padding: calc(2.5 * var(--u));
+        }
+
+        .game-over-title {
+            color: #f1c40f; 
+            font-size: calc(4.2 * var(--u));
+            margin: 0 0 calc(1 * var(--u)) 0;
+            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.5);
+        }
+
+        #final-puan {
+            font-size: calc(1.85 * var(--u)); 
+            color: white;
+            margin-bottom: calc(1.8 * var(--u));
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.04);
+            border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.1);
+            border-radius: calc(1.5 * var(--u));
+            padding: calc(1.5 * var(--u)) calc(2.5 * var(--u));
+            width: 92%;
+        }
+
+        .restart-btn {
+            padding: calc(1.3 * var(--u)) calc(3 * var(--u)); 
+            font-size: calc(1.9 * var(--u)); 
+            font-weight: bold;
+            background: linear-gradient(135deg, #2ecc71, #27ae60); 
+            color: white; 
+            border: none; 
+            border-radius: calc(1 * var(--u)); 
+            cursor: pointer; 
+            box-shadow: 0 calc(0.5 * var(--u)) calc(1.5 * var(--u)) rgba(46, 204, 113, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .restart-btn:hover, .restart-btn:focus { 
+            transform: scale(1.05); 
+            box-shadow: 0 0 calc(2.5 * var(--u)) rgba(46, 204, 113, 0.8);
+        }
+
+        .music-toggle-btn {
+            padding: calc(0.7 * var(--u)) calc(1.1 * var(--u)); 
+            cursor: pointer; 
+            border-radius: calc(0.6 * var(--u)); 
+            background: rgba(149, 165, 166, 0.2);
+            border: calc(0.1 * var(--u)) solid rgba(255,255,255,0.15);
+            color: white; 
+            font-weight: bold;
+            font-size: calc(1.05 * var(--u));
+            transition: background 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .music-toggle-btn:hover { 
+            background: rgba(149, 165, 166, 0.4); 
+            transform: scale(1.04);
+        }
+        .music-playing {
+            background: rgba(46, 204, 113, 0.3) !important;
+            border-color: #2ecc71 !important;
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(46, 204, 113, 0.4);
+        }
+
+        .mode-switch-btn {
+            padding: calc(0.7 * var(--u)) calc(1.1 * var(--u)); 
+            cursor: pointer; 
+            border-radius: calc(0.6 * var(--u)); 
+            background: rgba(0, 255, 255, 0.12);
+            border: calc(0.1 * var(--u)) solid rgba(0, 255, 255, 0.35);
+            color: #00FFFF; 
+            font-weight: bold;
+            font-size: calc(1.05 * var(--u));
+            transition: background 0.3s, transform 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .mode-switch-btn:hover {
+            background: rgba(0, 255, 255, 0.28);
+            transform: scale(1.04);
+        }
+
+        .admin-btn {
+            padding: calc(0.7 * var(--u)) calc(1.1 * var(--u)); 
+            cursor: pointer; 
+            border-radius: calc(0.6 * var(--u)); 
+            border: none; 
+            background: rgba(192, 57, 43, 0.65); 
+            color: white;
+            font-weight: bold;
+            font-size: calc(1.05 * var(--u));
+            transition: background 0.3s, transform 0.2s;
+        }
+        .admin-btn:hover { 
+            background: #e74c3c; 
+            transform: scale(1.04);
+        }
+
+        html, body {
+            background: #000 !important;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: calc(100 * var(--u));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #anaKapsayici {
+            background: rgba(10, 15, 30, 0.55) !important;
+            backdrop-filter: blur(calc(2.5 * var(--u))) saturate(180%);
+            border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.2);
+            box-shadow: 
+                0 0 calc(5 * var(--u)) rgba(139, 92, 246, 0.15),
+                inset 0 0 calc(2.5 * var(--u)) rgba(255,255,255,0.02);
+            border-radius: calc(2.5 * var(--u));
+            transform: translateZ(calc(2 * var(--u)));
+            position: relative;
+            z-index: 10;
+            text-align: center; 
+            padding: calc(2.2 * var(--u)) calc(2.8 * var(--u)); 
+            display: inline-block; 
+            width: calc(54 * var(--u)); 
+            max-width: 95vw;
+            transition: background-color 0.3s; 
+            overflow: hidden;
+        }
+
+        .baslik {
+            color: white; 
+            font-size: calc(3 * var(--u));
+            margin-top: 0;
+            margin-bottom: calc(1 * var(--u));
+            letter-spacing: calc(0.1 * var(--u));
+        }
+
+        /* Zaman Kumbarası, Faz Göstergesi ve Pas Geç Satırı */
+        .timer-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: calc(0.8 * var(--u));
+            margin: calc(0.3 * var(--u)) 0;
+        }
+
+        #sure {
+            display: inline-block;
+            font-size: calc(2.2 * var(--u)); 
+            color: #00FFFF; 
+            font-weight: bold; 
+            padding: calc(0.3 * var(--u)) calc(1.4 * var(--u));
+            background: rgba(0, 255, 255, 0.1);
+            border: calc(0.12 * var(--u)) solid rgba(0, 255, 255, 0.35);
+            border-radius: calc(2 * var(--u));
+            transition: all 0.2s;
+        }
+
+        #fazBadge {
+            display: inline-block;
+            font-size: calc(1.15 * var(--u));
+            font-weight: bold;
+            padding: calc(0.45 * var(--u)) calc(1 * var(--u));
+            border-radius: calc(1.5 * var(--u));
+            background: rgba(46, 204, 113, 0.15);
+            border: calc(0.1 * var(--u)) solid rgba(46, 204, 113, 0.4);
+            color: #2ecc71;
+        }
+
+        .skip-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border: calc(0.12 * var(--u)) solid rgba(231, 76, 60, 0.5);
+            color: #ff6b6b;
+            padding: calc(0.45 * var(--u)) calc(1.1 * var(--u));
+            border-radius: calc(1.5 * var(--u));
+            font-size: calc(1.2 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .skip-btn:hover {
+            background: rgba(231, 76, 60, 0.4);
+            transform: scale(1.05);
+        }
+
+        #karisik-kelime {
+            font-size: calc(5 * var(--u)); 
+            font-weight: bold; 
+            letter-spacing: calc(1 * var(--u)); 
+            color: #f1c40f; 
+            margin: calc(0.9 * var(--u)) 0; 
+            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.6);
+            word-break: break-all;
+        }
+
+        #ipucu {
+            font-size: calc(2.3 * var(--u)); 
+            color: #2ecc71; 
+            margin: calc(0.5 * var(--u)) auto calc(0.9 * var(--u)) auto; 
+            font-family: monospace; 
+            background: rgba(0,0,0,0.35); 
+            padding: calc(0.45 * var(--u)) calc(1.5 * var(--u)); 
+            border-radius: calc(0.8 * var(--u));
+            letter-spacing: calc(0.5 * var(--u));
+            display: inline-block;
+            min-width: 60%;
+        }
+
+        #tahmin {
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: calc(0.2 * var(--u)) solid #34495e !important;
+            border-radius: calc(1.2 * var(--u));
+            padding: calc(1.1 * var(--u)); 
+            font-size: calc(2 * var(--u)); 
+            text-align: center; 
+            outline: none; 
+            width: 85%; 
+            transition: all 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+        #tahmin:focus {
+            border-color: #8b5cf6 !important;
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(139, 92, 246, 0.4);
+        }
+
+        #gecen-sure-ekran {
+            font-size: calc(1.4 * var(--u)); 
+            color: #3498db; 
+            min-height: calc(2 * var(--u)); 
+            margin-top: calc(0.6 * var(--u)); 
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mesaj {
+            margin-top: calc(0.2 * var(--u)); 
+            margin-bottom: calc(0.8 * var(--u));
+            min-height: calc(2.6 * var(--u)); 
+            font-weight: bold; 
+            font-size: calc(1.5 * var(--u));
+            line-height: 1.25;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 calc(0.5 * var(--u));
+        }
+
+        .alt-butonlar {
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap;
+            gap: calc(0.55 * var(--u));
+            margin-top: calc(0.4 * var(--u));
+        }
+
+        /* ÖZEL ŞİFRE VE UYARI MODALI */
+        #ozel-modal {
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); 
+            z-index: 999; 
+            justify-content: center; 
+            align-items: center;
+            backdrop-filter: blur(calc(0.5 * var(--u)));
+        }
+        .modal-kutu {
+            background: rgba(15, 20, 45, 0.96); 
+            padding: calc(2.5 * var(--u)); 
+            border-radius: calc(2 * var(--u));
+            border: calc(0.2 * var(--u)) solid #8b5cf6; 
+            text-align: center; 
+            width: calc(35 * var(--u));
+            max-width: 90vw;
+            box-shadow: 0 0 calc(3 * var(--u)) rgba(139, 92, 246, 0.4);
+        }
+        .modal-kutu h3 { color: #f1c40f; margin-top: 0; font-size: calc(2.2 * var(--u)); }
+        .modal-kutu p { color: #ddd; margin-bottom: calc(1.8 * var(--u)); font-size: calc(1.5 * var(--u)); }
+        #modal-input {
+            width: 85%; 
+            padding: calc(1 * var(--u)); 
+            border-radius: calc(1 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid #8b5cf6;
+            background: rgba(0,0,0,0.6); 
+            color: white; 
+            outline: none; 
+            text-align: center; 
+            margin-bottom: calc(1.8 * var(--u)); 
+            font-size: calc(1.6 * var(--u));
+        }
+        .modal-btn { 
+            padding: calc(0.9 * var(--u)) calc(1.8 * var(--u)); 
+            border: none; 
+            border-radius: calc(0.9 * var(--u)); 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: calc(1.4 * var(--u)); 
+            transition: 0.2s; 
+            margin: 0 calc(0.4 * var(--u)); 
+        }
+        .btn-tamam { background: #8b5cf6; color: white; }
+        .btn-tamam:hover { background: #9b6cf6; box-shadow: 0 0 calc(1.5 * var(--u)) #8b5cf6; }
+        .btn-iptal { background: #e74c3c; color: white; }
+        .btn-iptal:hover { background: #ff5e4d; box-shadow: 0 0 calc(1.5 * var(--u)) #e74c3c; }
+
+        .kozmik-nebula {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            background: radial-gradient(circle at 30% 30%, #1a0b2e 0%, #000 70%);
+            animation: nebulaRenk 30s ease infinite alternate;
+        }
+
+        @keyframes nebulaRenk {
+            0% { background: radial-gradient(circle at 30% 30%, #1a0b2e 0%, #000 70%); }
+            50% { background: radial-gradient(circle at 70% 70%, #2c0e40 0%, #000 70%); }
+            100% { background: radial-gradient(circle at 30% 30%, #1a0b2e 0%, #000 70%); }
+        }
+
+        .kozmik-yildizlar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.1) 1px, transparent calc(2 * var(--u))),
+                radial-gradient(white, rgba(255,255,255,.05) 1px, transparent calc(3 * var(--u)));
+            background-size: calc(35 * var(--u)) calc(35 * var(--u)), calc(20 * var(--u)) calc(20 * var(--u));
+            animation: yildizPirilti 10s linear infinite;
+        }
+
+        @keyframes yildizPirilti {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: calc(35 * var(--u)) calc(35 * var(--u)), calc(20 * var(--u)) calc(20 * var(--u)); }
+        }
+
+        .kozmik-isima {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3;
+            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
+
+    <!-- Ses Etiketleri: Doğrudan src ile bağlandı -->
+    <audio id="arkaPlanMuzik" preload="auto"></audio>
+    <audio id="dogruSes" src="dogru.mp3" preload="auto"></audio>
+    <audio id="yanlisSes" src="m1g.mp3" preload="auto"></audio>
+
+    <!-- ÖZEL ŞİFRE VE UYARI MODALI -->
+    <div id="ozel-modal">
+        <div class="modal-kutu">
+            <h3 id="modal-baslik">Uyarı</h3>
+            <p id="modal-mesaj"></p>
+            <input type="password" id="modal-input" placeholder="Şifre..." autocomplete="off">
+            <div>
+                <button id="modal-tamam" class="modal-btn btn-tamam">Tamam</button>
+                <button id="modal-iptal" class="modal-btn btn-iptal">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="anaKapsayici">
+        
+        <div class="seco-signature">SECOVVV</div>
+
+        <!-- ÖZEL OYUNCU GİRİŞ EKRANI -->
+        <div id="start-screen">
+            <div class="start-icon">🚀</div>
+            <h1 class="start-title">KELİME AVI</h1>
+            <p class="start-subtitle">⏱️ Max 60sn Daralan Çember • &lt;2sn Refleks Bonusu!</p>
+            <input type="text" id="nickInput" placeholder="Nick'ini veya Adını Yaz..." maxlength="16" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div id="nickUyari"></div>
+            <button onclick="oyunuBaslat()" class="start-btn">OYUNA BAŞLA 🚀</button>
+        </div>
+
+        <!-- OYUN SONU PERFORMANS EKRANI -->
+        <div id="game-over">
+            <h1 class="game-over-title">⏱️ SÜRE BİTTİ!</h1>
+            <div id="final-puan"></div>
+            <button id="restartBtn" onclick="oyunuSifirla()" class="restart-btn">Yeniden Oyna 🔄 (Enter)</button>
+        </div>
+
+        <h1 class="baslik">Kelime Avı <span id="roket" style="display:inline-block;">🚀</span></h1>
+        
+        <!-- Oyuncu ve Doğru/Yanlış/Pas İsabet Barı -->
+        <div class="player-bar">
+            <div id="oyuncuIsimGosterge">👤 OYUNCU: ---</div>
+            <div class="accuracy-badge">
+                <span class="acc-dogru">✅ <span id="dogruSayisiText">0</span></span>
+                <span>|</span>
+                <span class="acc-yanlis">❌ <span id="yanlisSayisiText">0</span></span>
+                <span>|</span>
+                <span class="acc-pas">⏭️ <span id="pasSayisiText">0</span></span>
+                <span>|</span>
+                <span class="acc-oran">🎯 <span id="isabetOraniText">%100</span></span>
+            </div>
+        </div>
+        
+        <!-- Sade ve Şık 2x2 İstatistik Paneli -->
+        <div class="stats-grid">
+            <div class="stat-card gold">
+                <span class="stat-label">⭐ Toplam Puan</span>
+                <span id="toplamPuan" class="stat-value">0</span>
+            </div>
+            <div class="stat-card amber">
+                <span class="stat-label">🏆 En Yüksek Rekor</span>
+                <span id="rekorSkor" class="stat-value">0</span>
+                <span id="rekorSahibiText" class="stat-sub">👑 Yok</span>
+            </div>
+            <div class="stat-card blue">
+                <span class="stat-label">🔥 Üst Üste Seri</span>
+                <span id="aktifSeri" class="stat-value">0</span>
+                <span id="seriRekorText" class="stat-sub">En İyi Seri: 0</span>
+            </div>
+            <div class="stat-card green">
+                <span class="stat-label">⚡ Seri Çarpanı</span>
+                <span id="carpanDeger" class="stat-value">x1</span>
+                <span id="siradakiPuanText" class="stat-sub">Taban: 100 Puan</span>
+            </div>
+        </div>
+        
+        <!-- Zaman Kumbarası (Max 60sn), Faz Göstergesi ve Cezalı Pas Geç Butonu -->
+        <div class="timer-row">
+            <div id="sure">⏱️ 60 sn</div>
+            <div id="fazBadge">🟢 FAZ 1</div>
+            <button onclick="kelimePasGec()" class="skip-btn" title="Space tuşu ile pas geç (-3 sn ve -150 Puan)">⏭️ Pas (-3sn • -150P • Space)</button>
+        </div>
+
+        <div id="karisik-kelime">---</div>
+        <div id="ipucu">---</div>
+        
+        <!-- Kopyala-Yapıştır (onpaste / ondrop) ve otomatik tamamlama kapatıldı -->
+        <input type="text" id="tahmin" placeholder="Tahminin... (Pas için Space)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="return false" ondrop="return false">
+        
+        <div id="gecen-sure-ekran"></div>
+        
+        <div id="mesaj"></div>
+        
+        <div class="alt-butonlar">
+            <a href="https://secovvv.github.io/" class="music-toggle-btn">🏠 Ana Sayfa</a>
+            <a href="html10parmak.html" class="mode-switch-btn">⌨️ 10 Parmak</a>
+            <button id="muzikBtn" onclick="muzikToggle()" class="music-toggle-btn">🔊 Müzik</button>
+            <button onclick="sonrakiMuzik()" class="music-toggle-btn" title="Sıradaki Şarkıya Geç">⏭️ Sıradaki</button>
+            <button onclick="rekoruSifirlaSifreli()" class="admin-btn">🗑️ Sıfırla</button>
+        </div>
+    </div>
+
+    <div class="kozmik-nebula"></div>
+    <div class="kozmik-yildizlar"></div>
+    <div class="kozmik-isima"></div>
+
+    <script src="kelimeler.js"></script>
+
+    <script>
+        // 1. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme (index.html standardı)
+        var baseDPR = window.devicePixelRatio || 1;
+
+        function updateResolution() {
+            var currentDPR = window.devicePixelRatio || 1;
+            var zoomFactor = currentDPR / baseDPR;
+            document.documentElement.style.setProperty('--z', zoomFactor);
+        }
+        updateResolution();
+        window.addEventListener('resize', updateResolution);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateResolution);
+        }
+
+        // 2. Çoklu Şarkı Listesi ve Eksik Dosya Korumalı Sistem
+        // İstediğin kadar şarkı ismini buraya yazabilirsin; klasörde olmayanları otomatik atlar!
+        const muzikListesi = ["ozan.mp3", "sarki2.mp3", "sarki3.mp3"];
+        let aktifMuzikIndex = 0;
+        let hataliMuzikSayaci = 0;
+        const MAX_SURE = 60; // Süre asla 60 saniyenin üzerine çıkamaz!
+        let oyuncuAdi = "";
+        
+        function muzikSec() {
+            let ses = document.getElementById("arkaPlanMuzik");
+            let btn = document.getElementById("muzikBtn");
+            ses.src = muzikListesi[aktifMuzikIndex];
+            
+            // Şarkı bittiğinde otomatik olarak sıradaki şarkıya geçsin
+            ses.onended = () => {
+                sonrakiMuzik();
+            };
+
+            // Şarkı başarıyla çalmaya başlayınca hata sayacını sıfırla
+            ses.onplaying = () => {
+                hataliMuzikSayaci = 0;
+            };
+
+            // Şarkı klasörde veya GitHub'da yoksa çökmez, sıradaki şarkıya atlar
+            ses.onerror = () => {
+                hataliMuzikSayaci++;
+                if (hataliMuzikSayaci < muzikListesi.length) {
+                    sonrakiMuzik();
+                } else {
+                    if (btn) {
+                        btn.innerText = "🔊 Müzik";
+                        btn.classList.remove("music-playing");
+                    }
+                }
+            };
+        }
+
+        function muzikToggle() { 
+            let ses = document.getElementById("arkaPlanMuzik"); 
+            let btn = document.getElementById("muzikBtn");
+            if (!ses.src) muzikSec();
+
+            if (ses.paused) {
+                hataliMuzikSayaci = 0;
+                ses.play().then(() => {
+                    btn.innerText = "⏸️ Durdur";
+                    btn.classList.add("music-playing");
+                }).catch(e => console.warn("Müzik çalınamadı:", e));
+            } else {
+                ses.pause();
+                btn.innerText = "🔊 Müzik";
+                btn.classList.remove("music-playing");
+            }
+        }
+
+        // Tıkladığın anda listedeki sıradaki şarkıya geçer ve çalar
+        function sonrakiMuzik() {
+            let ses = document.getElementById("arkaPlanMuzik");
+            let btn = document.getElementById("muzikBtn");
+            aktifMuzikIndex = (aktifMuzikIndex + 1) % muzikListesi.length;
+            ses.src = muzikListesi[aktifMuzikIndex];
+            ses.currentTime = 0;
+            ses.play().then(() => {
+                btn.innerText = "⏸️ Durdur";
+                btn.classList.add("music-playing");
+            }).catch(e => console.warn("Müzik geçiş hatası:", e));
+        }
+
+        let secilenKelime = "", oncekiKelime = "", toplamPuan = 0;
+        let kalanKelimeHavuzu = [];
+        let kalanGenelSure = 60, kelimeGecenSure = 0, zamanlayici;
+        let ipucuSayaci = 0, ipucuAraligi = 4;
+        let bonusKatsayisi = 1, kombo = 0, buOyunEnIyiSeri = 0;
+        let dogruSayisi = 0, yanlisSayisi = 0, pasSayisi = 0, supersonikSayisi = 0;
+        let gorunenHarfler = [], baslangicZamani = 0;
+        let sonKelime = "";
+        let cevapVerildiMi = true;
+        let oyunAktifMi = false;
+        let yenidenBaslatHazirMi = false;
+
+        let enYuksekSkor = parseInt(localStorage.getItem("secoRekor")) || 0;
+        let enYuksekSeri = parseInt(localStorage.getItem("secoSeriRekor")) || 0;
+        let rekorSahibi = localStorage.getItem("secoRekorSahibi") || "Yok";
+        
+        function isabetHesapla() {
+            let toplamDeneme = dogruSayisi + yanlisSayisi + pasSayisi;
+            if (toplamDeneme === 0) return 100;
+            return Math.round((dogruSayisi / toplamDeneme) * 100);
+        }
+
+        function fazGuncelle() {
+            let fazEl = document.getElementById("fazBadge");
+            if (dogruSayisi < 15) {
+                fazEl.innerText = "🟢 FAZ 1";
+                fazEl.style.color = "#2ecc71";
+                fazEl.style.borderColor = "rgba(46, 204, 113, 0.4)";
+                fazEl.style.background = "rgba(46, 204, 113, 0.15)";
+            } else if (dogruSayisi < 30) {
+                fazEl.innerText = "🔥 FAZ 2 (ZOR)";
+                fazEl.style.color = "#f39c12";
+                fazEl.style.borderColor = "rgba(243, 156, 18, 0.5)";
+                fazEl.style.background = "rgba(243, 156, 18, 0.18)";
+            } else {
+                fazEl.innerText = "💀 FAZ 3 (OVERDRIVE)";
+                fazEl.style.color = "#ff3b3b";
+                fazEl.style.borderColor = "rgba(255, 59, 59, 0.6)";
+                fazEl.style.background = "rgba(255, 59, 59, 0.2)";
+            }
+        }
+
+        function ekranGuncelle() {
+            document.getElementById("toplamPuan").innerText = toplamPuan;
+            document.getElementById("rekorSkor").innerText = enYuksekSkor;
+            document.getElementById("rekorSahibiText").innerText = "👑 " + rekorSahibi;
+            document.getElementById("aktifSeri").innerText = kombo;
+            document.getElementById("seriRekorText").innerText = "En İyi Seri: " + enYuksekSeri;
+            document.getElementById("dogruSayisiText").innerText = dogruSayisi;
+            document.getElementById("yanlisSayisiText").innerText = yanlisSayisi;
+            document.getElementById("pasSayisiText").innerText = pasSayisi;
+            document.getElementById("isabetOraniText").innerText = "%" + isabetHesapla();
+            fazGuncelle();
+        }
+        ekranGuncelle();
+
+        function sesCal(id) { 
+            let ses = document.getElementById(id); 
+            if(ses) { 
+                ses.currentTime = 0; 
+                let p = ses.play();
+                if (p !== undefined) {
+                    p.catch(() => {});
+                }
+            } 
+        }
+
+        // Özel Şifre ve Bildirim Modalı
+        function ozelModalGoster(baslik, mesaj, tip, callback) {
+            let modal = document.getElementById("ozel-modal");
+            let titleEl = document.getElementById("modal-baslik");
+            let msgEl = document.getElementById("modal-mesaj");
+            let inputEl = document.getElementById("modal-input");
+            let btnTamam = document.getElementById("modal-tamam");
+            let btnIptal = document.getElementById("modal-iptal");
+
+            titleEl.innerText = baslik;
+            msgEl.innerHTML = mesaj;
+            modal.style.display = "flex";
+
+            let yeniBtnTamam = btnTamam.cloneNode(true);
+            btnTamam.parentNode.replaceChild(yeniBtnTamam, btnTamam);
+            let yeniBtnIptal = btnIptal.cloneNode(true);
+            btnIptal.parentNode.replaceChild(yeniBtnIptal, btnIptal);
+
+            if(tip === "sifre") {
+                titleEl.style.color = "#f1c40f";
+                inputEl.style.display = "inline-block";
+                inputEl.value = "";
+                inputEl.focus();
+                yeniBtnIptal.style.display = "inline-block";
+                
+                yeniBtnTamam.onclick = function() {
+                    modal.style.display = "none";
+                    if(callback) callback(inputEl.value);
+                };
+                yeniBtnIptal.onclick = function() {
+                    modal.style.display = "none";
+                };
+                inputEl.onkeypress = function(e) {
+                    if(e.key === "Enter") yeniBtnTamam.click();
+                };
+            } else {
+                titleEl.style.color = tip === "hata" ? "#e74c3c" : "#2ecc71";
+                inputEl.style.display = "none";
+                yeniBtnIptal.style.display = "none";
+                yeniBtnTamam.onclick = function() {
+                    modal.style.display = "none";
+                    if(callback) callback();
+                };
+            }
+        }
+
+        function rekoruSifirlaSifreli() {
+            ozelModalGoster("Yönetici Şifresi", "Tüm rekorları sıfırlamak için şifreyi girin:", "sifre", function(sifre) {
+                if (sifre === "780878") {
+                    localStorage.setItem("secoRekor", 0);
+                    localStorage.setItem("secoSeriRekor", 0);
+                    localStorage.setItem("secoRekorSahibi", "Yok");
+                    enYuksekSkor = 0; enYuksekSeri = 0; kombo = 0; rekorSahibi = "Yok";
+                    ekranGuncelle();
+                    ozelModalGoster("Başarılı!", "Tüm rekorlar başarıyla sıfırlandı!", "basarili");
+                } else if (sifre !== "") {
+                    ozelModalGoster("Hatalı Şifre!", "Yanlış şifre girdiniz.", "hata");
+                }
+            });
+        }
+
+        function bonusGuncelle() {
+            let harfSayisi = secilenKelime ? secilenKelime.length : 4;
+            let tabanPuan = harfSayisi * 25 * bonusKatsayisi;
+            document.getElementById("carpanDeger").innerText = "x" + bonusKatsayisi;
+            document.getElementById("siradakiPuanText").innerText = "Taban: +" + tabanPuan + " (<2sn Özel Bonus)";
+        }
+
+        function sureEkraniGuncelle() {
+            let sureEl = document.getElementById("sure");
+            sureEl.innerText = "⏱️ " + kalanGenelSure + " sn";
+            if (kalanGenelSure <= 10 && kalanGenelSure > 0) {
+                sureEl.classList.add("panik");
+            } else {
+                sureEl.classList.remove("panik");
+            }
+        }
+
+        // Gerçek Fisher-Yates Karıştırma
+        function kelimeyiKaristir(kelime) {
+            let kucuk = kelime.toLocaleLowerCase('tr-TR');
+            let harfler = kucuk.split('');
+            if (harfler.length <= 1) return kucuk;
+
+            let karisik = kucuk;
+            let deneme = 0;
+            while (karisik === kucuk && deneme < 15) {
+                for (let i = harfler.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [harfler[i], harfler[j]] = [harfler[j], harfler[i]];
+                }
+                karisik = harfler.join('');
+                deneme++;
+            }
+            return karisik;
+        }
+
+        // Tekrarsız Kelime Havuzundan Seçim
+        function havuzdanKelimeCek() {
+            if (kalanKelimeHavuzu.length === 0) {
+                kalanKelimeHavuzu = [...kelimeListesi];
+            }
+            let rastgeleIndex = Math.floor(Math.random() * kalanKelimeHavuzu.length);
+            let cekilen = kalanKelimeHavuzu.splice(rastgeleIndex, 1)[0];
+
+            if (cekilen === oncekiKelime && kalanKelimeHavuzu.length > 0) {
+                let yeniIndex = Math.floor(Math.random() * kalanKelimeHavuzu.length);
+                let yeniCekilen = kalanKelimeHavuzu.splice(yeniIndex, 1)[0];
+                kalanKelimeHavuzu.push(cekilen);
+                cekilen = yeniCekilen;
+            }
+            return cekilen;
+        }
+
+        function oyunuBaslat() {
+            let nickInput = document.getElementById("nickInput");
+            let uyari = document.getElementById("nickUyari");
+            let girilen = nickInput.value.trim();
+
+            if (girilen === "") {
+                uyari.innerText = "⚠️ Lütfen oyuna başlamak için bir isim girin!";
+                nickInput.classList.add("input-error", "sarsil");
+                setTimeout(() => nickInput.classList.remove("sarsil"), 300);
+                nickInput.focus();
+                return;
+            }
+
+            oyuncuAdi = girilen;
+            document.getElementById("oyuncuIsimGosterge").innerText = "👤 OYUNCU: " + oyuncuAdi;
+
+            // Ses motorlarını önceden hazırla
+            let dSes = document.getElementById("dogruSes");
+            let ySes = document.getElementById("yanlisSes");
+            if (dSes) dSes.load();
+            if (ySes) ySes.load();
+
+            let startScreen = document.getElementById("start-screen");
+            startScreen.style.opacity = "0";
+            startScreen.style.visibility = "hidden";
+            
+            setTimeout(() => {
+                startScreen.style.display = "none";
+                oyunAktifMi = true;
+                kalanGenelSure = MAX_SURE;
+                kalanKelimeHavuzu = [...kelimeListesi];
+                sureEkraniGuncelle();
+                clearInterval(zamanlayici);
+                zamanlayici = setInterval(genelZamanlayici, 1000);
+                yeniSoru();
+            }, 350);
+        }
+
+        function yeniSoru() {
+            if(!oyunAktifMi || kalanGenelSure <= 0) return;
+            cevapVerildiMi = false;
+            ipucuSayaci = 0;
+            kelimeGecenSure = 0;
+
+            secilenKelime = havuzdanKelimeCek();
+            oncekiKelime = secilenKelime;
+            sonKelime = secilenKelime;
+
+            let uzunluk = secilenKelime.length;
+            gorunenHarfler = new Array(uzunluk).fill(false);
+            ipucuAraligi = uzunluk <= 4 ? 3 : 4;
+            
+            baslangicZamani = Date.now();
+
+            let el = document.getElementById("karisik-kelime");
+            el.classList.remove("parla");
+            el.style.color = "#f1c40f";
+            el.innerText = kelimeyiKaristir(secilenKelime);
+            
+            document.getElementById("ipucu").innerText = "_".repeat(uzunluk);
+            let input = document.getElementById("tahmin");
+            input.readOnly = false;
+            input.value = "";
+            input.focus();
+            bonusGuncelle();
+        }
+
+        function genelZamanlayici() {
+            if (!oyunAktifMi) return;
+
+            kalanGenelSure--;
+            sureEkraniGuncelle();
+
+            if (kalanGenelSure <= 0) {
+                kalanGenelSure = 0;
+                sureEkraniGuncelle();
+                gameOver();
+                return;
+            }
+
+            if (!cevapVerildiMi) {
+                kelimeGecenSure++;
+                let maxIpucu = Math.max(1, secilenKelime.length - 1);
+
+                if (kelimeGecenSure > 0 && kelimeGecenSure % ipucuAraligi === 0 && ipucuSayaci < maxIpucu) {
+                    let gizli = []; 
+                    gorunenHarfler.forEach((d, i) => { if (!d) gizli.push(i); });
+                    if(gizli.length > 0) {
+                        let rnd = gizli[Math.floor(Math.random() * gizli.length)];
+                        gorunenHarfler[rnd] = true; 
+                        ipucuSayaci++;
+                        let g = ""; 
+                        for(let i=0; i<secilenKelime.length; i++) {
+                            g += gorunenHarfler[i] ? secilenKelime[i].toLocaleLowerCase('tr-TR') : "_";
+                        }
+                        document.getElementById("ipucu").innerText = g;
+                    }
+                }
+            }
+        }
+
+        function kelimePasGec() {
+            if (!oyunAktifMi || cevapVerildiMi || kalanGenelSure <= 0) return;
+
+            cevapVerildiMi = true;
+            document.getElementById("tahmin").readOnly = true;
+            pasSayisi++;
+            kombo = 0;
+            bonusKatsayisi = 1;
+
+            kalanGenelSure = Math.max(0, kalanGenelSure - 3);
+            toplamPuan = Math.max(0, toplamPuan - 150);
+
+            sureEkraniGuncelle();
+            ekranGuncelle();
+            bonusGuncelle();
+
+            sesCal("yanlisSes");
+            let el = document.getElementById("karisik-kelime");
+            el.style.color = "#f39c12";
+            el.innerText = secilenKelime.toLocaleLowerCase('tr-TR');
+            document.getElementById("mesaj").innerHTML = "<span style='color:#f39c12'>⏭️ PAS GEÇİLDİ! (-3 sn | -150 Puan)</span>";
+            document.getElementById("gecen-sure-ekran").innerText = "";
+
+            document.getElementById("anaKapsayici").classList.add("sarsil");
+            setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
+
+            if (kalanGenelSure <= 0) {
+                gameOver();
+            } else {
+                setTimeout(yeniSoru, 700);
+            }
+        }
+
+        function rekorKontrolEt() {
+            if(toplamPuan > enYuksekSkor) { 
+                roketKutlamasi(); 
+                enYuksekSkor = toplamPuan; 
+                rekorSahibi = oyuncuAdi;
+                localStorage.setItem("secoRekor", enYuksekSkor); 
+                localStorage.setItem("secoRekorSahibi", rekorSahibi);
+                return true;
+            }
+            return false;
+        }
+
+        // < 2.0 sn Süpersonik Refleks için Çift Yandan Havai Fişek Patlaması
+        function refleksKonfeti() {
+            confetti({
+                particleCount: 45,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0, y: 0.65 },
+                zIndex: 100
+            });
+            confetti({
+                particleCount: 45,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1, y: 0.65 },
+                zIndex: 100
+            });
+        }
+
+        function kontrolEt() {
+            if(!oyunAktifMi || kalanGenelSure <= 0 || cevapVerildiMi) return;
+            
+            let input = document.getElementById("tahmin");
+            let tahmin = input.value.toLocaleLowerCase('tr-TR').trim();
+            if (tahmin === "") return;
+
+            let mesaj = document.getElementById("mesaj");
+            let el = document.getElementById("karisik-kelime");
+            let sureGosterge = document.getElementById("gecen-sure-ekran");
+            
+            if (tahmin === secilenKelime.toLocaleLowerCase('tr-TR')) {
+                cevapVerildiMi = true;
+                input.readOnly = true;
+                dogruSayisi++;
+
+                let bitisZamani = Date.now();
+                let gecenSureSaniye = (bitisZamani - baslangicZamani) / 1000;
+                let harfSayisi = secilenKelime.length;
+                
+                let netSure = Math.max(0.2, gecenSureSaniye - 0.6);
+                let harfBasiSure = netSure / harfSayisi;
+                let kelimeTabanPuani = harfSayisi * 25;
+                let ipucuKesintisi = Math.max(0.4, 1 - (ipucuSayaci * 0.12));
+
+                let hizCarpani = 1;
+                let refleksEkstraBonus = 0;
+                let hizEtiketi = "";
+                let hizRengi = "#2ecc71";
+                let kazanilanSaniye = 0;
+
+                let faz = dogruSayisi <= 15 ? 1 : (dogruSayisi <= 30 ? 2 : 3);
+
+                if (gecenSureSaniye < 1.0) {
+                    supersonikSayisi++;
+                    hizCarpani = 9;
+                    refleksEkstraBonus = 1500;
+                    kazanilanSaniye = (faz === 1) ? 2 : ((faz === 2) ? 1 : 0);
+                    hizEtiketi = "💎 İNSANÜSTÜ (<1sn • 9x)";
+                    hizRengi = "#ff00ff";
+                    roketKutlamasi();
+                } else if (gecenSureSaniye < 2.0) {
+                    supersonikSayisi++;
+                    hizCarpani = 7;
+                    refleksEkstraBonus = 1000;
+                    kazanilanSaniye = (faz === 1) ? 2 : ((faz === 2) ? 1 : 0);
+                    hizEtiketi = "⚡ SÜPERSONİK (<2sn • 7x)";
+                    hizRengi = "#ffd700";
+                    refleksKonfeti();
+                } else if (harfBasiSure <= 0.45) {
+                    hizCarpani = 5;
+                    kazanilanSaniye = (faz === 1) ? 1 : 0;
+                    hizEtiketi = "🚀 IŞIK HIZI (5x)";
+                    hizRengi = "#f1c40f";
+                } else if (harfBasiSure <= 0.80) {
+                    hizCarpani = 3;
+                    kazanilanSaniye = (faz === 1) ? 1 : 0;
+                    hizEtiketi = "⚡ SÜPER HIZ (3x)";
+                    hizRengi = "#00FFFF";
+                } else if (harfBasiSure <= 1.30) {
+                    hizCarpani = 2;
+                    kazanilanSaniye = 0;
+                    hizEtiketi = "🔥 HIZLI (2x)";
+                    hizRengi = "#2ecc71";
+                } else {
+                    hizCarpani = 1;
+                    kazanilanSaniye = 0;
+                    hizEtiketi = "✅ DOĞRU (1x)";
+                    hizRengi = "#a8e6cf";
+                }
+
+                let kazanilanPuan = Math.round((kelimeTabanPuani * hizCarpani * bonusKatsayisi * ipucuKesintisi) + refleksEkstraBonus);
+                toplamPuan += kazanilanPuan;
+
+                kombo++;
+                if (kombo > buOyunEnIyiSeri) buOyunEnIyiSeri = kombo;
+                if (kombo > enYuksekSeri) { 
+                    enYuksekSeri = kombo; 
+                    localStorage.setItem("secoSeriRekor", enYuksekSeri); 
+                }
+
+                let seriSureOdulu = 0;
+                let seriOdulMetni = "";
+                if(kombo % 5 === 0) { 
+                    seriSureOdulu = (faz < 3) ? 3 : 2;
+                    seriOdulMetni = ` • 🔥 +${seriSureOdulu}sn`;
+                }
+
+                let toplamEklenenSure = kazanilanSaniye + seriSureOdulu;
+                kalanGenelSure = Math.min(MAX_SURE, kalanGenelSure + toplamEklenenSure);
+                sureEkraniGuncelle();
+
+                let sureBilgi = toplamEklenenSure > 0 ? `+${toplamEklenenSure} sn süre • Max 60sn` : `Süre sabit`;
+                sureGosterge.innerText = `⏱️ ${gecenSureSaniye.toFixed(2)} sn (${harfSayisi} harf • ${sureBilgi})`;
+                mesaj.innerHTML = `<span style="color:${hizRengi}">${hizEtiketi} ➔ +${kazanilanPuan} Puan${seriOdulMetni}</span>`;
+                
+                rekorKontrolEt();
+                ekranGuncelle();
+
+                el.classList.add("parla");
+                el.innerText = secilenKelime.toLocaleLowerCase('tr-TR');
+                sesCal("dogruSes");
+
+                if (gecenSureSaniye < 2.0) {
+                    bonusKatsayisi = Math.min(10, bonusKatsayisi + 2);
+                } else if (hizCarpani >= 2) {
+                    bonusKatsayisi = Math.min(10, bonusKatsayisi + 1);
+                }
+                
+                bonusGuncelle();
+                setTimeout(yeniSoru, 850);
+
+            } else {
+                yanlisSayisi++;
+                kombo = 0;
+                bonusKatsayisi = 1;
+
+                kalanGenelSure = Math.max(0, kalanGenelSure - 3);
+                toplamPuan = Math.max(0, toplamPuan - 150);
+
+                sureEkraniGuncelle();
+                ekranGuncelle();
+                bonusGuncelle();
+
+                sesCal("yanlisSes");
+                mesaj.innerHTML = "<span style='color:#e74c3c'>❌ YANLIŞ! (-3 sn | -150 Puan) • Tekrar Dene!</span>";
+                
+                document.getElementById("anaKapsayici").classList.add("sarsil");
+                setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
+
+                input.value = "";
+                input.focus();
+
+                if (kalanGenelSure <= 0) {
+                    gameOver();
+                }
+            }
+        }
+
+        function roketKutlamasi() {
+            const roket = document.getElementById("roket");
+            roket.classList.remove("roket-yorunge");
+            void roket.offsetWidth; 
+            roket.classList.add("roket-yorunge");
+            
+            var duration = 2.5 * 1000; 
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        function gameOver() {
+            oyunAktifMi = false;
+            cevapVerildiMi = true;
+            yenidenBaslatHazirMi = false;
+            clearInterval(zamanlayici);
+
+            document.getElementById("tahmin").blur();
+
+            let isabet = isabetHesapla();
+            let isabetBonusu = 0;
+            let bonusAciklama = "Yok (En az 5 doğru ve %75 isabet gerekir)";
+
+            if (dogruSayisi >= 5) {
+                if (isabet === 100) {
+                    isabetBonusu = dogruSayisi * 250;
+                    bonusAciklama = `🎯 KUSURSUZ İSABET (%100) ➔ +${isabetBonusu} Puan!`;
+                } else if (isabet >= 90) {
+                    isabetBonusu = dogruSayisi * 150;
+                    bonusAciklama = `🔥 KESKİN NİŞANCI (%${isabet}) ➔ +${isabetBonusu} Puan!`;
+                } else if (isabet >= 75) {
+                    isabetBonusu = dogruSayisi * 75;
+                    bonusAciklama = `👍 İYİ İSABET (%${isabet}) ➔ +${isabetBonusu} Puan!`;
+                }
+            }
+
+            toplamPuan += isabetBonusu;
+            let yeniRekorMu = rekorKontrolEt();
+            ekranGuncelle();
+
+            document.getElementById("game-over").style.display = "flex";
+            
+            let htmlContent = `<span style="color:#00FFFF; font-size:calc(2.5 * var(--u)); font-weight:bold;">👤 ${oyuncuAdi}</span><br>`;
+            if (yeniRekorMu) {
+                htmlContent += `<span style="color:#f1c40f; font-size:calc(1.9 * var(--u)); font-weight:bold;">🏆 YENİ REKOR KIRDlN! 🏆</span><br>`;
+            }
+            htmlContent += `<hr style="border:0; border-top:1px solid rgba(255,255,255,0.15); margin: calc(0.7 * var(--u)) 0;">`;
+            htmlContent += `✅ Doğru: <b style="color:#2ecc71">${dogruSayisi}</b> &nbsp;|&nbsp; ❌ Yanlış: <b style="color:#ff6b6b">${yanlisSayisi}</b> &nbsp;|&nbsp; ⏭️ Pas: <b style="color:#f39c12">${pasSayisi}</b><br>`;
+            htmlContent += `🎯 İsabet: <b style="color:#f1c40f">%${isabet}</b> &nbsp;|&nbsp; 🔥 En İyi Seri: <b style="color:#38ada9">${buOyunEnIyiSeri}</b> &nbsp;|&nbsp; ⚡ &lt;2sn Refleks: <b style="color:#ffd700">${supersonikSayisi}</b><br>`;
+            htmlContent += `<span style="font-size:calc(1.45 * var(--u)); color:#2ecc71;">${bonusAciklama}</span><br>`;
+            htmlContent += `<div style="margin-top:calc(0.7 * var(--u)); font-size:calc(2.5 * var(--u)); color:#f1c40f; font-weight:800;">TOPLAM SKOR: ${toplamPuan}</div>`;
+            
+            if (sonKelime) {
+                htmlContent += `<div style="margin-top:calc(0.5 * var(--u)); font-size:calc(1.45 * var(--u)); color:rgba(255,255,255,0.7);">Son ekrandaki kelime: <b style="color:#fff;">${sonKelime.toLocaleLowerCase('tr-TR')}</b></div>`;
+            }
+            document.getElementById("final-puan").innerHTML = htmlContent;
+
+            setTimeout(() => {
+                yenidenBaslatHazirMi = true;
+                document.getElementById("restartBtn").focus();
+            }, 400);
+        }
+
+        function oyunuSifirla() {
+            yenidenBaslatHazirMi = false;
+            toplamPuan = 0;
+            kalanGenelSure = MAX_SURE;
+            kalanKelimeHavuzu = [...kelimeListesi];
+            kombo = 0;
+            buOyunEnIyiSeri = 0;
+            dogruSayisi = 0;
+            yanlisSayisi = 0;
+            pasSayisi = 0;
+            supersonikSayisi = 0;
+            bonusKatsayisi = 1;
+            sonKelime = "";
+            document.getElementById("mesaj").innerHTML = "";
+            document.getElementById("gecen-sure-ekran").innerText = "";
+            sureEkraniGuncelle();
+            ekranGuncelle();
+            bonusGuncelle();
+            document.getElementById("game-over").style.display = "none";
+            
+            oyunAktifMi = true;
+            clearInterval(zamanlayici);
+            zamanlayici = setInterval(genelZamanlayici, 1000);
+            yeniSoru();
+        }
+        
+        document.getElementById("tahmin").addEventListener("keydown", (e) => { 
+            if(e.key === "Enter") {
+                e.preventDefault();
+                kontrolEt(); 
+            } else if(e.code === "Space" || e.key === " ") {
+                e.preventDefault();
+                kelimePasGec();
+            }
+        });
+
+        window.addEventListener("keydown", (e) => {
+            if (!oyunAktifMi && yenidenBaslatHazirMi && document.getElementById("game-over").style.display === "flex") {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    oyunuSifirla();
+                }
+            }
+        });
+        
+        document.getElementById("nickInput").addEventListener("keypress", (e) => { 
+            if(e.key === "Enter") oyunuBaslat(); 
+        });
+        document.getElementById("nickInput").addEventListener("input", () => {
+            document.getElementById("nickInput").classList.remove("input-error");
+            document.getElementById("nickUyari").innerText = "";
+        });
+        
+        window.onload = () => { 
+            muzikSec(); 
+            document.getElementById("nickInput").focus();
+        };
+    </script>
+</body>
+</html>
