@@ -44,11 +44,18 @@
             pointer-events: none;
         }
 
-        /* Sol Üst Panel Aç/Kapat ve Duraklat Butonları */
-        #hudToggleBtn, #pauseToggleBtn {
+        /* Sol Üst Taktiksel Kontrol Çubuğu */
+        #topControlBar {
             position: fixed;
             top: calc(0.8 * var(--u));
+            left: calc(0.8 * var(--u));
             z-index: 15;
+            display: flex;
+            gap: calc(0.55 * var(--u));
+            align-items: center;
+        }
+
+        .top-ctrl-btn {
             background: rgba(5, 12, 20, 0.9);
             color: lawngreen;
             border: calc(0.08 * var(--u)) solid lawngreen;
@@ -59,16 +66,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 0 calc(0.5 * var(--u)) rgba(0, 0, 0, 0.8);
-        }
-
-        #hudToggleBtn {
-            left: calc(0.8 * var(--u));
-        }
-
-        #pauseToggleBtn {
-            left: calc(10.8 * var(--u));
-            color: #00f2ff;
-            border-color: #00f2ff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
         #hudToggleBtn:hover {
@@ -77,10 +77,43 @@
             box-shadow: 0 0 calc(0.8 * var(--u)) lawngreen;
         }
 
+        #pauseToggleBtn {
+            color: #00f2ff;
+            border-color: #00f2ff;
+        }
         #pauseToggleBtn:hover {
             background: #00f2ff;
             color: #000;
             box-shadow: 0 0 calc(0.8 * var(--u)) #00f2ff;
+        }
+
+        #top10ToggleBtn {
+            color: gold;
+            border-color: gold;
+        }
+        #top10ToggleBtn:hover {
+            background: gold;
+            color: #000;
+            box-shadow: 0 0 calc(0.8 * var(--u)) gold;
+        }
+
+        #soundToggleBtn {
+            color: #00ff88;
+            border-color: #00ff88;
+        }
+        #soundToggleBtn:hover {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #00ff88;
+        }
+
+        #homeLinkBtn {
+            color: #cbd5e1;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+        #homeLinkBtn:hover {
+            background: #fff;
+            color: #000;
         }
 
         /* KOMPAKT TAKTİKSEL KOKPİT PANELİ */
@@ -98,7 +131,7 @@
             border-left: calc(0.22 * var(--u)) solid lawngreen;
             border-radius: calc(0.35 * var(--u));
             box-shadow: 0 0 calc(0.8 * var(--u)) rgba(0, 0, 0, 0.8);
-            width: calc(32.5 * var(--u));
+            width: calc(34.5 * var(--u));
             line-height: 1.35;
             pointer-events: none;
             transition: opacity 0.25s ease, transform 0.25s ease;
@@ -240,6 +273,93 @@
             letter-spacing: calc(0.04 * var(--u));
         }
 
+        /* BAŞLANGIÇ KAPTAN GİRİŞ EKRANI */
+        #pilotLoginOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, rgba(6, 15, 30, 0.92) 0%, rgba(0, 0, 0, 0.98) 100%);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-card {
+            background: rgba(5, 12, 22, 0.96);
+            border: calc(0.15 * var(--u)) solid lawngreen;
+            border-radius: calc(0.9 * var(--u));
+            padding: calc(2.2 * var(--u)) calc(3.0 * var(--u));
+            text-align: center;
+            width: calc(34 * var(--u));
+            max-width: 92vw;
+            box-shadow: 0 0 calc(2.5 * var(--u)) rgba(124, 252, 0, 0.35);
+        }
+
+        .login-card h1 {
+            color: lawngreen;
+            font-size: calc(2.0 * var(--u));
+            margin: 0 0 calc(0.4 * var(--u)) 0;
+            letter-spacing: calc(0.1 * var(--u));
+            text-shadow: 0 0 calc(1 * var(--u)) rgba(124, 252, 0, 0.6);
+        }
+
+        .login-card p {
+            color: #00f2ff;
+            font-size: calc(0.9 * var(--u));
+            margin: 0 0 calc(1.4 * var(--u)) 0;
+        }
+
+        #captainInput {
+            width: 86%;
+            padding: calc(0.75 * var(--u)) calc(1 * var(--u));
+            font-size: calc(1.25 * var(--u));
+            font-weight: bold;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border: calc(0.12 * var(--u)) solid #00f2ff;
+            border-radius: calc(0.45 * var(--u));
+            outline: none;
+            margin-bottom: calc(0.6 * var(--u));
+        }
+
+        #captainInput:focus {
+            border-color: lawngreen;
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(124, 252, 0, 0.5);
+        }
+
+        #captainError {
+            color: #ff3333;
+            font-size: calc(0.85 * var(--u));
+            font-weight: bold;
+            min-height: calc(1.2 * var(--u));
+            margin-bottom: calc(0.8 * var(--u));
+        }
+
+        .login-btn-row {
+            display: flex;
+            justify-content: center;
+            gap: calc(0.8 * var(--u));
+        }
+
+        .start-flight-btn {
+            padding: calc(0.7 * var(--u)) calc(1.8 * var(--u));
+            font-size: calc(1.05 * var(--u));
+            font-weight: bold;
+            background: lawngreen;
+            color: #000;
+            border: none;
+            border-radius: calc(0.4 * var(--u));
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .start-flight-btn:hover {
+            background: #00f2ff;
+            box-shadow: 0 0 calc(1.2 * var(--u)) #00f2ff;
+            transform: scale(1.05);
+        }
+
         /* DURAKLATMA (PAUSE) EKRANI */
         #pauseScreen {
             position: fixed;
@@ -318,73 +438,46 @@
             display: none;
             z-index: 10;
             box-shadow: 0 0 calc(2.2 * var(--u)) rgba(255, 0, 0, 0.6);
-            min-width: calc(28 * var(--u));
+            min-width: calc(30 * var(--u));
         }
 
         #gameOverTitle {
             color: #ff3333;
-            font-size: calc(2.3 * var(--u));
+            font-size: calc(2.2 * var(--u));
             font-weight: bold;
-            margin-bottom: calc(0.65 * var(--u));
+            margin-bottom: calc(0.5 * var(--u));
             text-shadow: 0 0 calc(1 * var(--u)) #ff0000;
         }
 
         #gameOverSubtitle {
             font-size: calc(1.05 * var(--u));
             color: #00f2ff;
-            margin-bottom: calc(0.9 * var(--u));
+            margin-bottom: calc(0.8 * var(--u));
         }
 
         .score-info {
-            font-size: calc(1.4 * var(--u));
-            margin: calc(0.65 * var(--u)) 0;
+            font-size: calc(1.35 * var(--u));
+            margin: calc(0.55 * var(--u)) 0;
         }
 
         .champion-info {
-            font-size: calc(1.3 * var(--u));
+            font-size: calc(1.2 * var(--u));
             color: gold;
-            margin: calc(1 * var(--u)) 0;
+            margin: calc(0.8 * var(--u)) 0;
             text-shadow: 0 0 calc(0.65 * var(--u)) rgba(255, 215, 0, 0.7);
-        }
-
-        #newRecordBox {
-            display: none;
-            margin: calc(1 * var(--u)) 0;
-        }
-
-        #playerNameInput {
-            padding: calc(0.5 * var(--u)) calc(0.8 * var(--u));
-            font-size: calc(1.05 * var(--u));
-            border-radius: calc(0.35 * var(--u));
-            border: calc(0.08 * var(--u)) solid lawngreen;
-            background: #111;
-            color: lawngreen;
-            outline: none;
-            text-align: center;
-        }
-
-        #saveRecordBtn {
-            padding: calc(0.5 * var(--u)) calc(1.05 * var(--u));
-            font-size: calc(1.05 * var(--u));
-            background-color: gold;
-            color: black;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: calc(0.35 * var(--u));
-            margin-left: calc(0.35 * var(--u));
         }
 
         .action-buttons {
             display: flex;
             justify-content: center;
-            gap: calc(1 * var(--u));
-            margin-top: calc(1.4 * var(--u));
+            gap: calc(0.9 * var(--u));
+            margin-top: calc(1.3 * var(--u));
+            flex-wrap: wrap;
         }
 
-        #restartBtn {
-            padding: calc(0.65 * var(--u)) calc(1.8 * var(--u));
-            font-size: calc(1.05 * var(--u));
+        #restartBtn, .over-top10-btn {
+            padding: calc(0.65 * var(--u)) calc(1.6 * var(--u));
+            font-size: calc(1.0 * var(--u));
             background-color: lawngreen;
             color: black;
             border: none;
@@ -400,6 +493,163 @@
             transform: scale(1.05);
         }
 
+        .over-top10-btn {
+            background-color: rgba(255, 215, 0, 0.18);
+            color: gold;
+            border: calc(0.1 * var(--u)) solid gold;
+        }
+        .over-top10-btn:hover {
+            background-color: gold;
+            color: #000;
+            box-shadow: 0 0 calc(1 * var(--u)) gold;
+            transform: scale(1.05);
+        }
+
+        /* =========================================================
+           🏆 EVRENSEL İLK 10 LİDERLİK TABLOSU VE ŞİFRE MODALLARI
+           ========================================================= */
+        #leaderboardModal, #resetPasswordModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(2, 6, 14, 0.88);
+            backdrop-filter: blur(6px);
+            z-index: 250;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .leaderboard-box {
+            background: linear-gradient(160deg, rgba(8, 16, 28, 0.98) 0%, rgba(4, 8, 16, 0.98) 100%);
+            border: calc(0.15 * var(--u)) solid #00f2ff;
+            border-radius: calc(0.9 * var(--u));
+            width: calc(44 * var(--u));
+            max-width: 94vw;
+            padding: calc(1.6 * var(--u));
+            box-shadow: 0 0 calc(3 * var(--u)) rgba(0, 242, 255, 0.3);
+            color: #fff;
+            text-align: center;
+        }
+
+        .lb-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.12);
+            padding-bottom: calc(0.7 * var(--u));
+            margin-bottom: calc(0.9 * var(--u));
+        }
+
+        .lb-title {
+            font-size: calc(1.45 * var(--u));
+            font-weight: 800;
+            color: gold;
+            margin: 0;
+            text-shadow: 0 0 calc(0.8 * var(--u)) rgba(255, 215, 0, 0.45);
+        }
+
+        .cloud-badge {
+            font-size: calc(0.78 * var(--u));
+            padding: calc(0.22 * var(--u)) calc(0.65 * var(--u));
+            border-radius: calc(1 * var(--u));
+            font-weight: bold;
+        }
+        .cloud-online {
+            background: rgba(124, 252, 0, 0.16);
+            color: lawngreen;
+            border: calc(0.08 * var(--u)) solid rgba(124, 252, 0, 0.5);
+        }
+        .cloud-local {
+            background: rgba(255, 215, 0, 0.15);
+            color: gold;
+            border: calc(0.08 * var(--u)) solid rgba(255, 215, 0, 0.45);
+        }
+
+        .lb-table-wrap {
+            max-height: calc(25 * var(--u));
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: calc(0.5 * var(--u));
+            padding: calc(0.4 * var(--u));
+            border: calc(0.07 * var(--u)) solid rgba(255, 255, 255, 0.08);
+        }
+
+        .lb-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 calc(0.28 * var(--u));
+            font-size: calc(0.9 * var(--u));
+        }
+
+        .lb-table th {
+            color: #94a3b8;
+            font-size: calc(0.75 * var(--u));
+            text-transform: uppercase;
+            padding: calc(0.35 * var(--u)) calc(0.5 * var(--u));
+            text-align: center;
+        }
+        .lb-table th:nth-child(2) { text-align: left; }
+
+        .lb-table td {
+            padding: calc(0.48 * var(--u)) calc(0.5 * var(--u));
+            background: rgba(255, 255, 255, 0.04);
+            font-weight: 700;
+            text-align: center;
+        }
+        .lb-table td:first-child { border-radius: calc(0.35 * var(--u)) 0 0 calc(0.35 * var(--u)); width: 14%; }
+        .lb-table td:nth-child(2) { text-align: left; width: 34%; }
+        .lb-table td:last-child { border-radius: 0 calc(0.35 * var(--u)) calc(0.35 * var(--u)) 0; }
+
+        .lb-row-1 td { background: linear-gradient(90deg, rgba(255, 215, 0, 0.26), rgba(255, 215, 0, 0.05)); color: #fef08a; }
+        .lb-row-2 td { background: linear-gradient(90deg, rgba(203, 213, 225, 0.2), rgba(203, 213, 225, 0.05)); color: #e2e8f0; }
+        .lb-row-3 td { background: linear-gradient(90deg, rgba(217, 119, 6, 0.22), rgba(217, 119, 6, 0.05)); color: #fed7aa; }
+        .lb-row-me td {
+            border-top: calc(0.08 * var(--u)) solid lawngreen !important;
+            border-bottom: calc(0.08 * var(--u)) solid lawngreen !important;
+            box-shadow: inset 0 0 calc(0.8 * var(--u)) rgba(124, 252, 0, 0.35);
+        }
+
+        .you-pill {
+            background: lawngreen;
+            color: #000;
+            font-size: calc(0.65 * var(--u));
+            font-weight: 900;
+            padding: calc(0.08 * var(--u)) calc(0.35 * var(--u));
+            border-radius: calc(0.25 * var(--u));
+            margin-left: calc(0.35 * var(--u));
+        }
+
+        .lb-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: calc(1.0 * var(--u));
+        }
+
+        .lb-reset-btn {
+            background: rgba(220, 38, 38, 0.25);
+            color: #ff6b6b;
+            border: calc(0.08 * var(--u)) solid #ef4444;
+            padding: calc(0.45 * var(--u)) calc(0.95 * var(--u));
+            border-radius: calc(0.35 * var(--u));
+            font-size: calc(0.82 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .lb-reset-btn:hover { background: #ef4444; color: #fff; }
+
+        .lb-close-btn {
+            background: #00f2ff;
+            color: #000;
+            border: none;
+            padding: calc(0.5 * var(--u)) calc(1.5 * var(--u));
+            border-radius: calc(0.35 * var(--u));
+            font-size: calc(0.9 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .lb-close-btn:hover { background: lawngreen; }
+
         /* GERÇEK ASTRONOMİK ORANLARA GÖRE ÖLÇEKLENDİRİLMİŞ GEZEGENLER (Dünya = 3.20u baz alındı) */
         .planet {
             position: fixed;
@@ -414,26 +664,17 @@
             display: none;
         }
 
-        /* Güneş: Gezegenleri yanında cüce bırakan devasa yıldız ölçeği */
         #sun     { width: calc(115.00 * var(--u)); }
-        /* Merkür: 0.38 x Dünya */
         #mercure { width: calc(1.22 * var(--u)); }
-        /* Venüs: 0.95 x Dünya */
         #venus   { width: calc(3.04 * var(--u)); }
-        /* Dünya: 1.00 x Referans */
         #earth   { width: calc(3.20 * var(--u)); }
-        /* Mars: 0.53 x Dünya */
         #mars    { width: calc(1.70 * var(--u)); }
-        /* Jüpiter: 10.97 x Dünya (En büyük gezegen) */
         #jupiter { width: calc(35.10 * var(--u)); }
-        /* Satürn: 9.14 x Dünya (Halka genişliği dahil edildiğinde küresi Jüpiter'den biraz küçüktür) */
         #saturn  { 
             width: calc(62.00 * var(--u)); 
             aspect-ratio: auto;
         }
-        /* Uranüs: 3.98 x Dünya */
         #uranus  { width: calc(12.74 * var(--u)); }
-        /* Neptün: 3.86 x Dünya */
         #neptune { width: calc(12.35 * var(--u)); }
     </style>
 </head>
@@ -441,14 +682,75 @@
     <!-- Sağ Üst Çözünürlük Bilgisi -->
     <div id="resolution-container"></div>
 
-    <!-- Sol Üst Kokpit Paneli Aç/Kapat ve Duraklat Butonları -->
-    <button id="hudToggleBtn" onclick="toggleHudPanel()" style="opacity: 0.65;">📊 PANELİ AÇ [H]</button>
-    <button id="pauseToggleBtn" onclick="togglePause()">⏸ DURAKLAT [P]</button>
+    <!-- Sol Üst Kokpit Kontrol Çubuğu -->
+    <div id="topControlBar">
+        <a id="homeLinkBtn" href="https://secovvv.github.io/" class="top-ctrl-btn">🏠 ANA SAYFA</a>
+        <button id="hudToggleBtn" class="top-ctrl-btn" onclick="toggleHudPanel()" style="opacity: 0.65;">📊 PANELİ AÇ [H]</button>
+        <button id="pauseToggleBtn" class="top-ctrl-btn" onclick="togglePause()">⏸ DURAKLAT [P]</button>
+        <button id="top10ToggleBtn" class="top-ctrl-btn" onclick="openLeaderboardModal()">🏆 İLK 10 [L]</button>
+        <button id="soundToggleBtn" class="top-ctrl-btn" onclick="toggleSoundSwitch()">🔊 SES: AÇIK [M]</button>
+    </div>
+
+    <!-- BAŞLANGIÇ ZORUNLU KAPTAN GİRİŞ EKRANI -->
+    <div id="pilotLoginOverlay">
+        <div class="login-card">
+            <h1>🛸 SPACEX INTERCEPTOR</h1>
+            <p>Evrensel İlk 10 Liderlik Tablosu İçin Kaptan Adını Girin</p>
+            <input type="text" id="captainInput" placeholder="Kaptan Adı (Örn: SECOVVV)" maxlength="15" autocomplete="off" />
+            <div id="captainError"></div>
+            <div class="login-btn-row">
+                <button class="start-flight-btn" onclick="confirmPilotLogin()">🚀 UÇUŞU BAŞLAT</button>
+                <button class="over-top10-btn" onclick="openLeaderboardModal()">🏆 İLK 10 TABLOSU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🏆 İLK 10 EVRENSEL LİDERLİK TABLOSU MODALI -->
+    <div id="leaderboardModal" onclick="if(event.target === this) closeLeaderboardModal()">
+        <div class="leaderboard-box">
+            <div class="lb-header">
+                <h2 class="lb-title">🏆 SPACEX UFO - İLK 10 KAPTAN</h2>
+                <span id="cloudStatusBadge" class="cloud-badge cloud-local">📦 Yerel Mod</span>
+            </div>
+            <div class="lb-table-wrap">
+                <table class="lb-table">
+                    <thead>
+                        <tr>
+                            <th>Sıra</th>
+                            <th>Kaptan</th>
+                            <th>⭐ En Yüksek Skor</th>
+                            <th>🌊 En İyi Dalga</th>
+                            <th>👾 İmha Boss</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTableBody"></tbody>
+                </table>
+            </div>
+            <div class="lb-footer">
+                <button class="lb-reset-btn" onclick="openResetPasswordModal()">Tabloyu Sıfırla 🔒</button>
+                <button class="lb-close-btn" onclick="closeLeaderboardModal()">Kapat ✖</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔒 ŞİFRELİ SIFIRLAMA MODALI -->
+    <div id="resetPasswordModal" onclick="if(event.target === this) closeResetPasswordModal()">
+        <div class="login-card" style="border-color: #ff3333;">
+            <h1 style="color: #ff3333; font-size: calc(1.6 * var(--u));">🔒 YÖNETİCİ ONAYI</h1>
+            <p style="color: #ccc;">Tüm İlk 10 rekorlarını sıfırlamak için yönetici şifresini girin:</p>
+            <input type="password" id="resetPassInput" placeholder="Şifre..." maxlength="16" autocomplete="off" style="width: 80%; padding: calc(0.65 * var(--u)); font-size: calc(1.2 * var(--u)); text-align: center; background: #111; color: #fff; border: calc(0.1 * var(--u)) solid #ff3333; border-radius: calc(0.4 * var(--u)); margin-bottom: calc(0.6 * var(--u));" />
+            <div id="resetPassError" style="color: #ff3333; font-size: calc(0.85 * var(--u)); min-height: calc(1.2 * var(--u)); margin-bottom: calc(0.6 * var(--u));"></div>
+            <div class="login-btn-row">
+                <button class="lb-reset-btn" onclick="verifyAndResetLeaderboard()">SIFIRLA</button>
+                <button class="lb-close-btn" onclick="closeResetPasswordModal()">İPTAL</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Sol Üst Kompakt Taktiksel Kokpit Paneli -->
     <div id="hud" class="hud-hidden">
         <div class="hud-row">
-            <div>SKOR: <span id="currentScore">0</span> | REKOR: <span id="hudHighScore">0</span> (<span id="hudChampion">Yok</span>)</div>
+            <div>KAPTAN: <span id="hudPilotName" style="color:#00f2ff;">---</span> | SKOR: <span id="currentScore">0</span> | REKOR: <span id="hudHighScore">0</span> (<span id="hudChampion">Yok</span>)</div>
             <div class="hud-wave-label">DALGA: <span id="phaseName" style="color:#00f2ff;">1 - GÜNEŞ SİSTEMİ</span></div>
         </div>
 
@@ -469,7 +771,7 @@
             <div class="status-badge" id="comboBadge" style="color: #888;">⚡ SERİ: 1x (0)</div>
             <div class="status-badge" id="gravityBadge" style="color: #888;">🌌 ÇEKİM: YOK</div>
         </div>
-        <div id="hudLog">🚀 [H] Paneli Gizle | [P / ESC] Oyunu Duraklat | Soldan sağa Güneş'e ilerliyorsun...</div>
+        <div id="hudLog">🚀 [H] Panel | [P] Duraklat | [L] İlk 10 | [M] Ses | Soldan sağa Güneş'e ilerliyorsun...</div>
     </div>
 
     <div id="stageAnnouncement">
@@ -487,23 +789,20 @@
         </div>
         <div class="action-buttons">
             <button id="resumeBtn" onclick="togglePause()">▶ DEVAM ET [P / ESC]</button>
+            <button class="over-top10-btn" onclick="openLeaderboardModal()">🏆 İLK 10 TABLOSU</button>
         </div>
     </div>
 
     <div id="gameOverScreen">
-        <div id="gameOverTitle">MEKİK İNFLAK ETTİ!</div>
-        <div id="gameOverSubtitle">Ulaşılan Dalga: <span id="finalWave">1</span> | İmha Edilen Boss: <span id="bossKillCount">0</span></div>
+        <div id="gameOverTitle">MEKİK İNFİLAK ETTİ!</div>
+        <div id="newRecordBanner" style="display: none; color: gold; font-size: calc(1.35 * var(--u)); font-weight: bold; margin-bottom: calc(0.4 * var(--u));">🏆 YENİ KİŞİSEL / EVRENSEL REKOR! 🏆</div>
+        <div id="gameOverSubtitle">Kaptan: <span id="finalPilotName" style="color:#fff;">---</span> | Ulaşılan Dalga: <span id="finalWave">1</span> | İmha Edilen Boss: <span id="bossKillCount">0</span></div>
         <div class="score-info">Senin Skorun: <strong id="finalScore" style="color: lawngreen;">0</strong></div>
-        <div class="champion-info">🏆 Rekortmen: <span id="championName">Yok</span> (<span id="highScoreVal">0</span> Puan)</div>
-        
-        <div id="newRecordBox">
-            <div style="color: lawngreen; font-weight: bold; margin-bottom: calc(0.5 * var(--u));">🎉 YENİ REKOR! İSMİNİ YAZ:</div>
-            <input type="text" id="playerNameInput" placeholder="Kaptan Adı..." maxlength="15" />
-            <button id="saveRecordBtn" onclick="saveNewRecord()">KAYDET</button>
-        </div>
+        <div class="champion-info">🏆 Evrensel Lider: <span id="championName">Yok</span> (<span id="highScoreVal">0</span> Puan)</div>
 
         <div class="action-buttons">
-            <button id="restartBtn" onclick="location.reload()">🔄 YENİDEN BAŞLA</button>
+            <button id="restartBtn" onclick="restartMission()">🔄 YENİDEN BAŞLA</button>
+            <button class="over-top10-btn" onclick="openLeaderboardModal()">🏆 İLK 10 TABLOSU</button>
         </div>
     </div>
 
@@ -523,12 +822,334 @@
     <audio id="laserSound" src="laser.mp3"></audio>
     
     <script>
-        function playSoundSafe(id) {
+        // =========================================================================
+        // 🌐 EVRENSEL REKOR TABLOSU (FIREBASE REALTIME DATABASE) AYARI
+        // =========================================================================
+        const FIREBASE_DB_URL = "https://secovvv-web-default-rtdb.firebaseio.com";
+
+        let pilotName = "";
+        let isLoginCompleted = false;
+        let soundEnabled = localStorage.getItem("secoSpacexSes") !== "off";
+        let oyuncularMap = {};
+        let pausedByLeaderboard = false;
+
+        function playGameSound(id) {
+            if (!soundEnabled) return;
             const el = document.getElementById(id);
             if (el) {
                 el.currentTime = 0;
                 el.play().catch(() => {});
             }
+        }
+
+        function updateSoundButtonUI() {
+            const btn = document.getElementById('soundToggleBtn');
+            if (!btn) return;
+            if (soundEnabled) {
+                btn.innerText = '🔊 SES: AÇIK [M]';
+                btn.style.color = '#00ff88';
+                btn.style.borderColor = '#00ff88';
+            } else {
+                btn.innerText = '🔇 SES: KAPALI [M]';
+                btn.style.color = '#ff6b6b';
+                btn.style.borderColor = '#ff6b6b';
+            }
+        }
+
+        function toggleSoundSwitch() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem("secoSpacexSes", soundEnabled ? "on" : "off");
+            updateSoundButtonUI();
+            const btn = document.getElementById('soundToggleBtn');
+            if (btn) btn.blur();
+        }
+
+        // =========================================================================
+        // 🏆 KİŞİ BAZLI İLK 10 (TOP 10) ALGORİTMASI VE FIREBASE SENKRONİZASYONU
+        // =========================================================================
+        function oyuncuAnahtariOlustur(isim) {
+            return isim.trim().toLocaleLowerCase('tr-TR').replace(/[.#$\[\]\/]/g, "_");
+        }
+
+        function firebaseAktifMi() {
+            return FIREBASE_DB_URL && FIREBASE_DB_URL.startsWith("https://") && !FIREBASE_DB_URL.includes("BURAYA_");
+        }
+
+        function temizFirebaseUrl() {
+            return FIREBASE_DB_URL.replace(/\/$/, "");
+        }
+
+        function baglantiEtiketiniGuncelle(bulutBasarili) {
+            const etiket = document.getElementById("cloudStatusBadge");
+            if (!etiket) return;
+            if (bulutBasarili) {
+                etiket.className = "cloud-badge cloud-online";
+                etiket.innerText = "🌐 Canlı Bulut Aktif";
+            } else {
+                etiket.className = "cloud-badge cloud-local";
+                etiket.innerText = "📦 Yerel Mod";
+            }
+        }
+
+        function yerelVerileriYukle() {
+            try {
+                const kayitli = localStorage.getItem("secoSpacexPlayers");
+                if (kayitli) {
+                    oyuncularMap = JSON.parse(kayitli) || {};
+                }
+                const eskiSkor = parseInt(localStorage.getItem("space_highscore")) || 0;
+                const eskiSampiyon = localStorage.getItem("space_champion") || "";
+                if (eskiSkor > 0 && eskiSampiyon && eskiSampiyon !== "Yok") {
+                    const k = oyuncuAnahtariOlustur(eskiSampiyon);
+                    if (!oyuncularMap[k]) {
+                        oyuncularMap[k] = {
+                            name: eskiSampiyon,
+                            bestScore: eskiSkor,
+                            bestWave: 1,
+                            bestBosses: 0,
+                            updatedAt: Date.now()
+                        };
+                        localStorage.setItem("secoSpacexPlayers", JSON.stringify(oyuncularMap));
+                    }
+                }
+            } catch (e) {
+                oyuncularMap = {};
+            }
+            ustLideriGuncelle();
+        }
+
+        function ustLideriGuncelle() {
+            const liste = Object.values(oyuncularMap);
+            if (liste.length === 0) {
+                highScore = 0;
+                champion = "Yok";
+            } else {
+                liste.sort((a, b) => (b.bestScore - a.bestScore) || ((b.bestWave || 1) - (a.bestWave || 1)));
+                highScore = liste[0].bestScore || 0;
+                champion = liste[0].name || "Yok";
+            }
+            localStorage.setItem('space_highscore', highScore);
+            localStorage.setItem('space_champion', champion);
+            document.getElementById('hudHighScore').innerText = highScore;
+            document.getElementById('hudChampion').innerText = champion;
+            document.getElementById('championName').innerText = champion;
+            document.getElementById('highScoreVal').innerText = highScore;
+        }
+
+        async function buluttanRekorlariCek() {
+            if (!firebaseAktifMi()) {
+                baglantiEtiketiniGuncelle(false);
+                return;
+            }
+            try {
+                const res = await fetch(`${temizFirebaseUrl()}/rekorlar_spacex_oyuncular.json`);
+                if (!res.ok) {
+                    baglantiEtiketiniGuncelle(false);
+                    return;
+                }
+                const bulutData = await res.json();
+                baglantiEtiketiniGuncelle(true);
+
+                if (bulutData && typeof bulutData === "object") {
+                    Object.keys(bulutData).forEach(key => {
+                        const bOyuncu = bulutData[key];
+                        if (bOyuncu && bOyuncu.name) {
+                            if (!oyuncularMap[key]) {
+                                oyuncularMap[key] = bOyuncu;
+                            } else {
+                                oyuncularMap[key].name = bOyuncu.name;
+                                oyuncularMap[key].bestScore = Math.max(oyuncularMap[key].bestScore || 0, bOyuncu.bestScore || 0);
+                                oyuncularMap[key].bestWave = Math.max(oyuncularMap[key].bestWave || 1, bOyuncu.bestWave || 1);
+                                oyuncularMap[key].bestBosses = Math.max(oyuncularMap[key].bestBosses || 0, bOyuncu.bestBosses || 0);
+                            }
+                        }
+                    });
+                    localStorage.setItem("secoSpacexPlayers", JSON.stringify(oyuncularMap));
+                }
+
+                Object.keys(oyuncularMap).forEach(k => {
+                    if (!bulutData || !bulutData[k]) {
+                        bulutaOyuncuKaydet(k, oyuncularMap[k]);
+                    }
+                });
+
+                ustLideriGuncelle();
+                if (document.getElementById("leaderboardModal").style.display === "flex") {
+                    renderLeaderboardTable();
+                }
+            } catch (err) {
+                baglantiEtiketiniGuncelle(false);
+            }
+        }
+
+        async function bulutaOyuncuKaydet(key, oyuncuVerisi) {
+            if (!firebaseAktifMi()) return;
+            try {
+                await fetch(`${temizFirebaseUrl()}/rekorlar_spacex_oyuncular/${encodeURIComponent(key)}.json`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(oyuncuVerisi)
+                });
+                baglantiEtiketiniGuncelle(true);
+            } catch (e) {}
+        }
+
+        async function oyuncuSkorunuIsle(isim, yeniSkor, yeniDalga, yeniBossSayisi) {
+            if (!isim || yeniSkor <= 0) return false;
+            const key = oyuncuAnahtariOlustur(isim);
+            const mevcut = oyuncularMap[key];
+            let rekorKirildi = false;
+
+            if (!mevcut) {
+                oyuncularMap[key] = {
+                    name: isim,
+                    bestScore: yeniSkor,
+                    bestWave: yeniDalga,
+                    bestBosses: yeniBossSayisi,
+                    updatedAt: Date.now()
+                };
+                rekorKirildi = true;
+            } else {
+                mevcut.name = isim;
+                if (yeniSkor > (mevcut.bestScore || 0)) {
+                    mevcut.bestScore = yeniSkor;
+                    rekorKirildi = true;
+                }
+                if (yeniDalga > (mevcut.bestWave || 1)) {
+                    mevcut.bestWave = yeniDalga;
+                    rekorKirildi = true;
+                }
+                if (yeniBossSayisi > (mevcut.bestBosses || 0)) {
+                    mevcut.bestBosses = yeniBossSayisi;
+                    rekorKirildi = true;
+                }
+                if (rekorKirildi) mevcut.updatedAt = Date.now();
+            }
+
+            localStorage.setItem("secoSpacexPlayers", JSON.stringify(oyuncularMap));
+            ustLideriGuncelle();
+
+            if (rekorKirildi) {
+                await bulutaOyuncuKaydet(key, oyuncularMap[key]);
+            }
+            return rekorKirildi;
+        }
+
+        function renderLeaderboardTable() {
+            const tbody = document.getElementById("leaderboardTableBody");
+            tbody.innerHTML = "";
+            const liste = Object.values(oyuncularMap);
+
+            if (liste.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="padding: calc(1.8 * var(--u)); color:#94a3b8;">Henüz kayıtlı kaptan rekoru yok. İlk rekoru sen kır! 🚀</td></tr>`;
+                return;
+            }
+
+            liste.sort((a, b) => (b.bestScore - a.bestScore) || ((b.bestWave || 1) - (a.bestWave || 1)));
+            const ilk10 = liste.slice(0, 10);
+            const aktifKey = pilotName ? oyuncuAnahtariOlustur(pilotName) : "";
+
+            ilk10.forEach((oyuncu, index) => {
+                const sira = index + 1;
+                const rozet = sira === 1 ? "🥇 1" : (sira === 2 ? "🥈 2" : (sira === 3 ? "🥉 3" : `#${sira}`));
+                let satirSinif = sira <= 3 ? `lb-row-${sira}` : "";
+                const benMiyim = aktifKey && oyuncuAnahtariOlustur(oyuncu.name) === aktifKey;
+                if (benMiyim) satirSinif += " lb-row-me";
+
+                const tr = document.createElement("tr");
+                if (satirSinif) tr.className = satirSinif.trim();
+
+                const guvenliIsim = document.createElement("span");
+                guvenliIsim.textContent = oyuncu.name;
+
+                tr.innerHTML = `
+                    <td>${rozet}</td>
+                    <td>${guvenliIsim.innerHTML}${benMiyim ? '<span class="you-pill">SEN</span>' : ''}</td>
+                    <td style="color:lawngreen; font-weight:900;">${oyuncu.bestScore || 0} P</td>
+                    <td style="color:#00f2ff;">${oyuncu.bestWave || 1}. Dalga</td>
+                    <td style="color:gold;">${oyuncu.bestBosses || 0} Boss</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function openLeaderboardModal() {
+            if (isLoginCompleted && window.ufo && !ufo.isDestroyed && !isPaused) {
+                pausedByLeaderboard = true;
+                togglePause(true);
+            }
+            document.getElementById("leaderboardModal").style.display = "flex";
+            renderLeaderboardTable();
+            await buluttanRekorlariCek();
+        }
+
+        function closeLeaderboardModal() {
+            document.getElementById("leaderboardModal").style.display = "none";
+            if (pausedByLeaderboard && isPaused) {
+                pausedByLeaderboard = false;
+                togglePause(false);
+            }
+        }
+
+        function openResetPasswordModal() {
+            document.getElementById("resetPassInput").value = "";
+            document.getElementById("resetPassError").innerText = "";
+            document.getElementById("resetPasswordModal").style.display = "flex";
+            document.getElementById("resetPassInput").focus();
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById("resetPasswordModal").style.display = "none";
+        }
+
+        async function verifyAndResetLeaderboard() {
+            const pass = document.getElementById("resetPassInput").value.trim();
+            if (pass === "780878") {
+                localStorage.removeItem("secoSpacexPlayers");
+                localStorage.removeItem("space_highscore");
+                localStorage.removeItem("space_champion");
+                oyuncularMap = {};
+                ustLideriGuncelle();
+                renderLeaderboardTable();
+                if (firebaseAktifMi()) {
+                    try {
+                        await fetch(`${temizFirebaseUrl()}/rekorlar_spacex_oyuncular.json`, { method: "DELETE" });
+                    } catch (e) {}
+                }
+                closeResetPasswordModal();
+            } else {
+                document.getElementById("resetPassError").innerText = "⚠️ Hatalı yönetici şifresi!";
+            }
+        }
+
+        function confirmPilotLogin() {
+            const input = document.getElementById("captainInput");
+            const err = document.getElementById("captainError");
+            const val = input.value.trim();
+
+            if (val === "") {
+                err.innerText = "⚠️ Lütfen uçuşa başlamak için bir Kaptan Adı girin!";
+                input.style.borderColor = "#ff3333";
+                input.focus();
+                return;
+            }
+
+            pilotName = val.toUpperCase();
+            sessionStorage.setItem("secoSpacexActivePilot", pilotName);
+            document.getElementById("hudPilotName").innerText = pilotName;
+            document.getElementById("pilotLoginOverlay").style.display = "none";
+            isLoginCompleted = true;
+            isPaused = false;
+            if (window.ufo) {
+                ufo.lastFrameTime = Date.now();
+                ufo.createAsteroids();
+            }
+            buluttanRekorlariCek();
+            showStageAnnouncement("1. DALGA", "GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI", "#00f2ff", 4000);
+        }
+
+        function restartMission() {
+            location.reload();
         }
 
         // Sol Üst Bilgi Panelini (HUD) Açıp Kapatma Fonksiyonu
@@ -548,11 +1169,11 @@
         }
 
         // --- TAM KAPSAMLI DURAKLATMA (PAUSE) SİSTEMİ ---
-        let isPaused = false;
-        let pauseStartTime = 0;
+        let isPaused = true; // Kaptan girişi yapılana kadar duraklatılmış başlar
+        let pauseStartTime = Date.now();
 
         function togglePause(forceState = null) {
-            if (window.ufo && ufo.isDestroyed) return;
+            if (!isLoginCompleted || (window.ufo && ufo.isDestroyed)) return;
 
             const targetState = forceState !== null ? forceState : !isPaused;
             if (targetState === isPaused) return;
@@ -673,9 +1294,6 @@
         let highScore = localStorage.getItem('space_highscore') ? parseInt(localStorage.getItem('space_highscore')) : 0;
         let champion = localStorage.getItem('space_champion') ? localStorage.getItem('space_champion') : 'Yok';
 
-        document.getElementById('hudHighScore').innerText = highScore;
-        document.getElementById('hudChampion').innerText = champion;
-
         const astronomicalSchedule = [
             { id: 'sun',     name: 'GÜNEŞ',   au: 0.00,  mKm: 0,    centerDist: 6000,  color: '#ffcc00', gLabel: 'DEVASA (GÜNEŞ)', announced: false },
             { id: 'mercure', name: 'MERKÜR',  au: 0.39,  mKm: 58,   centerDist: 11000, color: '#aaaaaa', gLabel: 'ÇOK DÜŞÜK',      announced: false },
@@ -688,6 +1306,7 @@
             { id: 'neptune', name: 'NEPTÜN',  au: 30.05, mKm: 4500, centerDist: 53500, color: '#3366ff', gLabel: 'ORTA-YÜKSEK',    announced: false }
         ];
 
+        // --- MERKEZ ODAKLI HİPER LAZER VE SERİ ÇARPANI ---
         let killStreak = 0;
         let comboMultiplier = 1;
 
@@ -769,21 +1388,6 @@
                     }
                 }, duration);
             }
-        }
-
-        function saveNewRecord() {
-            const nameInput = document.getElementById('playerNameInput').value.trim();
-            const finalName = nameInput !== "" ? nameInput : "Gizemli Pilot";
-            highScore = score;
-            champion = finalName;
-            localStorage.setItem('space_highscore', highScore);
-            localStorage.setItem('space_champion', champion);
-
-            document.getElementById('championName').innerText = finalName;
-            document.getElementById('highScoreVal').innerText = score;
-            document.getElementById('hudHighScore').innerText = score;
-            document.getElementById('hudChampion').innerText = finalName;
-            document.getElementById('newRecordBox').style.display = 'none';
         }
 
         function hidePlanetOffscreen(el) {
@@ -1604,6 +2208,7 @@
                 ctx.shadowBlur = 10 * S;
                 ctx.fillRect(-barW / 2, -r - 26 * S, barW * (Math.max(0, this.hp) / this.maxHp), barH);
 
+                // %65 ve %30 Kapsül Eşik Çizgileri
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(-barW / 2 + barW * 0.65, -r - 27 * S, 2 * S, barH + 2 * S);
                 ctx.fillRect(-barW / 2 + barW * 0.30, -r - 27 * S, 2 * S, barH + 2 * S);
@@ -1675,6 +2280,7 @@
             }
         }
 
+        // Karadelikler ekranın sağından doğup sola doğru ilerler
         class BlackHole {
             constructor() {
                 this.baseRadius = 42;
@@ -1804,6 +2410,7 @@
                 this.floatingTexts = [];
                 this.isDestroyed = false;
 
+                // 100 Gövde Canı (Hull HP) ve Kalkan Sistemi
                 this.hullHp = 100;
                 this.maxHullHp = 100;
                 this.shieldHits = 0;
@@ -1985,13 +2592,14 @@
                     this.floatingTexts.push(new FloatingText(centerX - 60 * S, centerY + 35 * S, msg, "#ff1e56"));
                 }
 
+                // 1) Kalkan Varken Darbe Sönümleme
                 if (this.shieldHits > 0) {
                     this.shieldHits--;
                     this.hullHp = Math.max(0, this.hullHp - 10);
                     this.syncHullDamageVisuals();
                     this.invulnerableUntil = now + 1250;
 
-                    playSoundSafe('astopatla');
+                    playGameSound('astopatla');
 
                     for (let i = 0; i < 35; i++) {
                         this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#00f2ff', '#ff6600', '#ffff00']));
@@ -2008,11 +2616,12 @@
                     return;
                 }
 
+                // 2) Kalkansız Dayanıklılık
                 this.hullHp = Math.max(0, this.hullHp - 25);
                 this.syncHullDamageVisuals();
                 this.invulnerableUntil = now + 1350;
 
-                playSoundSafe('astopatla');
+                playGameSound('astopatla');
 
                 for (let i = 0; i < 42; i++) {
                     this.explosionParticles.push(new ExplosionParticle(centerX, centerY, ['#ff2222', '#ff6600', '#ffff00']));
@@ -2147,14 +2756,14 @@
                 ctx.restore();
             }
 
-            explode() {
+            async explode() {
                 if (this.isDestroyed) return;
                 if (isPaused) togglePause(false);
                 this.isDestroyed = true;
                 this.hullHp = 0;
                 this.throttle = 0;
 
-                playSoundSafe('astopatla');
+                playGameSound('astopatla');
 
                 const centerX = this.x + this.width / 2;
                 const centerY = this.y + this.height / 2;
@@ -2163,17 +2772,17 @@
                     this.explosionParticles.push(new ExplosionParticle(centerX, centerY));
                 }
 
+                await buluttanRekorlariCek();
+                const isNewRecord = await oyuncuSkorunuIsle(pilotName, score, currentWave, bossesDefeated);
+
                 const screen = document.getElementById('gameOverScreen');
+                document.getElementById('finalPilotName').innerText = pilotName || "BİLİNMİYOR";
                 document.getElementById('finalWave').innerText = currentWave;
                 document.getElementById('bossKillCount').innerText = bossesDefeated;
                 document.getElementById('finalScore').innerText = score;
-                document.getElementById('championName').innerText = champion;
-                document.getElementById('highScoreVal').innerText = highScore;
+                document.getElementById('newRecordBanner').style.display = isNewRecord ? 'block' : 'none';
 
-                if (score > highScore) {
-                    document.getElementById('newRecordBox').style.display = 'block';
-                }
-
+                ustLideriGuncelle();
                 screen.style.display = 'block';
             }
 
@@ -2397,7 +3006,7 @@
                     }
                 }
 
-                playSoundSafe('laserSound');
+                playGameSound('laserSound');
             }
 
             updateHudBadges() {
@@ -2525,14 +3134,7 @@
                     }
                     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
                     ctx.scale(-1, 1);
-                    if (this.ufoImage.complete && this.ufoImage.naturalWidth > 0) {
-                        ctx.drawImage(this.ufoImage, -this.width / 2, -this.height / 2, this.width, this.height);
-                    } else {
-                        ctx.fillStyle = '#00f2ff';
-                        ctx.beginPath();
-                        ctx.ellipse(0, 0, this.width / 2, this.height / 3, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
+                    ctx.drawImage(this.ufoImage, -this.width / 2, -this.height / 2, this.width, this.height);
                     ctx.restore();
 
                     this.drawProgressiveHullDamage(ctx);
@@ -2654,7 +3256,7 @@
                 this.vy *= this.friction;
 
                 if (!keys.a && !keys.d && Math.abs(this.vx) < 0.15 * S) this.vx = 0;
-                if (!keys.w && !keys.s && Math.abs(this.vy) < 0.15 * S) this.vy = 0;
+                if (!keys.w && !keys.s && Math.abs(this.vy) < 0.15 * S) this.vx = 0;
 
                 this.vx = Math.max(-maxSpeedX, Math.min(maxSpeedX, this.vx));
                 this.vy = Math.max(-maxSpeedY, Math.min(maxSpeedY, this.vy));
@@ -2734,7 +3336,7 @@
                                 }
 
                                 this.floatingTexts.push(new FloatingText(drone.x, drone.y, label, drone.color));
-                                playSoundSafe('astopatla');
+                                playGameSound('astopatla');
                                 for (let p = 0; p < 25; p++) {
                                     this.explosionParticles.push(new ExplosionParticle(drone.x, drone.y, [drone.color, '#ffffff', '#ff9900']));
                                 }
@@ -2783,7 +3385,7 @@
                                 registerKillStreak();
                                 const bossBonus = addScore(800 + currentWave * 200);
                                 this.floatingTexts.push(new FloatingText(ms.x - 60 * S, ms.y, `+${bossBonus} ${ms.title} İMHA!`, "gold"));
-                                playSoundSafe('astopatla');
+                                playGameSound('astopatla');
                                 const bossX = ms.x;
                                 const bossY = ms.y;
                                 this.motherships.splice(mIdx, 1);
@@ -2828,7 +3430,7 @@
                                 registerKillStreak();
                                 const bhPts = addScore(300);
                                 this.floatingTexts.push(new FloatingText(bh.x, bh.y, `+${bhPts} KARADELİK ÇÖKTÜ!`, "#b829ff"));
-                                playSoundSafe('astopatla');
+                                playGameSound('astopatla');
                                 for (let p = 0; p < 35; p++) {
                                     this.explosionParticles.push(new ExplosionParticle(bh.x, bh.y, ['#b829ff', '#00f2ff', '#ffffff']));
                                 }
@@ -2882,7 +3484,7 @@
                                 this.bullets.splice(i, 1);
                                 i--;
                                 bulletRemoved = true;
-                                playSoundSafe('astopatla');
+                                playGameSound('astopatla');
                                 asteroid.reset();
                                 break;
                             }
@@ -3050,37 +3652,80 @@
         }
 
         updateResolution();
+        updateSoundButtonUI();
+        yerelVerileriYukle();
+        buluttanRekorlariCek();
+
         window.addEventListener('resize', updateResolution);
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', updateResolution);
         }
 
         window.ufo = new UFO();
-        ufo.createAsteroids();
 
-        showStageAnnouncement("1. DALGA", "GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI", "#00f2ff", 4000);
+        // Eğer aynı sekmede yeniden başlatıldıysa kayıtlı Kaptan Adı ile doğrudan uçuşa başla
+        const savedSessionPilot = sessionStorage.getItem("secoSpacexActivePilot");
+        if (savedSessionPilot) {
+            pilotName = savedSessionPilot;
+            document.getElementById("captainInput").value = pilotName;
+            document.getElementById("hudPilotName").innerText = pilotName;
+            document.getElementById("pilotLoginOverlay").style.display = "none";
+            isLoginCompleted = true;
+            isPaused = false;
+            ufo.lastFrameTime = Date.now();
+            ufo.createAsteroids();
+            showStageAnnouncement("1. DALGA", "GÜNEŞ SİSTEMİ VE KUİPER KUŞAĞI", "#00f2ff", 4000);
+        } else {
+            setTimeout(() => {
+                const capIn = document.getElementById("captainInput");
+                if (capIn) capIn.focus();
+            }, 100);
+        }
+
+        document.getElementById("captainInput").addEventListener("input", () => {
+            document.getElementById("captainError").innerText = "";
+            document.getElementById("captainInput").style.borderColor = "#00f2ff";
+        });
+
+        document.getElementById("captainInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") confirmPilotLogin();
+        });
+
+        document.getElementById("resetPassInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") verifyAndResetLeaderboard();
+        });
 
         window.addEventListener('mousedown', (event) => {
             if (
-                event.target.id === 'hudToggleBtn' ||
-                event.target.id === 'pauseToggleBtn' ||
-                event.target.id === 'resumeBtn' ||
-                event.target.id === 'restartBtn' || 
-                event.target.id === 'saveRecordBtn' || 
-                event.target.id === 'playerNameInput'
+                event.target.closest('#topControlBar') ||
+                event.target.closest('#pilotLoginOverlay') ||
+                event.target.closest('#leaderboardModal') ||
+                event.target.closest('#resetPasswordModal') ||
+                event.target.closest('#pauseScreen') ||
+                event.target.closest('#gameOverScreen')
             ) return;
 
-            if (isPaused) return;
+            if (isPaused || !isLoginCompleted) return;
             ufo.shoot();
         });
 
         window.addEventListener('keydown', (event) => {
-            if (document.activeElement && document.activeElement.id === 'playerNameInput') {
-                if (event.code === 'Enter' || event.code === 'NumpadEnter') {
-                    saveNewRecord();
-                }
+            if (document.activeElement && (document.activeElement.id === 'captainInput' || document.activeElement.id === 'resetPassInput')) {
                 return;
             }
+
+            if (event.code === 'Escape') {
+                if (document.getElementById("resetPasswordModal").style.display === "flex") {
+                    closeResetPasswordModal();
+                    return;
+                }
+                if (document.getElementById("leaderboardModal").style.display === "flex") {
+                    closeLeaderboardModal();
+                    return;
+                }
+            }
+
+            if (!isLoginCompleted) return;
 
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'Enter', 'NumpadEnter', 'Escape'].includes(event.code)) {
                 event.preventDefault();
@@ -3088,6 +3733,20 @@
 
             if (event.code === 'KeyH' && !event.repeat) {
                 toggleHudPanel();
+                return;
+            }
+
+            if (event.code === 'KeyM' && !event.repeat) {
+                toggleSoundSwitch();
+                return;
+            }
+
+            if (event.code === 'KeyL' && !event.repeat) {
+                if (document.getElementById("leaderboardModal").style.display === "flex") {
+                    closeLeaderboardModal();
+                } else {
+                    openLeaderboardModal();
+                }
                 return;
             }
 
@@ -3129,15 +3788,18 @@
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 resetAllKeys();
-                if (window.ufo && !ufo.isDestroyed && !isPaused) {
+                if (isLoginCompleted && window.ufo && !ufo.isDestroyed && !isPaused) {
                     togglePause(true);
                 }
             }
         });
 
         function animateUFO() {
-            if (!isPaused) {
-                const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d');
+            if (!isLoginCompleted) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawAndUpdateStars(ctx, 0.8);
+            } else if (!isPaused) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ufo.update();
             }
