@@ -3709,6 +3709,70 @@
             ufo.shoot();
         });
 
+         // Bağımsız ve Kesintisiz 8-Yön (Düz + Çapraz) Hareket Motoru
+        window.shipKeys = { w: false, a: false, s: false, d: false };
+
+        resetAllKeys = function() {
+            window.shipKeys.w = false;
+            window.shipKeys.a = false;
+            window.shipKeys.s = false;
+            window.shipKeys.d = false;
+            if (typeof keys !== 'undefined') {
+                keys.w = false; keys.a = false; keys.s = false; keys.d = false;
+            }
+            if (window.ufo) {
+                ufo.vx = 0;
+                ufo.vy = 0;
+            }
+        };
+
+        // UFO'nun hareket fonksiyonunu doğrudan temiz tuş okuyucuya bağla
+        UFO.prototype.handleMovement = function() {
+            if (this.isDestroyed) return;
+
+            const accelX = this.baseAccelX * S;
+            const accelY = this.baseAccelY * S;
+            const maxSpeedX = this.baseMaxSpeedX * S;
+            const maxSpeedY = this.baseMaxSpeedY * S;
+
+            const moveRight = window.shipKeys.d;
+            const moveLeft  = window.shipKeys.a;
+            const moveUp    = window.shipKeys.w;
+            const moveDown  = window.shipKeys.s;
+
+            if (moveRight && !moveLeft) {
+                this.vx += accelX;
+                this.throttle = Math.min(100, this.throttle + 0.85);
+            } else if (moveLeft && !moveRight) {
+                this.vx -= accelX;
+                this.throttle = Math.max(0, this.throttle - 0.75);
+            } else {
+                this.vx *= this.friction;
+                if (Math.abs(this.vx) < 0.15 * S) this.vx = 0;
+            }
+
+            if (moveUp && !moveDown) {
+                this.vy -= accelY;
+            } else if (moveDown && !moveUp) {
+                this.vy += accelY;
+            } else {
+                this.vy *= this.friction;
+                if (Math.abs(this.vy) < 0.15 * S) this.vy = 0;
+            }
+
+            if (!isReliefPhase) {
+                travelDistance += this.getShipSpeed();
+            }
+
+            this.vx = Math.max(-maxSpeedX, Math.min(maxSpeedX, this.vx));
+            this.vy = Math.max(-maxSpeedY, Math.min(maxSpeedY, this.vy));
+
+            this.x += this.vx + this.gx;
+            this.y += this.vy + this.gy;
+
+            this.handleScreenEdge();
+        };
+
         window.addEventListener('keydown', (event) => {
             if (document.activeElement && (document.activeElement.id === 'captainInput' || document.activeElement.id === 'resetPassInput')) {
                 return;
@@ -3761,21 +3825,19 @@
                 ufo.shoot();
             }
 
-            switch (event.code) {
-                case 'KeyA': case 'ArrowLeft': keys.a = true; break;
-                case 'KeyD': case 'ArrowRight': keys.d = true; break;
-                case 'KeyW': case 'ArrowUp': keys.w = true; break;
-                case 'KeyS': case 'ArrowDown': keys.s = true; break;
-            }
+            const k = (event.key || '').toLowerCase();
+            if (event.code === 'KeyA' || event.code === 'ArrowLeft'  || k === 'a') window.shipKeys.a = true;
+            if (event.code === 'KeyD' || event.code === 'ArrowRight' || k === 'd') window.shipKeys.d = true;
+            if (event.code === 'KeyW' || event.code === 'ArrowUp'    || k === 'w') window.shipKeys.w = true;
+            if (event.code === 'KeyS' || event.code === 'ArrowDown'  || k === 's') window.shipKeys.s = true;
         });
 
         window.addEventListener('keyup', (event) => {
-            switch (event.code) {
-                case 'KeyA': case 'ArrowLeft': keys.a = false; break;
-                case 'KeyD': case 'ArrowRight': keys.d = false; break;
-                case 'KeyW': case 'ArrowUp': keys.w = false; break;
-                case 'KeyS': case 'ArrowDown': keys.s = false; break;
-            }
+            const k = (event.key || '').toLowerCase();
+            if (event.code === 'KeyA' || event.code === 'ArrowLeft'  || k === 'a') window.shipKeys.a = false;
+            if (event.code === 'KeyD' || event.code === 'ArrowRight' || k === 'd') window.shipKeys.d = false;
+            if (event.code === 'KeyW' || event.code === 'ArrowUp'    || k === 'w') window.shipKeys.w = false;
+            if (event.code === 'KeyS' || event.code === 'ArrowDown'  || k === 's') window.shipKeys.s = false;
         });
 
         window.addEventListener('blur', () => {
