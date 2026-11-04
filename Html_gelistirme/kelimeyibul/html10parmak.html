@@ -112,8 +112,8 @@
 
         #oyun-wrapper {
             position: relative;
-            width: calc(56 * var(--u));
-            max-width: 95vw;
+            width: calc(66 * var(--u));
+            max-width: 96vw;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -125,7 +125,7 @@
             backdrop-filter: blur(calc(2 * var(--u)));
             border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.4);
             border-radius: calc(3 * var(--u)); 
-            padding: calc(6 * var(--u)) calc(2.5 * var(--u)) calc(2.2 * var(--u)) calc(2.5 * var(--u));
+            padding: calc(5.8 * var(--u)) calc(2.2 * var(--u)) calc(2 * var(--u)) calc(2.2 * var(--u));
             text-align: center;
             color: white;
             position: relative;
@@ -198,28 +198,28 @@
             justify-content: space-around; 
             width: 100%; 
             background: rgba(255,255,255,0.05); 
-            padding: calc(1.1 * var(--u)); 
+            padding: calc(1 * var(--u)); 
             border-radius: calc(1.8 * var(--u)); 
-            margin-bottom: calc(1 * var(--u)); 
+            margin-bottom: calc(0.8 * var(--u)); 
         }
         .stat-box { display: flex; flex-direction: column; }
-        .stat-val { font-size: calc(2.6 * var(--u)); font-weight: bold; color: #f1c40f; }
+        .stat-val { font-size: calc(2.5 * var(--u)); font-weight: bold; color: #f1c40f; }
         .stat-label { font-size: calc(1.05 * var(--u)); color: #aaa; text-transform: uppercase; }
 
         #rekorlar {
-            font-size: calc(1.3 * var(--u)); 
+            font-size: calc(1.25 * var(--u)); 
             color: #888; 
-            margin-bottom: calc(1 * var(--u)); 
+            margin-bottom: calc(0.8 * var(--u)); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: calc(0.5 * var(--u)); 
+            gap: calc(0.45 * var(--u)); 
             width: 100%;
         }
 
         .rekor-satir-gold {
             background: rgba(241, 196, 15, 0.1); 
-            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
+            padding: calc(0.45 * var(--u)) calc(1.4 * var(--u)); 
             border-radius: calc(1 * var(--u)); 
             border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.3); 
             width: 100%;
@@ -227,23 +227,69 @@
 
         .rekor-satir-purple {
             background: rgba(139, 92, 246, 0.1); 
-            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
+            padding: calc(0.45 * var(--u)) calc(1.4 * var(--u)); 
             border-radius: calc(1 * var(--u)); 
             border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.3); 
             width: 100%;
         }
 
-        #karisik-kelime { 
-            font-size: calc(4.6 * var(--u));
-            font-weight: bold; 
-            color: #f1c40f; 
-            margin: calc(0.6 * var(--u)) 0 calc(1.4 * var(--u)) 0; 
-            letter-spacing: calc(0.2 * var(--u)); 
-            text-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.35);
-            min-height: calc(5.5 * var(--u));
+        /* 3 SATIRLI ERGONOMİK ÇOKLU KELİME ALANI (TAM SIĞDIRILMIŞ) */
+        .coklu-kelime-alani {
+            width: 100%;
+            height: calc(12.6 * var(--u)); 
+            background: #ffffff;
+            border-radius: calc(1.2 * var(--u));
+            border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.35);
+            box-shadow: inset 0 calc(0.2 * var(--u)) calc(1 * var(--u)) rgba(0, 0, 0, 0.12);
+            margin-bottom: calc(1.2 * var(--u));
+            overflow: hidden;
+            position: relative;
+            padding: calc(0.75 * var(--u)) calc(1.3 * var(--u));
+            z-index: 25;
+        }
+
+        #kelime-konteyner {
+            position: relative;
+            top: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: calc(0.35 * var(--u)) calc(0.65 * var(--u));
+            width: 100%;
+            transition: top 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+            text-align: left;
+        }
+
+        /* Kelime Span'leri */
+        .w-span {
+            font-size: calc(2.1 * var(--u));
+            font-weight: 600;
+            color: #1e293b;
+            padding: calc(0.15 * var(--u)) calc(0.5 * var(--u));
+            border-radius: calc(0.4 * var(--u));
+            display: inline-block;
+            white-space: nowrap;
+            line-height: calc(3.1 * var(--u));
+            transition: background-color 0.1s, color 0.1s;
+        }
+
+        /* Fosforlu Mavi Aktif Kutucuk */
+        .w-span.aktif {
+            background-color: #0ea5e9 !important;
+            color: #ffffff !important;
+            box-shadow: 0 calc(0.15 * var(--u)) calc(0.6 * var(--u)) rgba(14, 165, 233, 0.45);
+        }
+
+        /* Doğru (Yeşil) Kelime */
+        .w-span.dogru {
+            color: #16a34a !important;
+            background-color: transparent !important;
+        }
+
+        /* Yanlış (Kırmızı) Kelime */
+        .w-span.yanlis {
+            color: #dc2626 !important;
+            background-color: transparent !important;
         }
         
         #tahmin {
@@ -251,14 +297,14 @@
             color: #fff; 
             border: calc(0.2 * var(--u)) solid #444; 
             border-radius: calc(1.4 * var(--u));
-            padding: calc(1.2 * var(--u)); 
+            padding: calc(1.15 * var(--u)); 
             font-size: calc(2 * var(--u)); 
             text-align: center; 
             width: 100%; 
-            max-width: calc(40 * var(--u)); 
+            max-width: calc(42 * var(--u)); 
             outline: none; 
             transition: 0.2s; 
-            z-index: 20;
+            z-index: 25;
         }
         #tahmin:focus { 
             border-color: #8b5cf6; 
@@ -266,22 +312,22 @@
         }
 
         #hiz-alani { 
-            min-height: calc(4.8 * var(--u)); 
-            margin-top: calc(1 * var(--u)); 
+            min-height: calc(4.5 * var(--u)); 
+            margin-top: calc(0.6 * var(--u)); 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
         }
         #hiz-gostergesi, #wpm-gostergesi { 
-            font-size: calc(1.75 * var(--u)); 
+            font-size: calc(1.7 * var(--u)); 
             font-weight: bold; 
             opacity: 0; 
             transition: 0.2s; 
         }
         #wpm-gostergesi { 
             color: #8b5cf6; 
-            margin-top: calc(0.25 * var(--u)); 
+            margin-top: calc(0.2 * var(--u)); 
         }
         .hiz-aktif { 
             animation: slideDownIn 0.4s ease-out forwards; 
@@ -289,10 +335,10 @@
         }
 
         #mesaj { 
-            min-height: calc(3 * var(--u)); 
-            margin-top: calc(0.3 * var(--u)); 
+            min-height: calc(2.7 * var(--u)); 
+            margin-top: calc(0.15 * var(--u)); 
             font-weight: bold; 
-            font-size: calc(1.9 * var(--u)); 
+            font-size: calc(1.85 * var(--u)); 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -300,11 +346,11 @@
 
         /* MÜZİK VE ALT KONTROLLER ALANI */
         #alt-kontroller {
-            margin-top: calc(1 * var(--u)); 
+            margin-top: calc(0.7 * var(--u)); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: calc(1.1 * var(--u)); 
+            gap: calc(0.95 * var(--u)); 
             width: 100%;
         }
 
@@ -318,7 +364,7 @@
         #muzik-paneli {
             background: rgba(255, 255, 255, 0.05); 
             border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.3);
-            padding: calc(0.8 * var(--u)) calc(1.4 * var(--u)); 
+            padding: calc(0.75 * var(--u)) calc(1.4 * var(--u)); 
             border-radius: calc(1.4 * var(--u)); 
             display: flex; 
             align-items: center; 
@@ -358,7 +404,7 @@
             background: rgba(52, 152, 219, 0.2); 
             color: #3498db; 
             border: calc(0.1 * var(--u)) solid rgba(52, 152, 219, 0.4);
-            padding: calc(0.8 * var(--u)) calc(1.5 * var(--u)); 
+            padding: calc(0.75 * var(--u)) calc(1.5 * var(--u)); 
             border-radius: calc(1 * var(--u)); 
             font-size: calc(1.15 * var(--u)); 
             cursor: pointer; 
@@ -380,7 +426,7 @@
             background: rgba(241, 196, 15, 0.15);
             color: #f1c40f;
             border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.4);
-            padding: calc(0.8 * var(--u)) calc(1.4 * var(--u));
+            padding: calc(0.75 * var(--u)) calc(1.4 * var(--u));
             border-radius: calc(1 * var(--u));
             font-size: calc(1.15 * var(--u));
             cursor: pointer;
@@ -408,7 +454,7 @@
             background: rgba(231, 76, 60, 0.1); 
             color: #e74c3c; 
             border: calc(0.1 * var(--u)) solid rgba(231, 76, 60, 0.3); 
-            padding: calc(0.7 * var(--u)) calc(1.4 * var(--u)); 
+            padding: calc(0.65 * var(--u)) calc(1.4 * var(--u)); 
             border-radius: calc(0.9 * var(--u)); 
             font-size: calc(1.05 * var(--u)); 
             cursor: pointer; 
@@ -426,7 +472,7 @@
             background: rgba(255, 255, 255, 0.08);
             color: #ccc;
             border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.2);
-            padding: calc(0.7 * var(--u)) calc(1.4 * var(--u));
+            padding: calc(0.65 * var(--u)) calc(1.4 * var(--u));
             border-radius: calc(0.9 * var(--u));
             font-size: calc(1.05 * var(--u));
             cursor: pointer;
@@ -499,18 +545,19 @@
         .panik { animation: pulse 0.5s infinite; }
         .sarsil { animation: shake 0.3s; }
 
+        /* KEDİ ANİMASYONU: Eski boyutu (8u), biraz daha aşağıda (9.5u) ve hafif solda (4.2u) */
         #animasyon-kedisi {
             position: absolute; 
             bottom: calc(-10 * var(--u)); 
-            right: calc(1.5 * var(--u)); 
+            right: calc(4.2 * var(--u)); 
             width: calc(8 * var(--u)); 
-            z-index: 50;
+            z-index: 20;
             opacity: 0;
-            transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; 
+            transition: bottom 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.25s; 
             pointer-events: none;
         }
         .kedi-zipla { 
-            bottom: calc(24 * var(--u)) !important; 
+            bottom: calc(9.5 * var(--u)) !important; 
             opacity: 1 !important; 
         }
 
@@ -685,9 +732,14 @@
             </div>
         </div>
 
-        <div id="karisik-kelime">hazır ol!</div>
+        <!-- 3 SATIRLI ERGONOMİK ÇOKLU KELİME ALANI -->
+        <div class="coklu-kelime-alani">
+            <div id="kelime-konteyner">
+                <!-- JavaScript ile dinamik doldurulur -->
+            </div>
+        </div>
         
-        <input type="text" id="tahmin" placeholder="Yazmaya Başla! (Enter veya Space)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="return false" ondrop="return false" disabled>
+        <input type="text" id="tahmin" placeholder="Mavi kutudaki kelimeyi yaz (Space veya Enter)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="return false" ondrop="return false" disabled>
         
         <div id="hiz-alani">
             <div id="hiz-gostergesi"></div>
@@ -721,13 +773,41 @@
 <script src="kelimeler.js"></script>
 
 <script>
-    // 1. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme (index.html standardı)
+    // 1. TÜM DEĞİŞKENLER EN ÜSTTE TANIMLANIR
     var baseDPR = window.devicePixelRatio || 1;
+    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
+    let kelimeBaslangicZamani = 0, oyunBaslangicZamani = 0;
+    let genelTimer;
+    let oyunBasladi = false;
+    let oyunBittiMi = false;
+    let yenidenBaslatHazirMi = false;
+    let toplamKarakter = 0; 
+    let aktifOyuncu = "";
+    let oyunKelimeleri = [];
+    let aktifKelimeIndex = 0;
+
+    // 2. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme
+    function satirKaydirmayiHizala() {
+        let konteyner = document.getElementById("kelime-konteyner");
+        let ilkSpan = document.getElementById("word-0");
+        let aktifSpan = document.getElementById("word-" + aktifKelimeIndex);
+        if (!konteyner || !ilkSpan || !aktifSpan) return;
+
+        let ilkSatirTop = ilkSpan.offsetTop;
+        let aktifSatirTop = aktifSpan.offsetTop;
+
+        if (aktifSatirTop > ilkSatirTop) {
+            konteyner.style.top = -(aktifSatirTop - ilkSatirTop) + "px";
+        } else {
+            konteyner.style.top = "0px";
+        }
+    }
 
     function updateResolution() {
         var currentDPR = window.devicePixelRatio || 1;
         var zoomFactor = currentDPR / baseDPR;
         document.documentElement.style.setProperty('--z', zoomFactor);
+        satirKaydirmayiHizala();
     }
     updateResolution();
     window.addEventListener('resize', updateResolution);
@@ -739,17 +819,6 @@
         document.getElementById("oyuncu-adi-input").focus();
     });
 
-    // 2. OYUN MANTIĞI
-    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
-    let secilenKelime = "", oncekiKelime = "";
-    let kelimeBaslangicZamani = 0, oyunBaslangicZamani = 0;
-    let genelTimer;
-    let oyunBasladi = false;
-    let oyunBittiMi = false;
-    let yenidenBaslatHazirMi = false;
-    let toplamKarakter = 0; 
-    let aktifOyuncu = "";
-
     // REKORLARI YÜKLE
     let bestCorrect = parseInt(localStorage.getItem("secoBestCorrect")) || 0;
     let bestCorrectName = localStorage.getItem("secoBestCorrectName") || "Yok";
@@ -759,8 +828,11 @@
     document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
     document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
 
-    document.getElementById("oyuncu-adi-input").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") oyunaGirisYap();
+    document.getElementById("oyuncu-adi-input").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            oyunaGirisYap();
+        }
     });
 
     function oyunaGirisYap() {
@@ -775,7 +847,6 @@
         document.getElementById("aktif-oyuncu-adi").innerText = aktifOyuncu;
         document.getElementById("giris-ekrani").style.display = "none";
         
-        // Oyuna girerken ses motorunu hazırla
         let dSes = document.getElementById("dogruSes");
         let ySes = document.getElementById("yanlisSes");
         if (dSes) dSes.load();
@@ -796,18 +867,20 @@
     setInterval(saatiGuncelle, 1000);
     saatiGuncelle();
 
-    function rastgeleKelimeGetir() {
-        if(typeof kelimeListesi !== 'undefined' && kelimeListesi.length > 0) {
-            let aday = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
-            if (kelimeListesi.length > 1) {
-                while (aday === oncekiKelime) {
-                    aday = kelimeListesi[Math.floor(Math.random() * kelimeListesi.length)];
-                }
-            }
-            oncekiKelime = aday;
-            return aday;
+    // Benzersiz karıştırılmış kelime havuzu
+    function havuzKaristir() {
+        if (typeof kelimeListesi === 'undefined' || !Array.isArray(kelimeListesi) || kelimeListesi.length === 0) {
+            return ["duymak", "vermek", "çıkmak", "bunlar", "zor", "getirmek", "girmek", "tüm", "şu", "gibi", "görmek", "doğru", "küçük", "işte", "bunun", "verilmek", "yok", "ben", "kız", "diğer", "üzerinde", "sahip", "düşmek", "demek", "yeni", "atmak", "bir", "oturmak", "göstermek", "ad", "dönmek", "ama", "koymak", "kullanmak", "istemek", "hiç", "ülke", "onlar", "uzun", "için"];
         }
-        return "test";
+        let liste = [...kelimeListesi];
+        for (let i = liste.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [liste[i], liste[j]] = [liste[j], liste[i]];
+        }
+        while (liste.length < 300) {
+            liste = liste.concat([...liste]);
+        }
+        return liste.slice(0, 300); 
     }
 
     function canliHarfTemizle() {
@@ -815,9 +888,27 @@
         inputAlani.classList.remove("typing-match", "typing-mismatch");
     }
 
+    function havuzRender() {
+        let konteyner = document.getElementById("kelime-konteyner");
+        konteyner.innerHTML = "";
+        konteyner.style.top = "0px";
+
+        oyunKelimeleri.forEach((kelime, idx) => {
+            let span = document.createElement("span");
+            span.classList.add("w-span");
+            span.id = "word-" + idx;
+            span.innerText = kelime.toLocaleLowerCase('tr-TR');
+            if (idx === 0) {
+                span.classList.add("aktif");
+            }
+            konteyner.appendChild(span);
+        });
+    }
+
     function ilkHazirlik() {
-        secilenKelime = rastgeleKelimeGetir();
-        document.getElementById("karisik-kelime").innerText = secilenKelime.toLocaleLowerCase('tr-TR');
+        oyunKelimeleri = havuzKaristir();
+        aktifKelimeIndex = 0;
+        havuzRender();
         canliHarfTemizle();
         document.getElementById("tahmin").focus();
     }
@@ -843,13 +934,19 @@
         }, 1000);
     }
 
-    function yeniSoru() {
-        if(oyunSuresi <= 0 || oyunBittiMi) return;
-        secilenKelime = rastgeleKelimeGetir();
-        document.getElementById("karisik-kelime").innerText = secilenKelime.toLocaleLowerCase('tr-TR');
-        document.getElementById("tahmin").value = "";
-        canliHarfTemizle();
-        kelimeBaslangicZamani = Date.now();
+    function odakGuncelle(isCorrect) {
+        let eskiSpan = document.getElementById("word-" + aktifKelimeIndex);
+        if (eskiSpan) {
+            eskiSpan.classList.remove("aktif");
+            eskiSpan.classList.add(isCorrect ? "dogru" : "yanlis");
+        }
+
+        aktifKelimeIndex++;
+        let yeniSpan = document.getElementById("word-" + aktifKelimeIndex);
+        if (yeniSpan) {
+            yeniSpan.classList.add("aktif");
+            satirKaydirmayiHizala();
+        }
     }
 
     function kontrolEt() {
@@ -863,14 +960,16 @@
 
         canliHarfTemizle();
 
-        if(tahmin === secilenKelime.toLocaleLowerCase('tr-TR')) {
+        let hedefKelime = oyunKelimeleri[aktifKelimeIndex];
+
+        if(tahmin === hedefKelime.toLocaleLowerCase('tr-TR')) {
             inputAlani.classList.add("correct-neon");
             setTimeout(() => inputAlani.classList.remove("correct-neon"), 500);
 
             let bitisZamani = Date.now();
             let gecenSure = Math.max(0.05, (bitisZamani - kelimeBaslangicZamani) / 1000);
             
-            toplamKarakter += secilenKelime.length + 1; 
+            toplamKarakter += hedefKelime.length + 1; 
             let gecenToplamSureDakika = Math.max(0.02, (bitisZamani - oyunBaslangicZamani) / 60000);
             let anlikWpm = Math.round((toplamKarakter / 5) / gecenToplamSureDakika);
 
@@ -907,11 +1006,15 @@
             document.getElementById("stat-dogru").innerText = toplamDogru;
             document.getElementById("mesaj").innerHTML = `<span style="color:${yorumRenk}">${yorum}</span>`;
             sesCal("dogruSes");
-            yeniSoru();
+            
+            odakGuncelle(true);
         } else {
             yanlisCevap();
-            yeniSoru();
+            odakGuncelle(false);
         }
+
+        inputAlani.value = "";
+        kelimeBaslangicZamani = Date.now();
     }
 
     function triggerHyperSpeed() {
@@ -1110,7 +1213,6 @@
     }
 
     // Müzik Bölümü (Çoklu Şarkı + Eksik Dosya Korumalı)
-    // İstediğin kadar şarkı ismini buraya yazabilirsin; klasörde olmayanları otomatik atlar!
     const playlist = ["ozan.mp3", "sarki2.mp3", "sarki3.mp3"];
     let suankiSarkiIndex = 0;
     let isPlaying = false;
@@ -1118,15 +1220,12 @@
     const player = document.getElementById("anaMuzik");
     const playBtn = document.getElementById("play-pause-btn");
 
-    // Şarkı bitince otomatik sıradakine geç
     player.addEventListener("ended", sonrakiSarki);
 
-    // Şarkı başarıyla çalmaya başlayınca hata sayacını sıfırla
     player.addEventListener("playing", () => {
         hataliSarkiSayaci = 0;
     });
 
-    // Şarkı klasörde veya GitHub'da yoksa çökmez, sıradaki şarkıya atlar
     player.addEventListener("error", () => {
         hataliSarkiSayaci++;
         if (hataliSarkiSayaci < playlist.length) {
@@ -1200,7 +1299,6 @@
         }).catch(e => console.warn("Müzik geçiş hatası:", e));
     }
 
-    // Güçlendirilmiş Ses Çalma ve Dosya Bulunamadı Kontrolü
     function sesCal(id) { 
         let s = document.getElementById(id); 
         if (s) { 
@@ -1224,7 +1322,7 @@
         }
 
         let yazilan = deger.toLocaleLowerCase('tr-TR');
-        let hedef = secilenKelime.toLocaleLowerCase('tr-TR');
+        let hedef = (oyunKelimeleri[aktifKelimeIndex] || "").toLocaleLowerCase('tr-TR');
 
         if (yazilan.length === 0) {
             canliHarfTemizle();
