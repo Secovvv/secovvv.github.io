@@ -156,38 +156,98 @@
             transition: transform 0.2s;
         }
 
+        /* ÜST ORTA KONSOL: SOL SWITCH (SES) + SAAT + SAĞ SWITCH (EFEKT) */
+        .ust-merkez-konsol {
+            position: absolute;
+            top: calc(1.35 * var(--u));
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: calc(0.75 * var(--u));
+            z-index: 35;
+            white-space: nowrap;
+        }
+
         .kozmik-saat {
-            position: absolute; 
-            top: calc(1.5 * var(--u)); 
-            left: 50%; 
-            transform: translateX(-50%); 
-            font-size: calc(1.5 * var(--u)); 
+            font-size: calc(1.45 * var(--u)); 
             font-weight: bold;
             font-family: 'Courier New', Courier, monospace; 
             color: #8b5cf6;
             text-shadow: 0 0 calc(1 * var(--u)) rgba(139, 92, 246, 0.6); 
-            z-index: 30;
             background: rgba(255, 255, 255, 0.05); 
-            padding: calc(0.5 * var(--u)) calc(1.4 * var(--u)); 
-            border-radius: calc(1 * var(--u));
-            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.2);
-            white-space: nowrap;
+            padding: calc(0.45 * var(--u)) calc(1.15 * var(--u)); 
+            border-radius: calc(0.9 * var(--u));
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.25);
+        }
+
+        /* MODERN TOGGLE SWITCH TASARIMI */
+        .ust-switch-kutu {
+            display: flex;
+            align-items: center;
+            gap: calc(0.4 * var(--u));
+            background: rgba(255, 255, 255, 0.05);
+            padding: calc(0.35 * var(--u)) calc(0.7 * var(--u));
+            border-radius: calc(0.9 * var(--u));
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.25);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .ust-switch-kutu:hover {
+            border-color: rgba(139, 92, 246, 0.6);
+            background: rgba(255, 255, 255, 0.09);
+        }
+        .switch-etiket {
+            font-size: calc(1.05 * var(--u));
+            font-weight: bold;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            gap: calc(0.25 * var(--u));
+        }
+        .switch-govde {
+            position: relative;
+            width: calc(2.7 * var(--u));
+            height: calc(1.45 * var(--u));
+            background: rgba(231, 76, 60, 0.45);
+            border: calc(0.1 * var(--u)) solid rgba(231, 76, 60, 0.7);
+            border-radius: calc(1.5 * var(--u));
+            transition: 0.25s;
+        }
+        .switch-top {
+            position: absolute;
+            top: calc(0.13 * var(--u));
+            left: calc(0.15 * var(--u));
+            width: calc(1.0 * var(--u));
+            height: calc(1.0 * var(--u));
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 0 calc(0.4 * var(--u)) rgba(0,0,0,0.5);
+        }
+        .ust-switch-kutu.aktif .switch-govde {
+            background: rgba(46, 204, 113, 0.55);
+            border-color: #2ecc71;
+            box-shadow: 0 0 calc(0.8 * var(--u)) rgba(46, 204, 113, 0.4);
+        }
+        .ust-switch-kutu.aktif .switch-top {
+            transform: translateX(calc(1.22 * var(--u)));
         }
         
         .oyuncu-bilgi {
             position: absolute; 
             top: calc(1.5 * var(--u)); 
             right: calc(1.8 * var(--u)); 
-            font-size: calc(1.35 * var(--u)); 
+            font-size: calc(1.3 * var(--u)); 
             font-weight: bold;
             font-family: 'Segoe UI', sans-serif; 
             color: #fff;
             background: rgba(139, 92, 246, 0.2); 
-            padding: calc(0.5 * var(--u)) calc(1.3 * var(--u)); 
-            border-radius: calc(1 * var(--u));
+            padding: calc(0.45 * var(--u)) calc(1.1 * var(--u)); 
+            border-radius: calc(0.9 * var(--u));
             border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.4); 
             z-index: 30;
-            max-width: calc(18 * var(--u));
+            max-width: calc(15.5 * var(--u));
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -198,42 +258,86 @@
             justify-content: space-around; 
             width: 100%; 
             background: rgba(255,255,255,0.05); 
-            padding: calc(1 * var(--u)); 
+            padding: calc(0.9 * var(--u)); 
             border-radius: calc(1.8 * var(--u)); 
-            margin-bottom: calc(0.8 * var(--u)); 
+            margin-bottom: calc(0.75 * var(--u)); 
         }
         .stat-box { display: flex; flex-direction: column; }
-        .stat-val { font-size: calc(2.5 * var(--u)); font-weight: bold; color: #f1c40f; }
-        .stat-label { font-size: calc(1.05 * var(--u)); color: #aaa; text-transform: uppercase; }
+        .stat-val { font-size: calc(2.45 * var(--u)); font-weight: bold; color: #f1c40f; }
+        .stat-label { font-size: calc(1.02 * var(--u)); color: #aaa; text-transform: uppercase; }
 
+        /* ŞAMPİYONLAR VE İLK 10 BAR */
         #rekorlar {
-            font-size: calc(1.25 * var(--u)); 
-            color: #888; 
-            margin-bottom: calc(0.8 * var(--u)); 
+            font-size: calc(1.2 * var(--u)); 
+            color: #ccc; 
+            margin-bottom: calc(0.85 * var(--u)); 
             display: flex; 
-            flex-direction: column; 
             align-items: center; 
-            gap: calc(0.45 * var(--u)); 
+            justify-content: space-between;
+            gap: calc(0.6 * var(--u)); 
             width: 100%;
+        }
+
+        .rekor-kutu-sol {
+            display: flex;
+            flex-direction: column;
+            gap: calc(0.38 * var(--u));
+            flex: 1;
+            text-align: left;
         }
 
         .rekor-satir-gold {
             background: rgba(241, 196, 15, 0.1); 
-            padding: calc(0.45 * var(--u)) calc(1.4 * var(--u)); 
-            border-radius: calc(1 * var(--u)); 
-            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.3); 
+            padding: calc(0.4 * var(--u)) calc(1.1 * var(--u)); 
+            border-radius: calc(0.85 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.35); 
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .rekor-satir-purple {
-            background: rgba(139, 92, 246, 0.1); 
-            padding: calc(0.45 * var(--u)) calc(1.4 * var(--u)); 
-            border-radius: calc(1 * var(--u)); 
-            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.3); 
+            background: rgba(139, 92, 246, 0.12); 
+            padding: calc(0.4 * var(--u)) calc(1.1 * var(--u)); 
+            border-radius: calc(0.85 * var(--u)); 
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.35); 
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* 3 SATIRLI ERGONOMİK ÇOKLU KELİME ALANI (TAM SIĞDIRILMIŞ) */
+        .top10-trigger-btn {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(241, 196, 15, 0.25));
+            border: calc(0.15 * var(--u)) solid rgba(241, 196, 15, 0.55);
+            color: #fff;
+            border-radius: calc(1.1 * var(--u));
+            padding: calc(0.75 * var(--u)) calc(1.2 * var(--u));
+            font-size: calc(1.15 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: calc(0.2 * var(--u));
+            transition: all 0.25s ease;
+            box-shadow: 0 0 calc(1.2 * var(--u)) rgba(241, 196, 15, 0.2);
+            white-space: nowrap;
+            height: 100%;
+        }
+        .top10-trigger-btn:hover {
+            transform: translateY(calc(-0.15 * var(--u))) scale(1.03);
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(241, 196, 15, 0.5);
+            border-color: #f1c40f;
+        }
+        .top10-trigger-btn span.t-icon {
+            font-size: calc(1.7 * var(--u));
+            line-height: 1;
+        }
+
+        /* 3 SATIRLI ERGONOMİK ÇOKLU KELİME ALANI */
         .coklu-kelime-alani {
             width: 100%;
             height: calc(12.6 * var(--u)); 
@@ -260,7 +364,6 @@
             text-align: left;
         }
 
-        /* Kelime Span'leri */
         .w-span {
             font-size: calc(2.1 * var(--u));
             font-weight: 600;
@@ -273,20 +376,17 @@
             transition: background-color 0.1s, color 0.1s;
         }
 
-        /* Fosforlu Mavi Aktif Kutucuk */
         .w-span.aktif {
             background-color: #0ea5e9 !important;
             color: #ffffff !important;
             box-shadow: 0 calc(0.15 * var(--u)) calc(0.6 * var(--u)) rgba(14, 165, 233, 0.45);
         }
 
-        /* Doğru (Yeşil) Kelime */
         .w-span.dogru {
             color: #16a34a !important;
             background-color: transparent !important;
         }
 
-        /* Yanlış (Kırmızı) Kelime */
         .w-span.yanlis {
             color: #dc2626 !important;
             background-color: transparent !important;
@@ -501,38 +601,44 @@
 
         #over-title { 
             color: #e74c3c; 
-            font-size: calc(4 * var(--u)); 
-            margin: 0 0 calc(1 * var(--u)) 0; 
+            font-size: calc(3.8 * var(--u)); 
+            margin: 0 0 calc(0.8 * var(--u)) 0; 
             text-align: center; 
         }
         #new-record-msg { 
-            font-size: calc(2.3 * var(--u)); 
+            font-size: calc(2.2 * var(--u)); 
             color: #f1c40f; 
             font-weight: bold; 
             display: none; 
-            margin-bottom: calc(1 * var(--u)); 
+            margin-bottom: calc(0.8 * var(--u)); 
         }
         #final-stats-container { 
             background: rgba(255,255,255,0.08); 
-            padding: calc(2 * var(--u)); 
+            padding: calc(1.8 * var(--u)); 
             border-radius: calc(2 * var(--u)); 
             width: 85%; 
             max-width: calc(36 * var(--u)); 
         }
         #final-stats { 
-            font-size: calc(1.9 * var(--u)); 
-            line-height: 1.6; 
+            font-size: calc(1.85 * var(--u)); 
+            line-height: 1.55; 
             margin: 0;
         }
+        .over-btn-grup {
+            display: flex;
+            gap: calc(1 * var(--u));
+            margin-top: calc(1.6 * var(--u));
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         #tekrar-dene-btn { 
-            padding: calc(1.2 * var(--u)) calc(2.8 * var(--u)); 
-            font-size: calc(1.8 * var(--u)); 
+            padding: calc(1.1 * var(--u)) calc(2.4 * var(--u)); 
+            font-size: calc(1.65 * var(--u)); 
             background: #2ecc71; 
             color: white; 
             border: none; 
             border-radius: calc(1 * var(--u)); 
             cursor: pointer; 
-            margin-top: calc(1.8 * var(--u)); 
             font-weight: bold;
             outline: none;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -540,6 +646,22 @@
         #tekrar-dene-btn:hover, #tekrar-dene-btn:focus {
             transform: scale(1.05);
             box-shadow: 0 0 calc(2 * var(--u)) rgba(46, 204, 113, 0.7);
+        }
+        .over-top10-btn {
+            padding: calc(1.1 * var(--u)) calc(2 * var(--u)); 
+            font-size: calc(1.65 * var(--u)); 
+            background: rgba(241, 196, 15, 0.2); 
+            color: #f1c40f; 
+            border: calc(0.15 * var(--u)) solid #f1c40f; 
+            border-radius: calc(1 * var(--u)); 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .over-top10-btn:hover {
+            transform: scale(1.05);
+            background: rgba(241, 196, 15, 0.35);
+            box-shadow: 0 0 calc(2 * var(--u)) rgba(241, 196, 15, 0.5);
         }
 
         .panik { animation: pulse 0.5s infinite; }
@@ -621,6 +743,221 @@
             transform: scale(1.05); 
         }
 
+        /* =========================================================
+           🏆 PRO İLK 10 EVRENSEL LİDERLİK TABLOSU MODALI (GLASSMORPHISM)
+           ========================================================= */
+        #liderlik-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 6, 18, 0.88);
+            backdrop-filter: blur(calc(0.8 * var(--u)));
+            z-index: 950;
+            justify-content: center;
+            align-items: center;
+            padding: calc(1.5 * var(--u));
+        }
+
+        .liderlik-kutu {
+            background: linear-gradient(160deg, rgba(18, 24, 56, 0.98) 0%, rgba(10, 12, 30, 0.98) 100%);
+            border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.55);
+            border-radius: calc(2.4 * var(--u));
+            width: calc(58 * var(--u));
+            max-width: 95vw;
+            padding: calc(2.2 * var(--u));
+            box-shadow: 0 0 calc(5 * var(--u)) rgba(139, 92, 246, 0.35);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: slideDownIn 0.25s ease-out;
+        }
+
+        .liderlik-ust {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: calc(1.2 * var(--u));
+            border-bottom: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.1);
+            padding-bottom: calc(0.9 * var(--u));
+        }
+
+        .liderlik-baslik {
+            font-size: calc(2.1 * var(--u));
+            font-weight: 800;
+            color: #f1c40f;
+            text-shadow: 0 0 calc(1.2 * var(--u)) rgba(241, 196, 15, 0.45);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: calc(0.6 * var(--u));
+        }
+
+        .baglanti-etiket {
+            font-size: calc(1.05 * var(--u));
+            padding: calc(0.3 * var(--u)) calc(0.8 * var(--u));
+            border-radius: calc(2 * var(--u));
+            font-weight: bold;
+        }
+        .baglanti-bulut {
+            background: rgba(46, 204, 113, 0.18);
+            color: #2ecc71;
+            border: calc(0.1 * var(--u)) solid rgba(46, 204, 113, 0.45);
+        }
+        .baglanti-yerel {
+            background: rgba(241, 196, 15, 0.15);
+            color: #f1c40f;
+            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.4);
+        }
+
+        /* Sıralama Sekmeleri */
+        .siralama-sekmeler {
+            display: flex;
+            gap: calc(0.8 * var(--u));
+            width: 100%;
+            margin-bottom: calc(1.2 * var(--u));
+        }
+
+        .sekme-btn {
+            flex: 1;
+            padding: calc(0.8 * var(--u));
+            font-size: calc(1.3 * var(--u));
+            font-weight: bold;
+            border-radius: calc(1 * var(--u));
+            border: calc(0.15 * var(--u)) solid rgba(139, 92, 246, 0.35);
+            background: rgba(255, 255, 255, 0.04);
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sekme-btn:hover {
+            color: #fff;
+            background: rgba(139, 92, 246, 0.15);
+        }
+        .sekme-btn.aktif-sekme-wpm {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.45), rgba(59, 130, 246, 0.35));
+            color: #fff;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(139, 92, 246, 0.45);
+        }
+        .sekme-btn.aktif-sekme-dogru {
+            background: linear-gradient(90deg, rgba(241, 196, 15, 0.4), rgba(46, 204, 113, 0.3));
+            color: #fff;
+            border-color: #f1c40f;
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(241, 196, 15, 0.4);
+        }
+
+        /* Tablo Yapısı */
+        .tablo-sarmal {
+            width: 100%;
+            max-height: calc(36 * var(--u));
+            overflow-y: auto;
+            border-radius: calc(1.2 * var(--u));
+            background: rgba(0, 0, 0, 0.35);
+            border: calc(0.1 * var(--u)) solid rgba(255, 255, 255, 0.08);
+            padding: calc(0.5 * var(--u));
+        }
+
+        .rekor-tablosu {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 calc(0.38 * var(--u));
+            font-size: calc(1.3 * var(--u));
+        }
+
+        .rekor-tablosu th {
+            color: #94a3b8;
+            font-size: calc(1.05 * var(--u));
+            text-transform: uppercase;
+            letter-spacing: calc(0.06 * var(--u));
+            padding: calc(0.5 * var(--u)) calc(0.8 * var(--u));
+            text-align: center;
+        }
+        .rekor-tablosu th:nth-child(2) { text-align: left; }
+
+        .rekor-tablosu td {
+            padding: calc(0.65 * var(--u)) calc(0.8 * var(--u));
+            background: rgba(255, 255, 255, 0.04);
+            text-align: center;
+            font-weight: 600;
+        }
+        .rekor-tablosu td:first-child {
+            border-top-left-radius: calc(0.8 * var(--u));
+            border-bottom-left-radius: calc(0.8 * var(--u));
+            width: 14%;
+        }
+        .rekor-tablosu td:nth-child(2) {
+            text-align: left;
+            width: 38%;
+        }
+        .rekor-tablosu td:last-child {
+            border-top-right-radius: calc(0.8 * var(--u));
+            border-bottom-right-radius: calc(0.8 * var(--u));
+        }
+
+        /* İlk 3 Sıra Özel Vurguları */
+        .satir-1 td {
+            background: linear-gradient(90deg, rgba(241, 196, 15, 0.25), rgba(241, 196, 15, 0.06));
+            border-top: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.45);
+            border-bottom: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.45);
+            color: #fef08a;
+        }
+        .satir-2 td {
+            background: linear-gradient(90deg, rgba(203, 213, 225, 0.2), rgba(203, 213, 225, 0.05));
+            color: #e2e8f0;
+        }
+        .satir-3 td {
+            background: linear-gradient(90deg, rgba(217, 119, 6, 0.22), rgba(217, 119, 6, 0.05));
+            color: #fed7aa;
+        }
+
+        /* Aktif Oyuncunun Kendi Satırı */
+        .satir-ben td {
+            box-shadow: inset 0 0 calc(1 * var(--u)) rgba(46, 204, 113, 0.45);
+            border-top: calc(0.12 * var(--u)) solid #2ecc71 !important;
+            border-bottom: calc(0.12 * var(--u)) solid #2ecc71 !important;
+        }
+
+        .sen-rozet {
+            background: #2ecc71;
+            color: #000;
+            font-size: calc(0.9 * var(--u));
+            font-weight: 800;
+            padding: calc(0.12 * var(--u)) calc(0.45 * var(--u));
+            border-radius: calc(0.4 * var(--u));
+            margin-left: calc(0.5 * var(--u));
+            vertical-align: middle;
+        }
+
+        .deger-wpm { color: #a78bfa; font-weight: 800; font-size: calc(1.4 * var(--u)); }
+        .deger-dogru { color: #4ade80; font-weight: 800; font-size: calc(1.4 * var(--u)); }
+        .deger-isabet { color: #fbbf24; font-size: calc(1.2 * var(--u)); }
+
+        .liderlik-alt-butonlar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: calc(1.4 * var(--u));
+        }
+
+        .kapat-liderlik-btn {
+            background: #8b5cf6;
+            color: #fff;
+            border: none;
+            padding: calc(0.85 * var(--u)) calc(2.4 * var(--u));
+            border-radius: calc(1 * var(--u));
+            font-size: calc(1.35 * var(--u));
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .kapat-liderlik-btn:hover {
+            background: #9b6cf6;
+            box-shadow: 0 0 calc(1.5 * var(--u)) #8b5cf6;
+        }
+
         /* ÖZEL UYARI MODALI */
         #ozel-modal {
             display: none; 
@@ -681,6 +1018,7 @@
 
 <div class="kozmik-nebula"></div>
 
+<!-- ŞİFRE VE UYARI MODALI -->
 <div id="ozel-modal">
     <div class="modal-kutu">
         <h3 id="modal-baslik">Uyarı</h3>
@@ -693,28 +1031,83 @@
     </div>
 </div>
 
+<!-- 🏆 İLK 10 EVRENSEL LİDERLİK TABLOSU MODALI -->
+<div id="liderlik-modal" onclick="if(event.target === this) liderlikTablosuKapat()">
+    <div class="liderlik-kutu">
+        <div class="liderlik-ust">
+            <h2 class="liderlik-baslik">🏆 İLK 10 REKORTMENLER</h2>
+            <span id="baglanti-durumu" class="baglanti-etiket baglanti-yerel">📦 Yerel Mod</span>
+        </div>
+
+        <div class="siralama-sekmeler">
+            <button id="sekme-wpm" class="sekme-btn aktif-sekme-wpm" onclick="siralamaDegistir('wpm')">⚡ WPM Hızına Göre İlk 10</button>
+            <button id="sekme-dogru" class="sekme-btn" onclick="siralamaDegistir('dogru')">🎯 Doğru Sayısına Göre İlk 10</button>
+        </div>
+
+        <div class="tablo-sarmal">
+            <table class="rekor-tablosu">
+                <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Oyuncu</th>
+                        <th>⚡ En İyi WPM</th>
+                        <th>🎯 En Çok Doğru</th>
+                        <th>İsabet</th>
+                    </tr>
+                </thead>
+                <tbody id="liderlik-tablo-govde">
+                    <!-- JavaScript ile dinamik doldurulur -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="liderlik-alt-butonlar">
+            <button class="reset-btn" onclick="rekoruSifirla()">Tüm Tabloyu Sıfırla 🔒</button>
+            <button class="kapat-liderlik-btn" onclick="liderlikTablosuKapat()">Kapat ✖</button>
+        </div>
+    </div>
+</div>
+
 <div id="oyun-wrapper">
     <div id="anaKapsayici">
         <img src="kedi.png" id="animasyon-kedisi" alt="Kedi">
 
         <div id="giris-ekrani">
             <h1>10 PARMAK HIZ ANALİZİ</h1>
-            <p class="giris-alt-yazi">WPM rekoru kırmak için adını gir ve başla!</p>
+            <p class="giris-alt-yazi">İlk 10 listesine girmek için adını yaz ve başla!</p>
             <input type="text" id="oyuncu-adi-input" placeholder="Kullanıcı Adı..." maxlength="16" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
             <button onclick="oyunaGirisYap()" id="basla-btn">Oyuna Gir</button>
         </div>
 
         <div id="seco-logo" class="seco-signature">SECOVVV</div>
-        <div id="saat-kutusu" class="kozmik-saat">00:00:00</div>
+
+        <!-- ÜST MERKEZ KONSOL: SOLDA SES EFEKTLERİ SWITCH | ORTADA SAAT | SAĞDA GÖRSEL EFEKT SWITCH -->
+        <div class="ust-merkez-konsol">
+            <div id="ses-switch-kutu" class="ust-switch-kutu aktif" onclick="sesSwitchDegistir()" title="Doğru / Yanlış Bildirim Seslerini Aç / Kapat">
+                <span class="switch-etiket"><span id="ses-ikon">🔊</span> Ses</span>
+                <div class="switch-govde"><div class="switch-top"></div></div>
+            </div>
+
+            <div id="saat-kutusu" class="kozmik-saat">00:00:00</div>
+
+            <div id="efekt-switch-kutu" class="ust-switch-kutu aktif" onclick="efektSwitchDegistir()" title="Kedi, Titreme, Konfeti ve Çerçeve Efektlerini Aç / Kapat">
+                <span class="switch-etiket"><span id="efekt-ikon">✨</span> Efekt</span>
+                <div class="switch-govde"><div class="switch-top"></div></div>
+            </div>
+        </div>
+
         <div class="oyuncu-bilgi">Oyuncu: <span id="aktif-oyuncu-adi" style="color:#f1c40f;">Belirsiz</span></div>
 
         <div id="game-over">
             <h1 id="over-title">SÜRE DOLDU!</h1>
-            <div id="new-record-msg">🏆 YENİ REKOR! 🏆</div>
+            <div id="new-record-msg">🏆 YENİ KİŞİSEL / EVRENSEL REKOR! 🏆</div>
             <div id="final-stats-container">
                 <p id="final-stats"></p>
             </div>
-            <button id="tekrar-dene-btn" onclick="oyunuSifirla()">Tekrar Dene 🔄 (Enter)</button>
+            <div class="over-btn-grup">
+                <button id="tekrar-dene-btn" onclick="oyunuSifirla()">Tekrar Dene 🔄 (Enter)</button>
+                <button class="over-top10-btn" onclick="liderlikTablosuAc()">🏆 İlk 10 Tablosu</button>
+            </div>
         </div>
 
         <div class="stats-panel">
@@ -723,13 +1116,22 @@
             <div class="stat-box"><span id="genel-sure" class="stat-val" style="color: #e74c3c;">60</span><span class="stat-label">Saniye</span></div>
         </div>
 
+        <!-- ŞAMPİYONLAR BANDI + İLK 10 TABLOSU BUTONU -->
         <div id="rekorlar">
-            <div class="rekor-satir-gold">
-                🏆 Doğru Rekortmeni: <span id="best-correct" style="color:#f1c40f; font-weight:bold;">0 (Yok)</span>
+            <div class="rekor-kutu-sol">
+                <div class="rekor-satir-gold">
+                    <span>🏆 Doğru Lideri:</span>
+                    <span id="best-correct" style="color:#f1c40f; font-weight:bold;">0 (Yok)</span>
+                </div>
+                <div class="rekor-satir-purple">
+                    <span>⚡ WPM Lideri:</span>
+                    <span id="best-wpm" style="color:#a78bfa; font-weight:bold;">0 (Yok)</span>
+                </div>
             </div>
-            <div class="rekor-satir-purple">
-                ⚡ WPM Rekortmeni: <span id="best-wpm" style="color:#8b5cf6; font-weight:bold;">0 (Yok)</span>
-            </div>
+            <button class="top10-trigger-btn" onclick="liderlikTablosuAc()" title="İlk 10 Rekortmen Tablosunu Göster">
+                <span class="t-icon">📊</span>
+                <span>İLK 10 TABLOSU</span>
+            </button>
         </div>
 
         <!-- 3 SATIRLI ERGONOMİK ÇOKLU KELİME ALANI -->
@@ -773,6 +1175,11 @@
 <script src="kelimeler.js"></script>
 
 <script>
+    // =========================================================================
+    // 🌐 EVRENSEL REKOR TABLOSU (FIREBASE REALTIME DATABASE) AYARI
+    // =========================================================================
+    const FIREBASE_DB_URL = "https://secovvv-web-default-rtdb.firebaseio.com";
+
     // 1. TÜM DEĞİŞKENLER EN ÜSTTE TANIMLANIR
     var baseDPR = window.devicePixelRatio || 1;
     let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
@@ -785,6 +1192,87 @@
     let aktifOyuncu = "";
     let oyunKelimeleri = [];
     let aktifKelimeIndex = 0;
+
+    // SES EFEKTLERİ (SFX) VE GÖRSEL EFEKT SWITCH DURUMLARI (Tercihler localStorage'da saklanır)
+    let sesAcikMi = localStorage.getItem("seco10ParmakSes") !== "off";
+    let efektAcikMi = localStorage.getItem("seco10ParmakEfekt") !== "off";
+
+    // KİŞİ BAZLI OYUNCU VERİTABANI OBJESİ
+    let oyuncularMap = {};
+    let aktifSiralamaTuru = "wpm"; // 'wpm' veya 'dogru'
+
+    // =========================================================================
+    // 🔊 SES EFEKTİ (SFX) VE ✨ GÖRSEL EFEKT SWITCH FONKSİYONLARI
+    // =========================================================================
+    function switchArayuzunuGuncelle() {
+        let sesKutu = document.getElementById("ses-switch-kutu");
+        let sesIkon = document.getElementById("ses-ikon");
+        let efektKutu = document.getElementById("efekt-switch-kutu");
+        let efektIkon = document.getElementById("efekt-ikon");
+
+        if (sesKutu && sesIkon) {
+            if (sesAcikMi) {
+                sesKutu.classList.add("aktif");
+                sesIkon.innerText = "🔊";
+            } else {
+                sesKutu.classList.remove("aktif");
+                sesIkon.innerText = "🔇";
+            }
+        }
+
+        if (efektKutu && efektIkon) {
+            if (efektAcikMi) {
+                efektKutu.classList.add("aktif");
+                efektIkon.innerText = "✨";
+            } else {
+                efektKutu.classList.remove("aktif");
+                efektIkon.innerText = "🚫";
+            }
+        }
+    }
+
+    function sesSwitchDegistir() {
+        sesAcikMi = !sesAcikMi;
+        localStorage.setItem("seco10ParmakSes", sesAcikMi ? "on" : "off");
+        switchArayuzunuGuncelle();
+
+        // Ses kapatıldıysa doğru/yanlış bildirim seslerini anında sustur (MP3 çalar bağımsız kalır)
+        if (!sesAcikMi) {
+            let dSes = document.getElementById("dogruSes");
+            let ySes = document.getElementById("yanlisSes");
+            if (dSes) { dSes.pause(); dSes.currentTime = 0; }
+            if (ySes) { ySes.pause(); ySes.currentTime = 0; }
+        }
+
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
+    }
+
+    function efektSwitchDegistir() {
+        efektAcikMi = !efektAcikMi;
+        localStorage.setItem("seco10ParmakEfekt", efektAcikMi ? "on" : "off");
+        switchArayuzunuGuncelle();
+
+        // Efekt kapatıldıysa ekranda aktif olan kedi, sarsıntı ve çerçeve ışıklarını anında temizle
+        if (!efektAcikMi) {
+            canliHarfTemizle();
+            let inputAlani = document.getElementById("tahmin");
+            if (inputAlani) inputAlani.classList.remove("correct-neon", "wrong-neon");
+            let kedi = document.getElementById("animasyon-kedisi");
+            if (kedi) kedi.classList.remove("kedi-zipla");
+            let anaKutu = document.getElementById("anaKapsayici");
+            if (anaKutu) anaKutu.classList.remove("sarsil", "punch-active");
+            document.body.classList.remove("light-speed-active");
+            if (typeof confetti === "function" && confetti.reset) {
+                confetti.reset();
+            }
+        }
+
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
+    }
 
     // 2. Çözünürlük ve Hem Pencere Hem Ctrl+Scroll Ölçekleme
     function satirKaydirmayiHizala() {
@@ -815,18 +1303,269 @@
         window.visualViewport.addEventListener('resize', updateResolution);
     }
 
+    // =========================================================================
+    // 3. KİŞİ BAZLI İLK 10 (TOP 10) ALGORİTMASI VE FIREBASE SENKRONİZASYONU
+    // =========================================================================
+    function oyuncuAnahtariOlustur(isim) {
+        return isim.trim().toLocaleLowerCase('tr-TR').replace(/[.#$\[\]\/]/g, "_");
+    }
+
+    function yerelVerileriYukle() {
+        try {
+            let kayitli = localStorage.getItem("seco10ParmakPlayers");
+            if (kayitli) {
+                oyuncularMap = JSON.parse(kayitli) || {};
+            }
+            let eskiDogru = parseInt(localStorage.getItem("secoBestCorrect")) || 0;
+            let eskiDogruIsim = localStorage.getItem("secoBestCorrectName") || "";
+            let eskiWpm = parseInt(localStorage.getItem("secoBestWPM")) || 0;
+            let eskiWpmIsim = localStorage.getItem("secoBestWPMName") || "";
+
+            if (eskiDogru > 0 && eskiDogruIsim && eskiDogruIsim !== "Yok") {
+                let k = oyuncuAnahtariOlustur(eskiDogruIsim);
+                if (!oyuncularMap[k]) {
+                    oyuncularMap[k] = { name: eskiDogruIsim, bestWPM: eskiWpm, bestCorrect: eskiDogru, accuracy: 95, updatedAt: Date.now() };
+                }
+            }
+            if (eskiWpm > 0 && eskiWpmIsim && eskiWpmIsim !== "Yok") {
+                let k2 = oyuncuAnahtariOlustur(eskiWpmIsim);
+                if (!oyuncularMap[k2]) {
+                    oyuncularMap[k2] = { name: eskiWpmIsim, bestWPM: eskiWpm, bestCorrect: eskiDogru, accuracy: 95, updatedAt: Date.now() };
+                } else if (eskiWpm > oyuncularMap[k2].bestWPM) {
+                    oyuncularMap[k2].bestWPM = eskiWpm;
+                }
+            }
+            localStorage.setItem("seco10ParmakPlayers", JSON.stringify(oyuncularMap));
+        } catch (e) {
+            oyuncularMap = {};
+        }
+        ustSampiyonBariniGuncelle();
+    }
+
+    function firebaseAktifMi() {
+        return FIREBASE_DB_URL && FIREBASE_DB_URL.startsWith("https://") && !FIREBASE_DB_URL.includes("BURAYA_");
+    }
+
+    function temizFirebaseUrl() {
+        return FIREBASE_DB_URL.replace(/\/$/, "");
+    }
+
+    function baglantiEtiketiniGuncelle(bulutBasarili) {
+        let etiket = document.getElementById("baglanti-durumu");
+        if (!etiket) return;
+        if (bulutBasarili) {
+            etiket.className = "baglanti-etiket baglanti-bulut";
+            etiket.innerText = "🌐 Canlı Bulut Aktif";
+        } else {
+            etiket.className = "baglanti-etiket baglanti-yerel";
+            etiket.innerText = "📦 Yerel Mod";
+        }
+    }
+
+    function ustSampiyonBariniGuncelle() {
+        let liste = Object.values(oyuncularMap);
+        if (liste.length === 0) {
+            document.getElementById("best-correct").innerText = "0 (Yok)";
+            document.getElementById("best-wpm").innerText = "0 (Yok)";
+            return;
+        }
+
+        let dogruSirali = [...liste].sort((a, b) => (b.bestCorrect - a.bestCorrect) || (b.bestWPM - a.bestWPM));
+        let liderDogru = dogruSirali[0];
+
+        let wpmSirali = [...liste].sort((a, b) => (b.bestWPM - a.bestWPM) || (b.bestCorrect - a.bestCorrect));
+        let liderWpm = wpmSirali[0];
+
+        document.getElementById("best-correct").innerText = `${liderDogru.bestCorrect} (${liderDogru.name})`;
+        document.getElementById("best-wpm").innerText = `${liderWpm.bestWPM} (${liderWpm.name})`;
+    }
+
+    async function buluttanRekorlariCek() {
+        if (!firebaseAktifMi()) {
+            baglantiEtiketiniGuncelle(false);
+            return;
+        }
+        try {
+            const res = await fetch(`${temizFirebaseUrl()}/rekorlar_10parmak_oyuncular.json`);
+            if (!res.ok) {
+                baglantiEtiketiniGuncelle(false);
+                return;
+            }
+            const bulutData = await res.json();
+            baglantiEtiketiniGuncelle(true);
+
+            if (bulutData && typeof bulutData === "object") {
+                Object.keys(bulutData).forEach(key => {
+                    let bOyuncu = bulutData[key];
+                    if (bOyuncu && bOyuncu.name) {
+                        if (!oyuncularMap[key]) {
+                            oyuncularMap[key] = bOyuncu;
+                        } else {
+                            oyuncularMap[key].name = bOyuncu.name;
+                            oyuncularMap[key].bestWPM = Math.max(oyuncularMap[key].bestWPM || 0, bOyuncu.bestWPM || 0);
+                            oyuncularMap[key].bestCorrect = Math.max(oyuncularMap[key].bestCorrect || 0, bOyuncu.bestCorrect || 0);
+                            oyuncularMap[key].accuracy = Math.max(oyuncularMap[key].accuracy || 0, bOyuncu.accuracy || 0);
+                        }
+                    }
+                });
+                localStorage.setItem("seco10ParmakPlayers", JSON.stringify(oyuncularMap));
+            }
+
+            // Eğer yerelde daha önceden kırılmış rekor varsa ve bulutta henüz yoksa otomatik buluta senkronize et
+            Object.keys(oyuncularMap).forEach(k => {
+                if (!bulutData || !bulutData[k]) {
+                    bulutaOyuncuKaydet(k, oyuncularMap[k]);
+                }
+            });
+
+            ustSampiyonBariniGuncelle();
+            if (document.getElementById("liderlik-modal").style.display === "flex") {
+                liderlikTablosuRender();
+            }
+        } catch (err) {
+            baglantiEtiketiniGuncelle(false);
+            console.warn("Bulut okuma hatası:", err);
+        }
+    }
+
+    async function bulutaOyuncuKaydet(key, oyuncuVerisi) {
+        if (!firebaseAktifMi()) return;
+        try {
+            await fetch(`${temizFirebaseUrl()}/rekorlar_10parmak_oyuncular/${encodeURIComponent(key)}.json`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(oyuncuVerisi)
+            });
+            baglantiEtiketiniGuncelle(true);
+        } catch (err) {
+            console.warn("Buluta oyuncu kaydı yazılamadı:", err);
+        }
+    }
+
+    async function oyuncuSkorunuIsle(isim, yeniDogru, yeniWpm, yeniIsabet) {
+        if (yeniDogru <= 0 && yeniWpm <= 0) return false;
+
+        let key = oyuncuAnahtariOlustur(isim);
+        let mevcut = oyuncularMap[key];
+        let rekorKirildi = false;
+
+        if (!mevcut) {
+            oyuncularMap[key] = {
+                name: isim,
+                bestWPM: yeniWpm,
+                bestCorrect: yeniDogru,
+                accuracy: yeniIsabet,
+                updatedAt: Date.now()
+            };
+            rekorKirildi = true;
+        } else {
+            mevcut.name = isim;
+            if (yeniWpm > (mevcut.bestWPM || 0)) {
+                mevcut.bestWPM = yeniWpm;
+                mevcut.accuracy = yeniIsabet;
+                rekorKirildi = true;
+            }
+            if (yeniDogru > (mevcut.bestCorrect || 0)) {
+                mevcut.bestCorrect = yeniDogru;
+                rekorKirildi = true;
+            }
+            if (rekorKirildi) {
+                mevcut.updatedAt = Date.now();
+            }
+        }
+
+        localStorage.setItem("seco10ParmakPlayers", JSON.stringify(oyuncularMap));
+        ustSampiyonBariniGuncelle();
+
+        if (rekorKirildi) {
+            await bulutaOyuncuKaydet(key, oyuncularMap[key]);
+        }
+        return rekorKirildi;
+    }
+
+    // =========================================================================
+    // 🏆 İLK 10 LİDERLİK TABLOSU ARAYÜZ FONKSİYONLARI
+    // =========================================================================
+    function siralamaDegistir(tur) {
+        aktifSiralamaTuru = tur;
+        let btnWpm = document.getElementById("sekme-wpm");
+        let btnDogru = document.getElementById("sekme-dogru");
+
+        if (tur === "wpm") {
+            btnWpm.className = "sekme-btn aktif-sekme-wpm";
+            btnDogru.className = "sekme-btn";
+        } else {
+            btnWpm.className = "sekme-btn";
+            btnDogru.className = "sekme-btn aktif-sekme-dogru";
+        }
+        liderlikTablosuRender();
+    }
+
+    function liderlikTablosuRender() {
+        let tbody = document.getElementById("liderlik-tablo-govde");
+        tbody.innerHTML = "";
+
+        let liste = Object.values(oyuncularMap);
+
+        if (liste.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="padding: calc(2.5 * var(--u)); color:#94a3b8;">Henüz kayıtlı rekor yok. İlk rekoru sen kır! 🚀</td></tr>`;
+            return;
+        }
+
+        if (aktifSiralamaTuru === "wpm") {
+            liste.sort((a, b) => (b.bestWPM - a.bestWPM) || (b.bestCorrect - a.bestCorrect));
+        } else {
+            liste.sort((a, b) => (b.bestCorrect - a.bestCorrect) || (b.bestWPM - a.bestWPM));
+        }
+
+        let ilk10 = liste.slice(0, 10);
+        let aktifKey = aktifOyuncu ? oyuncuAnahtariOlustur(aktifOyuncu) : "";
+
+        ilk10.forEach((oyuncu, index) => {
+            let sira = index + 1;
+            let rozet = sira === 1 ? "🥇 1" : (sira === 2 ? "🥈 2" : (sira === 3 ? "🥉 3" : `#${sira}`));
+            let satirSinif = sira <= 3 ? `satir-${sira}` : "";
+
+            let oyuncuKey = oyuncuAnahtariOlustur(oyuncu.name);
+            let benMiyim = (aktifKey && oyuncuKey === aktifKey);
+            if (benMiyim) satirSinif += " satir-ben";
+
+            let tr = document.createElement("tr");
+            if (satirSinif) tr.className = satirSinif.trim();
+
+            let guvenliIsim = document.createElement("span");
+            guvenliIsim.textContent = oyuncu.name;
+
+            tr.innerHTML = `
+                <td>${rozet}</td>
+                <td>${guvenliIsim.innerHTML}${benMiyim ? '<span class="sen-rozet">SEN</span>' : ''}</td>
+                <td class="deger-wpm">${oyuncu.bestWPM || 0} WPM</td>
+                <td class="deger-dogru">${oyuncu.bestCorrect || 0}</td>
+                <td class="deger-isabet">%${oyuncu.accuracy || 95}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function liderlikTablosuAc() {
+        document.getElementById("liderlik-modal").style.display = "flex";
+        liderlikTablosuRender();
+        await buluttanRekorlariCek();
+    }
+
+    function liderlikTablosuKapat() {
+        document.getElementById("liderlik-modal").style.display = "none";
+        if (oyunBasladi && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
+        switchArayuzunuGuncelle();
+        yerelVerileriYukle();
+        buluttanRekorlariCek();
         document.getElementById("oyuncu-adi-input").focus();
     });
-
-    // REKORLARI YÜKLE
-    let bestCorrect = parseInt(localStorage.getItem("secoBestCorrect")) || 0;
-    let bestCorrectName = localStorage.getItem("secoBestCorrectName") || "Yok";
-    let bestWPM = parseInt(localStorage.getItem("secoBestWPM")) || 0;
-    let bestWPMName = localStorage.getItem("secoBestWPMName") || "Yok";
-    
-    document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
-    document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
 
     document.getElementById("oyuncu-adi-input").addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
@@ -851,6 +1590,8 @@
         let ySes = document.getElementById("yanlisSes");
         if (dSes) dSes.load();
         if (ySes) ySes.load();
+
+        buluttanRekorlariCek();
 
         let tahminInput = document.getElementById("tahmin");
         tahminInput.disabled = false;
@@ -923,8 +1664,10 @@
         genelTimer = setInterval(() => {
             oyunSuresi--;
             document.getElementById("genel-sure").innerText = oyunSuresi;
-            if(oyunSuresi <= 10 && oyunSuresi > 0) {
+            if(oyunSuresi <= 10 && oyunSuresi > 0 && efektAcikMi) {
                 document.getElementById("genel-sure").classList.add("panik");
+            } else {
+                document.getElementById("genel-sure").classList.remove("panik");
             }
             if(oyunSuresi <= 0) {
                 oyunSuresi = 0;
@@ -963,8 +1706,10 @@
         let hedefKelime = oyunKelimeleri[aktifKelimeIndex];
 
         if(tahmin === hedefKelime.toLocaleLowerCase('tr-TR')) {
-            inputAlani.classList.add("correct-neon");
-            setTimeout(() => inputAlani.classList.remove("correct-neon"), 500);
+            if (efektAcikMi) {
+                inputAlani.classList.add("correct-neon");
+                setTimeout(() => inputAlani.classList.remove("correct-neon"), 500);
+            }
 
             let bitisZamani = Date.now();
             let gecenSure = Math.max(0.05, (bitisZamani - kelimeBaslangicZamani) / 1000);
@@ -975,7 +1720,7 @@
 
             hizGoster(gecenSure, anlikWpm);
 
-            if (gecenSure <= 0.65) { 
+            if (efektAcikMi && gecenSure <= 0.65) { 
                 let kedi = document.getElementById("animasyon-kedisi");
                 if(kedi) {
                     kedi.classList.add("kedi-zipla");
@@ -993,10 +1738,12 @@
             if(gecenSure < 1.0) {
                 yorum = "IŞIK HIZI! ⚡🔥";
                 yorumRenk = "#f1c40f";
-                logo.classList.remove("seco-ignite-action");
-                void logo.offsetWidth;
-                logo.classList.add("seco-ignite-action");
-                triggerHyperSpeed();
+                if (efektAcikMi) {
+                    logo.classList.remove("seco-ignite-action");
+                    void logo.offsetWidth;
+                    logo.classList.add("seco-ignite-action");
+                    triggerHyperSpeed();
+                }
             } else {
                 yorum = gecenSure < 1.4 ? "Hızlısın! 🔥" : (gecenSure < 2.0 ? "Fena değil. 👍" : "Hızlan biraz! 🐢");
                 yorumRenk = gecenSure < 1.4 ? "#2ecc71" : (gecenSure < 2.0 ? "#3498db" : "#e67e22");
@@ -1018,6 +1765,7 @@
     }
 
     function triggerHyperSpeed() {
+        if (!efektAcikMi) return;
         document.body.classList.add("light-speed-active");
         setTimeout(() => document.body.classList.remove("light-speed-active"), 500);
         document.getElementById("anaKapsayici").classList.add("punch-active");
@@ -1046,17 +1794,19 @@
 
     function yanlisCevap() {
         let inputAlani = document.getElementById("tahmin");
-        inputAlani.classList.add("wrong-neon");
-        setTimeout(() => inputAlani.classList.remove("wrong-neon"), 500);
+        if (efektAcikMi) {
+            inputAlani.classList.add("wrong-neon");
+            setTimeout(() => inputAlani.classList.remove("wrong-neon"), 500);
+            document.getElementById("anaKapsayici").classList.add("sarsil");
+            setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
+        }
         toplamYanlis++;
         document.getElementById("stat-yanlis").innerText = toplamYanlis;
         document.getElementById("mesaj").innerHTML = "<span style='color:#e74c3c'>HATA!</span>";
-        document.getElementById("anaKapsayici").classList.add("sarsil");
-        setTimeout(() => document.getElementById("anaKapsayici").classList.remove("sarsil"), 300);
         sesCal("yanlisSes");
     }
 
-    function gameOver() {
+    async function gameOver() {
         oyunBittiMi = true;
         yenidenBaslatHazirMi = false;
         clearInterval(genelTimer);
@@ -1066,34 +1816,20 @@
         inputAlani.disabled = true;
         inputAlani.blur();
 
+        await buluttanRekorlariCek();
+
         let finalWpm = Math.round((toplamKarakter / 5) / 1); 
-        let isNew = false;
+        let yuzde = Math.round((toplamDogru / (toplamDogru + toplamYanlis || 1)) * 100);
 
-        if (toplamDogru > bestCorrect) { 
-            localStorage.setItem("secoBestCorrect", toplamDogru); 
-            localStorage.setItem("secoBestCorrectName", aktifOyuncu); 
-            bestCorrect = toplamDogru;
-            bestCorrectName = aktifOyuncu;
-            document.getElementById("best-correct").innerText = `${bestCorrect} (${bestCorrectName})`;
-            isNew = true; 
-        }
-
-        if (finalWpm > bestWPM) {
-            localStorage.setItem("secoBestWPM", finalWpm);
-            localStorage.setItem("secoBestWPMName", aktifOyuncu); 
-            bestWPM = finalWpm;
-            bestWPMName = aktifOyuncu;
-            document.getElementById("best-wpm").innerText = `${bestWPM} (${bestWPMName})`;
-            isNew = true;
-        }
+        let isNew = await oyuncuSkorunuIsle(aktifOyuncu, toplamDogru, finalWpm, yuzde);
 
         document.getElementById("game-over").style.display = "flex";
         if(isNew) {
             document.getElementById("new-record-msg").style.display = "block";
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            if (efektAcikMi) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            }
         }
-        
-        let yuzde = Math.round((toplamDogru / (toplamDogru + toplamYanlis || 1)) * 100);
 
         document.getElementById("final-stats").innerHTML = `
             Oyuncu: <b style="color:#f1c40f;">${aktifOyuncu}</b><br><br>
@@ -1128,6 +1864,8 @@
         document.getElementById("wpm-gostergesi").classList.remove("hiz-aktif");
         document.getElementById("mesaj").innerText = "";
         
+        buluttanRekorlariCek();
+
         let inputAlani = document.getElementById("tahmin");
         inputAlani.disabled = false;
         inputAlani.value = "";
@@ -1193,26 +1931,32 @@
     }
 
     function rekoruSifirla() {
-        özelModalGoster("Şifre Gerekli", "TÜM rekorları sıfırlamak için şifreyi girin:", "sifre", function(sifre) {
+        özelModalGoster("Şifre Gerekli", "TÜM İlk 10 tablosunu ve evrensel rekorları sıfırlamak için şifreyi girin:", "sifre", async function(sifre) {
             if (sifre === "780878") {
+                localStorage.removeItem("seco10ParmakPlayers");
                 localStorage.removeItem("secoBestCorrect");
                 localStorage.removeItem("secoBestCorrectName");
                 localStorage.removeItem("secoBestWPM");
                 localStorage.removeItem("secoBestWPMName");
-                bestCorrect = 0;
-                bestCorrectName = "Yok";
-                bestWPM = 0;
-                bestWPMName = "Yok";
-                document.getElementById("best-correct").innerText = "0 (Yok)";
-                document.getElementById("best-wpm").innerText = "0 (Yok)";
-                özelModalGoster("Başarılı!", "Tüm rekorlar başarıyla sıfırlandı.", "basarili");
+                oyuncularMap = {};
+                ustSampiyonBariniGuncelle();
+                liderlikTablosuRender();
+
+                if (firebaseAktifMi()) {
+                    try {
+                        await fetch(`${temizFirebaseUrl()}/rekorlar_10parmak_oyuncular.json`, { method: "DELETE" });
+                    } catch (e) {
+                        console.warn("Bulut silme hatası:", e);
+                    }
+                }
+                özelModalGoster("Başarılı!", "Tüm İlk 10 liderlik tablosu başarıyla sıfırlandı.", "basarili");
             } else if (sifre !== "") {
                 özelModalGoster("Hatalı Şifre!", "Yanlış şifre girdiniz. İşlem iptal edildi.", "hata");
             }
         });
     }
 
-    // Müzik Bölümü (Çoklu Şarkı + Eksik Dosya Korumalı)
+    // Müzik Bölümü (Üstteki SFX Switch'ten tamamen bağımsız çalışır)
     const playlist = ["ozan.mp3", "sarki2.mp3", "sarki3.mp3"];
     let suankiSarkiIndex = 0;
     let isPlaying = false;
@@ -1262,6 +2006,9 @@
                 document.getElementById("sarki-bilgi").innerText = `🎵 Çalıyor (${suankiSarkiIndex + 1}/${playlist.length}): ${playlist[suankiSarkiIndex]}`;
             }).catch(e => console.warn("Müzik çalınamadı:", e));
         }
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
     }
 
     function sonrakiSarki() {
@@ -1273,6 +2020,9 @@
             playBtn.innerText = "⏸";
             playBtn.classList.add("playing");
         }).catch(e => console.warn("Müzik geçiş hatası:", e));
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
     }
 
     function oncekiSarki() {
@@ -1285,6 +2035,9 @@
             playBtn.innerText = "⏸";
             playBtn.classList.add("playing");
         }).catch(e => console.warn("Müzik geçiş hatası:", e));
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
     }
 
     function rastgeleSarki() {
@@ -1297,9 +2050,13 @@
             playBtn.innerText = "⏸";
             playBtn.classList.add("playing");
         }).catch(e => console.warn("Müzik geçiş hatası:", e));
+        if (document.getElementById("giris-ekrani").style.display === "none" && !oyunBittiMi) {
+            document.getElementById("tahmin").focus();
+        }
     }
 
     function sesCal(id) { 
+        if (!sesAcikMi) return; // Ses Switch OFF ise hiçbir doğru/yanlış bildirim sesi çalma
         let s = document.getElementById(id); 
         if (s) { 
             s.currentTime = 0; 
@@ -1307,8 +2064,6 @@
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
                     console.warn("Ses çalınamadı (" + id + "):", err);
-                    document.getElementById("sarki-bilgi").innerText = "⚠️ Ses dosyası bulunamadı: " + s.getAttribute("src");
-                    document.getElementById("sarki-bilgi").style.color = "#e74c3c";
                 });
             }
         } 
@@ -1319,6 +2074,12 @@
         let deger = e.target.value;
         if(!oyunBasladi && !oyunBittiMi && deger.trim().length > 0) { 
             oyunuBaslat(); 
+        }
+
+        // Efekt Switch OFF ise çerçeve yeşil/kırmızı yanıp sönmez
+        if (!efektAcikMi) {
+            canliHarfTemizle();
+            return;
         }
 
         let yazilan = deger.toLocaleLowerCase('tr-TR');
@@ -1343,9 +2104,13 @@
         }
     });
 
-    // Oyun bittiğinde Enter ile direkt yeniden başlatma
+    // Oyun bittiğinde Enter ile direkt yeniden başlatma (veya ESC ile İlk 10 tablosunu kapatma)
     window.addEventListener("keydown", (e) => {
-        if (oyunBittiMi && yenidenBaslatHazirMi && document.getElementById("game-over").style.display === "flex") {
+        if (e.key === "Escape" && document.getElementById("liderlik-modal").style.display === "flex") {
+            liderlikTablosuKapat();
+            return;
+        }
+        if (oyunBittiMi && yenidenBaslatHazirMi && document.getElementById("game-over").style.display === "flex" && document.getElementById("liderlik-modal").style.display !== "flex") {
             if (e.key === "Enter") {
                 e.preventDefault();
                 oyunuSifirla();
