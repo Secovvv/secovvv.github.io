@@ -572,6 +572,184 @@
         }
 
         .hidden { display: none !important; }
+
+        /* --- NEON SİBERPUNK İLETİŞİM BUTONU VE AÇILIR PANEL (MODAL) --- */
+        .contact-trigger-btn {
+            background: rgba(0, 255, 204, 0.08);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.18);
+        }
+
+        .contact-trigger-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 25px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .contact-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.78);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 10005;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .contact-modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .contact-modal-card {
+            background: rgba(16, 20, 28, 0.94);
+            border: 1px solid rgba(0, 255, 204, 0.4);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 460px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 255, 204, 0.22);
+            transform: translateY(25px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .contact-modal-overlay.open .contact-modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 18px; right: 18px;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: #ff3333;
+            border-color: #ff3333;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 51, 51, 0.6);
+        }
+
+        .modal-title {
+            margin: 0 0 6px 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-title i {
+            color: var(--primary-color);
+            text-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .modal-subtitle {
+            color: var(--text-gray);
+            font-size: 0.88rem;
+            margin: 0 0 22px 0;
+        }
+
+        .cyber-form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .cyber-form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+        }
+
+        .cyber-input, .cyber-select, .cyber-textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .cyber-select option {
+            background: #10141c;
+            color: #fff;
+        }
+
+        .cyber-input:focus, .cyber-select:focus, .cyber-textarea:focus {
+            border-color: var(--primary-color);
+            background: rgba(0, 255, 204, 0.05);
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+        }
+
+        .cyber-submit-btn {
+            width: 100%;
+            background: var(--primary-color);
+            color: #050505;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 6px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+
+        .cyber-submit-btn:hover {
+            box-shadow: 0 0 30px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .cyber-submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
     </style>
 </head>
 <body oncontextmenu="return !(fxEnabled && drawModeActive)">
@@ -595,11 +773,7 @@
 
                 <div id="fxControls" class="fx-controls disabled">
                     <div class="shape-group">
-                        <button class="shape-btn active" data-mode="heart" onclick="setShapeMode('heart')" title="Kalp Modu">❤️</button>
-                        <button class="shape-btn" data-mode="skull" onclick="setShapeMode('skull')" title="Kurukafa Modu">💀</button>
-                        <button class="shape-btn" data-mode="letterS" onclick="setShapeMode('letterS')" title="Bordo-Mavi S Harfi Modu" style="font-family: 'Courier New', monospace; font-size: 18px;">S</button>
-                        <button class="shape-btn" data-mode="fire" onclick="setShapeMode('fire')" title="Alev Modu">🔥</button>
-                        <button class="shape-btn" data-mode="paw" onclick="setShapeMode('paw')" title="Kedi Patisi Modu">🐾</button>
+                        <button class="shape-btn active" data-mode="letterS" onclick="setShapeMode('letterS')" title="Bordo-Mavi S Harfi Modu" style="font-family: 'Courier New', monospace; font-size: 18px;">S</button>
                         <button class="shape-btn" data-mode="ts" onclick="setShapeMode('ts')" title="Trabzonspor Arması Modu">TS</button>
                         <button class="shape-btn" data-mode="matrix" onclick="setShapeMode('matrix')" title="Matrix Digital Rain & Cyber Code Modu">01</button>
                     </div>
@@ -624,6 +798,9 @@
             <button class="filter-btn" data-filter="html"><i class="fa-brands fa-html5"></i> Web Oyunları</button>
             <button class="filter-btn" data-filter="python"><i class="fa-brands fa-python"></i> Python</button>
             <button class="filter-btn" data-filter="legacy"><i class="fa-solid fa-gamepad"></i> Klasikler</button>
+            <button type="button" class="contact-trigger-btn" onclick="openContactModal()">
+                <i class="fa-solid fa-paper-plane"></i> İletişim / Mesaj Gönder
+            </button>
         </div>
 
         <div class="container" id="project-container">
@@ -726,7 +903,51 @@
         <div>© 2026 <strong>SECOVVV</strong> — Her kod bir hikaye anlatır.</div>
     </div>
 
-    <script>
+    <!-- SİBERPUNK GLASSMORPHISM İLETİŞİM PANELİ (MODAL) -->
+    <div class="contact-modal-overlay" id="contactModalOverlay" onclick="closeContactModalOutside(event)">
+        <div class="contact-modal-card">
+            <button type="button" class="modal-close-btn" onclick="closeContactModal()" title="Kapat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> İLETİŞİM</h2>
+            <p class="modal-subtitle">Görüş, öneri veya projeler hakkında doğrudan mesaj gönderin.</p>
+
+            <form id="secovvvCyberForm" onsubmit="return sendCyberContactForm(event)">
+                <div class="cyber-form-group">
+                    <label for="cyberName">Adınız</label>
+                    <input type="text" id="cyberName" class="cyber-input" placeholder="Adınız veya Nickname" required>
+                </div>
+
+                <div class="cyber-form-group">
+                    <label for="cyberEmail">E-posta Adresiniz</label>
+                    <input type="email" id="cyberEmail" class="cyber-input" placeholder="ornek@mail.com" required>
+                </div>
+
+                <div class="cyber-form-group">
+                    <label for="cyberRegion">Bölge (Region)</label>
+                    <select id="cyberRegion" class="cyber-select" required>
+                        <option value="" disabled selected>Bölge Seçiniz</option>
+                        <option value="Europe">Europe</option>
+                        <option value="Asia">Asia</option>
+                        <option value="North America">North America</option>
+                        <option value="South America">South America</option>
+                        <option value="Africa">Africa</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Antarctica">Antarctica</option>
+                    </select>
+                </div>
+
+                <div class="cyber-form-group">
+                    <label for="cyberMessage">Mesajınız</label>
+                    <textarea id="cyberMessage" class="cyber-textarea" rows="4" placeholder="Mesajınızı buraya yazın..." required></textarea>
+                </div>
+
+                <button type="button" id="cyberSubmitBtn" class="cyber-submit-btn" onclick="sendCyberContactForm(event)">
+                    <i class="fa-solid fa-paper-plane"></i> Gönder
+                </button>
+            </form>
+        </div>
+    </div><script>
         document.addEventListener("DOMContentLoaded", () => {
             // --- FİLTRELEME VE KART ANİMASYONLARI ---
             const filterBtns = document.querySelectorAll(".filter-btn");
@@ -788,7 +1009,7 @@
         canvas.height = staticCanvas.height = window.innerHeight;
 
         let fxEnabled = false;
-        let currentShapeMode = 'heart';
+        let currentShapeMode = 'letterS';
         let drawModeActive = false;
         let isDrawingTrail = false;
         let lastTrailX = null;
@@ -1476,7 +1697,7 @@
 
         window.addEventListener('mousedown', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .btn, .filter-btn')) return;
+            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card')) return;
 
             if (drawModeActive) {
                 if (event.button === 0) {
@@ -1496,7 +1717,7 @@
 
         window.addEventListener('mousemove', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar')) return;
+            if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
 
             if (drawModeActive) {
                 if (isDrawingTrail || event.buttons === 1) {
@@ -1518,7 +1739,7 @@
 
         window.addEventListener('touchstart', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .btn, .filter-btn')) return;
+            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card')) return;
             const touch = event.touches[0];
             if (!touch) return;
 
@@ -1534,7 +1755,7 @@
 
         window.addEventListener('touchmove', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar')) return;
+            if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
             const touch = event.touches[0];
             if (!touch) return;
 
@@ -1564,6 +1785,86 @@
             canvas.height = staticCanvas.height = window.innerHeight;
             staticCtx.drawImage(tempCanvas, 0, 0);
         });
+
+        // --- SİBERPUNK İLETİŞİM PANELİ VE GOOGLE SCRIPT GÖNDERİMİ ---
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXtJ9GC5n95ZZ7J1m_r3YWlqUmXtA_Xw100-2AB1qC7TdZ26s0afpBKU4E31Szh6eV/exec";
+
+        function openContactModal() {
+            document.getElementById('contactModalOverlay').classList.add('open');
+        }
+
+        function closeContactModal() {
+            document.getElementById('contactModalOverlay').classList.remove('open');
+        }
+
+        function closeContactModalOutside(event) {
+            if (event.target.id === 'contactModalOverlay') {
+                closeContactModal();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeContactModal();
+        });
+
+        function sendCyberContactForm(event) {
+            if (event) event.preventDefault();
+
+            const nameEl = document.getElementById("cyberName");
+            const emailEl = document.getElementById("cyberEmail");
+            const regionEl = document.getElementById("cyberRegion");
+            const messageEl = document.getElementById("cyberMessage");
+            const submitBtn = document.getElementById("cyberSubmitBtn");
+
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const continent = regionEl.value;
+            const message = messageEl.value.trim();
+
+            if (!name || !email || !continent || !message) {
+                alert("Lütfen tüm alanları doldurunuz.");
+                return false;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gönderiliyor...';
+            submitBtn.style.background = "#f59e0b";
+
+            const formData = new URLSearchParams();
+            formData.append("name", name + " [Oyun Evreni]");
+            formData.append("email", email);
+            formData.append("continent", continent);
+            formData.append("message", message);
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            })
+            .then(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Mesajınız Gönderildi!';
+                submitBtn.style.background = "#10b981";
+                nameEl.value = "";
+                emailEl.value = "";
+                regionEl.selectedIndex = 0;
+                messageEl.value = "";
+
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gönder';
+                    submitBtn.style.background = "var(--primary-color)";
+                    closeContactModal();
+                }, 2000);
+            })
+            .catch((err) => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Gönder';
+                submitBtn.style.background = "var(--primary-color)";
+                alert("Bağlantı hatası: " + err);
+            });
+
+            return false;
+        }
 
         animateParticles();
     </script>
