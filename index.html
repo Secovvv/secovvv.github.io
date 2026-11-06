@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
+            --z: 1;
+            /* Tüm sayfayı pencere boyutuna göre orantılı küçültüp büyütmek için 0.82vw */
+            --u: calc(0.82vw * var(--z));
             --primary-color: #00ffcc; /* Neon siberpunk yeşili/mavisi */
             --primary-glow: rgba(0, 255, 204, 0.5);
             --bg-dark: #050505;
@@ -22,10 +25,18 @@
             box-sizing: border-box;
         }
 
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+        }
+
         body { 
             font-family: 'Inter', 'Segoe UI', sans-serif; 
             margin: 0;
             padding: 0;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -46,7 +57,7 @@
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-size: calc(3.2 * var(--u)) calc(3.2 * var(--u));
             z-index: -1;
             pointer-events: none;
         }
@@ -58,9 +69,9 @@
         }
 
         /* Özel Kaydırma Çubuğu */
-        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar { width: calc(0.65 * var(--u)); }
         ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: calc(0.35 * var(--u)); }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
 
         /* --- MOUSE EFEKT CANVAS KATMANLARI (Sayfa tıklamalarını engellemez) --- */
@@ -92,23 +103,24 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: calc(0.7 * var(--u));
             background: rgba(10, 14, 18, 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
-            padding: 8px 18px;
-            margin-bottom: 24px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 255, 204, 0.28);
-            box-shadow: 0 0 24px rgba(0, 0, 0, 0.85), 0 0 15px rgba(0, 255, 204, 0.12);
-            flex-wrap: wrap;
+            padding: calc(0.5 * var(--u)) calc(1.2 * var(--u));
+            margin-bottom: calc(1.6 * var(--u));
+            border-radius: calc(2.2 * var(--u));
+            border: calc(0.08 * var(--u)) solid rgba(0, 255, 204, 0.28);
+            box-shadow: 0 0 calc(1.6 * var(--u)) rgba(0, 0, 0, 0.85), 0 0 calc(1 * var(--u)) rgba(0, 255, 204, 0.12);
+            flex-wrap: nowrap;
+            white-space: nowrap;
             user-select: none;
             -webkit-user-select: none;
         }
 
         .power-switch {
-            padding-right: 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            padding-right: calc(0.75 * var(--u));
+            border-right: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.15);
         }
 
         .power-switch .switch-track {
@@ -118,19 +130,19 @@
         .power-switch.active .switch-track {
             background: rgba(57, 255, 20, 0.8) !important;
             border-color: #39ff14 !important;
-            box-shadow: 0 0 12px rgba(57, 255, 20, 0.65) !important;
+            box-shadow: 0 0 calc(0.8 * var(--u)) rgba(57, 255, 20, 0.65) !important;
         }
 
         .power-switch.active .switch-label {
             color: #39ff14 !important;
-            text-shadow: 0 0 8px rgba(57, 255, 20, 0.7) !important;
+            text-shadow: 0 0 calc(0.55 * var(--u)) rgba(57, 255, 20, 0.7) !important;
         }
 
         .fx-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: calc(0.7 * var(--u));
+            flex-wrap: nowrap;
             justify-content: center;
             transition: opacity 0.25s ease;
         }
@@ -144,25 +156,26 @@
         .shape-group {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding-right: 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.15);
+            gap: calc(0.45 * var(--u));
+            padding-right: calc(0.75 * var(--u));
+            border-right: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.15);
         }
 
         .shape-btn {
-            width: 34px;
-            height: 34px;
+            width: calc(2.4 * var(--u));
+            height: calc(2.4 * var(--u));
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.25);
             background: rgba(255, 255, 255, 0.06);
             color: #fff;
-            font-size: 16px;
+            font-size: calc(1.1 * var(--u));
             font-weight: 900;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            padding: 0;
         }
 
         .shape-btn:hover {
@@ -173,37 +186,37 @@
         .shape-btn.active[data-mode="heart"] {
             background: rgba(255, 0, 85, 0.35);
             border-color: #ff0055;
-            box-shadow: 0 0 12px #ff0055;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #ff0055;
         }
 
         .shape-btn.active[data-mode="skull"] {
             background: rgba(255, 30, 0, 0.35);
             border-color: #ffd700;
-            box-shadow: 0 0 12px #ff1e00;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #ff1e00;
         }
 
         .shape-btn.active[data-mode="letterS"] {
             background: linear-gradient(135deg, rgba(140, 17, 57, 0.75), rgba(75, 188, 235, 0.45));
             border-color: #4bbceb;
             color: #4bbceb;
-            box-shadow: 0 0 12px #4bbceb;
+            box-shadow: 0 0 calc(0.8 * var(--u)) #4bbceb;
         }
 
         .shape-btn.active[data-mode="fire"] {
             background: rgba(255, 170, 0, 0.42);
             border-color: #ffd000;
-            box-shadow: 0 0 15px #ff8800;
+            box-shadow: 0 0 calc(1 * var(--u)) #ff8800;
         }
 
         .shape-btn.active[data-mode="paw"] {
             background: rgba(255, 102, 178, 0.35);
             border-color: #ff66b2;
-            box-shadow: 0 0 14px #ff66b2;
+            box-shadow: 0 0 calc(0.95 * var(--u)) #ff66b2;
         }
 
         .shape-btn[data-mode="ts"] {
             font-family: 'Segoe UI', Arial, sans-serif;
-            font-size: 12px;
+            font-size: calc(0.85 * var(--u));
             font-weight: 900;
             background: linear-gradient(135deg, #6c0b2a 50%, #4bbceb 50%);
             color: #ffffff;
@@ -213,13 +226,13 @@
 
         .shape-btn.active[data-mode="ts"] {
             border-color: #ffd700;
-            box-shadow: 0 0 14px #4bbceb, 0 0 8px #6c0b2a;
+            box-shadow: 0 0 calc(0.95 * var(--u)) #4bbceb, 0 0 calc(0.55 * var(--u)) #6c0b2a;
             transform: scale(1.08);
         }
 
         .shape-btn[data-mode="matrix"] {
             font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-size: calc(0.9 * var(--u));
             letter-spacing: -0.5px;
             color: #00ff41;
             border-color: rgba(0, 255, 65, 0.45);
@@ -229,40 +242,40 @@
             background: rgba(0, 255, 65, 0.32);
             border-color: #00ff41;
             color: #ffffff;
-            text-shadow: 0 0 8px #00ff41;
-            box-shadow: 0 0 16px #00ff41, inset 0 0 8px rgba(0, 255, 65, 0.5);
+            text-shadow: 0 0 calc(0.55 * var(--u)) #00ff41;
+            box-shadow: 0 0 calc(1.1 * var(--u)) #00ff41, inset 0 0 calc(0.55 * var(--u)) rgba(0, 255, 65, 0.5);
         }
 
         .switch-wrapper {
             display: flex;
             align-items: center;
-            gap: 9px;
+            gap: calc(0.6 * var(--u));
             cursor: pointer;
         }
 
         .switch-label {
-            font-size: 13.5px;
+            font-size: calc(0.95 * var(--u));
             font-weight: bold;
             color: #cbd5e1;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
         }
 
         .switch-track {
             position: relative;
-            width: 44px;
-            height: 22px;
+            width: calc(3.1 * var(--u));
+            height: calc(1.55 * var(--u));
             background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 0, 85, 0.6);
-            border-radius: 20px;
+            border: calc(0.08 * var(--u)) solid rgba(255, 0, 85, 0.6);
+            border-radius: calc(1.4 * var(--u));
             transition: 0.25s;
         }
 
         .switch-thumb {
             position: absolute;
-            top: 2px;
-            left: 3px;
-            width: 16px;
-            height: 16px;
+            top: calc(0.14 * var(--u));
+            left: calc(0.2 * var(--u));
+            width: calc(1.1 * var(--u));
+            height: calc(1.1 * var(--u));
             background: #fff;
             border-radius: 50%;
             transition: 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -271,23 +284,23 @@
         .switch-wrapper.active .switch-track {
             background: rgba(0, 255, 65, 0.75);
             border-color: #00ff41;
-            box-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
+            box-shadow: 0 0 calc(0.8 * var(--u)) rgba(0, 255, 65, 0.6);
         }
 
         .switch-wrapper.active .switch-thumb {
-            transform: translateX(20px);
+            transform: translateX(calc(1.4 * var(--u)));
         }
 
         .switch-wrapper.active .switch-label {
             color: #fff;
-            text-shadow: 0 0 8px #00ff41;
+            text-shadow: 0 0 calc(0.55 * var(--u)) #00ff41;
         }
 
         .hint-badge {
-            font-size: 12px;
+            font-size: calc(0.85 * var(--u));
             color: #ffd700;
-            border-left: 1px solid rgba(255, 255, 255, 0.15);
-            padding-left: 10px;
+            border-left: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.15);
+            padding-left: calc(0.7 * var(--u));
             display: none;
         }
 
@@ -296,10 +309,10 @@
         .clear-btn {
             background: rgba(255, 0, 85, 0.22);
             color: #ff5e7e;
-            border: 1px solid rgba(255, 0, 85, 0.5);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
+            border: calc(0.08 * var(--u)) solid rgba(255, 0, 85, 0.5);
+            padding: calc(0.35 * var(--u)) calc(0.85 * var(--u));
+            border-radius: calc(1.1 * var(--u));
+            font-size: calc(0.85 * var(--u));
             font-weight: bold;
             cursor: pointer;
             transition: 0.2s;
@@ -310,13 +323,14 @@
         .clear-btn:hover {
             background: #ff0055;
             color: #fff;
-            box-shadow: 0 0 10px #ff0055;
+            box-shadow: 0 0 calc(0.7 * var(--u)) #ff0055;
         }
 
+        /* --- ANA KAPSAYICI (Diğer sayfadaki gibi 80vw ve --u orantılı) --- */
         .main-wrapper {
-            width: 100%;
-            max-width: 1200px;
-            padding: 45px 20px 60px 20px;
+            width: 82vw;
+            max-width: calc(96 * var(--u));
+            padding: calc(2.8 * var(--u)) calc(1.5 * var(--u)) calc(4 * var(--u)) calc(1.5 * var(--u));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -326,7 +340,7 @@
         /* --- BAŞLIK --- */
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: calc(2.6 * var(--u));
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -334,31 +348,32 @@
         }
 
         h1 { 
-            font-size: clamp(3rem, 8vw, 5rem);
+            font-size: calc(5.2 * var(--u));
             font-weight: 900;
-            letter-spacing: 6px;
+            letter-spacing: calc(0.4 * var(--u));
             color: #fff; 
             margin: 0;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 0 40px var(--primary-glow);
+            text-shadow: 0 0 calc(1.4 * var(--u)) rgba(255, 255, 255, 0.2), 0 0 calc(2.6 * var(--u)) var(--primary-glow);
             position: relative;
+            line-height: 1.05;
         }
 
         h1 span { color: var(--primary-color); }
 
         .subtitle { 
             color: var(--text-gray); 
-            font-size: 1.2rem; 
-            margin-top: 15px;
+            font-size: calc(1.25 * var(--u)); 
+            margin-top: calc(1 * var(--u));
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: calc(0.15 * var(--u));
             opacity: 0.8;
         }
 
         /* --- FİLTRELEME BUTONLARI --- */
         .filters {
             display: flex;
-            gap: 15px;
-            margin-bottom: 50px;
+            gap: calc(1 * var(--u));
+            margin-bottom: calc(3.2 * var(--u));
             flex-wrap: wrap;
             justify-content: center;
             animation: fadeIn 1.5s ease-out;
@@ -366,39 +381,41 @@
 
         .filter-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
+            border: calc(0.08 * var(--u)) solid var(--glass-border);
             color: #fff;
-            padding: 10px 24px;
-            border-radius: 30px;
+            padding: calc(0.7 * var(--u)) calc(1.6 * var(--u));
+            border-radius: calc(2 * var(--u));
             cursor: pointer;
             font-family: inherit;
+            font-size: calc(0.95 * var(--u));
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: calc(0.06 * var(--u));
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            white-space: nowrap;
         }
 
         .filter-btn:hover, .filter-btn.active {
             background: var(--primary-color);
             color: #000;
-            box-shadow: 0 0 20px var(--primary-glow);
+            box-shadow: 0 0 calc(1.4 * var(--u)) var(--primary-glow);
             border-color: var(--primary-color);
         }
 
-        /* --- KART KONTEYNERİ --- */
+        /* --- KART KONTEYNERİ (Her ekran boyutunda orantılı 3 sütun) --- */
         .container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 35px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: calc(2.2 * var(--u));
             width: 100%;
         }
 
         /* --- KART TASARIMI (Glassmorphism) --- */
         .project-card { 
             background: var(--card-bg); 
-            border: 1px solid var(--glass-border); 
-            border-radius: 24px; 
-            padding: 35px 30px; 
+            border: calc(0.08 * var(--u)) solid var(--glass-border); 
+            border-radius: calc(1.6 * var(--u)); 
+            padding: calc(2.2 * var(--u)) calc(2 * var(--u)); 
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -408,7 +425,7 @@
             -webkit-backdrop-filter: blur(16px);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(calc(2 * var(--u)));
         }
 
         .project-card::before {
@@ -424,8 +441,8 @@
 
         .project-card:hover { 
             border-color: rgba(0, 255, 204, 0.3); 
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px var(--primary-glow);
+            transform: translateY(calc(-0.65 * var(--u))) scale(1.02);
+            box-shadow: 0 calc(1.4 * var(--u)) calc(2.6 * var(--u)) rgba(0, 0, 0, 0.8), 0 0 calc(2 * var(--u)) var(--primary-glow);
         }
 
         .project-card:hover::before { opacity: 0.15; }
@@ -437,56 +454,56 @@
         }
 
         .badge {
-            font-size: 0.75rem;
-            padding: 6px 14px;
-            border-radius: 50px;
+            font-size: calc(0.75 * var(--u));
+            padding: calc(0.4 * var(--u)) calc(0.95 * var(--u));
+            border-radius: calc(3 * var(--u));
             text-transform: uppercase;
             font-weight: 800;
-            margin-bottom: 20px;
+            margin-bottom: calc(1.3 * var(--u));
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            gap: calc(0.4 * var(--u));
+            letter-spacing: calc(0.06 * var(--u));
+            box-shadow: 0 calc(0.28 * var(--u)) calc(0.7 * var(--u)) rgba(0,0,0,0.3);
         }
         .badge-py { background: linear-gradient(135deg, #3776ab, #2a5a85); color: white; }
         .badge-html { background: linear-gradient(135deg, #e34c26, #b83a1c); color: white; }
         .badge-as3 { background: linear-gradient(135deg, #ff3333, #cc0000); color: white; }
 
         h3 { 
-            margin: 10px 0 15px 0; 
-            font-size: 1.8rem; 
+            margin: calc(0.65 * var(--u)) 0 calc(1 * var(--u)) 0; 
+            font-size: calc(1.85 * var(--u)); 
             color: #fff; 
             font-weight: 700;
         }
         
         p { 
             color: var(--text-gray); 
-            line-height: 1.7; 
-            margin-bottom: 30px; 
-            font-size: 0.95rem;
+            line-height: 1.65; 
+            margin-bottom: calc(2 * var(--u)); 
+            font-size: calc(0.98 * var(--u));
         }
 
         /* --- BUTONLAR --- */
         .btn { 
             background: rgba(255, 255, 255, 0.03); 
             color: #fff; 
-            padding: 14px 24px; 
+            padding: calc(0.95 * var(--u)) calc(1.6 * var(--u)); 
             text-decoration: none; 
-            border: 1px solid var(--glass-border);
-            border-radius: 12px; 
+            border: calc(0.08 * var(--u)) solid var(--glass-border);
+            border-radius: calc(0.8 * var(--u)); 
             font-weight: 700; 
             transition: all 0.3s ease;
             text-align: center;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
+            letter-spacing: calc(0.06 * var(--u));
+            font-size: calc(0.92 * var(--u));
             position: relative;
             z-index: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: calc(0.65 * var(--u));
             overflow: hidden;
         }
 
@@ -508,7 +525,7 @@
 
         /* Legacy Özel Tasarım */
         .card-legacy {
-            border: 2px dashed var(--as3-color);
+            border: calc(0.14 * var(--u)) dashed var(--as3-color);
             background: linear-gradient(145deg, rgba(22,22,22,0.9), rgba(40,10,10,0.5));
         }
         .card-legacy:hover { border-color: #ff5555; }
@@ -516,48 +533,48 @@
         /* --- FOOTER & SAYAC --- */
         .footer { 
             width: 100%;
-            padding: 40px 20px;
+            padding: calc(2.6 * var(--u)) calc(1.4 * var(--u));
             text-align: center;
             color: #555;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-size: calc(0.92 * var(--u));
+            letter-spacing: calc(0.06 * var(--u));
             background: rgba(0, 0, 0, 0.5);
-            border-top: 1px solid #111;
+            border-top: calc(0.08 * var(--u)) solid #111;
             backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: calc(1.3 * var(--u));
         }
 
         .footer strong { color: var(--primary-color); }
 
         .visitor-counter {
-            padding: 10px 20px;
+            padding: calc(0.65 * var(--u)) calc(1.4 * var(--u));
             background: rgba(0, 255, 204, 0.05);
-            border: 1px solid var(--primary-color);
-            border-radius: 50px;
+            border: calc(0.08 * var(--u)) solid var(--primary-color);
+            border-radius: calc(3 * var(--u));
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
+            gap: calc(0.65 * var(--u));
+            font-size: calc(0.92 * var(--u));
             font-weight: 600;
             color: var(--primary-color);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(0, 255, 204, 0.2);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: calc(0.06 * var(--u));
         }
 
         .visitor-counter span {
             color: #fff;
             font-weight: 800;
-            font-size: 1.1rem;
-            text-shadow: 0 0 10px var(--primary-glow);
+            font-size: calc(1.12 * var(--u));
+            text-shadow: 0 0 calc(0.7 * var(--u)) var(--primary-glow);
         }
 
         /* --- ANİMASYONLAR --- */
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-40px); }
+            from { opacity: 0; transform: translateY(calc(-2.6 * var(--u))); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -576,27 +593,29 @@
         /* --- NEON SİBERPUNK İLETİŞİM BUTONU VE AÇILIR PANEL (MODAL) --- */
         .contact-trigger-btn {
             background: rgba(0, 255, 204, 0.08);
-            border: 1px solid var(--primary-color);
+            border: calc(0.08 * var(--u)) solid var(--primary-color);
             color: var(--primary-color);
-            padding: 10px 24px;
-            border-radius: 30px;
+            padding: calc(0.7 * var(--u)) calc(1.6 * var(--u));
+            border-radius: calc(2 * var(--u));
             cursor: pointer;
             font-family: inherit;
+            font-size: calc(0.95 * var(--u));
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: calc(0.06 * var(--u));
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.18);
+            gap: calc(0.55 * var(--u));
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(0, 255, 204, 0.18);
+            white-space: nowrap;
         }
 
         .contact-trigger-btn:hover {
             background: var(--primary-color);
             color: #000;
-            box-shadow: 0 0 25px var(--primary-glow);
-            transform: translateY(-2px);
+            box-shadow: 0 0 calc(1.6 * var(--u)) var(--primary-glow);
+            transform: translateY(calc(-0.15 * var(--u)));
         }
 
         .contact-modal-overlay {
@@ -613,7 +632,7 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
-            padding: 20px;
+            padding: calc(1.4 * var(--u));
         }
 
         .contact-modal-overlay.open {
@@ -623,13 +642,13 @@
 
         .contact-modal-card {
             background: rgba(16, 20, 28, 0.94);
-            border: 1px solid rgba(0, 255, 204, 0.4);
-            border-radius: 24px;
+            border: calc(0.08 * var(--u)) solid rgba(0, 255, 204, 0.4);
+            border-radius: calc(1.6 * var(--u));
             width: 100%;
-            max-width: 460px;
-            padding: 32px 28px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 255, 204, 0.22);
-            transform: translateY(25px) scale(0.95);
+            max-width: calc(32 * var(--u));
+            padding: calc(2.2 * var(--u)) calc(1.9 * var(--u));
+            box-shadow: 0 calc(1.4 * var(--u)) calc(3.4 * var(--u)) rgba(0, 0, 0, 0.9), 0 0 calc(2.4 * var(--u)) rgba(0, 255, 204, 0.22);
+            transform: translateY(calc(1.6 * var(--u))) scale(0.95);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
         }
@@ -640,13 +659,13 @@
 
         .modal-close-btn {
             position: absolute;
-            top: 18px; right: 18px;
-            width: 34px; height: 34px;
+            top: calc(1.2 * var(--u)); right: calc(1.2 * var(--u));
+            width: calc(2.3 * var(--u)); height: calc(2.3 * var(--u));
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.15);
             color: #cbd5e1;
-            font-size: 16px;
+            font-size: calc(1.1 * var(--u));
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -658,55 +677,55 @@
             background: #ff3333;
             border-color: #ff3333;
             color: #fff;
-            box-shadow: 0 0 12px rgba(255, 51, 51, 0.6);
+            box-shadow: 0 0 calc(0.8 * var(--u)) rgba(255, 51, 51, 0.6);
         }
 
         .modal-title {
-            margin: 0 0 6px 0;
-            font-size: 1.6rem;
+            margin: 0 0 calc(0.4 * var(--u)) 0;
+            font-size: calc(1.65 * var(--u));
             font-weight: 800;
             color: #fff;
-            letter-spacing: 1.5px;
+            letter-spacing: calc(0.1 * var(--u));
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: calc(0.65 * var(--u));
         }
 
         .modal-title i {
             color: var(--primary-color);
-            text-shadow: 0 0 12px var(--primary-glow);
+            text-shadow: 0 0 calc(0.8 * var(--u)) var(--primary-glow);
         }
 
         .modal-subtitle {
             color: var(--text-gray);
-            font-size: 0.88rem;
-            margin: 0 0 22px 0;
+            font-size: calc(0.9 * var(--u));
+            margin: 0 0 calc(1.5 * var(--u)) 0;
         }
 
         .cyber-form-group {
-            margin-bottom: 16px;
+            margin-bottom: calc(1.1 * var(--u));
             text-align: left;
         }
 
         .cyber-form-group label {
             display: block;
-            font-size: 0.82rem;
+            font-size: calc(0.84 * var(--u));
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: calc(0.06 * var(--u));
             color: var(--primary-color);
-            margin-bottom: 6px;
+            margin-bottom: calc(0.4 * var(--u));
         }
 
         .cyber-input, .cyber-select, .cyber-textarea {
             width: 100%;
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 12px;
-            padding: 12px 14px;
+            border: calc(0.08 * var(--u)) solid rgba(255, 255, 255, 0.14);
+            border-radius: calc(0.8 * var(--u));
+            padding: calc(0.8 * var(--u)) calc(0.95 * var(--u));
             color: #fff;
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: calc(0.96 * var(--u));
             outline: none;
             transition: all 0.25s ease;
         }
@@ -719,7 +738,7 @@
         .cyber-input:focus, .cyber-select:focus, .cyber-textarea:focus {
             border-color: var(--primary-color);
             background: rgba(0, 255, 204, 0.05);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(0, 255, 204, 0.2);
         }
 
         .cyber-submit-btn {
@@ -727,22 +746,22 @@
             background: var(--primary-color);
             color: #050505;
             border: none;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: calc(0.8 * var(--u));
+            padding: calc(0.95 * var(--u));
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: calc(0.98 * var(--u));
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: calc(0.1 * var(--u));
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 6px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            margin-top: calc(0.4 * var(--u));
+            box-shadow: 0 0 calc(1.4 * var(--u)) rgba(0, 255, 204, 0.3);
         }
 
         .cyber-submit-btn:hover {
-            box-shadow: 0 0 30px var(--primary-glow);
-            transform: translateY(-2px);
+            box-shadow: 0 0 calc(2 * var(--u)) var(--primary-glow);
+            transform: translateY(calc(-0.15 * var(--u)));
         }
 
         .cyber-submit-btn:disabled {
@@ -773,7 +792,7 @@
 
                 <div id="fxControls" class="fx-controls disabled">
                     <div class="shape-group">
-                        <button class="shape-btn active" data-mode="letterS" onclick="setShapeMode('letterS')" title="Bordo-Mavi S Harfi Modu" style="font-family: 'Courier New', monospace; font-size: 18px;">S</button>
+                        <button class="shape-btn active" data-mode="letterS" onclick="setShapeMode('letterS')" title="Bordo-Mavi S Harfi Modu" style="font-family: 'Courier New', monospace; font-size: calc(1.25 * var(--u));">S</button>
                         <button class="shape-btn" data-mode="ts" onclick="setShapeMode('ts')" title="Trabzonspor Arması Modu">TS</button>
                         <button class="shape-btn" data-mode="matrix" onclick="setShapeMode('matrix')" title="Matrix Digital Rain & Cyber Code Modu">01</button>
                     </div>
@@ -948,6 +967,20 @@
             </form>
         </div>
     </div><script>
+        // --- 1. PENCERE VE CTRL+SCROLL DİNAMİK ÖLÇEKLENDİRME ---
+        var baseDPR = window.devicePixelRatio || 1;
+
+        function updateZoomScale() {
+            var currentDPR = window.devicePixelRatio || 1;
+            var zoomFactor = currentDPR / baseDPR;
+            document.documentElement.style.setProperty('--z', zoomFactor);
+        }
+        updateZoomScale();
+        window.addEventListener('resize', updateZoomScale);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateZoomScale);
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             // --- FİLTRELEME VE KART ANİMASYONLARI ---
             const filterBtns = document.querySelectorAll(".filter-btn");
@@ -1354,7 +1387,7 @@
         buildSpriteCache();
 
         function getRandomSprite(mode) {
-            const list = spriteCache[mode] || spriteCache.heart;
+            const list = spriteCache[mode] || spriteCache.letterS;
             return list[Math.floor(Math.random() * list.length)];
         }
 
@@ -1529,7 +1562,7 @@
         }
 
         class Particle {
-            constructor(x, y, isBurst = false, shapeType = 'heart') {
+            constructor(x, y, isBurst = false, shapeType = 'letterS') {
                 this.x = x;
                 this.y = y;
                 this.shapeType = shapeType;
