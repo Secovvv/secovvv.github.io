@@ -765,8 +765,11 @@
         <span>Video Yükleme & İndirme Seçenekleri</span>
       </div>
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <button class="upload-bg-label" id="btnToggleSocialDl" onclick="toggleSocialDownloader()" data-tip="YouTube, Instagram, TikTok veya direkt video linklerinden yeşil ekranlı video indirip doğrudan sahneye aktarır.">
-          🌐 Sosyal Medya / YouTube Video İndirici
+        <a href="https://www.mediafire.com/file/ornek_link/studyo_motor.exe/file" target="_blank" rel="noopener noreferrer" class="upload-bg-label" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; text-decoration: none;" data-tip="Medya İndirici özelliğini bilgisayarda kullanabilmek için gerekli olan yardımcı motor dosyası (studyo_motor.exe). İndirip çalıştırmanız yeterlidir.">
+          ⚙️ studyo_motor.exe İndir
+        </a>
+        <button class="upload-bg-label" id="btnToggleSocialDl" onclick="toggleSocialDownloader()" data-tip="⚠️ Bu özellik sadece studyo_motor.exe dosyasını bilgisayarınıza indirip çalıştırırsanız kullanılabilir. Açık olduğunda linkten videoyu indirip doğrudan sahneye aktarır.">
+          🌐 Medya İndirici
         </button>
         <div class="source-info-tag" id="perfBadge">Henüz kaynak video seçilmedi</div>
       </div>
@@ -3068,9 +3071,9 @@ async function checkLocalEngineStatus() {
   const titleEl = document.querySelector('.social-dl-title');
   if (titleEl) {
     const badge = isLocalEngineOnline
-      ? `<span style="background:#065f46; color:#6ee7b7; padding:2px 8px; border-radius:12px; font-size:11px;">🟢 Yerel yt-dlp Motoru Aktif (YouTube %100 Açık)</span>`
-      : `<span style="background:#7c2d12; color:#fdba74; padding:2px 8px; border-radius:12px; font-size:11px;" title="YouTube için studyo_motor.py dosyasını çalıştırın">🟠 Yerel Motor Kapalı (Direkt Link & Stok Arama Aktif)</span>`;
-    titleEl.innerHTML = `<span>🌐 Sosyal Platform & Yeşil Ekran Video Avcısı</span> ${badge}`;
+      ? `<span style="background:#065f46; color:#6ee7b7; padding:2px 8px; border-radius:12px; font-size:11px;">🟢 studyo_motor.exe Aktif (Medya İndirici Açık)</span>`
+      : `<span style="background:#7c2d12; color:#fdba74; padding:2px 8px; border-radius:12px; font-size:11px;" title="Medya indirmek için studyo_motor.exe dosyasını indirip çalıştırın">🟠 studyo_motor.exe Kapalı (Lütfen .exe modülünü çalıştırın)</span>`;
+    titleEl.innerHTML = `<span>🌐 Medya & Yeşil Ekran Video İndirici</span> ${badge}`;
   }
 }
 
