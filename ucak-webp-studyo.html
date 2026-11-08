@@ -765,7 +765,7 @@
         <span>Video Yükleme & İndirme Seçenekleri</span>
       </div>
       <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <a href="https://www.mediafire.com/file/ornek_link/studyo_motor.exe/file" target="_blank" rel="noopener noreferrer" class="upload-bg-label" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; text-decoration: none;" data-tip="Medya İndirici özelliğini bilgisayarda kullanabilmek için gerekli olan yardımcı motor dosyası (studyo_motor.exe). İndirip çalıştırmanız yeterlidir.">
+        <a href="javascript:void(0)" onclick="alert('ℹ️ studyo_motor.exe dosyası şu an genel indirmeye kapalıdır (Sadece site yöneticisi yetkisiyle çalışır).');" class="upload-bg-label" style="background: linear-gradient(135deg, #10b981, #059669); border-color: #34d399; text-decoration: none;" data-tip="Medya İndirici özelliğini bilgisayarda kullanabilmek için gerekli olan yardımcı motor dosyası (studyo_motor.exe).">
           ⚙️ studyo_motor.exe İndir
         </a>
         <button class="upload-bg-label" id="btnToggleSocialDl" onclick="toggleSocialDownloader()" data-tip="⚠️ Bu özellik sadece studyo_motor.exe dosyasını bilgisayarınıza indirip çalıştırırsanız kullanılabilir. Açık olduğunda linkten videoyu indirip doğrudan sahneye aktarır.">
@@ -3136,6 +3136,12 @@ async function startSocialDownload(targetMode, customTitle = null) {
     return;
   }
 
+  // Yeni indirme denemesi başladığı anda önceki uyarı kutusunu otomatik gizler ve temizler
+  if (bridgeBox) {
+    bridgeBox.classList.remove('show');
+    bridgeBox.innerHTML = '';
+  }
+
   socialAbortController = new AbortController();
   const signal = socialAbortController.signal;
 
@@ -3150,10 +3156,10 @@ async function startSocialDownload(targetMode, customTitle = null) {
     let videoTitle = customTitle || 'yeşil-ekran-video';
     let fileExt = (quality === 'mp3' || quality === 'm4a') ? quality : 'mp4';
 
-    // 1. DURUM: Yerel studyo_motor.py (yt-dlp) AÇIKSA -> Canlı yüzde (%) göstererek çeker
+    // 1. DURUM: Yerel studyo_motor.exe AÇIKSA -> Canlı yüzde (%) göstererek çeker
     let progressTimer = null;
     if (isLocalEngineOnline && !/\.(mp4|webm|mov)(\?.*)?$/i.test(rawUrl)) {
-      socialStatus.innerText = "🚀 Yerel yt-dlp Motoru başlatıldı, YouTube akışı hazırlanıyor...";
+      socialStatus.innerText = "🚀 studyo_motor.exe bağlandı, medya akışı hazırlanıyor...";
       fetchUrl = `http://127.0.0.1:8765/fetch?url=${encodeURIComponent(rawUrl)}&quality=${encodeURIComponent(quality)}`;
       progressTimer = setInterval(async () => {
         try {
@@ -3183,17 +3189,17 @@ async function startSocialDownload(targetMode, customTitle = null) {
         throw new Error("TikTok çözülemedi");
       }
     }
-    // 4. DURUM: YouTube linki girilmiş ama yerel studyo_motor.py çalıştırılmamış!
+    // 4. DURUM: YouTube linki girilmiş ama yerel studyo_motor.exe çalıştırılmamış!
     else {
       bridgeBox.classList.add('show');
       bridgeBox.innerHTML = `
         <div style="background:#1e1b4b; border:1px solid #818cf8; padding:10px 14px; border-radius:8px; width:100%; color:#e0e7ff; font-size:12px; line-height:1.5;">
-          ⚠️ <b>YouTube Tarayıcı Kilidi (CORS):</b> Saf HTML sayfaları YouTube'un IP korumasını tek başına aşamaz.<br>
-          👉 <b>Çözüm 1 (YouTube İçin):</b> Klasördeki <b><code>studyo_motor.py</code></b> dosyasını çalıştırın (Üstteki rozet 🟢 Yeşil olur ve YouTube videoları doğrudan sahneye iner).<br>
-          👉 <b>Çözüm 2 (Programsız Hemen Kullan):</b> Sol taraftaki <b>"🔍 Hazır Yeşil Ekran Bul"</b> kutusuna İngilizce kelime (örn: <i>jet, plane, explosion, ufo</i>) yazıp <b>"🟢 Pixabay'de Ara"</b> butonuna basın; videolar doğrudan burada listelenir ve tek tıkla sahneye yüklenir!
+          ⚠️ <b>Tarayıcı Kilidi (CORS):</b> Saf HTML sayfaları YouTube'un IP korumasını tek başına aşamaz.<br>
+          👉 <b>Çözüm 1 (Medya İndirici İçin):</b> Bilgisayarınızdaki <b><code>studyo_motor.exe</code></b> dosyasını çalıştırın (Üstteki rozet 🟢 Yeşil olur ve videolar doğrudan iner).<br>
+          👉 <b>Çözüm 2 (Programsız Stok Video):</b> Sol taraftaki <b>"🔍 Hazır Yeşil Ekran Bul"</b> kutusundan <b>"🟢 Pixabay'de Ara"</b> butonuna basarak telifsiz yeşil ekran videoları indirip sahneye atabilirsiniz.
         </div>
       `;
-      socialStatus.innerText = "ℹ️ YouTube için yerel motoru (studyo_motor.py) başlatın veya sol alttan Pixabay aramasını kullanın.";
+      socialStatus.innerText = "ℹ️ İndirme için studyo_motor.exe dosyasını başlatın veya Pixabay aramasını kullanın.";
       return;
     }
 
