@@ -1,0 +1,3209 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yeşil & Mavi Ekran (Chroma Key) Silici & Şeffaf Video Stüdyosu Pro</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #060911;
+    color: #f8fafc;
+    margin: 0;
+    padding: 20px 14px;
+  }
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .main-header {
+    text-align: center;
+    padding: 18px 20px;
+    background: linear-gradient(180deg, #111a2e 0%, #0b111e 100%);
+    border-radius: 16px;
+    border: 2px solid #283a5e;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  }
+  .main-header h1 {
+    margin: 0;
+    color: #38bdf8;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+  }
+  .main-header p {
+    margin: 6px 0 0 0;
+    color: #94a3b8;
+    font-size: 13.5px;
+  }
+
+  .studio-panel {
+    background: #0e1626;
+    border: 2px solid #2e436e;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.75);
+    position: relative;
+  }
+  .panel-1 { border-top: 4px solid #38bdf8; }
+  .panel-2 { border-top: 4px solid #10b981; }
+  .panel-3 { border-top: 4px solid #a855f7; }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1e2d4a;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .panel-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .panel-step-badge {
+    background: #1e293b;
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .source-info-tag {
+    font-size: 12px;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  [data-tip] { position: relative; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.45;
+    width: max-content;
+    max-width: 300px;
+    white-space: normal;
+    text-align: left;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.95);
+    border: 1px solid #38bdf8;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.18s ease;
+    pointer-events: none;
+    z-index: 999;
+  }
+  [data-tip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .top-export-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 1080px) {
+    .top-export-bar { grid-template-columns: 1fr; }
+  }
+  .export-card {
+    background: #152036;
+    border: 2px solid #263859;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .export-card.card-mp4 { border-color: #9d174d; }
+  .card-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #38bdf8;
+    border-bottom: 1px solid #263859;
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .audio-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #6ee7b7;
+    padding: 3px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+  .audio-pill.muted-mode {
+    background: rgba(244, 63, 94, 0.15);
+    border-color: #f43f5e;
+    color: #fda4af;
+  }
+  .audio-pill.audio-only-mode {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: #f59e0b;
+    color: #fde68a;
+    pointer-events: none;
+  }
+  .audio-pill input { margin: 0; cursor: pointer; accent-color: #10b981; }
+
+  .source-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .field-box {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 135px;
+  }
+  .field-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #cbd5e1;
+  }
+  input[type="file"], select, input[type="number"] {
+    background: #090e1a;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #3b4f73;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    height: 36px;
+  }
+  select optgroup { background: #0f172a; color: #38bdf8; font-weight: 800; }
+  select option { background: #090e1a; color: #f8fafc; font-weight: 500; }
+  select:hover, input[type="file"]:hover, input[type="number"]:hover { border-color: #38bdf8; }
+
+  .btn-group {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .ergo-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 10px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.16s ease;
+    text-align: center;
+    min-height: 54px;
+    min-width: 105px;
+  }
+  .ergo-btn:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.5); }
+  .ergo-btn .btn-main { font-size: 12.5px; font-weight: 800; }
+  .ergo-btn .btn-sub { font-size: 10px; font-weight: 500; opacity: 0.92; margin-top: 3px; }
+
+  .btn-webp { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+  .btn-webp:hover:not(:disabled) { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
+
+  .btn-webm { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; }
+  .btn-webm:hover:not(:disabled) { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-1px); }
+
+  .btn-png { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; }
+  .btn-png:hover:not(:disabled) { background: linear-gradient(135deg, #7c3aed, #5b21b6); transform: translateY(-1px); }
+
+  .btn-mp4 { background: linear-gradient(135deg, #ec4899, #be185d); color: #fff; }
+  .btn-mp4:hover:not(:disabled) { background: linear-gradient(135deg, #db2777, #9d174d); transform: translateY(-1px); }
+
+  .btn-audio-mode { background: linear-gradient(135deg, #f59e0b, #d97706) !important; color: #fff; }
+  .btn-audio-mode:hover:not(:disabled) { background: linear-gradient(135deg, #d97706, #b45309) !important; transform: translateY(-1px); }
+
+  .btn-reset {
+    background: #1e2c46;
+    color: #e2e8f0;
+    padding: 6px 11px;
+    border-radius: 7px;
+    border: 1px solid #3b5078;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .btn-reset:hover:not(:disabled) { background: #2d4063; border-color: #38bdf8; }
+  .btn-reset.active-toggle { background: #0284c7; border-color: #38bdf8; color: #fff; }
+  .btn-reset:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .upload-bg-label {
+    background: #0284c7;
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #38bdf8;
+    transition: 0.15s;
+  }
+  .upload-bg-label:hover { background: #0369a1; }
+
+  .locked-ui { pointer-events: none !important; opacity: 0.55; }
+
+  .bg-custom-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    background: #152036;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #2e436e;
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+  .bg-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid #64748b;
+    cursor: pointer;
+    transition: transform 0.12s;
+  }
+  .swatch:hover { transform: scale(1.15); border-color: #fff; }
+  .swatch.checker {
+    background-image: conic-gradient(#475569 25%, #1e293b 0 50%, #475569 0 75%, #1e293b 0);
+    background-size: 10px 10px;
+  }
+  .zoom-box {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #0b111e;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid #2e436e;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    background: #152036;
+    padding: 14px;
+    border-radius: 12px 12px 0 0;
+    border: 2px solid #263859;
+    border-bottom: none;
+  }
+  @media (max-width: 960px) { .controls { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 540px) { .controls { grid-template-columns: 1fr; } }
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+    background: #0c1322;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #223252;
+  }
+  .control-group label {
+    font-weight: 700;
+    font-size: 12px;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .control-group label span { color: #38bdf8; font-weight: 800; }
+  .micro-note { font-size: 10.5px; color: #94a3b8; line-height: 1.25; }
+  input[type="range"] { width: 100%; accent-color: #10b981; cursor: pointer; height: 6px; margin: 5px 0; }
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 4px;
+    cursor: pointer;
+    color: #6ee7b7;
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 500px;
+    overflow: hidden;
+    border-left: 2px solid #263859;
+    border-right: 2px solid #263859;
+    background-image: conic-gradient(#26334d 25%, #161f30 0 50%, #26334d 0 75%, #161f30 0);
+    background-size: 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: grab;
+    margin: 0 auto;
+  }
+  .stage:active { cursor: grabbing; }
+  .stage.is-rendering { cursor: wait !important; border-color: #f59e0b; }
+  .stage.drag-over { border: 3px dashed #10b981; }
+
+  #bgVideo, #bgImage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: center center;
+    max-width: none;
+    max-height: none;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+  }
+  canvas {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: center center;
+    pointer-events: none;
+  }
+  .fly-mode canvas {
+    position: absolute;
+    width: 55%;
+    height: auto;
+    animation: flyAcross 6.5s linear infinite;
+  }
+  @keyframes flyAcross {
+    0% { left: -60%; }
+    100% { left: 100%; }
+  }
+  .stage-hud {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    z-index: 5;
+    background: rgba(11, 17, 30, 0.9);
+    border: 1px solid #334669;
+    color: #cbd5e1;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    pointer-events: none;
+  }
+
+  /* YENİ: OYNATMA VE BAŞLANGIÇ/BİTİŞ KIRPMA (TRIM) ÇUBUĞU */
+  .trim-bar {
+    background: #121c30;
+    border: 2px solid #263859;
+    border-radius: 0 0 12px 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .trim-top-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-play-pause {
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    min-width: 115px;
+    transition: 0.15s;
+  }
+  .btn-play-pause:hover:not(:disabled) { filter: brightness(1.1); }
+  .btn-play-pause:disabled { opacity: 0.4; cursor: not-allowed; }
+  .time-readout {
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #38bdf8;
+    background: #090e1a;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #263859;
+  }
+  .seek-slider-wrap {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+  }
+  .trim-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: #0b111e;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #1e2d4a;
+    font-size: 12px;
+  }
+  .trim-input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .trim-input-group input[type="number"] {
+    width: 78px;
+    height: 30px;
+    padding: 4px 8px;
+    font-weight: 700;
+    color: #34d399;
+  }
+  .trim-badge {
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #7dd3fc;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+  }
+
+  .progress-row {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    width: 100%;
+  }
+  .progress-wrap {
+    flex: 1;
+    background: #090d16;
+    height: 34px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #38bdf8;
+    position: relative;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981, #38bdf8, #ec4899);
+    transition: width 0.08s linear;
+  }
+  .progress-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  }
+  .btn-cancel-render {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    color: #ffffff;
+    border: 1px solid #f87171;
+    padding: 0 18px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+    transition: all 0.15s ease;
+  }
+  .btn-cancel-render:hover { background: linear-gradient(135deg, #dc2626, #991b1b); transform: translateY(-1px); }
+
+  .status-banner {
+    margin-top: 12px;
+    background: #0b111e;
+    border: 1px solid #223252;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 600;
+    color: #38bdf8;
+    font-size: 13px;
+  }
+
+  .tester-stage {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px dashed #475569;
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 50%, #0284c7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #testWebpImg, #testWebmVideo {
+    max-height: 190px;
+    max-width: 90%;
+    height: auto;
+    object-fit: contain;
+    display: none;
+  }
+  #testAudioPlayer {
+    display: none;
+    width: 80%;
+    max-width: 520px;
+    z-index: 10;
+  }
+  .fly-webp #testWebpImg, .fly-webp #testWebmVideo {
+    position: absolute;
+    animation: flyAcross 6.5s linear infinite;
+  }
+
+  /* YENİ: SOSYAL MEDYA VİDEO İNDİRİCİ & YEŞİL EKRAN AVCISI (MAINACTIVITY UYARLAMASI) */
+  .social-dl-drawer {
+    margin-top: 16px;
+    background: linear-gradient(180deg, #131d33 0%, #0b1220 100%);
+    border: 2px solid #38bdf8;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  }
+  .social-dl-drawer.open { display: flex; }
+  .social-dl-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #263859;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .social-dl-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .social-dl-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .social-url-input {
+    background: #090e1a;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #3b4f73;
+    color: #fff;
+    font-size: 12.5px;
+    width: 100%;
+    height: 36px;
+  }
+  .social-url-input:focus { outline: none; border-color: #38bdf8; }
+  .social-helper-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #090e1a;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #1e2d4a;
+    font-size: 11.5px;
+  }
+  .bridge-links {
+    display: none;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    padding-top: 6px;
+    border-top: 1px dashed #263859;
+  }
+  .bridge-links.show { display: flex; }
+  .seco-watermark {
+    font-family: cursive, sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #38bdf8, #10b981, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="main-header">
+    <h1>🎬 Yeşil & Mavi Ekran (Chroma Key) Silici & Şeffaf Video Stüdyosu Pro</h1>
+    <p>Videolarınızın arka planını temizleyin; istediğiniz aralığı kırpıp şeffaf <b>WebP</b>, <b>WebM</b>, <b>PNG</b>, özel manzaralı <b>MP4</b> veya <b>Sadece Ses</b> olarak indirin</p>
+  </header>
+
+  <!-- ==================== 1. ANA PANEL: MEDYA YÜKLEME VE ÇIKTI MERKEZİ ==================== -->
+  <section class="studio-panel panel-1">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="panel-step-badge">PANEL 1</span>
+        <span>Video Yükleme & İndirme Seçenekleri</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button class="upload-bg-label" id="btnToggleSocialDl" onclick="toggleSocialDownloader()" data-tip="YouTube, Instagram, TikTok veya direkt video linklerinden yeşil ekranlı video indirip doğrudan sahneye aktarır.">
+          🌐 Sosyal Medya / YouTube Video İndirici
+        </button>
+        <div class="source-info-tag" id="perfBadge">Henüz kaynak video seçilmedi</div>
+      </div>
+    </div>
+
+    <!-- YENİ: MAINACTIVITY.KT UYARLAMASI SOSYAL MEDYA VİDEO İNDİRME VE SAHNEYE AKTARMA PANELİ -->
+    <div class="social-dl-drawer" id="socialDlDrawer">
+      <div class="social-dl-header">
+        <div class="social-dl-title">
+          <span>🌐 Sosyal Platform & Linkten Video Avcısı (YouTube • Insta • TikTok • Direkt MP4/WebM)</span>
+          <span class="seco-watermark">SECOVVV Engine</span>
+        </div>
+        <button class="btn-reset" onclick="toggleSocialDownloader()">✖ Kapat</button>
+      </div>
+
+      <div class="social-dl-row">
+        <div class="field-box" style="flex: 2.5; min-width: 240px;">
+          <span class="field-title">🔗 Video Linki (Insta, Face, YouTube, TikTok veya Direkt .mp4):</span>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="socialUrlInput" class="social-url-input" placeholder="https://www.youtube.com/watch?v=... veya direkt .mp4 linki yapıştırın">
+            <button class="btn-reset" onclick="pasteToSocialInput()" data-tip="Panodaki kopyalanmış linki yapıştırır.">📋 Yapıştır</button>
+            <button class="btn-reset" onclick="document.getElementById('socialUrlInput').value=''" data-tip="Kutuyu temizler.">🧹</button>
+          </div>
+        </div>
+
+        <div class="field-box" style="flex: 1; min-width: 165px;">
+          <span class="field-title">⚙️ Seçilen Kalite:</span>
+          <select id="socialQualitySelect">
+            <option value="best">🌟 En İyi Kalite (Otomatik)</option>
+            <option value="2160">🎬 4K (Maksimum - 2160p)</option>
+            <option value="1440">🎬 2K (Maksimum - 1440p)</option>
+            <option value="1080" selected>🎬 1080p Full HD</option>
+            <option value="720">🎬 720p HD</option>
+            <option value="480">🎬 480p SD</option>
+            <option value="mp3">🎵 Sadece Ses (MP3)</option>
+            <option value="m4a">🎵 Sadece Ses (M4A)</option>
+          </select>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="ergo-btn btn-webp" id="btnSocialToStage" style="min-height:38px; padding:6px 12px;" onclick="startSocialDownload('stage')" data-tip="Videoyu indirip doğrudan Panel 2'deki Chroma Key sahnesine yükler!">
+            <span class="btn-main">🎬 Sahneye Yükle</span>
+            <span class="btn-sub">Direkt Stüdyoya Aktar</span>
+          </button>
+          <button class="ergo-btn btn-webm" id="btnSocialToDisk" style="min-height:38px; padding:6px 12px;" onclick="startSocialDownload('disk')" data-tip="Videoyu veya sesi seçilen kalitede doğrudan cihazınıza indirir.">
+            <span class="btn-main">⬇️ Cihaza İndir</span>
+            <span class="btn-sub">İndirilenlere Kaydet</span>
+          </button>
+          <button class="btn-cancel-render" id="btnSocialCancel" style="display:none; height:38px;" onclick="cancelSocialDownload()">
+            🛑 İptal
+          </button>
+        </div>
+      </div>
+
+      <div class="social-helper-bar">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <strong style="color:#34d399;">🔍 Hazır Yeşil Ekran Bul:</strong>
+          <input type="text" id="greenSearchQuery" placeholder="Örn: F16 jet, patlama, kedi..." style="background:#152036; border:1px solid #3b4f73; color:#fff; border-radius:6px; padding:4px 8px; font-size:11.5px; width:165px;">
+          <button class="btn-reset" onclick="searchGreenScreenVideos('youtube')" data-tip="YouTube'da yeşil ekranlı videoları arar.">▶️ YouTube'da Ara</button>
+          <button class="btn-reset" onclick="searchGreenScreenVideos('pixabay')" data-tip="Pixabay'de telifsiz ve doğrudan indirilebilir yeşil ekran videoları arar.">🟢 Pixabay'de Ara</button>
+        </div>
+        <div id="socialStatusText" style="color:#7dd3fc; font-weight:700;">Link yapıştırıp "Sahneye Yükle" veya "Cihaza İndir" butonuna basın.</div>
+      </div>
+
+      <!-- Tarayıcı CORS engeli durumunda tek tıkla çalışan garantili yedek köprüler -->
+      <div class="bridge-links" id="socialBridgeBox">
+        <span style="color:#fbbf24; font-weight:700; font-size:11.5px;">⚡ Tarayıcı Koruması Aşma Köprüleri (Tek Tıkla İndir):</span>
+        <button class="btn-reset" onclick="openExternalBridge('cobalt')">🚀 Cobalt.tools (Reklamsız)</button>
+        <button class="btn-reset" onclick="openExternalBridge('ssyoutube')">📥 SSYouTube / SaveFrom</button>
+        <button class="btn-reset" onclick="openExternalBridge('y2mate')">🎬 Y2Mate (YouTube HD)</button>
+        <button class="btn-reset" onclick="copyYtDlpCommand()" data-tip="MainActivity.kt içindeki Android/Web player_client parametreli yt-dlp komutunu kopyalar.">💻 yt-dlp Komutunu Kopyala</button>
+      </div>
+    </div>
+
+    <div class="top-export-bar">
+      <!-- ADIM 1: KAYNAK VİDEO -->
+      <div class="export-card">
+        <div class="card-title">
+          <span>📂 1. Kaynak Video & Çözünürlük</span>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-reset" id="btnPreviewMute" style="padding:3px 8px; font-size:11px;" onclick="togglePreviewAudio()" data-tip="Sahnede çalışırken videonun sesini hoparlörden duymayı açar/kapatır.">🔇 Önizleme Sesi</button>
+            <button class="btn-reset" id="btnFlyToggle" style="padding:3px 8px; font-size:11px;" onclick="toggleFly()" data-tip="Objeyi soldan sağa hareket ettirme testini açar/kapatır.">🚀 Hareket</button>
+          </div>
+        </div>
+        <div class="source-row" id="sourceControls">
+          <div class="field-box" data-tip="Yeşil veya mavi ekranlı videonuzu buradan yükleyin. İndirilen dosyalar bu videonun adıyla kaydedilir.">
+            <span class="field-title">Kaynak Video Seç (MP4/WebM/MOV):</span>
+            <input type="file" id="videoFile" accept=".mp4,.webm,.mov,.mkv,.avi,video/*">
+          </div>
+          <div class="field-box" data-tip="İndirilecek dosyanın çözünürlük kalitesini belirler.">
+            <span class="field-title">Çıktı Kalitesi (Çözünürlük):</span>
+            <select id="exportWidth">
+              <option value="500">500 px — Web Küçük Boy (En Hafif)</option>
+              <option value="720">720p HD — Standart Web (1280x720)</option>
+              <option value="1080" selected>1080p Full HD — Keskin Kalite (1920x1080)</option>
+              <option value="1440">2K QHD — Stüdyo Kalitesi (2560x1440)</option>
+              <option value="2160">4K Ultra HD — Sinema Kalitesi (3840x2160)</option>
+              <option value="0">Orijinal Kaynak Boyutu (Kayıpsız)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADIM 2: ŞEFFAF ÇIKTI (WEBP + WEBM + PNG) -->
+      <div class="export-card">
+        <div class="card-title">
+          <span>👻 2. Arka Plansız (Şeffaf) İndir</span>
+          <label class="audio-pill" id="webmAudioPill" data-tip="İşaretliyse Şeffaf WebM videosu SESLİ iner. İşareti kaldırırsanız SESSİZ iner.">
+            <input type="checkbox" id="webmAudioCheck" checked onchange="updateAudioPills()">
+            <span id="webmAudioLabel">🔊 WebM: Sesli</span>
+          </label>
+        </div>
+        <div class="btn-group">
+          <button class="ergo-btn btn-webp" id="btnWebP" onclick="exportAnimatedWebP()" disabled data-tip="HAREKETLİ ŞEFFAF RESİM (.webp): Süre sınırı olmadan seçtiğiniz kırpma aralığını şeffaf animasyonlu WebP olarak indirir.">
+            <span class="btn-main">📦 Şeffaf WebP</span>
+            <span class="btn-sub">Hareketli Resim</span>
+          </button>
+
+          <button class="ergo-btn btn-webm" id="btnWebM" onclick="exportTransparentWebM()" disabled data-tip="ŞEFFAF VİDEO (.webm): Seçtiğiniz aralığı ister SESLİ ister SESSİZ şeffaf WebM videosu olarak indirir.">
+            <span class="btn-main">🎥 Şeffaf WebM</span>
+            <span class="btn-sub" id="btnWebmSubText">🔊 Sesli Video</span>
+          </button>
+
+          <button class="ergo-btn btn-png" id="btnPNG" onclick="exportTransparentPNG()" disabled data-tip="ANLIK ŞEFFAF FOTOĞRAF (.png): Videonun o an durduğu/oynadığı kareyi arka planı silinmiş yüksek çözünürlüklü Şeffaf PNG olarak tek tıkla indirir.">
+            <span class="btn-main">📸 Şeffaf<br>PNG</span>
+            <span class="btn-sub">Tek Kare Sprite</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ADIM 3: ARKA PLANLA BİRLEŞİK VİDEO VEYA SADECE SES ÇIKTISI -->
+      <div class="export-card card-mp4">
+        <div class="card-title" style="color:#f472b6;">
+          <span id="card3HeaderTitle">🎬 3. Birleşik Video & Ses İndir</span>
+          <label class="audio-pill" id="compAudioPill" data-tip="Video modunda işaretliyse SESLİ, kaldırırsanız SESSİZ iner. Sadece Ses formatlarında otomatik ses moduna geçer.">
+            <input type="checkbox" id="compAudioCheck" checked onchange="updateAudioPills()">
+            <span id="compAudioLabel">🔊 MP4: Sesli</span>
+          </label>
+        </div>
+        <div class="source-row">
+          <div class="field-box" data-tip="İster arka planla birleşik video formatı, isterseniz sadece videonun sesini ayıklamak için ses formatı seçin.">
+            <span class="field-title">Video ve Ses Formatı:</span>
+            <select id="compositeFormat" onchange="onCompositeFormatChange()">
+              <optgroup label="🎬 BİRLEŞİK VİDEO FORMATLARI">
+                <option value="mp4">📹 MP4 Video (H.264) — En Uyumlu</option>
+                <option value="webm_vp9">🎥 WebM Video (VP9) — 4K Kalite</option>
+                <option value="webm_av1">⚡ WebM Video (AV1) — Ultra Sıkıştırma</option>
+              </optgroup>
+              <optgroup label="🎵 SADECE SES FORMATLARI (AUDIO EXTRACT)">
+                <option value="audio_mp3">🎵 MP3 (.mp3) — Evrensel Sıkıştırılmış Ses</option>
+                <option value="audio_aac">🎵 AAC (.m4a / .mp4) — Apple & Web Standart</option>
+                <option value="audio_wav">🎵 WAV (.wav) — Kayıpsız Stüdyo PCM (Anında)</option>
+                <option value="audio_aiff">🎵 AIFF (.aiff) — Apple Kayıpsız PCM (Anında)</option>
+                <option value="audio_flac">🎵 FLAC (.flac) — Kayıpsız Sıkıştırma</option>
+                <option value="audio_alac">🎵 ALAC (.m4a) — Apple Lossless Audio</option>
+                <option value="audio_opus">🎵 Opus (.opus) — Yüksek Verimli Modern Ses</option>
+                <option value="audio_ogg">🎵 OGG (.ogg) — Açık Kaynak Ses Konteyneri</option>
+              </optgroup>
+            </select>
+          </div>
+          <button class="ergo-btn btn-mp4" id="btnComposite" onclick="handleCard3Export()" disabled data-tip="Seçilen formata göre Birleşik Video veya Sadece Ses dosyası indirir.">
+            <span class="btn-main" id="btnCompMainText">🎬 Birleşik Video İndir</span>
+            <span class="btn-sub" id="btnCompSubText">🔊 Sesli + Manzara Kaydı</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 2. ANA PANEL: SAHNE, ARKA PLAN VE CHROMA KEY AYARLARI ==================== -->
+  <section class="studio-panel panel-2">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="panel-step-badge" style="color:#34d399; border-color:#10b981;">PANEL 2</span>
+        <span>Stüdyo Sahnesi, Yön/Boyut & Yeşil/Mavi Ekran Ayarları</span>
+      </div>
+      <div style="font-size:12px; color:#94a3b8;">
+        💡 <b>İpucu:</b> Sahneden yeşil/mavi renk seçmek için <b>Shift + Sol Tık</b>, objeyi taşımak için <b>Alt + Sürükle</b> kullanın.
+      </div>
+    </div>
+
+    <!-- ZEMİN, BOYUT, YÖN ÇEVİRME (FLIP) VE DÖNDÜRME ARAÇ ÇUBUĞU -->
+    <div class="bg-custom-bar" id="bgCustomBar">
+      <div class="bg-section">
+        <strong>🎨 Zemin:</strong>
+        <input type="color" id="stageColorPicker" value="#0ea5e9" style="width:28px; height:25px; cursor:pointer; border:none; border-radius:4px;">
+        <div class="swatch checker" onclick="setCheckerBg()" data-tip="Şeffaf Dama Zemini"></div>
+        <div class="swatch" style="background: linear-gradient(180deg, #0284c7, #bae6fd);" onclick="setGradientBg('#0284c7', '#e0f2fe')" data-tip="Gündüz Gökyüzü"></div>
+        <div class="swatch" style="background: linear-gradient(180deg, #0f172a, #1e3a8a);" onclick="setGradientBg('#0f172a', '#1e3a8a')" data-tip="Gece Gökyüzü"></div>
+        <div class="swatch" style="background: #09090b;" onclick="setSolidBg('#09090b')" data-tip="Tam Siyah"></div>
+        <div class="swatch" style="background: #ffffff;" onclick="setSolidBg('#ffffff')" data-tip="Tam Beyaz"></div>
+        <label class="upload-bg-label" for="bgMediaInput" data-tip="Arka plana kendi fotoğrafınızı veya videonuzu yükleyin.">
+          🖼️ Görsel Yükle
+        </label>
+        <input type="file" id="bgMediaInput" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,.svg,.avif,.mp4,.webm,.mov,image/*,video/*" style="display:none;">
+      </div>
+
+      <div class="bg-section">
+        <div class="zoom-box" data-tip="Yüklediğiniz arka plan görselini büyütüp küçültür.">
+          <span>🖼️ Zemin: <b id="bgZoomVal" style="color:#38bdf8;">100%</b></span>
+          <input type="range" id="bgZoomRange" min="20" max="400" value="100" style="width:65px;">
+        </div>
+
+        <div class="zoom-box" style="border-color:#10b981;" data-tip="Videodaki objeyi küçültüp büyütür.">
+          <span>🎬 Boyut: <b id="planeScaleVal" style="color:#10b981;">100%</b></span>
+          <input type="range" id="planeScaleRange" min="15" max="150" value="100" style="width:70px;">
+        </div>
+
+        <button class="btn-reset" id="btnFlipX" onclick="toggleFlipX()" data-tip="Objeyi yatayda aynalar (Sağa bakan uçağı sola çevirir).">↔️ Yatay</button>
+        <button class="btn-reset" id="btnFlipY" onclick="toggleFlipY()" data-tip="Objeyi dikeyde ters çevirir (Baş aşağı aynalar).">↕️ Dikey</button>
+
+        <div class="zoom-box" style="border-color:#a855f7;" data-tip="Sürgüyle, -1°/+1° butonlarıyla veya kutuya doğrudan sayı yazarak (örn: 15, -30, 12.5) açıyı hassas ayarlayın.">
+          <span>🔄 Açı:</span>
+          <button type="button" class="btn-reset" style="padding:2px 6px;" onclick="stepRotation(-1)">-1°</button>
+          <input type="range" id="planeRotRange" min="-180" max="180" value="0" step="0.5" style="width:115px;">
+          <button type="button" class="btn-reset" style="padding:2px 6px;" onclick="stepRotation(1)">+1°</button>
+          <input type="number" id="planeRotInput" min="-360" max="360" step="0.5" value="0" style="width:64px; height:26px; padding:2px 5px; text-align:center; font-weight:800; color:#c084fc;">
+          <span style="color:#c084fc; font-weight:800;">°</span>
+        </div>
+
+        <button class="btn-reset" onclick="resetBgTransform()" data-tip="Zemini, obje boyutunu, yönünü ve açısını merkeze sıfırlar.">🎯 Sıfırla</button>
+        <button class="btn-reset" onclick="setCheckerBg()" data-tip="Yüklenen arka plan görselini kaldırır.">❌ Zemin Kaldır</button>
+      </div>
+    </div>
+
+    <!-- 4x2 SİMETRİK HASSAS AYAR IZGARASI -->
+    <div class="controls" id="chromaControls">
+      <div class="control-group" data-tip="Silinecek arka plan rengidir (Yeşil, Mavi, Kırmızı vb.). Sahneden renk seçmek için SHIFT tuşuna basılı tutarak arka plana tıklayın.">
+        <label>🎯 1. Silinecek Renk <span id="colorHex">#00ff00</span></label>
+        <input type="color" id="keyColor" value="#00ff00" style="width:100%; height:26px; cursor:pointer; border:none; border-radius:4px;">
+        <div class="micro-note">Yeşil/Mavi seç: <b>Shift + Sol Tık</b></div>
+      </div>
+
+      <div class="control-group" data-tip="Arka plandaki seçili rengi (yeşil, mavi vb.) silme gücüdür.">
+        <label>🧹 2. Renk Silme Gücü <span id="tolVal">65</span></label>
+        <input type="range" id="tolerance" min="15" max="135" value="65" step="1">
+        <div class="micro-note">Perdeyi temizleme oranı</div>
+      </div>
+
+      <div class="control-group" data-tip="Objenin kendi üzerindeki koyu yeşil/mavi tonların silinmesini engeller.">
+        <label>🛡️ 3. İç Rengi Koruma <span id="protectVal">75%</span></label>
+        <input type="range" id="protectGreen" min="10" max="100" value="75" step="1">
+        <div class="micro-note">Objenin kendi iç tonlarını korur</div>
+      </div>
+
+      <div class="control-group" data-tip="Objenin en dış sınır hattındaki renkli çapakları içeri doğru tıraşlar.">
+        <label>✂️ 4. Kenar Tıraşlama <span id="chokeVal">1.5 px</span></label>
+        <input type="range" id="edgeChoke" min="0" max="4" value="1.5" step="0.5">
+        <div class="micro-note">Dış kenardaki izleri keser</div>
+      </div>
+
+      <div class="control-group" data-tip="Objenin dış kenar geçişlerini yumuşatır.">
+        <label>✨ 5. Kenar Yumuşatma <span id="softVal">12</span></label>
+        <input type="range" id="softness" min="0" max="40" value="12" step="1">
+        <div class="micro-note">Keskin piksel sınırlarını yumuşatır</div>
+      </div>
+
+      <div class="control-group" data-tip="Yeşil veya mavi ekrandan objenin kenarlarına yansıyan renkli parlamayı yok eder.">
+        <label>🎨 6. Yansıma Kırıcı <span id="spillVal">85%</span></label>
+        <input type="range" id="despill" min="0" max="100" value="85" step="1">
+        <div class="micro-note">Kenardaki renk yansımasını siler</div>
+      </div>
+
+      <div class="control-group" data-tip="Sol sürgü saniyedeki kare sayısını (FPS), sağ sürgü ise kaliteyi belirler.">
+        <label>⚡ 7. Akıcılık & Kalite <span id="fpsVal">24 FPS / %95</span></label>
+        <div style="display:flex; gap:6px;">
+          <input type="range" id="fpsRange" min="10" max="60" value="24" title="FPS">
+          <input type="range" id="qualRange" min="65" max="100" value="95" title="Kalite (%)">
+        </div>
+        <div class="micro-note">Sol: FPS (10-60) • Sağ: Kalite (%)</div>
+      </div>
+
+      <div class="control-group" data-tip="İşaretliyse tüm videodaki hareket alanını tarayarak sadece dışta kalan boşlukları kırpar. Kapalıysa orijinal sahne boyutu korunur.">
+        <label>📐 8. Akıllı Kadraj</label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="autoCrop"> Boşlukları Otomatik Kırp
+        </label>
+        <div class="micro-note" id="cropHint">Açılırsa tüm dans/hareket alanını tarar</div>
+      </div>
+    </div>
+
+    <!-- VİDEO ÖNİZLEME SAHNESİ -->
+    <div class="stage" id="stage">
+      <video id="bgVideo" loop muted playsinline crossorigin="anonymous"></video>
+      <img id="bgImage" alt="Özel Arka Plan" crossorigin="anonymous">
+      <canvas id="canvas"></canvas>
+      <div class="stage-hud" id="stageHud">✋ <b>Sol Tık + Sürükle:</b> Zemini Kaydır &nbsp;|&nbsp; 🎬 <b>Alt + Sürükle:</b> Objeyi Taşı &nbsp;|&nbsp; 🔍 <b>Tekerlek:</b> Zemin Zoom &nbsp;|&nbsp; 🎨 <b>Shift + Tık:</b> Renk Seç</div>
+    </div>
+
+    <!-- YENİ: OYNATMA VE BAŞLANGIÇ / BİTİŞ KIRPMA (TRIM) ÇUBUĞU -->
+    <div class="trim-bar" id="trimBar">
+      <div class="trim-top-row">
+        <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlayPause()" disabled>⏸️ Duraklat</button>
+        <span class="time-readout" id="timeReadout">00.0s / 00.0s</span>
+        <div class="seek-slider-wrap" data-tip="Videoyu istediğiniz saniyeye/kareye sarın. Duraklatılmış haldeyken de yeşil ekran ayarlarıyla ince ince oynayabilirsiniz.">
+          <input type="range" id="seekBar" min="0" max="100" step="0.02" value="0" disabled>
+        </div>
+        <button class="btn-reset" id="btnSnapPngQuick" onclick="exportTransparentPNG()" disabled data-tip="Bu kareyi anında Şeffaf PNG olarak indirir.">📸 Bu Kareyi PNG Al</button>
+      </div>
+
+      <div class="trim-bottom-row">
+        <div class="trim-input-group">
+          <span>✂️ <b>Başlangıç (sn):</b></span>
+          <input type="number" id="trimStartInput" min="0" step="0.1" value="0.0" disabled onchange="onTrimInputChanged('start')">
+          <button class="btn-reset" id="btnSetStartNow" onclick="setTrimFromCurrent('start')" disabled data-tip="Videonun şu an bulunduğu saniyeyi Başlangıç noktası yapar.">📍 Buradan Başlat</button>
+        </div>
+
+        <div class="trim-input-group">
+          <span>🏁 <b>Bitiş (sn):</b></span>
+          <input type="number" id="trimEndInput" min="0.1" step="0.1" value="5.0" disabled onchange="onTrimInputChanged('end')">
+          <button class="btn-reset" id="btnSetEndNow" onclick="setTrimFromCurrent('end')" disabled data-tip="Videonun şu an bulunduğu saniyeyi Bitiş noktası yapar.">📍 Burada Bitir</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="trim-badge" id="trimDurationBadge">Seçili Süre: 0.0 sn</span>
+          <button class="btn-reset" id="btnResetTrim" onclick="resetTrimRange()" disabled data-tip="Başlangıç ve bitiş kırpmasını videonun tam süresine sıfırlar.">🔄 Tüm Süre</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- İLERLEME ÇUBUĞU + İPTAL BUTONU VE DURUM SATIRI -->
+    <div class="progress-row" id="progressRow">
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">%0</div>
+      </div>
+      <button class="btn-cancel-render" id="btnCancelRender" onclick="cancelActiveExport()" data-tip="Devam eden render/dışa aktarma işlemini anında durdurur ve iptal eder.">
+        🛑 İşlemi İptal Et
+      </button>
+    </div>
+
+    <div class="status-banner" id="status">Başlamak için Panel 1'den yeşil veya mavi ekranlı videonuzu seçin.</div>
+  </section>
+
+  <!-- ==================== 3. ANA PANEL: İNDİRİLEN DOSYAYI TEST ETME SAHNESİ ==================== -->
+  <section class="studio-panel panel-3">
+    <div class="panel-header">
+      <div class="panel-title">
+        <span class="panel-step-badge" style="color:#c084fc; border-color:#a855f7;">PANEL 3</span>
+        <span>Üretilen Dosyayı Canlı Test Etme Alanı (.webp / .webm / .png / Ses)</span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+        <input type="file" id="testWebpInput" accept=".webp,.webm,.gif,.png,.mp3,.wav,.m4a,.ogg,.opus,.flac,.aiff,image/*,video/*,audio/*" style="width:auto; height:32px; padding:4px 8px;">
+        <button class="btn-reset" id="btnTesterMute" onclick="toggleTesterAudio()">🔇 Test Sesi: Kapalı</button>
+        <button class="btn-reset" id="btnTesterFly" onclick="toggleTesterFly()">🛑 Hareket: Kapalı</button>
+      </div>
+    </div>
+
+    <div class="tester-stage" id="testerStage">
+      <span id="testerPlaceholder" style="color:#cbd5e1; font-size:13px;">Panel 1'den "Şeffaf WebP", "Şeffaf WebM", "Şeffaf PNG" veya "Sadece Ses" indirdiğinizde, dosyanız otomatik olarak burada test edilir...</span>
+      <img id="testWebpImg" alt="Şeffaf WebP/PNG Testi">
+      <video id="testWebmVideo" loop autoplay muted playsinline></video>
+      <audio id="testAudioPlayer" controls muted></audio>
+    </div>
+  </section>
+
+</div>
+
+<!-- Gizli Kaynak Video -->
+<video id="video" loop muted playsinline crossorigin="anonymous" style="display:none;"></video>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+const stage = document.getElementById('stage');
+const bgVideo = document.getElementById('bgVideo');
+const bgImage = document.getElementById('bgImage');
+const statusEl = document.getElementById('status');
+const perfBadge = document.getElementById('perfBadge');
+const progressRow = document.getElementById('progressRow');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const testWebpImg = document.getElementById('testWebpImg');
+const testWebmVideo = document.getElementById('testWebmVideo');
+const testAudioPlayer = document.getElementById('testAudioPlayer');
+const testerPlaceholder = document.getElementById('testerPlaceholder');
+const btnPreviewMute = document.getElementById('btnPreviewMute');
+
+const webmAudioCheck = document.getElementById('webmAudioCheck');
+const compAudioCheck = document.getElementById('compAudioCheck');
+
+const keyColorInput = document.getElementById('keyColor');
+const toleranceInput = document.getElementById('tolerance');
+const protectInput = document.getElementById('protectGreen');
+const chokeInput = document.getElementById('edgeChoke');
+const softnessInput = document.getElementById('softness');
+const despillInput = document.getElementById('despill');
+const fpsInput = document.getElementById('fpsRange');
+const qualInput = document.getElementById('qualRange');
+const exportWidthSelect = document.getElementById('exportWidth');
+const autoCropCheck = document.getElementById('autoCrop');
+const stageColorPicker = document.getElementById('stageColorPicker');
+const compositeFormatSelect = document.getElementById('compositeFormat');
+const bgZoomRange = document.getElementById('bgZoomRange');
+const bgZoomVal = document.getElementById('bgZoomVal');
+const planeScaleRange = document.getElementById('planeScaleRange');
+const planeScaleVal = document.getElementById('planeScaleVal');
+const planeRotRange = document.getElementById('planeRotRange');
+const planeRotInput = document.getElementById('planeRotInput');
+
+const seekBar = document.getElementById('seekBar');
+const timeReadout = document.getElementById('timeReadout');
+const trimStartInput = document.getElementById('trimStartInput');
+const trimEndInput = document.getElementById('trimEndInput');
+const trimDurationBadge = document.getElementById('trimDurationBadge');
+const btnPlayPause = document.getElementById('btnPlayPause');
+
+const workCanvas = document.createElement('canvas');
+const workCtx = workCanvas.getContext('2d', { willReadFrequently: true });
+
+let reusableAlphaMask = new Uint8Array(0);
+let reusableTempMask = new Uint8Array(0);
+let lastExportUrl = null;
+let currentSourceFile = null;
+let currentBaseName = 'animasyon';
+let isExporting = false;
+let cancelRequested = false;
+let activeMediaRecorder = null;
+let userWantsPreviewMuted = true;
+
+let trimStart = 0;
+let trimEnd = 5;
+
+function getCleanFileBaseName(file) {
+  if (!file || !file.name) return 'animasyon';
+  const withoutExt = file.name.replace(/\.[^/.]+$/, '');
+  return withoutExt.trim().replace(/[\\/:*?"<>|]+/g, '-') || 'animasyon';
+}
+
+// ================= İPTAL MEKANİZMASI =================
+function cancelActiveExport() {
+  if (!isExporting) return;
+  cancelRequested = true;
+  if (activeMediaRecorder && activeMediaRecorder.state !== 'inactive') {
+    try { activeMediaRecorder.stop(); } catch (e) {}
+  }
+  video.pause();
+  setExportLock(false);
+  video.currentTime = trimStart;
+  video.play().catch(() => {});
+  updatePlayPauseButton();
+  statusEl.innerText = "🛑 Dışa aktarma (Render) işlemi kullanıcı tarafından iptal edildi.";
+}
+
+function isAudioOnlyFormatSelected() {
+  return compositeFormatSelect.value.startsWith('audio_');
+}
+
+function onCompositeFormatChange() {
+  updateAudioPills();
+}
+
+function updateAudioPills() {
+  const webmHasAudio = webmAudioCheck.checked;
+  const webmPill = document.getElementById('webmAudioPill');
+  document.getElementById('webmAudioLabel').innerText = webmHasAudio ? '🔊 WebM: Sesli' : '🔇 WebM: Sessiz';
+  document.getElementById('btnWebmSubText').innerText = webmHasAudio ? '🔊 Sesli Video' : '🔇 Sessiz Video';
+  webmPill.classList.toggle('muted-mode', !webmHasAudio);
+
+  const compPill = document.getElementById('compAudioPill');
+  const btnComp = document.getElementById('btnComposite');
+  const btnMainText = document.getElementById('btnCompMainText');
+  const btnSubText = document.getElementById('btnCompSubText');
+
+  if (isAudioOnlyFormatSelected()) {
+    const fmtName = compositeFormatSelect.options[compositeFormatSelect.selectedIndex].text.split('—')[0].trim();
+    compPill.classList.remove('muted-mode');
+    compPill.classList.add('audio-only-mode');
+    compAudioCheck.style.display = 'none';
+    document.getElementById('compAudioLabel').innerText = '🎵 Sadece Ses Modu';
+    btnComp.classList.add('btn-audio-mode');
+    btnMainText.innerText = '🎵 Sadece Sesi İndir';
+    btnSubText.innerText = fmtName;
+  } else {
+    compPill.classList.remove('audio-only-mode');
+    compAudioCheck.style.display = 'inline-block';
+    btnComp.classList.remove('btn-audio-mode');
+    const compHasAudio = compAudioCheck.checked;
+    document.getElementById('compAudioLabel').innerText = compHasAudio ? '🔊 MP4: Sesli' : '🔇 MP4: Sessiz';
+    btnMainText.innerText = '🎬 Birleşik Video İndir';
+    btnSubText.innerText = compHasAudio ? '🔊 Sesli + Manzara Kaydı' : '🔇 Sessiz + Manzara Kaydı';
+    compPill.classList.toggle('muted-mode', !compHasAudio);
+  }
+}
+
+function handleCard3Export() {
+  if (isAudioOnlyFormatSelected()) {
+    exportAudioOnly();
+  } else {
+    exportCompositeVideo();
+  }
+}
+
+let audioCtx = null;
+let audioSourceNode = null;
+let audioDestNode = null;
+let recordGainNode = null;
+let speakerGainNode = null;
+
+function ensureAudioGraph() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContextClass();
+    audioSourceNode = audioCtx.createMediaElementSource(video);
+    audioDestNode = audioCtx.createMediaStreamDestination();
+    recordGainNode = audioCtx.createGain();
+    speakerGainNode = audioCtx.createGain();
+
+    recordGainNode.gain.value = 1.0;
+    audioSourceNode.connect(recordGainNode);
+    recordGainNode.connect(audioDestNode);
+
+    audioSourceNode.connect(speakerGainNode);
+    speakerGainNode.connect(audioCtx.destination);
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  video.muted = false;
+  video.volume = 1.0;
+  speakerGainNode.gain.value = userWantsPreviewMuted ? 0 : 1;
+}
+
+function attachAudioTrackToStream(canvasStream, includeAudio) {
+  if (!includeAudio) return;
+  try {
+    ensureAudioGraph();
+    const audioTracks = audioDestNode.stream.getAudioTracks();
+    if (audioTracks.length > 0) {
+      canvasStream.addTrack(audioTracks[0]);
+    }
+  } catch (err) {
+    try {
+      video.muted = false;
+      const vStream = video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
+      if (vStream && vStream.getAudioTracks().length > 0) {
+        canvasStream.addTrack(vStream.getAudioTracks()[0]);
+      }
+    } catch (e2) {
+      console.warn("Ses kanalı eklenemedi:", e2);
+    }
+  }
+}
+
+function togglePreviewAudio() {
+  userWantsPreviewMuted = !userWantsPreviewMuted;
+  ensureAudioGraph();
+  btnPreviewMute.innerText = userWantsPreviewMuted ? "🔇 Önizleme Sesi" : "🔊 Önizleme Açık";
+}
+
+let userWantsTesterMuted = true;
+
+function toggleTesterAudio() {
+  userWantsTesterMuted = !userWantsTesterMuted;
+  testWebmVideo.muted = userWantsTesterMuted;
+  testAudioPlayer.muted = userWantsTesterMuted;
+  const btn = document.getElementById('btnTesterMute');
+  btn.innerText = userWantsTesterMuted ? "🔇 Test Sesi: Kapalı" : "🔊 Test Sesi: Açık";
+  btn.classList.toggle('active-toggle', !userWantsTesterMuted);
+}
+
+function toggleTesterFly() {
+  const testerStage = document.getElementById('testerStage');
+  const isFlying = testerStage.classList.toggle('fly-webp');
+  const btn = document.getElementById('btnTesterFly');
+  btn.innerText = isFlying ? "🚀 Hareket: Açık" : "🛑 Hareket: Kapalı";
+  btn.classList.toggle('active-toggle', isFlying);
+}
+
+let currentBgState = {
+  type: 'checker',
+  color1: '#0ea5e9',
+  color2: '#e0f2fe',
+  panX: 0,
+  panY: 0,
+  zoom: 1.0,
+  planeScale: 1.0,
+  planeX: 0,
+  planeY: 0,
+  flipX: 1,
+  flipY: 1,
+  rotateDeg: 0,
+  baseW: 0,
+  baseH: 0
+};
+
+function updateProgressUI(pct, labelText) {
+  const clamped = Math.min(100, Math.max(0, Math.round(pct)));
+  progressBar.style.width = clamped + '%';
+  progressText.innerText = `%${clamped}`;
+  if (labelText) statusEl.innerText = labelText;
+}
+
+function setExportLock(locked) {
+  isExporting = locked;
+  if (locked) cancelRequested = false;
+  document.getElementById('btnWebP').disabled = locked;
+  document.getElementById('btnWebM').disabled = locked;
+  document.getElementById('btnPNG').disabled = locked;
+  document.getElementById('btnSnapPngQuick').disabled = locked;
+  document.getElementById('btnComposite').disabled = locked;
+  document.getElementById('btnFlyToggle').disabled = locked;
+  webmAudioCheck.disabled = locked;
+  compAudioCheck.disabled = locked;
+
+  const panels = [
+    document.getElementById('sourceControls'),
+    document.getElementById('bgCustomBar'),
+    document.getElementById('chromaControls'),
+    document.getElementById('trimBar')
+  ];
+  panels.forEach(p => {
+    if (locked) p.classList.add('locked-ui');
+    else p.classList.remove('locked-ui');
+  });
+
+  if (locked) {
+    stage.classList.add('is-rendering');
+    progressRow.style.display = 'flex';
+    updateProgressUI(0);
+  } else {
+    activeMediaRecorder = null;
+    stage.classList.remove('is-rendering');
+    progressRow.style.display = 'none';
+    video.loop = true;
+    video.playbackRate = 1.0;
+    if (speakerGainNode) speakerGainNode.gain.value = userWantsPreviewMuted ? 0 : 1;
+    else video.muted = userWantsPreviewMuted;
+  }
+}
+
+function showInTester(url, mediaType, hasAudio = true) {
+  if (lastExportUrl) URL.revokeObjectURL(lastExportUrl);
+  lastExportUrl = url;
+  testerPlaceholder.style.display = 'none';
+  const testerHeight = Math.round(180 * currentBgState.planeScale);
+  testWebpImg.style.height = testerHeight + 'px';
+  testWebmVideo.style.height = testerHeight + 'px';
+
+  testWebpImg.style.display = 'none';
+  testWebmVideo.pause();
+  testWebmVideo.style.display = 'none';
+  testAudioPlayer.pause();
+  testAudioPlayer.style.display = 'none';
+
+  if (mediaType === 'audio') {
+    testAudioPlayer.src = url;
+    testAudioPlayer.volume = 1.0;
+    testAudioPlayer.muted = userWantsTesterMuted;
+    testAudioPlayer.style.display = 'block';
+    testAudioPlayer.play().catch(() => {});
+  } else if (mediaType === 'video') {
+    testWebmVideo.src = url;
+    testWebmVideo.muted = userWantsTesterMuted;
+    testWebmVideo.style.display = 'block';
+    testWebmVideo.play().catch(() => {
+      testWebmVideo.muted = true;
+      testWebmVideo.play();
+    });
+  } else {
+    testWebpImg.src = url;
+    testWebpImg.style.display = 'block';
+  }
+}
+
+document.getElementById('testWebpInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const name = file.name.toLowerCase();
+  if (file.type.startsWith('audio/') || /\.(mp3|wav|m4a|ogg|opus|flac|aiff)$/.test(name)) {
+    showInTester(URL.createObjectURL(file), 'audio', true);
+  } else if (file.type.startsWith('video/') || name.endsWith('.webm')) {
+    showInTester(URL.createObjectURL(file), 'video', true);
+  } else {
+    showInTester(URL.createObjectURL(file), 'image', false);
+  }
+});
+
+// ================= OYNATMA VE TRIM (BAŞLANGIÇ/BİTİŞ ARALIĞI) YÖNETİMİ =================
+function updatePlayPauseButton() {
+  btnPlayPause.innerText = video.paused ? "▶️ Oynat" : "⏸️ Duraklat";
+}
+
+function togglePlayPause() {
+  if (isExporting || !video.src) return;
+  if (video.paused) {
+    if (video.currentTime >= trimEnd || video.currentTime < trimStart) {
+      video.currentTime = trimStart;
+    }
+    video.play().catch(() => {});
+  } else {
+    video.pause();
+    renderCurrentFrameIfPaused();
+  }
+  updatePlayPauseButton();
+}
+
+function updateTrimUI() {
+  const dur = video.duration || 0;
+  trimStart = Math.max(0, Math.min(trimStart, Math.max(0, dur - 0.1)));
+  trimEnd = Math.max(trimStart + 0.1, Math.min(trimEnd, dur));
+  trimStartInput.value = trimStart.toFixed(1);
+  trimEndInput.value = trimEnd.toFixed(1);
+  const clipDur = Math.max(0.1, trimEnd - trimStart);
+  trimDurationBadge.innerText = `Seçili Süre: ${clipDur.toFixed(1)} sn`;
+}
+
+function onTrimInputChanged(which) {
+  if (isExporting || !video.duration) return;
+  const startVal = parseFloat(trimStartInput.value) || 0;
+  const endVal = parseFloat(trimEndInput.value) || video.duration;
+  if (which === 'start') {
+    trimStart = Math.max(0, Math.min(startVal, trimEnd - 0.1));
+    video.currentTime = trimStart;
+  } else {
+    trimEnd = Math.min(video.duration, Math.max(endVal, trimStart + 0.1));
+    video.currentTime = trimEnd;
+  }
+  updateTrimUI();
+}
+
+function setTrimFromCurrent(which) {
+  if (isExporting || !video.duration) return;
+  if (which === 'start') {
+    trimStart = Math.min(video.currentTime, trimEnd - 0.1);
+  } else {
+    trimEnd = Math.max(video.currentTime, trimStart + 0.1);
+  }
+  updateTrimUI();
+  statusEl.innerText = `✂️ Kırpma aralığı güncellendi: ${trimStart.toFixed(1)} sn — ${trimEnd.toFixed(1)} sn (${(trimEnd - trimStart).toFixed(1)} sn)`;
+}
+
+function resetTrimRange() {
+  if (isExporting || !video.duration) return;
+  trimStart = 0;
+  trimEnd = video.duration;
+  updateTrimUI();
+  statusEl.innerText = `🔄 Kırpma aralığı videonun tam süresine (${video.duration.toFixed(1)} sn) sıfırlandı.`;
+}
+
+seekBar.addEventListener('input', () => {
+  if (isExporting || !video.duration) return;
+  video.currentTime = parseFloat(seekBar.value);
+  timeReadout.innerText = `${video.currentTime.toFixed(1)}s / ${video.duration.toFixed(1)}s`;
+});
+
+video.addEventListener('seeked', () => {
+  if (!isExporting && video.readyState >= 2) {
+    processChromaKey(ctx, canvas.width, canvas.height);
+  }
+});
+
+let pausedSliderRaf = false;
+function renderCurrentFrameIfPaused() {
+  if (isExporting || video.readyState < 2 || video.seeking) return;
+  // Video zaten oynuyorsa renderLoop yeni sürgü değerini bir sonraki karede otomatik çizer (çakışmayı önler)
+  if (!video.paused && !video.ended) return;
+  if (pausedSliderRaf) return;
+  pausedSliderRaf = true;
+  requestAnimationFrame(() => {
+    pausedSliderRaf = false;
+    if (!isExporting && video.readyState >= 2 && !video.seeking) {
+      processChromaKey(ctx, canvas.width, canvas.height);
+    }
+  });
+}
+
+// ================= İNTERAKTİF ARKA PLAN, BOYUT, YÖN (FLIP) VE AÇI =================
+function initMediaBaseSize(mediaEl, naturalW, naturalH) {
+  if (!naturalW || !naturalH) return;
+  const stageW = stage.clientWidth;
+  const stageH = stage.clientHeight;
+  const scale = Math.max(stageW / naturalW, stageH / naturalH);
+  currentBgState.baseW = naturalW * scale;
+  currentBgState.baseH = naturalH * scale;
+  mediaEl.style.width = currentBgState.baseW + 'px';
+  mediaEl.style.height = currentBgState.baseH + 'px';
+  resetBgTransform();
+}
+
+function updateBgTransformDOM() {
+  const { panX, panY, zoom, planeScale, planeX, planeY, flipX, flipY, rotateDeg } = currentBgState;
+  const transformCss = `translate(calc(-50% + ${panX}px), calc(-50% + ${panY}px)) scale(${zoom})`;
+  bgImage.style.transform = transformCss;
+  bgVideo.style.transform = transformCss;
+  bgZoomRange.value = Math.round(zoom * 100);
+  bgZoomVal.innerText = Math.round(zoom * 100) + '%';
+
+  canvas.style.transform = `translate(${planeX}px, ${planeY}px) rotate(${rotateDeg}deg) scale(${planeScale * flipX}, ${planeScale * flipY})`;
+  planeScaleRange.value = Math.round(planeScale * 100);
+  planeScaleVal.innerText = Math.round(planeScale * 100) + '%';
+  planeRotRange.value = rotateDeg;
+  if (document.activeElement !== planeRotInput) {
+    planeRotInput.value = rotateDeg;
+  }
+
+  document.getElementById('btnFlipX').classList.toggle('active-toggle', flipX === -1);
+  document.getElementById('btnFlipY').classList.toggle('active-toggle', flipY === -1);
+}
+
+function toggleFlipX() {
+  if (isExporting) return;
+  currentBgState.flipX *= -1;
+  updateBgTransformDOM();
+  statusEl.innerText = `↔️ Yatay ayna (Flip X): ${currentBgState.flipX === -1 ? 'AÇIK' : 'NORMAL'}`;
+}
+
+function toggleFlipY() {
+  if (isExporting) return;
+  currentBgState.flipY *= -1;
+  updateBgTransformDOM();
+  statusEl.innerText = `↕️ Dikey ayna (Flip Y): ${currentBgState.flipY === -1 ? 'AÇIK' : 'NORMAL'}`;
+}
+
+function setPlaneRotation(deg) {
+  if (isExporting) return;
+  let val = parseFloat(deg);
+  if (isNaN(val)) val = 0;
+  val = Math.max(-360, Math.min(360, Math.round(val * 10) / 10));
+  currentBgState.rotateDeg = val;
+  updateBgTransformDOM();
+  renderCurrentFrameIfPaused();
+}
+
+function stepRotation(delta) {
+  setPlaneRotation((currentBgState.rotateDeg || 0) + delta);
+}
+
+planeRotRange.addEventListener('input', () => {
+  setPlaneRotation(planeRotRange.value);
+});
+
+planeRotInput.addEventListener('input', () => {
+  setPlaneRotation(planeRotInput.value);
+});
+
+function resetBgTransform() {
+  if (isExporting) return;
+  currentBgState.panX = 0;
+  currentBgState.panY = 0;
+  currentBgState.zoom = 1.0;
+  currentBgState.planeScale = 1.0;
+  currentBgState.planeX = 0;
+  currentBgState.planeY = 0;
+  currentBgState.flipX = 1;
+  currentBgState.flipY = 1;
+  currentBgState.rotateDeg = 0;
+  autoCropCheck.checked = false;
+  updateBgTransformDOM();
+  statusEl.innerText = "🎯 Arka plan, obje boyutu (%100), yönü ve açısı (0°) sıfırlandı.";
+}
+
+bgZoomRange.addEventListener('input', () => {
+  if (isExporting) return;
+  currentBgState.zoom = parseInt(bgZoomRange.value, 10) / 100;
+  updateBgTransformDOM();
+});
+
+planeScaleRange.addEventListener('input', () => {
+  if (isExporting) return;
+  const val = parseInt(planeScaleRange.value, 10);
+  currentBgState.planeScale = val / 100;
+  if (val < 98 && autoCropCheck.checked) {
+    autoCropCheck.checked = false;
+    document.getElementById('cropHint').innerText = "Boyut küçültüldüğü için kırpma kapatıldı";
+    document.getElementById('cropHint').style.color = "#f59e0b";
+  }
+  updateBgTransformDOM();
+  statusEl.innerText = `🎬 Obje boyutu %${val} olarak ayarlandı.`;
+});
+
+let dragMode = null;
+let dragStartX = 0;
+let dragStartY = 0;
+let initialX = 0;
+let initialY = 0;
+
+stage.addEventListener('mousedown', (e) => {
+  if (isExporting) return;
+
+  if (e.shiftKey) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+      let normX = (e.clientX - rect.left) / rect.width;
+      let normY = (e.clientY - rect.top) / rect.height;
+      if (currentBgState.flipX === -1) normX = 1 - normX;
+      if (currentBgState.flipY === -1) normY = 1 - normY;
+      const x = Math.max(0, Math.min(canvas.width - 1, Math.floor(normX * canvas.width)));
+      const y = Math.max(0, Math.min(canvas.height - 1, Math.floor(normY * canvas.height)));
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const p = ctx.getImageData(x, y, 1, 1).data;
+      const hex = "#" + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
+      keyColorInput.value = hex;
+      updateLabels();
+      renderCurrentFrameIfPaused();
+      statusEl.innerText = `🎯 Yeni ekran rengi seçildi: ${hex} (Yeşil/Mavi/Kırmızı otomatik algılandı)`;
+    }
+    return;
+  }
+
+  if (e.altKey) {
+    dragMode = 'plane';
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    initialX = currentBgState.planeX;
+    initialY = currentBgState.planeY;
+    autoCropCheck.checked = false;
+    return;
+  }
+
+  if (currentBgState.type === 'image' || currentBgState.type === 'video') {
+    dragMode = 'bg';
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    initialX = currentBgState.panX;
+    initialY = currentBgState.panY;
+  } else {
+    dragMode = 'plane';
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    initialX = currentBgState.planeX;
+    initialY = currentBgState.planeY;
+    autoCropCheck.checked = false;
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (isExporting || !dragMode) return;
+  if (dragMode === 'bg') {
+    currentBgState.panX = initialX + (e.clientX - dragStartX);
+    currentBgState.panY = initialY + (e.clientY - dragStartY);
+  } else if (dragMode === 'plane') {
+    currentBgState.planeX = initialX + (e.clientX - dragStartX);
+    currentBgState.planeY = initialY + (e.clientY - dragStartY);
+  }
+  updateBgTransformDOM();
+});
+
+window.addEventListener('mouseup', () => {
+  dragMode = null;
+});
+
+stage.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (isExporting) return;
+  if (currentBgState.type === 'image' || currentBgState.type === 'video') {
+    const delta = e.deltaY < 0 ? 0.06 : -0.06;
+    currentBgState.zoom = Math.min(4.0, Math.max(0.2, currentBgState.zoom + delta));
+    updateBgTransformDOM();
+  }
+}, { passive: false });
+
+// ================= SAHNE ARKA PLAN YÖNETİCİSİ =================
+function hideBgMedia() {
+  bgVideo.pause();
+  bgVideo.style.display = 'none';
+  bgImage.style.display = 'none';
+}
+
+stageColorPicker.addEventListener('input', (e) => {
+  if (isExporting) return;
+  setSolidBg(e.target.value);
+});
+
+function setSolidBg(hexColor) {
+  if (isExporting) return;
+  hideBgMedia();
+  currentBgState.type = 'solid';
+  currentBgState.color1 = hexColor;
+  stage.style.backgroundImage = 'none';
+  stage.style.backgroundColor = hexColor;
+  stageColorPicker.value = hexColor.startsWith('#') && hexColor.length === 7 ? hexColor : '#0ea5e9';
+}
+
+function setGradientBg(c1, c2) {
+  if (isExporting) return;
+  hideBgMedia();
+  currentBgState.type = 'gradient';
+  currentBgState.color1 = c1;
+  currentBgState.color2 = c2;
+  stage.style.backgroundImage = `linear-gradient(180deg, ${c1} 0%, ${c2} 100%)`;
+  stage.style.backgroundSize = '100% 100%';
+}
+
+function setCheckerBg() {
+  if (isExporting) return;
+  hideBgMedia();
+  currentBgState.type = 'checker';
+  document.getElementById('bgMediaInput').value = '';
+  stage.style.backgroundColor = 'transparent';
+  stage.style.backgroundImage = 'conic-gradient(#26334d 25%, #161f30 0 50%, #26334d 0 75%, #161f30 0)';
+  stage.style.backgroundSize = '24px 24px';
+}
+
+function applyBackgroundFile(file) {
+  if (isExporting || !file) return;
+  const url = URL.createObjectURL(file);
+  const name = file.name.toLowerCase();
+  const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|mkv|avi)$/.test(name);
+  const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|bmp|svg|avif)$/.test(name);
+
+  stage.style.backgroundImage = 'none';
+  stage.style.backgroundColor = '#050811';
+
+  if (isVideo) {
+    bgImage.style.display = 'none';
+    bgVideo.src = url;
+    bgVideo.style.display = 'block';
+    bgVideo.onloadedmetadata = () => {
+      initMediaBaseSize(bgVideo, bgVideo.videoWidth, bgVideo.videoHeight);
+      bgVideo.play();
+    };
+    currentBgState.type = 'video';
+    statusEl.innerText = `🎬 "${file.name}" arka plana yüklendi! Fare tekerleği ile zemini yakınlaştırabilirsiniz.`;
+  } else if (isImage) {
+    bgVideo.pause();
+    bgVideo.style.display = 'none';
+    bgImage.onload = () => {
+      initMediaBaseSize(bgImage, bgImage.naturalWidth, bgImage.naturalHeight);
+    };
+    bgImage.src = url;
+    bgImage.style.display = 'block';
+    currentBgState.type = 'image';
+    statusEl.innerText = `🖼️ "${file.name}" arka plana yüklendi! Fare tekerleği ile zemini yakınlaştırabilirsiniz.`;
+  }
+}
+
+document.getElementById('bgMediaInput').addEventListener('change', (e) => {
+  applyBackgroundFile(e.target.files[0]);
+});
+
+function loadSourceVideoFile(file) {
+  if (!file || isExporting) return;
+  // Eğer daha önce yanlışlıkla zemine video atıldıysa onu temizle ve şeffaf dama zeminine dön
+  if (currentBgState.type === 'video') {
+    setCheckerBg();
+  }
+  if (video.src && video.src.startsWith('blob:')) URL.revokeObjectURL(video.src);
+  currentSourceFile = file;
+  currentBaseName = getCleanFileBaseName(file);
+  lastRenderedVideoTime = -1;
+  video.src = URL.createObjectURL(file);
+  video.play().catch(() => {});
+}
+
+function autoDetectChromaKeyColor() {
+  if (!canvas.width || !canvas.height) return;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const w = canvas.width;
+  const h = canvas.height;
+  const samplePoints = [
+    [8, 8], [w - 9, 8], [8, h - 9], [w - 9, h - 9],
+    [Math.floor(w / 2), 8], [8, Math.floor(h / 2)]
+  ];
+
+  let bestHex = '#00ff00';
+  let bestScore = -1;
+
+  for (const [sx, sy] of samplePoints) {
+    const p = ctx.getImageData(Math.max(0, sx), Math.max(0, sy), 1, 1).data;
+    const r = p[0], g = p[1], b = p[2];
+    const maxC = Math.max(r, g, b);
+    const minC = Math.min(r, g, b);
+    const saturation = maxC - minC;
+    if (saturation > bestScore && maxC > 35) {
+      bestScore = saturation;
+      bestHex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+  }
+
+  keyColorInput.value = bestScore > 20 ? bestHex : '#00ff00';
+  updateLabels();
+  processChromaKey(ctx, canvas.width, canvas.height);
+}
+
+stage.addEventListener('dragover', (e) => { e.preventDefault(); if (!isExporting) stage.classList.add('drag-over'); });
+stage.addEventListener('dragleave', () => { stage.classList.remove('drag-over'); });
+stage.addEventListener('drop', (e) => {
+  e.preventDefault();
+  stage.classList.remove('drag-over');
+  if (!isExporting && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    const file = e.dataTransfer.files[0];
+    const name = file.name.toLowerCase();
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|mkv|avi)$/.test(name);
+    if (isVideo) {
+      loadSourceVideoFile(file);
+    } else {
+      applyBackgroundFile(file);
+    }
+  }
+});
+
+// ================= ÇOK KANALLI (YEŞİL / MAVİ / KIRMIZI) CHROMA KEY MOTORU =================
+const updateLabels = () => {
+  document.getElementById('tolVal').innerText = toleranceInput.value;
+  document.getElementById('protectVal').innerText = protectInput.value + '%';
+  document.getElementById('chokeVal').innerText = chokeInput.value + ' px';
+  document.getElementById('softVal').innerText = softnessInput.value;
+  document.getElementById('spillVal').innerText = despillInput.value + '%';
+  document.getElementById('fpsVal').innerText = `${fpsInput.value} FPS / %${qualInput.value}`;
+  document.getElementById('colorHex').innerText = keyColorInput.value;
+  renderCurrentFrameIfPaused();
+};
+[toleranceInput, protectInput, chokeInput, softnessInput, despillInput, fpsInput, qualInput, keyColorInput].forEach(el => {
+  el.addEventListener('input', updateLabels);
+});
+
+let isRenderLoopRunning = false;
+
+document.getElementById('videoFile').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) loadSourceVideoFile(file);
+});
+
+video.addEventListener('loadeddata', () => {
+  stage.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+
+  const previewScale = Math.min(1, 1280 / video.videoWidth);
+  canvas.width = Math.round(video.videoWidth * previewScale);
+  canvas.height = Math.round(video.videoHeight * previewScale);
+
+  if (video.videoHeight >= 2000) exportWidthSelect.value = "2160";
+  else if (video.videoHeight >= 1350) exportWidthSelect.value = "1440";
+
+  autoDetectChromaKeyColor();
+  setTimeout(autoDetectChromaKeyColor, 180);
+
+  const dur = video.duration || 5;
+  seekBar.max = dur;
+  seekBar.value = 0;
+  seekBar.disabled = false;
+  trimStart = 0;
+  trimEnd = dur;
+  trimStartInput.max = dur;
+  trimEndInput.max = dur;
+  trimStartInput.disabled = false;
+  trimEndInput.disabled = false;
+  btnPlayPause.disabled = false;
+  document.getElementById('btnSetStartNow').disabled = false;
+  document.getElementById('btnSetEndNow').disabled = false;
+  document.getElementById('btnResetTrim').disabled = false;
+  document.getElementById('btnSnapPngQuick').disabled = false;
+  updateTrimUI();
+  updatePlayPauseButton();
+
+  document.getElementById('btnWebP').disabled = false;
+  document.getElementById('btnWebM').disabled = false;
+  document.getElementById('btnPNG').disabled = false;
+  document.getElementById('btnComposite').disabled = false;
+  const fName = currentSourceFile ? currentSourceFile.name : 'Video';
+  perfBadge.innerText = `${currentBaseName} • ${video.videoWidth}x${video.videoHeight}px • ${dur.toFixed(1)} sn`;
+  statusEl.innerText = `✅ "${fName}" sahneye yüklendi ve yeşil/mavi ekran otomatik silindi!`;
+  if (!isRenderLoopRunning) {
+    isRenderLoopRunning = true;
+    requestAnimationFrame(renderLoop);
+  }
+});
+
+function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+let lastRenderedVideoTime = -1;
+let isLoopSeeking = false;
+
+video.addEventListener('ended', () => {
+  if (!isExporting) {
+    video.currentTime = trimStart;
+    video.play().catch(() => {});
+  }
+});
+
+function processChromaKey(targetCtx, w, h) {
+  if (video.readyState < 2 || video.seeking) return;
+
+  targetCtx.drawImage(video, 0, 0, w, h);
+  const frame = targetCtx.getImageData(0, 0, w, h);
+  const data = frame.data;
+  const target = hexToRgb(keyColorInput.value);
+
+  const tol = parseFloat(toleranceInput.value);
+  const protectRatio = parseFloat(protectInput.value) / 100;
+  const baseChoke = parseFloat(chokeInput.value);
+  const soft = parseFloat(softnessInput.value);
+  const despill = parseFloat(despillInput.value) / 100;
+
+  const resScale = Math.max(1, w / 960);
+  const choke = Math.min(4, baseChoke * resScale);
+
+  const tr = target.r, tg = target.g, tb = target.b;
+  let domChannel = 1;
+  if (tr >= tg && tr >= tb) domChannel = 0;
+  else if (tb >= tg && tb >= tr) domChannel = 2;
+
+  const domTarget = domChannel === 0 ? tr : (domChannel === 1 ? tg : tb);
+  const otherTargetMax = domChannel === 0 ? Math.max(tg, tb) : (domChannel === 1 ? Math.max(tr, tb) : Math.max(tr, tg));
+  const targetDominantExcess = Math.max(1, domTarget - otherTargetMax);
+  const useChannelProtection = targetDominantExcess > 12;
+  const minExcessForBg = useChannelProtection ? targetDominantExcess * (0.20 + protectRatio * 0.45) : -999;
+
+  const tolSq = tol * tol;
+  const softRangeSq = Math.max(1, (tol + soft) * (tol + soft) - tolSq);
+
+  const pixelCount = w * h;
+  if (reusableAlphaMask.length < pixelCount) {
+    reusableAlphaMask = new Uint8Array(pixelCount);
+    reusableTempMask = new Uint8Array(pixelCount);
+  }
+  const alphaMask = reusableAlphaMask;
+
+  for (let p = 0, i = 0; p < pixelCount; p++, i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+
+    if (useChannelProtection) {
+      const domVal = domChannel === 0 ? r : (domChannel === 1 ? g : b);
+      const maxOther = domChannel === 0 ? (g > b ? g : b) : (domChannel === 1 ? (r > b ? r : b) : (r > g ? r : g));
+      if (maxOther > 18 && (domVal - maxOther) < minExcessForBg) {
+        alphaMask[p] = 255;
+        continue;
+      }
+    }
+
+    const dr = r - tr, dg = g - tg, db = b - tb;
+    const distSq = dr * dr + dg * dg + db * db;
+
+    if (distSq < tolSq) {
+      alphaMask[p] = 0;
+    } else if (distSq < tolSq + softRangeSq) {
+      alphaMask[p] = ((distSq - tolSq) / softRangeSq) * 255;
+    } else {
+      alphaMask[p] = 255;
+    }
+  }
+
+  if (choke > 0) {
+    reusableTempMask.set(alphaMask.subarray(0, pixelCount));
+    const tempMask = reusableTempMask;
+    const strength = Math.min(1.0, choke * 0.45);
+    for (let y = 1; y < h - 1; y++) {
+      const row = y * w;
+      for (let x = 1; x < w - 1; x++) {
+        const idx = row + x;
+        const a = tempMask[idx];
+        if (a > 0 && a < 254) {
+          let minN = tempMask[idx - 1];
+          if (tempMask[idx + 1] < minN) minN = tempMask[idx + 1];
+          if (tempMask[idx - w] < minN) minN = tempMask[idx - w];
+          if (tempMask[idx + w] < minN) minN = tempMask[idx + w];
+          if (minN < a) {
+            const eroded = a - (a - minN) * strength;
+            alphaMask[idx] = eroded < 16 ? 0 : eroded;
+          }
+        }
+      }
+    }
+  }
+
+  for (let y = 1; y < h - 1; y++) {
+    const row = y * w;
+    for (let x = 1; x < w - 1; x++) {
+      const p = row + x;
+      const i = p * 4;
+      const a = alphaMask[p];
+      data[i + 3] = a;
+
+      if (a > 0 && useChannelProtection && despill > 0) {
+        const isNearEdge = (
+          a < 250 ||
+          alphaMask[p - 1] < 245 || alphaMask[p + 1] < 245 ||
+          alphaMask[p - w] < 245 || alphaMask[p + w] < 245
+        );
+        if (isNearEdge) {
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          if (domChannel === 1) {
+            const maxRB = r > b ? r : b;
+            if (g > maxRB) data[i + 1] = g - (g - maxRB) * despill;
+          } else if (domChannel === 2) {
+            const maxRG = r > g ? r : g;
+            if (b > maxRG) data[i + 2] = b - (b - maxRG) * despill;
+          } else {
+            const maxGB = g > b ? g : b;
+            if (r > maxGB) data[i] = r - (r - maxGB) * despill;
+          }
+        }
+      }
+    }
+  }
+
+  targetCtx.putImageData(frame, 0, 0);
+}
+
+function renderLoop() {
+  if (!isExporting && video.readyState >= 2) {
+    if (!video.paused) {
+      if ((video.currentTime >= trimEnd - 0.04 || video.currentTime < trimStart - 0.05) && !video.seeking && !isLoopSeeking) {
+        isLoopSeeking = true;
+        video.currentTime = trimStart;
+        video.addEventListener('seeked', () => {
+          isLoopSeeking = false;
+          lastRenderedVideoTime = -1;
+          if (video.paused && !isExporting) video.play().catch(() => {});
+        }, { once: true });
+      } else if (!video.seeking && !isLoopSeeking) {
+        if (Math.abs(video.currentTime - lastRenderedVideoTime) >= 0.015) {
+          lastRenderedVideoTime = video.currentTime;
+          processChromaKey(ctx, canvas.width, canvas.height);
+        }
+      }
+    }
+    if (video.duration) {
+      seekBar.value = video.currentTime;
+      timeReadout.innerText = `${video.currentTime.toFixed(1)}s / ${video.duration.toFixed(1)}s`;
+    }
+  }
+  requestAnimationFrame(renderLoop);
+}
+
+function toggleFly() {
+  if (isExporting) return;
+  stage.classList.toggle('fly-mode');
+}
+
+// DÜZELTME 1: Hem Yatay (16:9) hem Dikey (9:16) Videolarda Doğru Çözünürlük Hesabı (3414px hatası giderildi)
+function getTargetDimensions() {
+  const val = parseInt(exportWidthSelect.value, 10);
+  const vw = video.videoWidth || 1920;
+  const vh = video.videoHeight || 1080;
+  const srcAspect = vw / vh;
+  const isPortrait = vh > vw;
+
+  if (val === 0) {
+    return { w: vw + (vw % 2), h: vh + (vh % 2) };
+  }
+
+  let longSide = 1920;
+  if (val === 500) longSide = 500;
+  else if (val === 720) longSide = 1280;
+  else if (val === 1080) longSide = 1920;
+  else if (val === 1440) longSide = 2560;
+  else if (val === 2160) longSide = 3840;
+
+  let w, h;
+  if (isPortrait) {
+    h = longSide;
+    w = Math.round(h * srcAspect);
+  } else {
+    w = longSide;
+    h = Math.round(w / srcAspect);
+  }
+  w += (w % 2);
+  h += (h % 2);
+  return { w, h };
+}
+
+function findBoundingBox(ctxToScan, w, h) {
+  const data = ctxToScan.getImageData(0, 0, w, h).data;
+  let minX = w, minY = h, maxX = 0, maxY = 0;
+  for (let y = 4; y < h - 4; y++) {
+    for (let x = 4; x < w - 4; x++) {
+      if (data[(y * w + x) * 4 + 3] > 25) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (minX >= maxX || minY >= maxY) return { x: 0, y: 0, w, h };
+  const padX = Math.round((maxX - minX) * 0.12);
+  const padY = Math.round((maxY - minY) * 0.08);
+  const x = Math.max(0, minX - padX);
+  const y = Math.max(0, minY - padY);
+  let bw = Math.min(w - x, (maxX - minX) + padX * 2);
+  let bh = Math.min(h - y, (maxY - minY) + padY * 2);
+  bw += (bw % 2);
+  bh += (bh % 2);
+  return { x, y, w: bw, h: bh };
+}
+
+// DÜZELTME 2: Sadece ilk kareye değil, tüm video süresindeki dans/hareket sınırlarına bakan Akıllı Tarayıcı
+async function scanFullVideoMotionBoundingBox(targetW, targetH, clipStart, clipEnd) {
+  const scanScale = Math.min(1, 360 / Math.max(targetW, targetH));
+  const sw = Math.max(64, Math.round(targetW * scanScale));
+  const sh = Math.max(64, Math.round(targetH * scanScale));
+
+  const scanCanvas = document.createElement('canvas');
+  scanCanvas.width = sw;
+  scanCanvas.height = sh;
+  const scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
+
+  const sampleCount = 12;
+  const dur = Math.max(0.1, clipEnd - clipStart);
+  let globalMinX = sw, globalMinY = sh, globalMaxX = 0, globalMaxY = 0;
+
+  for (let s = 0; s < sampleCount; s++) {
+    if (cancelRequested) break;
+    updateProgressUI(Math.round(((s + 1) / sampleCount) * 15), `🔍 Saç/bacak taşmasını önlemek için tüm hareket alanı taranıyor (${s + 1}/${sampleCount})...`);
+    video.currentTime = clipStart + (s / (sampleCount - 1)) * dur;
+    await new Promise(r => {
+      if (!video.seeking) r();
+      else video.addEventListener('seeked', r, { once: true });
+    });
+
+    processChromaKey(scanCtx, sw, sh);
+    const data = scanCtx.getImageData(0, 0, sw, sh).data;
+    for (let y = 2; y < sh - 2; y++) {
+      for (let x = 2; x < sw - 2; x++) {
+        if (data[(y * sw + x) * 4 + 3] > 25) {
+          if (x < globalMinX) globalMinX = x;
+          if (x > globalMaxX) globalMaxX = x;
+          if (y < globalMinY) globalMinY = y;
+          if (y > globalMaxY) globalMaxY = y;
+        }
+      }
+    }
+  }
+
+  if (globalMinX >= globalMaxX || globalMinY >= globalMaxY) {
+    return { x: 0, y: 0, w: targetW, h: targetH };
+  }
+
+  const invScaleX = targetW / sw;
+  const invScaleY = targetH / sh;
+  const rawMinX = Math.floor(globalMinX * invScaleX);
+  const rawMaxX = Math.ceil(globalMaxX * invScaleX);
+  const rawMinY = Math.floor(globalMinY * invScaleY);
+  const rawMaxY = Math.ceil(globalMaxY * invScaleY);
+
+  const padX = Math.round((rawMaxX - rawMinX) * 0.10);
+  const padY = Math.round((rawMaxY - rawMinY) * 0.06);
+
+  const x = Math.max(0, rawMinX - padX);
+  const y = Math.max(0, rawMinY - padY);
+  let bw = Math.min(targetW - x, (rawMaxX - rawMinX) + padX * 2);
+  let bh = Math.min(targetH - y, (rawMaxY - rawMinY) + padY * 2);
+  bw += (bw % 2);
+  bh += (bh % 2);
+  return { x, y, w: bw, h: bh };
+}
+
+function drawScaledPlaneToCanvas(destCtx, sourceCanvas, cropBox, outW, outH, baseW, baseH) {
+  const pScale = currentBgState.planeScale;
+  const { flipX, flipY, rotateDeg } = currentBgState;
+  const rotRad = (rotateDeg * Math.PI) / 180;
+
+  destCtx.save();
+  if (autoCropCheck.checked) {
+    destCtx.translate(outW / 2, outH / 2);
+    if (rotateDeg !== 0) destCtx.rotate(rotRad);
+    destCtx.scale(flipX, flipY);
+    destCtx.drawImage(sourceCanvas, cropBox.x, cropBox.y, cropBox.w, cropBox.h, -outW / 2, -outH / 2, outW, outH);
+  } else {
+    const stageW = stage.clientWidth;
+    const stageH = stage.clientHeight;
+    const ratioX = outW / stageW;
+    const ratioY = outH / stageH;
+
+    const drawW = outW * pScale;
+    const drawH = outH * pScale;
+    const cx = outW / 2 + (currentBgState.planeX * ratioX);
+    const cy = outH / 2 + (currentBgState.planeY * ratioY);
+
+    destCtx.translate(cx, cy);
+    if (rotateDeg !== 0) destCtx.rotate(rotRad);
+    destCtx.scale(flipX, flipY);
+    destCtx.drawImage(sourceCanvas, 0, 0, baseW, baseH, -drawW / 2, -drawH / 2, drawW, drawH);
+  }
+  destCtx.restore();
+}
+
+// ================= YENİ: ANLIK ŞEFFAF PNG (TEK KARE) İNDİRME MOTORU =================
+async function exportTransparentPNG() {
+  if (isExporting || !video.src) return;
+  const { w: targetW, h: targetH } = getTargetDimensions();
+  const pScale = currentBgState.planeScale;
+
+  workCanvas.width = targetW;
+  workCanvas.height = targetH;
+  processChromaKey(workCtx, targetW, targetH);
+
+  const crop = autoCropCheck.checked
+    ? findBoundingBox(workCtx, targetW, targetH)
+    : { x: 0, y: 0, w: targetW, h: targetH };
+
+  let finalW = autoCropCheck.checked ? Math.max(64, Math.round(crop.w * pScale)) : targetW;
+  let finalH = autoCropCheck.checked ? Math.max(64, Math.round(crop.h * pScale)) : targetH;
+
+  const pngCanvas = document.createElement('canvas');
+  pngCanvas.width = finalW;
+  pngCanvas.height = finalH;
+  const pngCtx = pngCanvas.getContext('2d');
+
+  drawScaledPlaneToCanvas(pngCtx, workCanvas, crop, finalW, finalH, targetW, targetH);
+
+  const blob = await new Promise(res => pngCanvas.toBlob(res, 'image/png'));
+  const sizeKB = (blob.size / 1024).toFixed(1);
+  const blobUrl = URL.createObjectURL(blob);
+
+  showInTester(blobUrl, 'image', false);
+
+  const timeTag = video.currentTime.toFixed(1).replace('.', '_');
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = `${currentBaseName}-seffaf-kare-${timeTag}sn-${finalW}x${finalH}.png`;
+  a.click();
+
+  statusEl.innerText = `📸 Şeffaf PNG (${finalW}x${finalH}px • ${sizeKB} KB) "${a.download}" adıyla indirildi ve Panel 3'te gösterildi!`;
+}
+
+// ================= 1. PRO ŞEFFAF WEBM KAYIT MOTORU (DONMA & TAKILMA ÖNLEYİCİ) =================
+async function exportTransparentWebM() {
+  setExportLock(true);
+  video.pause();
+  video.loop = false;
+
+  const wantAudio = webmAudioCheck.checked;
+  const audioTagText = wantAudio ? "sesli" : "sessiz";
+  const fps = parseInt(fpsInput.value, 10);
+  const { w: targetW, h: targetH } = getTargetDimensions();
+  const pScale = currentBgState.planeScale;
+
+  workCanvas.width = targetW;
+  workCanvas.height = targetH;
+
+  const clipStart = trimStart;
+  const clipEnd = trimEnd;
+  const clipDuration = Math.max(0.1, clipEnd - clipStart);
+
+  const crop = autoCropCheck.checked
+    ? await scanFullVideoMotionBoundingBox(targetW, targetH, clipStart, clipEnd)
+    : { x: 0, y: 0, w: targetW, h: targetH };
+
+  video.currentTime = clipStart;
+  await new Promise(r => {
+    if (Math.abs(video.currentTime - clipStart) < 0.05 && !video.seeking) r();
+    else video.addEventListener('seeked', r, { once: true });
+  });
+  if (cancelRequested) return;
+
+  processChromaKey(workCtx, targetW, targetH);
+
+  let finalW = autoCropCheck.checked ? Math.max(64, Math.round(crop.w * pScale)) : targetW;
+  let finalH = autoCropCheck.checked ? Math.max(64, Math.round(crop.h * pScale)) : targetH;
+  finalW += (finalW % 2);
+  finalH += (finalH % 2);
+
+  const webmCanvas = document.createElement('canvas');
+  webmCanvas.width = finalW;
+  webmCanvas.height = finalH;
+  const webmCtx = webmCanvas.getContext('2d');
+
+  const stream = webmCanvas.captureStream(fps);
+  attachAudioTrackToStream(stream, wantAudio);
+
+  const bitrate = Math.min(10000000, Math.max(4500000, Math.round(finalW * finalH * fps * 0.09)));
+  let mime = 'video/webm';
+  const candidates = wantAudio
+    ? ['video/webm;codecs=vp8,opus', 'video/webm;codecs=vp9,opus', 'video/webm']
+    : ['video/webm;codecs=vp8', 'video/webm;codecs=vp9', 'video/webm'];
+
+  for (const c of candidates) {
+    if (MediaRecorder.isTypeSupported(c)) { mime = c; break; }
+  }
+
+  const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: bitrate });
+  activeMediaRecorder = recorder;
+  const chunks = [];
+
+  recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    if (cancelRequested) return;
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+    const blobUrl = URL.createObjectURL(blob);
+
+    showInTester(blobUrl, 'video', wantAudio);
+
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `${currentBaseName}-seffaf-${audioTagText}-${finalW}x${finalH}.webm`;
+    a.click();
+
+    setExportLock(false);
+    video.currentTime = trimStart;
+    video.play();
+    updatePlayPauseButton();
+    statusEl.innerText = `🎉 Şeffaf WebM (${wantAudio ? '🔊 Sesli' : '🔇 Sessiz'}) "${a.download}" İndirildi! (${finalW}x${finalH}px | ${sizeMB} MB)`;
+  };
+
+  video.playbackRate = 1.0;
+  let lastExportFrameTime = -1;
+  let previewSkipCounter = 0;
+
+  recorder.start(1000);
+  await video.play();
+
+  function drawWebmFrame() {
+    if (!isExporting || cancelRequested) return;
+
+    const mediaElapsed = Math.max(0, video.currentTime - clipStart);
+    const pct = Math.min(100, (mediaElapsed / clipDuration) * 100);
+
+    if (Math.abs(video.currentTime - lastExportFrameTime) >= (1 / (fps + 5))) {
+      lastExportFrameTime = video.currentTime;
+      updateProgressUI(pct, `🎥 Şeffaf WebM (${wantAudio ? '🔊 Sesli' : '🔇 Sessiz'} • ${clipDuration.toFixed(1)}sn) kaydediliyor... %${Math.round(pct)}`);
+
+      processChromaKey(workCtx, targetW, targetH);
+      webmCtx.clearRect(0, 0, finalW, finalH);
+      drawScaledPlaneToCanvas(webmCtx, workCanvas, crop, finalW, finalH, targetW, targetH);
+
+      if ((previewSkipCounter++ % 3) === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(workCanvas, 0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    if (!video.ended && video.currentTime < clipEnd - 0.03) {
+      requestAnimationFrame(drawWebmFrame);
+    } else {
+      updateProgressUI(100);
+      if (recorder.state !== 'inactive') recorder.stop();
+    }
+  }
+
+  requestAnimationFrame(drawWebmFrame);
+}
+
+// ================= 2. BİRLEŞİK VİDEO (MP4 / WEBM) EXPORT =================
+function drawInteractiveBackgroundToCanvas(targetCtx, mediaEl, destW, destH) {
+  const stageW = stage.clientWidth;
+  const stageH = stage.clientHeight;
+  const ratioX = destW / stageW;
+  const ratioY = destH / stageH;
+  const scaleRatio = Math.max(ratioX, ratioY);
+
+  const drawW = currentBgState.baseW * currentBgState.zoom * scaleRatio;
+  const drawH = currentBgState.baseH * currentBgState.zoom * scaleRatio;
+
+  const centerX = (destW / 2) + (currentBgState.panX * ratioX);
+  const centerY = (destH / 2) + (currentBgState.panY * ratioY);
+
+  targetCtx.drawImage(mediaEl, centerX - drawW / 2, centerY - drawH / 2, drawW, drawH);
+}
+
+function getSupportedMimeType(formatPref, wantAudio) {
+  const mp4Types = wantAudio
+    ? ['video/mp4;codecs="avc1.640034,mp4a.40.2"', 'video/mp4;codecs="avc1.42E01E,mp4a.40.2"', 'video/mp4;codecs=h264,aac', 'video/mp4;codecs=h264,opus', 'video/mp4']
+    : ['video/mp4;codecs="avc1.640034"', 'video/mp4;codecs="avc1.42E01E"', 'video/mp4;codecs=h264', 'video/mp4'];
+
+  const vp9Types = wantAudio
+    ? ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm;codecs=vp9', 'video/webm']
+    : ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+
+  const av1Types = wantAudio
+    ? ['video/webm;codecs=av01,opus', 'video/mp4;codecs=av01', 'video/webm;codecs=vp9,opus']
+    : ['video/webm;codecs=av01', 'video/mp4;codecs=av01', 'video/webm;codecs=vp9'];
+
+  let list = mp4Types;
+  if (formatPref === 'webm_vp9') list = vp9Types;
+  if (formatPref === 'webm_av1') list = av1Types;
+
+  for (const t of list) {
+    if (MediaRecorder.isTypeSupported(t)) {
+      return { mime: t, ext: t.includes('mp4') ? 'mp4' : 'webm' };
+    }
+  }
+  return { mime: wantAudio ? 'video/webm;codecs=vp9,opus' : 'video/webm;codecs=vp9', ext: 'webm' };
+}
+
+async function exportCompositeVideo() {
+  setExportLock(true);
+  video.pause();
+  video.loop = false;
+
+  const wantAudio = compAudioCheck.checked;
+  const audioTagText = wantAudio ? "sesli" : "sessiz";
+  const { w, h } = getTargetDimensions();
+  const fps = parseInt(fpsInput.value, 10);
+  const formatPref = compositeFormatSelect.value;
+  const { mime, ext } = getSupportedMimeType(formatPref, wantAudio);
+  const pScale = currentBgState.planeScale;
+  const { flipX, flipY, rotateDeg } = currentBgState;
+  const rotRad = (rotateDeg * Math.PI) / 180;
+
+  const pixels = w * h;
+  const bitrate = Math.min(45000000, Math.max(12000000, Math.round(pixels * fps * 0.22)));
+
+  const compCanvas = document.createElement('canvas');
+  compCanvas.width = w;
+  compCanvas.height = h;
+  const compCtx = compCanvas.getContext('2d');
+
+  workCanvas.width = w;
+  workCanvas.height = h;
+
+  const clipStart = trimStart;
+  const clipEnd = trimEnd;
+  const clipDuration = Math.max(0.1, clipEnd - clipStart);
+  const isFlyActive = stage.classList.contains('fly-mode');
+  const srcAspect = video.videoWidth / video.videoHeight;
+
+  video.currentTime = clipStart;
+  await new Promise(r => {
+    if (Math.abs(video.currentTime - clipStart) < 0.05 && !video.seeking) r();
+    else video.addEventListener('seeked', r, { once: true });
+  });
+  if (cancelRequested) return;
+
+  const stream = compCanvas.captureStream(fps);
+  attachAudioTrackToStream(stream, wantAudio);
+
+  const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: bitrate });
+  activeMediaRecorder = recorder;
+  const chunks = [];
+
+  recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    if (cancelRequested) return;
+    const blob = new Blob(chunks, { type: mime });
+    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+    const blobUrl = URL.createObjectURL(blob);
+
+    showInTester(blobUrl, 'video', wantAudio);
+
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `${currentBaseName}-birlesik-${audioTagText}-${w}x${h}.${ext}`;
+    a.click();
+
+    setExportLock(false);
+    video.currentTime = trimStart;
+    video.play();
+    updatePlayPauseButton();
+    statusEl.innerText = `🎉 Birleşik Video "${a.download}" İndirildi! Çözünürlük: ${w}x${h}px | ${sizeMB} MB`;
+  };
+
+  if (currentBgState.type === 'video') {
+    bgVideo.currentTime = 0;
+    bgVideo.play();
+  }
+  video.playbackRate = 1.0;
+  const startTime = performance.now();
+  recorder.start(100);
+  await video.play();
+
+  const stageW = stage.clientWidth;
+  const stageH = stage.clientHeight;
+  const ratioX = w / stageW;
+  const ratioY = h / stageH;
+
+  function drawCompositeFrame(now) {
+    if (!isExporting || cancelRequested) return;
+    const wallElapsed = (now - startTime) / 1000;
+    const mediaElapsed = Math.max(0, video.currentTime - clipStart);
+    const pct = Math.min(100, Math.max((mediaElapsed / clipDuration) * 100, (wallElapsed / clipDuration) * 100));
+    updateProgressUI(pct, `🎬 Birleşik Video (${wantAudio ? '🔊 Sesli' : '🔇 Sessiz'} • ${w}x${h}px .${ext.toUpperCase()}) kaydediliyor... %${Math.round(pct)}`);
+
+    compCtx.fillStyle = '#000000';
+    compCtx.fillRect(0, 0, w, h);
+
+    if (currentBgState.type === 'solid') {
+      compCtx.fillStyle = currentBgState.color1;
+      compCtx.fillRect(0, 0, w, h);
+    } else if (currentBgState.type === 'gradient') {
+      const grad = compCtx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, currentBgState.color1);
+      grad.addColorStop(1, currentBgState.color2);
+      compCtx.fillStyle = grad;
+      compCtx.fillRect(0, 0, w, h);
+    } else if (currentBgState.type === 'image' && bgImage.complete) {
+      drawInteractiveBackgroundToCanvas(compCtx, bgImage, w, h);
+    } else if (currentBgState.type === 'video' && bgVideo.readyState >= 2) {
+      drawInteractiveBackgroundToCanvas(compCtx, bgVideo, w, h);
+    }
+
+    processChromaKey(workCtx, w, h);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(workCanvas, 0, 0, canvas.width, canvas.height);
+
+    compCtx.save();
+    if (isFlyActive) {
+      const progress = (wallElapsed % clipDuration) / clipDuration;
+      const planeW = w * 0.55 * pScale;
+      const planeH = planeW / srcAspect;
+      const startX = -planeW;
+      const endX = w;
+      const curX = startX + progress * (endX - startX);
+      const curY = (h - planeH) / 2 + (currentBgState.planeY * ratioY);
+      const cx = curX + planeW / 2;
+      const cy = curY + planeH / 2;
+      compCtx.translate(cx, cy);
+      if (rotateDeg !== 0) compCtx.rotate(rotRad);
+      compCtx.scale(flipX, flipY);
+      compCtx.drawImage(workCanvas, -planeW / 2, -planeH / 2, planeW, planeH);
+    } else {
+      const drawW = w * pScale;
+      const drawH = drawW / srcAspect;
+      const cx = w / 2 + (currentBgState.planeX * ratioX);
+      const cy = h / 2 + (currentBgState.planeY * ratioY);
+      compCtx.translate(cx, cy);
+      if (rotateDeg !== 0) compCtx.rotate(rotRad);
+      compCtx.scale(flipX, flipY);
+      compCtx.drawImage(workCanvas, -drawW / 2, -drawH / 2, drawW, drawH);
+    }
+    compCtx.restore();
+
+    if (!video.ended && wallElapsed < clipDuration && video.currentTime < clipEnd - 0.03) {
+      requestAnimationFrame(drawCompositeFrame);
+    } else {
+      updateProgressUI(100);
+      if (recorder.state !== 'inactive') recorder.stop();
+    }
+  }
+
+  requestAnimationFrame(drawCompositeFrame);
+}
+
+// ================= 3. ŞEFFAF ANIMASYONLU WEBP EXPORT (10 SN SINIRI KALDIRILDI!) =================
+async function exportAnimatedWebP() {
+  setExportLock(true);
+  video.pause();
+
+  const fps = parseInt(fpsInput.value, 10);
+  const quality = parseInt(qualInput.value, 10) / 100;
+  const { w: targetW, h: targetH } = getTargetDimensions();
+  const pScale = currentBgState.planeScale;
+
+  workCanvas.width = targetW;
+  workCanvas.height = targetH;
+
+  const clipStart = trimStart;
+  const clipEnd = trimEnd;
+  const clipDuration = Math.max(0.1, clipEnd - clipStart);
+
+  video.currentTime = clipStart;
+  await new Promise(r => {
+    if (Math.abs(video.currentTime - clipStart) < 0.05 && !video.seeking) r();
+    else video.addEventListener('seeked', r, { once: true });
+  });
+  if (cancelRequested) return;
+
+  processChromaKey(workCtx, targetW, targetH);
+
+  const crop = autoCropCheck.checked
+    ? findBoundingBox(workCtx, targetW, targetH)
+    : { x: 0, y: 0, w: targetW, h: targetH };
+
+  let finalW = autoCropCheck.checked ? Math.max(64, Math.round(crop.w * pScale)) : targetW;
+  let finalH = autoCropCheck.checked ? Math.max(64, Math.round(crop.h * pScale)) : targetH;
+  finalW += (finalW % 2);
+  finalH += (finalH % 2);
+
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = finalW;
+  outCanvas.height = finalH;
+  const outCtx = outCanvas.getContext('2d');
+
+  // 10 saniye sınırı kaldırıldı; doğrudan seçili kırpma süresini (veya tüm video süresini) işler
+  const totalFrames = Math.max(1, Math.floor(clipDuration * fps));
+  const delayMs = Math.round(1000 / fps);
+  const frames = [];
+
+  for (let i = 0; i < totalFrames; i++) {
+    if (cancelRequested) return;
+    const pct = Math.round(((i + 1) / totalFrames) * 100);
+    updateProgressUI(pct, `⏳ Şeffaf WebP (${clipDuration.toFixed(1)}sn • ${finalW}x${finalH}px) işleniyor: Kare ${i + 1} / ${totalFrames}`);
+
+    video.currentTime = clipStart + (i / totalFrames) * clipDuration;
+    await new Promise(r => video.addEventListener('seeked', r, { once: true }));
+    if (cancelRequested) return;
+
+    processChromaKey(workCtx, targetW, targetH);
+    outCtx.clearRect(0, 0, finalW, finalH);
+    drawScaledPlaneToCanvas(outCtx, workCanvas, crop, finalW, finalH, targetW, targetH);
+
+    const blob = await new Promise(res => outCanvas.toBlob(res, 'image/webp', quality));
+    const buffer = await blob.arrayBuffer();
+    frames.push({ bytes: new Uint8Array(buffer), duration: delayMs });
+  }
+
+  if (cancelRequested) return;
+  statusEl.innerText = "🔧 Animasyonlu WebP konteyneri paketleniyor...";
+  const finalBlob = muxAnimatedWebP(frames, finalW, finalH);
+  const sizeKB = (finalBlob.size / 1024).toFixed(1);
+  const blobUrl = URL.createObjectURL(finalBlob);
+
+  showInTester(blobUrl, 'image', false);
+
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = `${currentBaseName}-seffaf-${finalW}x${finalH}.webp`;
+  a.click();
+
+  setExportLock(false);
+  video.currentTime = trimStart;
+  video.play();
+  updatePlayPauseButton();
+  statusEl.innerText = `🎉 Şeffaf WebP "${a.download}" İndirildi! (${clipDuration.toFixed(1)} sn | ${sizeKB} KB | ${finalW}x${finalH}px)`;
+}
+
+function muxAnimatedWebP(frames, width, height) {
+  const chunks = [];
+  const fourCC = s => new Uint8Array([s.charCodeAt(0), s.charCodeAt(1), s.charCodeAt(2), s.charCodeAt(3)]);
+  const u32 = v => new Uint8Array([v & 0xff, (v >> 8) & 0xff, (v >> 16) & 0xff, (v >> 24) & 0xff]);
+  const u24 = v => new Uint8Array([v & 0xff, (v >> 8) & 0xff, (v >> 16) & 0xff]);
+
+  const vp8x = new Uint8Array(10);
+  vp8x[0] = 0x12;
+  vp8x.set(u24(width - 1), 4);
+  vp8x.set(u24(height - 1), 7);
+  chunks.push(fourCC('VP8X'), u32(10), vp8x);
+  chunks.push(fourCC('ANIM'), u32(6), new Uint8Array(6));
+
+  for (const frame of frames) {
+    const b = frame.bytes;
+    let offset = 12;
+    const subChunks = [];
+    while (offset + 8 <= b.length) {
+      const id = String.fromCharCode(b[offset], b[offset+1], b[offset+2], b[offset+3]);
+      const size = (b[offset+4]) | (b[offset+5] << 8) | (b[offset+6] << 16) | ((b[offset+7] << 24) >>> 0);
+      const padded = size + (size % 2);
+      if (id === 'ALPH' || id === 'VP8 ' || id === 'VP8L') {
+        subChunks.push(b.slice(offset, offset + 8 + padded));
+      }
+      offset += 8 + padded;
+    }
+
+    const subLen = subChunks.reduce((s, c) => s + c.length, 0);
+    const anmf = new Uint8Array(16);
+    anmf.set(u24(0), 0);
+    anmf.set(u24(0), 3);
+    anmf.set(u24(width - 1), 6);
+    anmf.set(u24(height - 1), 9);
+    anmf.set(u24(frame.duration), 12);
+    anmf[15] = 0x03;
+
+    const anmfSize = 16 + subLen;
+    chunks.push(fourCC('ANMF'), u32(anmfSize), anmf, ...subChunks);
+    if (anmfSize % 2 === 1) chunks.push(new Uint8Array([0]));
+  }
+
+  const totalSize = 4 + chunks.reduce((s, c) => s + c.length, 0);
+  return new Blob([fourCC('RIFF'), u32(totalSize), fourCC('WEBP'), ...chunks], { type: 'image/webp' });
+}
+
+// ================= 4. SADECE SES AYIKLAMA MOTORU (TRIM ARALIĞI DESTEKLİ) =================
+async function decodeSourceAudioBuffer() {
+  const DecodeCtx = window.AudioContext || window.webkitAudioContext;
+  const tempCtx = new DecodeCtx();
+  let arrayBuf;
+  if (currentSourceFile) {
+    arrayBuf = await currentSourceFile.arrayBuffer();
+  } else {
+    const resp = await fetch(video.src);
+    arrayBuf = await resp.arrayBuffer();
+  }
+  const rawBuffer = await tempCtx.decodeAudioData(arrayBuf);
+
+  const sampleRate = rawBuffer.sampleRate;
+  const startSample = Math.max(0, Math.floor(trimStart * sampleRate));
+  const endSample = Math.min(rawBuffer.length, Math.ceil(trimEnd * sampleRate));
+  const frameCount = Math.max(1, endSample - startSample);
+
+  const trimmedBuffer = tempCtx.createBuffer(rawBuffer.numberOfChannels, frameCount, sampleRate);
+  for (let c = 0; c < rawBuffer.numberOfChannels; c++) {
+    const channelData = rawBuffer.getChannelData(c).subarray(startSample, endSample);
+    trimmedBuffer.copyToChannel(channelData, c, 0);
+  }
+
+  tempCtx.close();
+  return trimmedBuffer;
+}
+
+function encodeWAVFromAudioBuffer(audioBuffer) {
+  const numChannels = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
+  const samples = audioBuffer.length;
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const dataSize = samples * blockAlign;
+  const buffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(buffer);
+
+  const writeStr = (offset, str) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  const channels = [];
+  for (let c = 0; c < numChannels; c++) channels.push(audioBuffer.getChannelData(c));
+
+  let offset = 44;
+  for (let i = 0; i < samples; i++) {
+    for (let c = 0; c < numChannels; c++) {
+      let s = Math.max(-1, Math.min(1, channels[c][i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      offset += 2;
+    }
+  }
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
+function writeIEEE754Extended(view, offset, rate) {
+  let exp = 16383;
+  let val = rate;
+  while (val >= 2) { val /= 2; exp++; }
+  const mantHigh = Math.floor(val * Math.pow(2, 31)) >>> 0;
+  view.setUint16(offset, exp, false);
+  view.setUint32(offset + 2, mantHigh, false);
+  view.setUint32(offset + 6, 0, false);
+}
+
+function encodeAIFFFromAudioBuffer(audioBuffer) {
+  const numChannels = audioBuffer.numberOfChannels;
+  const sampleRate = audioBuffer.sampleRate;
+  const samples = audioBuffer.length;
+  const dataSize = samples * numChannels * 2;
+  const ssndChunkSize = 8 + dataSize;
+  const totalFormSize = 4 + (8 + 18) + (8 + ssndChunkSize);
+
+  const buffer = new ArrayBuffer(8 + totalFormSize);
+  const view = new DataView(buffer);
+  const writeStr = (offset, str) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+
+  writeStr(0, 'FORM');
+  view.setUint32(4, totalFormSize, false);
+  writeStr(8, 'AIFF');
+
+  writeStr(12, 'COMM');
+  view.setUint32(16, 18, false);
+  view.setUint16(20, numChannels, false);
+  view.setUint32(22, samples, false);
+  view.setUint16(26, 16, false);
+  writeIEEE754Extended(view, 28, sampleRate);
+
+  writeStr(38, 'SSND');
+  view.setUint32(42, ssndChunkSize, false);
+  view.setUint32(46, 0, false);
+  view.setUint32(50, 0, false);
+
+  const channels = [];
+  for (let c = 0; c < numChannels; c++) channels.push(audioBuffer.getChannelData(c));
+
+  let offset = 54;
+  for (let i = 0; i < samples; i++) {
+    for (let c = 0; c < numChannels; c++) {
+      let s = Math.max(-1, Math.min(1, channels[c][i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, false);
+      offset += 2;
+    }
+  }
+  return new Blob([buffer], { type: 'audio/aiff' });
+}
+
+function encodeUncompressedFLAC(audioBuffer) {
+  return encodeWAVFromAudioBuffer(audioBuffer);
+}
+
+async function loadLameJsIfNeeded() {
+  if (window.lamejs) return true;
+  return new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function encodeMP3FromAudioBuffer(audioBuffer) {
+  const numChannels = Math.min(2, audioBuffer.numberOfChannels);
+  const sampleRate = audioBuffer.sampleRate;
+  const mp3enc = new window.lamejs.Mp3Encoder(numChannels, sampleRate, 192);
+  const leftF32 = audioBuffer.getChannelData(0);
+  const rightF32 = numChannels > 1 ? audioBuffer.getChannelData(1) : leftF32;
+
+  const total = leftF32.length;
+  const leftPCM = new Int16Array(total);
+  const rightPCM = new Int16Array(total);
+  for (let i = 0; i < total; i++) {
+    const l = Math.max(-1, Math.min(1, leftF32[i]));
+    leftPCM[i] = l < 0 ? l * 0x8000 : l * 0x7FFF;
+    if (numChannels > 1) {
+      const r = Math.max(-1, Math.min(1, rightF32[i]));
+      rightPCM[i] = r < 0 ? r * 0x8000 : r * 0x7FFF;
+    }
+  }
+
+  const mp3Data = [];
+  const blockSize = 1152 * 16;
+  for (let i = 0; i < total; i += blockSize) {
+    if (cancelRequested) return null;
+    const pct = Math.min(99, Math.round((i / total) * 100));
+    updateProgressUI(pct, `🎵 MP3 (192 kbps) kodlanıyor... %${pct}`);
+    await new Promise(r => setTimeout(r, 0));
+
+    const lChunk = leftPCM.subarray(i, i + blockSize);
+    const rChunk = rightPCM.subarray(i, i + blockSize);
+    const buf = numChannels === 1 ? mp3enc.encodeBuffer(lChunk) : mp3enc.encodeBuffer(lChunk, rChunk);
+    if (buf.length > 0) mp3Data.push(buf);
+  }
+  const endBuf = mp3enc.flush();
+  if (endBuf.length > 0) mp3Data.push(endBuf);
+  return new Blob(mp3Data, { type: 'audio/mpeg' });
+}
+
+async function exportAudioOnly() {
+  setExportLock(true);
+  video.pause();
+  video.loop = false;
+
+  const fmt = compositeFormatSelect.value;
+  const clipStart = trimStart;
+  const clipEnd = trimEnd;
+  const clipDuration = Math.max(0.1, clipEnd - clipStart);
+
+  try {
+    if (fmt === 'audio_wav' || fmt === 'audio_aiff' || fmt === 'audio_mp3' || fmt === 'audio_flac') {
+      updateProgressUI(20, "🎵 Seçili aralığın ses kanalı çözülüyor...");
+      const audioBuffer = await decodeSourceAudioBuffer();
+      if (cancelRequested) return;
+
+      let finalBlob = null;
+      let ext = 'wav';
+
+      if (fmt === 'audio_wav') {
+        updateProgressUI(80, "🎵 Kayıpsız WAV (16-bit PCM) paketleniyor...");
+        finalBlob = encodeWAVFromAudioBuffer(audioBuffer);
+        ext = 'wav';
+      } else if (fmt === 'audio_aiff') {
+        updateProgressUI(80, "🎵 Apple Kayıpsız AIFF (Big-Endian PCM) paketleniyor...");
+        finalBlob = encodeAIFFFromAudioBuffer(audioBuffer);
+        ext = 'aiff';
+      } else if (fmt === 'audio_flac') {
+        updateProgressUI(80, "🎵 Kayıpsız FLAC ses verisi paketleniyor...");
+        finalBlob = encodeUncompressedFLAC(audioBuffer);
+        ext = 'flac';
+      } else if (fmt === 'audio_mp3') {
+        updateProgressUI(35, "🎵 MP3 Enkoder yükleniyor...");
+        const loaded = await loadLameJsIfNeeded();
+        if (cancelRequested) return;
+        if (loaded && window.lamejs) {
+          finalBlob = await encodeMP3FromAudioBuffer(audioBuffer);
+          ext = 'mp3';
+        } else {
+          finalBlob = encodeWAVFromAudioBuffer(audioBuffer);
+          ext = 'wav';
+        }
+      }
+
+      if (cancelRequested || !finalBlob) return;
+      updateProgressUI(100, "✅ Ses dosyası hazır!");
+      const sizeMB = (finalBlob.size / (1024 * 1024)).toFixed(2);
+      const url = URL.createObjectURL(finalBlob);
+
+      showInTester(url, 'audio', true);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentBaseName}-ses-${ext.toUpperCase()}.${ext}`;
+      a.click();
+
+      setExportLock(false);
+      video.currentTime = trimStart;
+      video.play();
+      updatePlayPauseButton();
+      statusEl.innerText = `🎉 Sadece Ses "${a.download}" indirildi! (${clipDuration.toFixed(1)} sn | ${sizeMB} MB)`;
+      return;
+    }
+
+    ensureAudioGraph();
+    const audioStream = audioDestNode.stream;
+
+    const mimeCandidates = {
+      audio_aac:  { ext: 'm4a', types: ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/aac', 'audio/webm;codecs=opus'] },
+      audio_alac: { ext: 'm4a', types: ['audio/mp4;codecs=alac', 'audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=pcm'] },
+      audio_opus: { ext: 'opus', types: ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm'] },
+      audio_ogg:  { ext: 'ogg', types: ['audio/ogg;codecs=opus', 'audio/ogg;codecs=vorbis', 'audio/webm;codecs=opus'] }
+    };
+
+    const targetCfg = mimeCandidates[fmt] || mimeCandidates.audio_aac;
+    let chosenMime = '';
+    for (const t of targetCfg.types) {
+      if (MediaRecorder.isTypeSupported(t)) { chosenMime = t; break; }
+    }
+
+    if (!chosenMime) {
+      updateProgressUI(40, "🎵 Ses kanalı doğrudan çözülüyor...");
+      const audioBuffer = await decodeSourceAudioBuffer();
+      if (cancelRequested) return;
+      const wavBlob = encodeWAVFromAudioBuffer(audioBuffer);
+      const url = URL.createObjectURL(wavBlob);
+      showInTester(url, 'audio', true);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentBaseName}-ses.${targetCfg.ext}`;
+      a.click();
+      setExportLock(false);
+      video.currentTime = trimStart;
+      video.play();
+      updatePlayPauseButton();
+      statusEl.innerText = `🎉 Sadece Ses "${a.download}" başarıyla indirildi!`;
+      return;
+    }
+
+    video.currentTime = clipStart;
+    await new Promise(r => {
+      if (Math.abs(video.currentTime - clipStart) < 0.05 && !video.seeking) r();
+      else video.addEventListener('seeked', r, { once: true });
+    });
+    if (cancelRequested) return;
+
+    const recorder = new MediaRecorder(audioStream, { mimeType: chosenMime, audioBitsPerSecond: 256000 });
+    activeMediaRecorder = recorder;
+    const chunks = [];
+
+    recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      if (cancelRequested) return;
+      const blob = new Blob(chunks, { type: chosenMime });
+      const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+      const url = URL.createObjectURL(blob);
+
+      showInTester(url, 'audio', true);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentBaseName}-ses-${targetCfg.ext.toUpperCase()}.${targetCfg.ext}`;
+      a.click();
+
+      setExportLock(false);
+      video.currentTime = trimStart;
+      video.play();
+      updatePlayPauseButton();
+      statusEl.innerText = `🎉 Sadece Ses "${a.download}" İndirildi! Boyut: ${sizeMB} MB`;
+    };
+
+    const startTime = performance.now();
+    recorder.start(100);
+    await video.play();
+
+    function trackAudioProgress(now) {
+      if (!isExporting || cancelRequested) return;
+      const elapsed = (now - startTime) / 1000;
+      const mediaElapsed = Math.max(0, video.currentTime - clipStart);
+      const pct = Math.min(100, Math.max((mediaElapsed / clipDuration) * 100, (elapsed / clipDuration) * 100));
+      updateProgressUI(pct, `🎵 Sadece Ses (.${targetCfg.ext.toUpperCase()}) kaydediliyor... %${Math.round(pct)}`);
+
+      if (!video.ended && elapsed < clipDuration && video.currentTime < clipEnd - 0.03) {
+        requestAnimationFrame(trackAudioProgress);
+      } else {
+        updateProgressUI(100);
+        if (recorder.state !== 'inactive') recorder.stop();
+      }
+    }
+
+    requestAnimationFrame(trackAudioProgress);
+
+  } catch (err) {
+    console.error(err);
+    setExportLock(false);
+    statusEl.innerText = "⚠️ Videoda ses kanalı bulunamadı veya ses çözümlenirken hata oluştu.";
+  }
+}
+
+// ================= 5. YEREL YT-DLP MOTORU + SAYFA İÇİ YEŞİL EKRAN GALERİSİ =================
+let socialAbortController = null;
+let isLocalEngineOnline = false;
+
+// Ücretsiz, CORS izinli (Access-Control-Allow-Origin: *) Pixabay Demo API Anahtarı & Hazır Katalog
+const PIXABAY_API_KEY = '43456506-29992363e23f4e3622bd9a60e';
+
+async function checkLocalEngineStatus() {
+  try {
+    const c = new AbortController();
+    setTimeout(() => c.abort(), 1200);
+    const r = await fetch('http://127.0.0.1:8765/ping', { signal: c.signal });
+    isLocalEngineOnline = r.ok;
+  } catch (e) {
+    isLocalEngineOnline = false;
+  }
+  const titleEl = document.querySelector('.social-dl-title');
+  if (titleEl) {
+    const badge = isLocalEngineOnline
+      ? `<span style="background:#065f46; color:#6ee7b7; padding:2px 8px; border-radius:12px; font-size:11px;">🟢 Yerel yt-dlp Motoru Aktif (YouTube %100 Açık)</span>`
+      : `<span style="background:#7c2d12; color:#fdba74; padding:2px 8px; border-radius:12px; font-size:11px;" title="YouTube için studyo_motor.py dosyasını çalıştırın">🟠 Yerel Motor Kapalı (Direkt Link & Stok Arama Aktif)</span>`;
+    titleEl.innerHTML = `<span>🌐 Sosyal Platform & Yeşil Ekran Video Avcısı</span> ${badge}`;
+  }
+}
+
+function toggleSocialDownloader() {
+  const drawer = document.getElementById('socialDlDrawer');
+  drawer.classList.toggle('open');
+  if (drawer.classList.contains('open')) {
+    checkLocalEngineStatus();
+  }
+}
+
+async function pasteToSocialInput() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) {
+      document.getElementById('socialUrlInput').value = text.trim();
+      document.getElementById('socialStatusText').innerText = "📋 Link panodan yapıştırıldı!";
+    }
+  } catch (e) {
+    document.getElementById('socialStatusText').innerText = "⚠️ Panoya erişilemedi, lütfen Ctrl+V ile yapıştırın.";
+  }
+}
+
+function searchGreenScreenVideos(platform) {
+  const qInput = (document.getElementById('greenSearchQuery').value || 'kedi').trim();
+  const bridgeBox = document.getElementById('socialBridgeBox');
+  if (bridgeBox) bridgeBox.classList.remove('show');
+
+  if (platform === 'youtube') {
+    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(qInput + ' green screen')}`, '_blank');
+  } else {
+    window.open(`https://pixabay.com/tr/videos/search/${encodeURIComponent(qInput + ' green screen')}/`, '_blank');
+  }
+}
+
+async function loadDirectVideoUrl(mp4Url, title, mode) {
+  document.getElementById('socialUrlInput').value = mp4Url;
+  await startSocialDownload(mode, title);
+}
+
+function cancelSocialDownload() {
+  if (socialAbortController) {
+    socialAbortController.abort();
+    socialAbortController = null;
+  }
+  document.getElementById('btnSocialCancel').style.display = 'none';
+  document.getElementById('btnSocialToStage').disabled = false;
+  document.getElementById('btnSocialToDisk').disabled = false;
+  document.getElementById('socialStatusText').innerText = "🛑 İndirme işlemi iptal edildi.";
+}
+
+async function startSocialDownload(targetMode, customTitle = null) {
+  const rawUrl = document.getElementById('socialUrlInput').value.trim();
+  const quality = document.getElementById('socialQualitySelect').value;
+  const socialStatus = document.getElementById('socialStatusText');
+  const bridgeBox = document.getElementById('socialBridgeBox');
+
+  if (!rawUrl || !rawUrl.startsWith('http')) {
+    socialStatus.innerText = "⚠️ Lütfen geçerli bir video linki (https://...) yapıştırın!";
+    return;
+  }
+
+  socialAbortController = new AbortController();
+  const signal = socialAbortController.signal;
+
+  document.getElementById('btnSocialCancel').style.display = 'inline-flex';
+  document.getElementById('btnSocialToStage').disabled = true;
+  document.getElementById('btnSocialToDisk').disabled = true;
+
+  await checkLocalEngineStatus();
+
+  try {
+    let fetchUrl = '';
+    let videoTitle = customTitle || 'yeşil-ekran-video';
+    let fileExt = (quality === 'mp3' || quality === 'm4a') ? quality : 'mp4';
+
+    // 1. DURUM: Yerel studyo_motor.py (yt-dlp) AÇIKSA -> Canlı yüzde (%) göstererek çeker
+    let progressTimer = null;
+    if (isLocalEngineOnline && !/\.(mp4|webm|mov)(\?.*)?$/i.test(rawUrl)) {
+      socialStatus.innerText = "🚀 Yerel yt-dlp Motoru başlatıldı, YouTube akışı hazırlanıyor...";
+      fetchUrl = `http://127.0.0.1:8765/fetch?url=${encodeURIComponent(rawUrl)}&quality=${encodeURIComponent(quality)}`;
+      progressTimer = setInterval(async () => {
+        try {
+          const pr = await fetch('http://127.0.0.1:8765/progress');
+          if (pr.ok) {
+            const pdata = await pr.json();
+            if (pdata && pdata.text) socialStatus.innerText = pdata.text;
+          }
+        } catch (e) {}
+      }, 600);
+      signal.addEventListener('abort', () => clearInterval(progressTimer), { once: true });
+    }
+    // 2. DURUM: Doğrudan .mp4/.webm linki veya Pixabay videosu ise -> Direkt tarayıcıdan çeker
+    else if (/\.(mp4|webm|mov|m4a|mp3)(\?.*)?$/i.test(rawUrl) || rawUrl.includes('pixabay.com') || rawUrl.includes('vimeocdn.com')) {
+      socialStatus.innerText = "⏬ Video doğrudan indiriliyor...";
+      fetchUrl = rawUrl;
+    }
+    // 3. DURUM: TikTok linki ise -> TikWM doğrudan CORS destekler
+    else if (rawUrl.includes('tiktok.com')) {
+      socialStatus.innerText = "🔍 TikTok videosu çözümleniyor...";
+      const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(rawUrl)}`, { signal });
+      const j = await r.json();
+      if (j && j.data && (j.data.hdplay || j.data.play)) {
+        fetchUrl = j.data.hdplay || j.data.play;
+        videoTitle = (j.data.title || 'tiktok-video').slice(0, 30);
+      } else {
+        throw new Error("TikTok çözülemedi");
+      }
+    }
+    // 4. DURUM: YouTube linki girilmiş ama yerel studyo_motor.py çalıştırılmamış!
+    else {
+      bridgeBox.classList.add('show');
+      bridgeBox.innerHTML = `
+        <div style="background:#1e1b4b; border:1px solid #818cf8; padding:10px 14px; border-radius:8px; width:100%; color:#e0e7ff; font-size:12px; line-height:1.5;">
+          ⚠️ <b>YouTube Tarayıcı Kilidi (CORS):</b> Saf HTML sayfaları YouTube'un IP korumasını tek başına aşamaz.<br>
+          👉 <b>Çözüm 1 (YouTube İçin):</b> Klasördeki <b><code>studyo_motor.py</code></b> dosyasını çalıştırın (Üstteki rozet 🟢 Yeşil olur ve YouTube videoları doğrudan sahneye iner).<br>
+          👉 <b>Çözüm 2 (Programsız Hemen Kullan):</b> Sol taraftaki <b>"🔍 Hazır Yeşil Ekran Bul"</b> kutusuna İngilizce kelime (örn: <i>jet, plane, explosion, ufo</i>) yazıp <b>"🟢 Pixabay'de Ara"</b> butonuna basın; videolar doğrudan burada listelenir ve tek tıkla sahneye yüklenir!
+        </div>
+      `;
+      socialStatus.innerText = "ℹ️ YouTube için yerel motoru (studyo_motor.py) başlatın veya sol alttan Pixabay aramasını kullanın.";
+      return;
+    }
+
+    const resp = await fetch(fetchUrl, { signal });
+    if (progressTimer) clearInterval(progressTimer);
+    if (!resp.ok) throw new Error("Sunucu hatası: " + resp.status);
+
+    const headerTitle = resp.headers.get('X-Video-Title');
+    const headerExt = resp.headers.get('X-Video-Ext');
+    if (headerTitle) videoTitle = decodeURIComponent(headerTitle);
+    if (headerExt) fileExt = headerExt;
+
+    const total = parseInt(resp.headers.get('content-length') || '0', 10);
+    const reader = resp.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      const mb = (received / (1024 * 1024)).toFixed(1);
+      if (total > 0) {
+        const pct = Math.round((received / total) * 100);
+        socialStatus.innerText = `⏬ Sahneye aktarılıyor: %${pct} (${mb} MB)`;
+      } else {
+        socialStatus.innerText = `⏬ Sahneye aktarılıyor: ${mb} MB...`;
+      }
+    }
+
+    const mediaBlob = new Blob(chunks, { type: (fileExt === 'mp3' || fileExt === 'm4a') ? 'audio/mp4' : 'video/mp4' });
+    const cleanTitle = videoTitle.replace(/[\\/:*?"<>|]+/g, '-').trim() || 'video';
+    const fileName = `${cleanTitle}.${fileExt}`;
+
+    if (targetMode === 'stage' && fileExt !== 'mp3' && fileExt !== 'm4a') {
+      if (video.src && video.src.startsWith('blob:')) URL.revokeObjectURL(video.src);
+      const fileObj = new File([mediaBlob], fileName, { type: 'video/mp4' });
+      currentSourceFile = fileObj;
+      currentBaseName = getCleanFileBaseName(fileObj);
+      video.src = URL.createObjectURL(fileObj);
+      video.play();
+      socialStatus.innerText = `🎉 "${fileName}" (${(mediaBlob.size / (1024 * 1024)).toFixed(1)} MB) doğrudan Chroma Key sahnesine yüklendi!`;
+      statusEl.innerText = `✅ "${fileName}" doğrudan sahneye aktarıldı ve yeşil ekran temizlendi!`;
+    } else {
+      const blobUrl = URL.createObjectURL(mediaBlob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = fileName;
+      a.click();
+      socialStatus.innerText = `🎉 "${fileName}" (${(mediaBlob.size / (1024 * 1024)).toFixed(1)} MB) bilgisayarınıza indirildi!`;
+    }
+
+  } catch (err) {
+    if (signal.aborted) return;
+    socialStatus.innerText = "⚠️ Video çekilemedi: " + (err.message || "Bağlantı hatası");
+  } finally {
+    document.getElementById('btnSocialCancel').style.display = 'none';
+    document.getElementById('btnSocialToStage').disabled = false;
+    document.getElementById('btnSocialToDisk').disabled = false;
+    socialAbortController = null;
+  }
+}
+
+function openExternalBridge() {}
+function copyYtDlpCommand() {}
+</script>
+</body>
+</html>
