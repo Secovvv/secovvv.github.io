@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SECOVVV | Oyun Evreni & Stüdyo</title>
+
+    <!-- Sosyal Medya (WhatsApp, Discord, Telegram, X) Paylaşım Kartı (Open Graph) -->
+    <meta name="description" content="SECOVVV Dijital Oyun ve Yazılım Atölyesi — AI Resim Stüdyosu, Yeşil Ekran Video Silici, Web ve Python Oyunları.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="SECOVVV | Oyun Evreni & Stüdyo">
+    <meta property="og:description" content="Dijital Oyun ve Yazılım Atölyesi — AI Resim Stüdyosu, Chroma Key Video Silici ve İnteraktif Oyunlar.">
+    <meta property="og:url" content="https://secovvv.github.io/">
+    <meta name="theme-color" content="#00ffcc">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -64,7 +72,21 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
 
-        /* --- MOUSE EFEKT CANVAS KATMANLARI (Sayfa tıklamalarını engellemez) --- */
+        html, body {
+            position: relative;
+        }
+
+        /* --- KALICI ÇİZİM KANVASI (Sayfaya çivilenir, aşağı kaydırınca çizilen yerde kalır!) --- */
+        #staticCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            pointer-events: none;
+            z-index: 9991;
+        }
+
+        /* --- UÇUŞAN EFEKT KANVASI (Ekranda sabit kalır) --- */
         #fxCanvasContainer {
             position: fixed;
             top: 0;
@@ -72,19 +94,16 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 9990;
+            z-index: 9992;
         }
 
-        #fxCanvasContainer canvas {
+        #heartCanvas {
             position: absolute;
             top: 0;
             left: 0;
             display: block;
             pointer-events: none;
         }
-
-        #staticCanvas { z-index: 9991; }
-        #heartCanvas  { z-index: 9992; }
 
         /* --- SECOVVV YAZISININ ÜSTÜNDEKİ MOUSE ANİMASYON PANELİ --- */
         .top-ui-bar {
@@ -925,13 +944,55 @@
             cursor: not-allowed;
             transform: none;
         }
+
+        /* --- GOOGLE PLAY ÖZEL NEON BUTON VE MAĞAZA KARTI --- */
+        .playstore-trigger-btn {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid #10b981;
+            color: #34d399;
+            padding: 10px 22px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .playstore-trigger-btn:hover {
+            background: #10b981;
+            color: #050505;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.65);
+            transform: translateY(-2px);
+        }
+
+        .badge-playstore {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .card-playstore {
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: linear-gradient(145deg, rgba(16, 28, 24, 0.88), rgba(10, 20, 30, 0.7));
+        }
+
+        .card-playstore:hover {
+            border-color: #34d399;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(16, 185, 129, 0.35);
+        }
     </style>
 </head>
-<body oncontextmenu="return !(fxEnabled && drawModeActive)">
+<body>
 
-    <!-- Tam Ekran Şeffaf Mouse Efekt & Çizim Katmanı -->
+    <!-- Tam Ekran Şeffaf Mouse Efekt Katmanı -->
     <div id="fxCanvasContainer">
-        <canvas id="staticCanvas"></canvas>
         <canvas id="heartCanvas"></canvas>
     </div>
 
@@ -947,24 +1008,15 @@
                 </div>
 
                 <div id="fxControls" class="fx-controls disabled">
-                    <div class="shape-group">
+                    <div class="shape-group" style="border-right: none; padding-right: 0;">
                         <button class="shape-btn active" data-mode="letterS" onclick="setShapeMode('letterS')" title="Bordo-Mavi S Harfi Modu" style="font-family: 'Courier New', monospace; font-size: 18px;">S</button>
                         <button class="shape-btn" data-mode="ts" onclick="setShapeMode('ts')" title="Trabzonspor Arması Modu">TS</button>
                         <button class="shape-btn" data-mode="matrix" onclick="setShapeMode('matrix')" title="Matrix Digital Rain & Cyber Code Modu">01</button>
                     </div>
-
-                    <div id="drawModeSwitch" class="switch-wrapper" onclick="toggleDrawMode()">
-                        <span class="switch-label">✍️ Çizim Modu</span>
-                        <div class="switch-track">
-                            <div class="switch-thumb"></div>
-                        </div>
-                    </div>
-                    <span id="drawHint" style="display:none !important;"></span>
-                    <button id="clearBtn" class="clear-btn" onclick="clearCanvasAll()">🗑️ Temizle</button>
                 </div>
             </div>
 
-            <h1>SECO<span>VVV</span></h1>
+            <h1 style="user-select: none; -webkit-user-select: none;"><span id="secretS" style="color: #fff;">S</span>ECO<span>VVV</span></h1>
             <p class="subtitle">Dijital Oyun ve Yazılım Atölyesi</p>
         </div>
 
@@ -974,12 +1026,27 @@
             <button class="filter-btn" data-filter="html"><i class="fa-brands fa-html5"></i> Web Oyunları</button>
             <button class="filter-btn" data-filter="python"><i class="fa-brands fa-python"></i> Python</button>
             <button class="filter-btn" data-filter="legacy"><i class="fa-solid fa-gamepad"></i> Klasikler</button>
+            <a href="https://play.google.com/store/apps/dev?id=4805356574484137589&hl=tr" target="_blank" rel="noopener noreferrer" class="playstore-trigger-btn">
+                <i class="fa-brands fa-google-play"></i> Google Play
+            </a>
             <button type="button" class="contact-trigger-btn" onclick="openContactModal()">
                 <i class="fa-solid fa-paper-plane"></i> İletişim
             </button>
         </div>
 
         <div class="container" id="project-container">
+
+            <!-- GOOGLE PLAY STORE RESMİ GELİŞTİRİCİ MAĞAZASI KARTI -->
+            <div class="project-card card-playstore" data-category="studio">
+                <div class="card-content">
+                    <span class="badge badge-playstore"><i class="fa-brands fa-google-play"></i> Android / Google Play</span>
+                    <h3>Mobil Uygulamalar</h3>
+                    <p>SECOVVV imzalı tüm resmi Android mobil uygulamalarımızı ve oyunlarımızı doğrudan Google Play Store mağazamızdan inceleyin ve ücretsiz indirin.</p>
+                </div>
+                <a href="https://play.google.com/store/apps/dev?id=4805356574484137589&hl=tr" target="_blank" rel="noopener noreferrer" class="btn">
+                    <i class="fa-brands fa-google-play"></i> Mağazayı Aç
+                </a>
+            </div>
 
             <!-- 1. YENİ STÜDYO PANELİ: YEŞİL EKRAN SİLİCİ -->
             <div class="project-card card-studio" data-category="studio">
@@ -1232,21 +1299,15 @@
             });
         });
 
-        // --- MOUSE EFEKT VE ÇİZİM MOTORU ---
-        const staticCanvas = document.getElementById('staticCanvas');
-        const staticCtx = staticCanvas.getContext('2d');
+        // --- MOUSE EFEKT MOTORU ---
         const canvas = document.getElementById('heartCanvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = staticCanvas.width = window.innerWidth;
-        canvas.height = staticCanvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         let fxEnabled = false;
         let currentShapeMode = 'letterS';
-        let drawModeActive = false;
-        let isDrawingTrail = false;
-        let lastTrailX = null;
-        let lastTrailY = null;
         let lastMatrixSpawnX = null;
         let lastMatrixSpawnY = null;
         let lastMatrixSpawnTime = 0;
@@ -1282,9 +1343,6 @@
             fxControls.classList.toggle('disabled', !fxEnabled);
 
             if (!fxEnabled) {
-                isDrawingTrail = false;
-                lastTrailX = null;
-                lastTrailY = null;
                 particles.length = 0;
                 matrixStreams.length = 0;
                 matrixShockwaves.length = 0;
@@ -1535,16 +1593,17 @@
 
             palettes.letterS.forEach(item => {
                 const c = document.createElement('canvas');
-                c.width = c.height = size;
+                c.width = 150;
+                c.height = 54;
                 const g = c.getContext('2d');
-                g.translate(half, half);
+                g.translate(c.width / 2, c.height / 2);
                 g.shadowColor = item.glow;
-                g.shadowBlur = 13;
+                g.shadowBlur = 12;
                 g.fillStyle = item.fill;
-                g.font = '900 28px "Segoe UI", Arial, sans-serif';
+                g.font = '900 22px "Segoe UI", Arial, sans-serif';
                 g.textAlign = 'center';
                 g.textBaseline = 'middle';
-                g.fillText('S', 0, 1);
+                g.fillText('SECOVVV', 0, 1);
                 spriteCache.letterS.push(c);
             });
 
@@ -1601,30 +1660,6 @@
             document.querySelectorAll('.shape-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
-        }
-
-        function toggleDrawMode() {
-            if (!fxEnabled) return;
-            drawModeActive = !drawModeActive;
-            isDrawingTrail = false;
-            lastTrailX = null;
-            lastTrailY = null;
-
-            document.getElementById('drawModeSwitch').classList.toggle('active', drawModeActive);
-            document.getElementById('drawHint').classList.toggle('visible', drawModeActive);
-            document.getElementById('clearBtn').classList.toggle('visible', drawModeActive);
-        }
-
-        function clearCanvasAll() {
-            particles.length = 0;
-            matrixStreams.length = 0;
-            matrixShockwaves.length = 0;
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            staticCtx.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
-            isDrawingTrail = false;
-            lastTrailX = null;
-            lastTrailY = null;
         }
 
         class MatrixCodeStream {
@@ -1699,70 +1734,8 @@
             }
         }
 
-        function stampPermanentShape(x, y) {
-            staticCtx.save();
-            if (currentShapeMode === 'matrix') {
-                if (lastTrailX !== null && lastTrailY !== null) {
-                    staticCtx.save();
-                    staticCtx.strokeStyle = 'rgba(57, 255, 20, 0.55)';
-                    staticCtx.shadowColor = '#00FF41';
-                    staticCtx.shadowBlur = 10;
-                    staticCtx.lineWidth = 2.5;
-                    staticCtx.beginPath();
-                    staticCtx.moveTo(lastTrailX, lastTrailY);
-                    staticCtx.lineTo(x, y);
-                    staticCtx.stroke();
-                    staticCtx.restore();
-                }
-                const gIdx = randomGlyphIndex();
-                const sprite = (Math.random() < 0.4) ? spriteCache.matrixHead[gIdx] : spriteCache.matrixBright[gIdx];
-                const scale = 0.88 + Math.random() * 0.2;
-                staticCtx.translate(x, y);
-                staticCtx.scale(scale, scale);
-                staticCtx.drawImage(sprite, -27, -27);
-                staticCtx.restore();
-
-                if (Math.random() < 0.32 && matrixStreams.length < 110) {
-                    matrixStreams.push(new MatrixCodeStream(x, y + 14, false));
-                }
-                return;
-            }
-
-            const sprite = (currentShapeMode === 'fire')
-                ? spriteCache.fire[Math.floor(Math.random() * 2)]
-                : getRandomSprite(currentShapeMode);
-
-            const scale = (currentShapeMode === 'ts') ? (0.88 + Math.random() * 0.22) : (0.75 + Math.random() * 0.25);
-            const rot = (Math.random() - 0.5) * 0.25;
-            staticCtx.translate(x, y);
-            staticCtx.rotate(rot);
-            staticCtx.scale(scale, scale);
-            staticCtx.drawImage(sprite, -32, -32);
-            staticCtx.restore();
-        }
-
-        function addPermanentTrailPoint(x, y) {
-            if (lastTrailX === null || lastTrailY === null) {
-                stampPermanentShape(x, y);
-                lastTrailX = x;
-                lastTrailY = y;
-                return;
-            }
-            const dist = Math.hypot(x - lastTrailX, y - lastTrailY);
-            const step = currentShapeMode === 'matrix' ? 18 : 11;
-            if (dist >= step) {
-                const steps = Math.floor(dist / step);
-                for (let i = 1; i <= steps; i++) {
-                    const ratio = i / steps;
-                    stampPermanentShape(lastTrailX + (x - lastTrailX) * ratio, lastTrailY + (y - lastTrailY) * ratio);
-                }
-                lastTrailX = x;
-                lastTrailY = y;
-            }
-        }
-
         class Particle {
-            constructor(x, y, isBurst = false, shapeType = 'heart') {
+            constructor(x, y, isBurst = false, shapeType = 'heart', customAngle = null) {
                 this.x = x;
                 this.y = y;
                 this.shapeType = shapeType;
@@ -1779,6 +1752,26 @@
                     this.rotation = 0;
                     this.rotationSpeed = 0;
                     this.wobbleSpeed = 0;
+                } else if (shapeType === 'letterS') {
+                    // SECOVVV yazısı için uzatılmış ekran süresi ve net süzülme matematiği
+                    this.sprite = getRandomSprite('letterS');
+                    this.initialScale = isBurst ? 0.88 : 0.76;
+                    // Tıklayınca (isBurst) 175 kare (~3 sn), gezdirirken 115 kare (~2 sn) ekranda kalır
+                    this.maxLifetime = isBurst ? 175 : 115;
+
+                    if (isBurst) {
+                        const angle = customAngle !== null ? customAngle : (Math.random() * Math.PI * 2);
+                        const speed = 2.6; // Etrafa çok hızlı kaçmaması, okunaklı açılması için ideal hız
+                        this.speedX = Math.cos(angle) * speed;
+                        this.speedY = Math.sin(angle) * speed;
+                    } else {
+                        // Fareyi takip ederken hafifçe yukarı süzülür
+                        this.speedX = (Math.random() - 0.5) * 0.3;
+                        this.speedY = -0.75 - Math.random() * 0.3;
+                    }
+                    this.rotation = 0;
+                    this.rotationSpeed = 0;
+                    this.wobbleSpeed = 0.025;
                 } else {
                     this.sprite = getRandomSprite(shapeType);
                     const sizeBoost = (shapeType === 'ts') ? 1.2 : 1.0;
@@ -1821,7 +1814,7 @@
                 }
                 this.lifetime -= 1;
                 const lifeRatio = Math.max(0, this.lifetime / this.maxLifetime);
-                this.scale = this.shapeType === 'matrix' ? this.initialScale : this.initialScale * (0.25 + lifeRatio * 0.75);
+                this.scale = (this.shapeType === 'matrix' || this.shapeType === 'letterS') ? this.initialScale : this.initialScale * (0.25 + lifeRatio * 0.75);
             }
 
             draw() {
@@ -1848,15 +1841,21 @@
                 } else {
                     ctx.rotate(this.rotation);
                     ctx.scale(this.scale, this.scale);
-                    ctx.globalAlpha = Math.max(0, Math.min(1, lifeRatio * 1.35));
-                    ctx.drawImage(this.sprite, -32, -32);
+                    // SECOVVV modunda ömrünün %70'i boyunca tam parlak (1.0) kalır, son %30'da yumuşakça söner
+                    const alphaBoost = (this.shapeType === 'letterS') ? (lifeRatio > 0.3 ? 1.0 : (lifeRatio / 0.3)) : Math.min(1, lifeRatio * 1.35);
+                    ctx.globalAlpha = Math.max(0, alphaBoost);
+                    ctx.drawImage(this.sprite, -this.sprite.width / 2, -this.sprite.height / 2);
                 }
                 ctx.restore();
             }
         }
 
+        let lastSecovvvX = null;
+        let lastSecovvvY = null;
+
         function createParticles(x, y, count, isBurst = false) {
             if (!fxEnabled) return;
+
             if (currentShapeMode === 'matrix') {
                 if (isBurst) {
                     matrixShockwaves.push(new MatrixShockwave(x, y));
@@ -1877,6 +1876,29 @@
                         lastMatrixSpawnTime = now;
                         if (matrixStreams.length >= 120) matrixStreams.shift();
                         matrixStreams.push(new MatrixCodeStream(x, y, false));
+                    }
+                }
+                return;
+            }
+
+            // SECOVVV Modu için üst üste binmeyi önleyen özel aralık kontrolü
+            if (currentShapeMode === 'letterS') {
+                if (isBurst) {
+                    // Tıklayınca 8 yöne simetrik ve okunaklı halka halinde açılır
+                    const ringCount = 8;
+                    for (let i = 0; i < ringCount; i++) {
+                        if (particles.length >= MAX_ACTIVE_PARTICLES) particles.shift();
+                        const angle = (i / ringCount) * Math.PI * 2;
+                        particles.push(new Particle(x, y, true, 'letterS', angle));
+                    }
+                } else {
+                    // Sadece fare en az 55 piksel hareket ettiğinde 1 adet SECOVVV bırakır
+                    const dist = (lastSecovvvX === null) ? 999 : Math.hypot(x - lastSecovvvX, y - lastSecovvvY);
+                    if (dist >= 55) {
+                        lastSecovvvX = x;
+                        lastSecovvvY = y;
+                        if (particles.length >= MAX_ACTIVE_PARTICLES) particles.shift();
+                        particles.push(new Particle(x, y, false, 'letterS'));
                     }
                 }
                 return;
@@ -1931,19 +1953,7 @@
         window.addEventListener('mousedown', (event) => {
             if (!fxEnabled) return;
             if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .cyber-analytics-section')) return;
-
-            if (drawModeActive) {
-                if (event.button === 0) {
-                    isDrawingTrail = true;
-                    lastTrailX = null;
-                    lastTrailY = null;
-                    addPermanentTrailPoint(event.clientX, event.clientY);
-                } else if (event.button === 2) {
-                    isDrawingTrail = false;
-                    lastTrailX = null;
-                    lastTrailY = null;
-                }
-            } else if (event.button === 0) {
+            if (event.button === 0) {
                 createParticles(event.clientX, event.clientY, 26, true);
             }
         });
@@ -1951,37 +1961,14 @@
         window.addEventListener('mousemove', (event) => {
             if (!fxEnabled) return;
             if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
-
-            if (drawModeActive) {
-                if (isDrawingTrail || event.buttons === 1) {
-                    addPermanentTrailPoint(event.clientX, event.clientY);
-                }
-            } else {
-                createParticles(event.clientX, event.clientY, 2, false);
-            }
-        });
-
-        window.addEventListener('mouseup', (event) => {
-            if (!fxEnabled) return;
-            if (drawModeActive && event.button === 0) {
-                isDrawingTrail = false;
-                lastTrailX = null;
-                lastTrailY = null;
-            }
+            createParticles(event.clientX, event.clientY, 2, false);
         });
 
         window.addEventListener('touchstart', (event) => {
             if (!fxEnabled) return;
             if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .cyber-analytics-section')) return;
             const touch = event.touches[0];
-            if (!touch) return;
-
-            if (drawModeActive) {
-                isDrawingTrail = true;
-                lastTrailX = null;
-                lastTrailY = null;
-                addPermanentTrailPoint(touch.clientX, touch.clientY);
-            } else {
+            if (touch) {
                 createParticles(touch.clientX, touch.clientY, 22, true);
             }
         }, { passive: true });
@@ -1990,33 +1977,14 @@
             if (!fxEnabled) return;
             if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
             const touch = event.touches[0];
-            if (!touch) return;
-
-            if (drawModeActive) {
-                if (isDrawingTrail) addPermanentTrailPoint(touch.clientX, touch.clientY);
-            } else {
+            if (touch) {
                 createParticles(touch.clientX, touch.clientY, 2, false);
             }
         }, { passive: true });
 
-        window.addEventListener('touchend', () => {
-            if (!fxEnabled) return;
-            if (drawModeActive) {
-                isDrawingTrail = false;
-                lastTrailX = null;
-                lastTrailY = null;
-            }
-        });
-
         window.addEventListener('resize', () => {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = staticCanvas.width;
-            tempCanvas.height = staticCanvas.height;
-            tempCanvas.getContext('2d').drawImage(staticCanvas, 0, 0);
-
-            canvas.width = staticCanvas.width = window.innerWidth;
-            canvas.height = staticCanvas.height = window.innerHeight;
-            staticCtx.drawImage(tempCanvas, 0, 0);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         });
 
         // --- SİBERPUNK İLETİŞİM PANELİ VE GOOGLE SCRIPT GÖNDERİMİ ---
@@ -2268,6 +2236,85 @@
                 }
             });
         }
+
+        // --- 1. DİNAMİK SEKME BAŞLIĞI (KULLANICI BAŞKA SEKMEYE GEÇİNCE DEĞİŞİR) ---
+        const originalPageTitle = document.title;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.title = "⚡ Evren Seni Bekliyor... | SECOVVV";
+            } else {
+                document.title = "🚀 Hoş Geldin! | SECOVVV";
+                setTimeout(() => {
+                    if (!document.hidden) document.title = originalPageTitle;
+                }, 1800);
+            }
+        });
+
+        // --- 3. SİNEMATİK GİZLİ GEÇİT (S HARFİNE 7 TIKLAMA + BOŞLUĞA TIKLAYINCA SIFIRLAMA) ---
+        (function initSecretPassage() {
+            const secretS = document.getElementById('secretS');
+            if (!secretS) return;
+            let clickCount = 0;
+            let resetTimer = null;
+            let isTeleporting = false;
+
+            secretS.style.display = 'inline-block';
+            secretS.style.transition = 'all 0.25s ease';
+
+            function resetSecretState() {
+                if (isTeleporting || clickCount === 0) return;
+                clickCount = 0;
+                clearTimeout(resetTimer);
+                secretS.style.textShadow = 'none';
+                secretS.style.color = '#fff';
+                secretS.style.transform = 'scale(1)';
+            }
+
+            // S harfi dışındaki herhangi bir yere tıklanırsa sayacı ve parlamayı anında sıfırlar
+            document.addEventListener('click', (e) => {
+                if (e.target !== secretS && !secretS.contains(e.target)) {
+                    resetSecretState();
+                }
+            });
+
+            secretS.addEventListener('click', (e) => {
+                e.stopPropagation(); // Tıklamanın dışarı (document'a) sızmasını engeller
+                if (isTeleporting) return;
+                clickCount++;
+                clearTimeout(resetTimer);
+
+                // Her tıklamada kademeli artan altın enerji tepkisi
+                if (clickCount < 7) {
+                    secretS.style.textShadow = `0 0 ${clickCount * 4}px #ffd700`;
+                    resetTimer = setTimeout(resetSecretState, 2500);
+                } else {
+                    // 7. Tıklama: Tapınak Kapısı Açılıyor!
+                    isTeleporting = true;
+                    clickCount = 0;
+
+                    // 1) S Harfi altın sarısı ve bordo-mavi parlayıp büyür
+                    secretS.style.color = '#ffd700';
+                    secretS.style.textShadow = '0 0 25px #ffd700, 0 0 50px #4bbceb, 0 0 80px #8c1139';
+                    secretS.style.transform = 'scale(1.28)';
+
+                    // 2) Efekt açıksa S harfinin olduğu yerden ekstra parçacık patlatır
+                    if (typeof fxEnabled !== 'undefined' && fxEnabled) {
+                        createParticles(e.clientX, e.clientY, 26, true);
+                    }
+
+                    // 3) Tüm sayfa sinematik şekilde kararır ve gizli adrese ışınlanır
+                    document.body.style.transition = 'opacity 0.75s ease, filter 0.75s ease';
+                    setTimeout(() => {
+                        document.body.style.opacity = '0';
+                        document.body.style.filter = 'brightness(1.8) blur(6px)';
+                    }, 180);
+
+                    setTimeout(() => {
+                        window.location.href = "https://secovvv.github.io/secovvv2/";
+                    }, 880);
+                }
+            });
+        })();
 
         animateParticles();
         initSecovvvAnalytics();
