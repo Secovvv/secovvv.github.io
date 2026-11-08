@@ -21,13 +21,58 @@
     gap: 16px;
   }
 
-  .main-header {
+ .main-header {
+    position: relative;
     text-align: center;
     padding: 15px 18px;
     background: linear-gradient(180deg, #111a2e 0%, #0b111e 100%);
     border-radius: 16px;
     border: 2px solid #283a5e;
     box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+  }
+  .home-btn {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #152036, #0b111e);
+    color: #38bdf8;
+    border: 1.5px solid #38bdf8;
+    padding: 9px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: 0.4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 12px rgba(56, 189, 248, 0.18);
+    transition: all 0.2s ease;
+  }
+  .home-btn:hover {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #ffffff;
+    border-color: #7dd3fc;
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+    transform: translateY(calc(-50% - 2px));
+  }
+  .home-btn svg {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    stroke-width: 2.3;
+    fill: none;
+  }
+  @media (max-width: 1180px) {
+    .home-btn {
+      position: static;
+      transform: none;
+      margin-bottom: 10px;
+    }
+    .home-btn:hover {
+      transform: translateY(-2px);
+    }
   }
   .main-header h1 {
     margin: 0;
@@ -832,10 +877,17 @@
 <div class="container">
 
   <header class="main-header">
+    <a href="index.html" class="home-btn" title="Ana Sayfaya Dön">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10.5L12 3l9 7.5"></path>
+        <path d="M5 9.5V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9.5"></path>
+        <path d="M9 21v-6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6"></path>
+      </svg>
+      <span>Ana Sayfa</span>
+    </a>
     <h1>🖼️ SECOVVV Çok Katmanlı Resim İşleme, AI Kesim, Kontur/Gölge & Yazı Stüdyosu Pro</h1>
     <p>Katmanlı resim ve yazı ekleyin, <b>Yapay Zeka (AI) + 60 FPS Fırça</b> ile arka planı silin, <b>Kontur/Gölge/Renk</b> verip <b>Otomatik Boşluk Kırpma</b> ile kaydedin</p>
   </header>
-
   <!-- ==================== PANEL 1: RESİM/YAZI EKLEME, KIRPMA/AI KESİM VE KAYDETME ==================== -->
   <section class="studio-panel panel-1">
     <div class="panel-header">
