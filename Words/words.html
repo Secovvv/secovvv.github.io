@@ -3541,8 +3541,9 @@
 
             for (let i = 0; i < activeWords.length; i++) {
                 const validAnswers = activeWords[i].data.tr
-                    .split('/')
-                    .map(w => w.trim().toLocaleLowerCase('tr-TR'));
+                    .split(/[/,]/)
+                    .map(w => w.replace(/\(.*?\)/g, '').trim().toLocaleLowerCase('tr-TR'))
+                    .filter(Boolean);
 
                 if (validAnswers.includes(userClean)) {
                     playSuccessSound(); 
