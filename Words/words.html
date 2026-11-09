@@ -3074,21 +3074,9 @@
     { "en": "potato (n)", "tr": "patates", "ex": "I want to eat some baked potatoes for dinner." }
         ];
 
-        // --- B SEVİYESİ (B1-B2) HTML KELİMELERİNİ BURAYA EKLE ---
-        const htmlWordsB = [
-            { "en": "clue (n)", "tr": "ipucu", "ex": "The police are looking for clues at the crime scene." },
-            { "en": "coach (n)", "tr": "antrenör", "ex": "The basketball coach gave us new tactics." },
-            { "en": "coal (n)", "tr": "kömür", "ex": "They used coal to heat the house in winter." }
-            // B seviyesi kelimelerinin devamını buraya yapıştır...
-        ];
-
-        // --- C SEVİYESİ (C1-C2) HTML KELİMELERİNİ BURAYA EKLE ---
-        const htmlWordsC = [
-            { "en": "abhor (v)", "tr": "nefret etmek / iğrenmek", "ex": "I abhor any form of discrimination in the workplace." },
-            { "en": "abridge (v)", "tr": "kısaltmak / özetlemek", "ex": "The author decided to abridge his massive novel for the audio version." },
-            { "en": "abstruse (adj)", "tr": "anlaşılması güç / karmaşık", "ex": "The professor's lecture on quantum physics was too abstruse for the freshmen." }
-            // C seviyesi kelimelerinin devamını buraya yapıştır...
-        ];
+        // --- B ve C SEVİYESİ İÇ ÖRNEKLERİ KALDIRILDI (Doğrudan JSON'dan Çekilir) ---
+        const htmlWordsB = [];
+        const htmlWordsC = [];
 
         // =========================================================================
         // 2. DIŞ JSON DOSYASI HAVUZLARI (words-b.json ve words-c.json)
@@ -3106,28 +3094,37 @@
             const labelEl = document.getElementById('active-source-label');
             labelEl.innerText = currentSource === 'html' ? "HTML:" : "JSON:";
 
-            if (currentSource === 'html') {
-                document.getElementById('count-a').innerText = htmlWordsA.length;
-                document.getElementById('count-b').innerText = htmlWordsB.length;
-                document.getElementById('count-c').innerText = htmlWordsC.length;
-            } else {
-                document.getElementById('count-a').innerText = jsonWordsA.length > 0 ? jsonWordsA.length : htmlWordsA.length;
-                document.getElementById('count-b').innerText = jsonWordsB.length > 0 ? jsonWordsB.length : htmlWordsB.length;
-                document.getElementById('count-c').innerText = jsonWordsC.length > 0 ? jsonWordsC.length : htmlWordsC.length;
-            }
+            const countA = (currentSource === 'json' && jsonWordsA.length > 0) ? jsonWordsA.length : htmlWordsA.length;
+            const countB = jsonWordsB.length;
+            const countC = jsonWordsC.length;
+
+            document.getElementById('count-a').innerText = countA;
+            document.getElementById('count-b').innerText = countB;
+            document.getElementById('count-c').innerText = countC;
         }
 
         function syncActiveDictionary() {
-            const htmlPool = { 'A': htmlWordsA, 'B': htmlWordsB, 'C': htmlWordsC };
-            const jsonPool = { 'A': jsonWordsA, 'B': jsonWordsB, 'C': jsonWordsC };
-
-            if (currentSource === 'html') {
-                currentDictionary = htmlPool[currentLevelCode];
-            } else {
-                if (jsonPool[currentLevelCode] && jsonPool[currentLevelCode].length > 0) {
-                    currentDictionary = jsonPool[currentLevelCode];
+            if (currentLevelCode === 'A') {
+                currentDictionary = (currentSource === 'json' && jsonWordsA.length > 0) ? jsonWordsA : htmlWordsA;
+            } else if (currentLevelCode === 'B') {
+                if (jsonWordsB.length > 0) {
+                    currentDictionary = jsonWordsB;
                 } else {
-                    currentDictionary = htmlPool[currentLevelCode];
+                    currentLevelCode = 'A';
+                    document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+                    document.getElementById('btn-level-a').classList.add('active');
+                    currentDictionary = htmlWordsA;
+                    showFeedback("⚠️ B ve C JSON dosyaları olmadığı için A kelimelerle devam edilecek!", "error");
+                }
+            } else if (currentLevelCode === 'C') {
+                if (jsonWordsC.length > 0) {
+                    currentDictionary = jsonWordsC;
+                } else {
+                    currentLevelCode = 'A';
+                    document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+                    document.getElementById('btn-level-a').classList.add('active');
+                    currentDictionary = htmlWordsA;
+                    showFeedback("⚠️ B ve C JSON dosyaları olmadığı için A kelimelerle devam edilecek!", "error");
                 }
             }
             updateLevelCounts();
@@ -3135,18 +3132,25 @@
         }
 
         async function fetchJsonForLevel(level) {
-            const fileMap = { 'A': 'words-a.json', 'B': 'words-b.json', 'C': 'words-c.json' };
-            try {
-                const res = await fetch(fileMap[level]);
-                if (!res.ok) return false;
-                const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    if (level === 'A') jsonWordsA = data;
-                    if (level === 'B') jsonWordsB = data;
-                    if (level === 'C') jsonWordsC = data;
-                    return true;
-                }
-            } catch (e) {}
+            const fileMap = {
+                'A': ['words-a.json', 'words-a_2.json'],
+                'B': ['words-b.json', 'words-b_2.json'],
+                'C': ['words-c.json', 'words-c_2.json']
+            };
+            const candidates = fileMap[level] || [];
+            for (const fileName of candidates) {
+                try {
+                    const res = await fetch(fileName);
+                    if (!res.ok) continue;
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        if (level === 'A') jsonWordsA = data;
+                        if (level === 'B') jsonWordsB = data;
+                        if (level === 'C') jsonWordsC = data;
+                        return true;
+                    }
+                } catch (e) {}
+            }
             return false;
         }
 
@@ -3163,7 +3167,11 @@
                     jsonWordsC.length === 0 ? fetchJsonForLevel('C') : Promise.resolve(),
                     jsonWordsA.length === 0 ? fetchJsonForLevel('A') : Promise.resolve()
                 ]);
-                showFeedback(`📂 JSON Kaynağı Aktif (${currentLevelCode})`, "success");
+                if (jsonWordsB.length === 0 && jsonWordsC.length === 0) {
+                    showFeedback("⚠️ B ve C JSON dosyaları olmadığı için A kelimelerle devam edilecek!", "error");
+                } else {
+                    showFeedback(`📂 JSON Kaynağı Aktif (${currentLevelCode})`, "success");
+                }
             } else {
                 showFeedback(`📄 HTML İçi Kaynak Aktif (${currentLevelCode})`, "success");
             }
@@ -3173,6 +3181,27 @@
         }
 
         async function changeLevel(level) {
+            if (level === 'B' && jsonWordsB.length === 0) {
+                await fetchJsonForLevel('B');
+            } else if (level === 'C' && jsonWordsC.length === 0) {
+                await fetchJsonForLevel('C');
+            } else if (level === 'A' && currentSource === 'json' && jsonWordsA.length === 0) {
+                await fetchJsonForLevel('A');
+            }
+
+            if ((level === 'B' && jsonWordsB.length === 0) || (level === 'C' && jsonWordsC.length === 0)) {
+                currentLevelCode = 'A';
+                goruntulenenTabSeviyesi = 'A';
+                document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('btn-level-a').classList.add('active');
+                updateHighScoreDisplay();
+                syncActiveDictionary();
+                showFeedback("⚠️ B ve C JSON dosyaları olmadığı için A kelimelerle devam edilecek!", "error");
+                showCenterFeedback("JSON YOK -> A SEVİYE");
+                if (!isGameOver) startGame();
+                return;
+            }
+
             document.querySelectorAll('.level-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-level-${level.toLowerCase()}`).classList.add('active');
             currentLevelCode = level;
@@ -3180,15 +3209,9 @@
             updateHighScoreDisplay();
             buluttanRekorlariCek(level);
 
-            if (currentSource === 'json') {
-                const pool = level === 'A' ? jsonWordsA : (level === 'B' ? jsonWordsB : jsonWordsC);
-                if (pool.length === 0) {
-                    await fetchJsonForLevel(level);
-                }
-            }
-
             syncActiveDictionary();
-            showFeedback(`${currentSource.toUpperCase()} • ${level} (${currentDictionary.length} Kelime)`, "success");
+            const activeTypeLabel = (level === 'B' || level === 'C') ? 'JSON' : currentSource.toUpperCase();
+            showFeedback(`${activeTypeLabel} • ${level} (${currentDictionary.length} Kelime)`, "success");
 
             if (!isGameOver) startGame();
         }
