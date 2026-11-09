@@ -125,7 +125,7 @@
             backdrop-filter: blur(calc(2 * var(--u)));
             border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.4);
             border-radius: calc(3 * var(--u)); 
-            padding: calc(5.8 * var(--u)) calc(2.2 * var(--u)) calc(2 * var(--u)) calc(2.2 * var(--u));
+            padding: calc(5.6 * var(--u)) calc(2.2 * var(--u)) calc(1.8 * var(--u)) calc(2.2 * var(--u));
             text-align: center;
             color: white;
             position: relative;
@@ -258,7 +258,7 @@
             justify-content: space-around; 
             width: 100%; 
             background: rgba(255,255,255,0.05); 
-            padding: calc(0.9 * var(--u)); 
+            padding: calc(0.85 * var(--u)); 
             border-radius: calc(1.8 * var(--u)); 
             margin-bottom: calc(0.75 * var(--u)); 
         }
@@ -266,46 +266,55 @@
         .stat-val { font-size: calc(2.45 * var(--u)); font-weight: bold; color: #f1c40f; }
         .stat-label { font-size: calc(1.02 * var(--u)); color: #aaa; text-transform: uppercase; }
 
-        /* ŞAMPİYONLAR VE İLK 10 BAR */
+        /* ŞAMPİYONLAR VE İLK 10 BAR (GENİŞLETİLMİŞ VE BÜYÜTÜLMÜŞ LİDER SATIRLARI) */
         #rekorlar {
-            font-size: calc(1.2 * var(--u)); 
-            color: #ccc; 
-            margin-bottom: calc(0.85 * var(--u)); 
+            font-size: calc(1.5 * var(--u)); 
+            color: #eee; 
+            margin-bottom: calc(0.9 * var(--u)); 
             display: flex; 
-            align-items: center; 
+            align-items: stretch; 
             justify-content: space-between;
-            gap: calc(0.6 * var(--u)); 
+            gap: calc(0.75 * var(--u)); 
             width: 100%;
         }
 
         .rekor-kutu-sol {
             display: flex;
             flex-direction: column;
-            gap: calc(0.38 * var(--u));
+            gap: calc(0.5 * var(--u));
             flex: 1;
             text-align: left;
         }
 
         .rekor-satir-gold {
-            background: rgba(241, 196, 15, 0.1); 
-            padding: calc(0.4 * var(--u)) calc(1.1 * var(--u)); 
-            border-radius: calc(0.85 * var(--u)); 
-            border: calc(0.1 * var(--u)) solid rgba(241, 196, 15, 0.35); 
+            background: rgba(241, 196, 15, 0.14); 
+            padding: calc(0.62 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(0.95 * var(--u)); 
+            border: calc(0.13 * var(--u)) solid rgba(241, 196, 15, 0.45); 
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 600;
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(241, 196, 15, 0.1);
         }
 
         .rekor-satir-purple {
-            background: rgba(139, 92, 246, 0.12); 
-            padding: calc(0.4 * var(--u)) calc(1.1 * var(--u)); 
-            border-radius: calc(0.85 * var(--u)); 
-            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.35); 
+            background: rgba(139, 92, 246, 0.16); 
+            padding: calc(0.62 * var(--u)) calc(1.4 * var(--u)); 
+            border-radius: calc(0.95 * var(--u)); 
+            border: calc(0.13 * var(--u)) solid rgba(139, 92, 246, 0.45); 
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-weight: 600;
+            box-shadow: 0 0 calc(1 * var(--u)) rgba(139, 92, 246, 0.12);
+        }
+
+        #best-correct, #best-wpm {
+            font-size: calc(1.62 * var(--u));
+            letter-spacing: calc(0.03 * var(--u));
         }
 
         .top10-trigger-btn {
@@ -313,19 +322,18 @@
             border: calc(0.15 * var(--u)) solid rgba(241, 196, 15, 0.55);
             color: #fff;
             border-radius: calc(1.1 * var(--u));
-            padding: calc(0.75 * var(--u)) calc(1.2 * var(--u));
-            font-size: calc(1.15 * var(--u));
+            padding: calc(0.75 * var(--u)) calc(1.35 * var(--u));
+            font-size: calc(1.22 * var(--u));
             font-weight: bold;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: calc(0.2 * var(--u));
+            gap: calc(0.25 * var(--u));
             transition: all 0.25s ease;
             box-shadow: 0 0 calc(1.2 * var(--u)) rgba(241, 196, 15, 0.2);
             white-space: nowrap;
-            height: 100%;
         }
         .top10-trigger-btn:hover {
             transform: translateY(calc(-0.15 * var(--u))) scale(1.03);
@@ -333,7 +341,7 @@
             border-color: #f1c40f;
         }
         .top10-trigger-btn span.t-icon {
-            font-size: calc(1.7 * var(--u));
+            font-size: calc(1.85 * var(--u));
             line-height: 1;
         }
 
@@ -345,7 +353,7 @@
             border-radius: calc(1.2 * var(--u));
             border: calc(0.2 * var(--u)) solid rgba(139, 92, 246, 0.35);
             box-shadow: inset 0 calc(0.2 * var(--u)) calc(1 * var(--u)) rgba(0, 0, 0, 0.12);
-            margin-bottom: calc(1.2 * var(--u));
+            margin-bottom: calc(1.1 * var(--u));
             overflow: hidden;
             position: relative;
             padding: calc(0.75 * var(--u)) calc(1.3 * var(--u));
@@ -397,7 +405,7 @@
             color: #fff; 
             border: calc(0.2 * var(--u)) solid #444; 
             border-radius: calc(1.4 * var(--u));
-            padding: calc(1.15 * var(--u)); 
+            padding: calc(1.1 * var(--u)); 
             font-size: calc(2 * var(--u)); 
             text-align: center; 
             width: 100%; 
@@ -412,8 +420,8 @@
         }
 
         #hiz-alani { 
-            min-height: calc(4.5 * var(--u)); 
-            margin-top: calc(0.6 * var(--u)); 
+            min-height: calc(4.3 * var(--u)); 
+            margin-top: calc(0.55 * var(--u)); 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -435,8 +443,8 @@
         }
 
         #mesaj { 
-            min-height: calc(2.7 * var(--u)); 
-            margin-top: calc(0.15 * var(--u)); 
+            min-height: calc(2.6 * var(--u)); 
+            margin-top: calc(0.1 * var(--u)); 
             font-weight: bold; 
             font-size: calc(1.85 * var(--u)); 
             display: flex;
@@ -446,11 +454,11 @@
 
         /* MÜZİK VE ALT KONTROLLER ALANI */
         #alt-kontroller {
-            margin-top: calc(0.7 * var(--u)); 
+            margin-top: calc(0.6 * var(--u)); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            gap: calc(0.95 * var(--u)); 
+            gap: calc(0.9 * var(--u)); 
             width: 100%;
         }
 
@@ -519,6 +527,27 @@
         .restart-game-btn:hover {
             background: rgba(52, 152, 219, 0.4); 
             box-shadow: 0 0 calc(1.5 * var(--u)) rgba(52, 152, 219, 0.5); 
+            transform: scale(1.04);
+        }
+
+        .sure-mode-btn {
+            background: rgba(139, 92, 246, 0.22);
+            color: #c4b5fd;
+            border: calc(0.1 * var(--u)) solid rgba(139, 92, 246, 0.5);
+            padding: calc(0.75 * var(--u)) calc(1.4 * var(--u));
+            border-radius: calc(1 * var(--u));
+            font-size: calc(1.15 * var(--u));
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: calc(0.05 * var(--u));
+            display: inline-flex;
+            align-items: center;
+        }
+        .sure-mode-btn:hover {
+            background: rgba(139, 92, 246, 0.42);
+            box-shadow: 0 0 calc(1.5 * var(--u)) rgba(139, 92, 246, 0.5);
             transform: scale(1.04);
         }
 
@@ -617,10 +646,10 @@
             padding: calc(1.8 * var(--u)); 
             border-radius: calc(2 * var(--u)); 
             width: 85%; 
-            max-width: calc(36 * var(--u)); 
+            max-width: calc(38 * var(--u)); 
         }
         #final-stats { 
-            font-size: calc(1.85 * var(--u)); 
+            font-size: calc(1.8 * var(--u)); 
             line-height: 1.55; 
             margin: 0;
         }
@@ -1153,6 +1182,7 @@
         <div id="alt-kontroller">
             <div class="ust-aksiyon-satiri">
                 <button class="restart-game-btn" onclick="oyunuSifirla()">🔄 Yeniden Başlat</button>
+                <button id="sure-sec-btn" class="sure-mode-btn" onclick="sureModuDegistir()">⏱️ Süre: 60 sn</button>
                 <a href="kelimeyibul.html" class="nav-mode-btn">🧩 Kelimeyi Bul</a>
             </div>
 
@@ -1182,7 +1212,8 @@
 
     // 1. TÜM DEĞİŞKENLER EN ÜSTTE TANIMLANIR
     var baseDPR = window.devicePixelRatio || 1;
-    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = 60;
+    let secilenSure = 60;
+    let toplamDogru = 0, toplamYanlis = 0, oyunSuresi = secilenSure;
     let kelimeBaslangicZamani = 0, oyunBaslangicZamani = 0;
     let genelTimer;
     let oyunBasladi = false;
@@ -1618,10 +1649,15 @@
             const j = Math.floor(Math.random() * (i + 1));
             [liste[i], liste[j]] = [liste[j], liste[i]];
         }
-        while (liste.length < 300) {
-            liste = liste.concat([...liste]);
+        while (liste.length < 600) {
+            let ek = [...kelimeListesi];
+            for (let i = ek.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [ek[i], ek[j]] = [ek[j], ek[i]];
+            }
+            liste = liste.concat(ek);
         }
-        return liste.slice(0, 300); 
+        return liste.slice(0, 600); 
     }
 
     function canliHarfTemizle() {
@@ -1652,6 +1688,15 @@
         havuzRender();
         canliHarfTemizle();
         document.getElementById("tahmin").focus();
+    }
+
+    function sureModuDegistir() {
+        secilenSure = (secilenSure === 60) ? 30 : 60;
+        let btn = document.getElementById("sure-sec-btn");
+        if (btn) {
+            btn.innerText = `⏱️ Süre: ${secilenSure} sn`;
+        }
+        oyunuSifirla();
     }
 
     function oyunuBaslat() {
@@ -1685,6 +1730,13 @@
         }
 
         aktifKelimeIndex++;
+        if (aktifKelimeIndex >= oyunKelimeleri.length - 30) {
+            oyunKelimeleri = havuzKaristir();
+            aktifKelimeIndex = 0;
+            havuzRender();
+            return;
+        }
+
         let yeniSpan = document.getElementById("word-" + aktifKelimeIndex);
         if (yeniSpan) {
             yeniSpan.classList.add("aktif");
@@ -1818,7 +1870,9 @@
 
         await buluttanRekorlariCek();
 
-        let finalWpm = Math.round((toplamKarakter / 5) / 1); 
+        let dakikaCarpani = secilenSure / 60;
+        let finalWpm = Math.round((toplamKarakter / 5) / dakikaCarpani); 
+        let gercekDkKelime = Math.round(toplamDogru / dakikaCarpani);
         let yuzde = Math.round((toplamDogru / (toplamDogru + toplamYanlis || 1)) * 100);
 
         let isNew = await oyuncuSkorunuIsle(aktifOyuncu, toplamDogru, finalWpm, yuzde);
@@ -1832,11 +1886,11 @@
         }
 
         document.getElementById("final-stats").innerHTML = `
-            Oyuncu: <b style="color:#f1c40f;">${aktifOyuncu}</b><br><br>
-            Toplam Doğru: <b style="color:#2ecc71;">${toplamDogru}</b><br>
-            Toplam Yanlış: <b style="color:#e74c3c;">${toplamYanlis}</b><br>
-            İsabet Oranı: <b style="color:#f1c40f;">%${yuzde}</b><br>
-            <span style="color:#8b5cf6; font-size: calc(2.2 * var(--u)); font-weight:bold;">Ortalama WPM: ${finalWpm}</span>
+            Oyuncu: <b style="color:#f1c40f;">${aktifOyuncu}</b> (${secilenSure} sn Modu)<br><br>
+            Gerçek Kelime Hızı: <b style="color:#2ecc71;">${gercekDkKelime} Kelime/Dk</b> (Toplam: ${toplamDogru})<br>
+            Toplam Tuş Vuruşu: <b style="color:#38bdf8;">${toplamKarakter} Karakter</b><br>
+            Doğru: <b style="color:#2ecc71;">${toplamDogru}</b> &nbsp;|&nbsp; Yanlış: <b style="color:#e74c3c;">${toplamYanlis}</b> &nbsp;|&nbsp; İsabet: <b style="color:#f1c40f;">%${yuzde}</b><br>
+            <span style="color:#8b5cf6; font-size: calc(2.1 * var(--u)); font-weight:bold;">Standart Hız (Karakter/5): ${finalWpm} WPM</span>
         `;
 
         setTimeout(() => {
@@ -1850,13 +1904,13 @@
         yenidenBaslatHazirMi = false;
         toplamDogru = 0;
         toplamYanlis = 0;
-        oyunSuresi = 60;
+        oyunSuresi = secilenSure;
         oyunBasladi = false;
         oyunBittiMi = false;
         toplamKarakter = 0;
         document.getElementById("stat-dogru").innerText = "0";
         document.getElementById("stat-yanlis").innerText = "0";
-        document.getElementById("genel-sure").innerText = "60";
+        document.getElementById("genel-sure").innerText = secilenSure;
         document.getElementById("genel-sure").classList.remove("panik");
         document.getElementById("game-over").style.display = "none";
         document.getElementById("new-record-msg").style.display = "none";
