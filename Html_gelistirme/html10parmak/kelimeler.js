@@ -25,7 +25,7 @@ const kelimeListesi = [
   "eldiven", "şapka", "atkı", "çorap", "ayakkabı", "bot", "terlik", "sandal",
   "takı", "yüzük", "küpe", "kolye", "bilezik", "gözlük", "kemer", "şemsiye",
   "tarz", "stil", "trend", "ikon", "marka", "lüks", "ucuz", "pahalı", "indirim",
-  "fiyat", "kâr", "zarar", "borç", "alacak", "kasa", "banka", "hesap", "bütçe",
+  "fiyat", "zarar", "borç", "alacak", "kasa", "banka", "hesap", "bütçe",
   "döviz", "kur", "faiz", "vergi", "kira", "maaş", "ücret", "prim", "iş", "görev",
   "mesai", "izin", "tatil", "kariyer", "terfi", "istifa", "emekli", "yönetim",
   "müdür", "şef", "ekip", "proje", "plan", "hedef", "vizyon", "misyon", "strateji",
