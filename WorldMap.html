@@ -30,10 +30,7 @@
     box-shadow: 0 6px 25px rgba(0,0,0,0.7);
   }
 
-  @keyframes quizLabelFlash {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.1; transform: scale(1.15); }
-}
+
 .quiz-label-flashing {
   animation: quizLabelFlash 0.35s ease-in-out 2;
 }
@@ -194,52 +191,79 @@
   }
   .hud-card {
     position: absolute;
-    bottom: 18px;
-    left: 18px;
-    background: rgba(11, 17, 30, 0.97);
-    border: 1.5px solid #38bdf8;
-    border-radius: 12px;
-    padding: 8px 10px;
-    min-width: 270px;
-    max-width: 340px;
+    bottom: 14px;
+    left: 14px;
+    background: rgba(11, 17, 30, 0.96);
+    border: 1.2px solid #38bdf8;
+    border-radius: 10px;
+    padding: 6px 8px;
+    min-width: 235px;
+    max-width: 295px;
     pointer-events: auto;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.9);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.88);
     z-index: 15;
   }
   @media (max-width: 640px) {
     .hud-card {
       min-width: auto;
-      left: 10px;
-      right: 60px;
-      bottom: 10px;
-      padding: 8px 10px;
+      left: 8px;
+      right: 54px;
+      bottom: 8px;
+      padding: 6px 8px;
     }
   }
   .hud-title {
-    font-size: 10px;
+    font-size: 9px;
     color: #38bdf8;
     font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 4px;
+    letter-spacing: 0.6px;
+    margin-bottom: 3px;
     border-bottom: 1px solid #1e2d4a;
-    padding-bottom: 3px;
+    padding-bottom: 2px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+  .hud-title-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hud-close-btn {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid #38bdf8;
+    border-radius: 5px;
+    color: #38bdf8;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .hud-close-btn:hover {
+    background: rgba(56, 189, 248, 0.3);
+  }
+  .hud-card.hud-hidden {
+    display: none !important;
+  }
   .hud-country {
-    font-size: 16px;
+    font-size: 13.5px;
     font-weight: 900;
     color: #ffffff;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .hud-details {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    font-size: 11.5px;
-    line-height: 1.3;
+    gap: 2.5px;
+    font-size: 10.5px;
+    line-height: 1.25;
     color: #cbd5e1;
   }
   .hud-details b {
@@ -440,7 +464,7 @@
     }
   }
 
-  /* AÇILIR KONTROL MENÜSÜ (POPOVER DRAWER) STİLLERİ */
+  /* AÇILIR KONTROL MENÜSÜ (POPOVER DRAWER) STİLLERİ - KOMPAKT */
   .dropdown-panel-wrap {
     position: relative;
     display: inline-block;
@@ -449,8 +473,8 @@
     background: linear-gradient(135deg, #0284c7, #0369a1);
     border: 1.5px solid #38bdf8;
     color: #ffffff;
-    padding: 7px 14px;
-    font-size: 12.5px;
+    padding: 6px 12px;
+    font-size: 12px;
     font-weight: 800;
     box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
   }
@@ -461,38 +485,38 @@
   .tools-dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 7px);
     right: 0;
-    width: 380px;
+    width: 310px;
     max-width: 88vw;
-    background: rgba(11, 17, 30, 0.97);
+    background: rgba(11, 17, 30, 0.96);
     backdrop-filter: blur(12px);
-    border: 1.5px solid #38bdf8;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.82);
+    border: 1.2px solid #38bdf8;
+    border-radius: 9px;
+    padding: 7px 8px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.82);
     z-index: 100;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 4px;
   }
   .tools-dropdown-menu.open {
     display: grid;
-    animation: menuFadeIn 0.16s ease-out;
+    animation: menuFadeIn 0.14s ease-out;
   }
   @keyframes menuFadeIn {
-    from { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
   }
   .menu-sec-title {
     grid-column: 1 / -1;
-    font-size: 9.5px;
+    font-size: 8.5px;
     font-weight: 900;
     color: #38bdf8;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.5px;
     border-bottom: 1px solid #1e2d4a;
-    padding-bottom: 3px;
-    margin-top: 4px;
+    padding-bottom: 2px;
+    margin-top: 3px;
     margin-bottom: 1px;
   }
   .menu-sec-title:first-child {
@@ -501,17 +525,22 @@
   .tools-dropdown-menu .btn {
     width: 100%;
     justify-content: flex-start;
-    padding: 6px 8px;
-    font-size: 10.5px;
+    padding: 4.5px 6px;
+    font-size: 9.5px;
+    border-radius: 6px;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* ================= SECOVVV GEO-QUIZ STİLLERİ ================= */
+  /* ================= SECOVVV GEO-QUIZ STİLLERİ - KOMPAKT ================= */
   .btn-quiz-launch {
     background: linear-gradient(135deg, #f59e0b, #d97706);
     border: 1.5px solid #fde047;
     color: #ffffff;
-    padding: 7px 14px;
-    font-size: 12.5px;
+    padding: 6px 12px;
+    font-size: 12px;
     font-weight: 900;
     box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
   }
@@ -534,28 +563,29 @@
   .quiz-mode-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 7px;
-    margin-top: 8px;
+    gap: 4px;
+    margin-top: 5px;
   }
   .quiz-mode-btn {
     background: #172554;
     border: 1px solid #38bdf8;
     color: #f8fafc;
-    padding: 9px 10px;
-    border-radius: 8px;
-    font-size: 11.5px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    font-size: 10px;
     font-weight: 800;
     cursor: pointer;
     text-align: left;
     transition: 0.15s;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
   .quiz-mode-btn span {
-    font-size: 10px;
+    font-size: 8.5px;
     color: #94a3b8;
     font-weight: 600;
+    line-height: 1.15;
   }
   .quiz-mode-btn:hover {
     background: #0284c7;
@@ -569,40 +599,43 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid #1e2d4a;
-    border-radius: 7px;
-    padding: 5px 10px;
-    margin-bottom: 7px;
-    font-size: 11.5px;
+    border-radius: 6px;
+    padding: 3.5px 7px;
+    margin-bottom: 4px;
+    font-size: 9.5px;
     font-weight: 800;
   }
   .quiz-flag-box {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 9px;
     background: rgba(15, 23, 42, 0.75);
     border: 1px dashed #38bdf8;
-    border-radius: 9px;
-    padding: 9px 12px;
-    margin: 5px 0;
+    border-radius: 7px;
+    padding: 6px 8px;
+    margin: 3px 0;
   }
   .quiz-big-flag {
-    width: 84px;
-    height: 56px;
+    width: 64px;
+    height: 42px;
     object-fit: cover;
-    border-radius: 6px;
-    border: 2px solid #fde047;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.75);
+    border-radius: 5px;
+    border: 1.5px solid #fde047;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75);
     background: #090e1a;
     flex-shrink: 0;
   }
   .quiz-feedback {
-    padding: 6px 10px;
-    border-radius: 7px;
-    font-size: 11.5px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    font-size: 10px;
     font-weight: 800;
-    margin-top: 5px;
+    margin-top: 4px;
+    line-height: 1.25;
   }
   .quiz-fb-ok {
     background: rgba(16, 185, 129, 0.2);
@@ -621,17 +654,17 @@
   }
   .quiz-answer-form {
     display: flex;
-    gap: 6px;
-    margin-top: 6px;
+    gap: 5px;
+    margin-top: 4px;
   }
   .quiz-answer-input {
     flex: 1;
     background: #090e1a;
-    border: 1.5px solid #fde047;
+    border: 1.2px solid #fde047;
     color: #ffffff;
-    padding: 7px 10px;
-    border-radius: 7px;
-    font-size: 12.5px;
+    padding: 4.5px 7px;
+    border-radius: 6px;
+    font-size: 10.5px;
     font-weight: 800;
     outline: none;
   }
@@ -657,6 +690,223 @@
   }
   .quiz-label-flashing {
     animation: quizLabelFlash 0.50s ease-in-out 3 forwards !important;
+  }
+/* ================= DİKEY CANLI KOORDİNAT & RAKIM RADARI STİLLERİ ================= */
+  .coord-radar-hud {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 178px;
+    background: rgba(9, 14, 26, 0.94);
+    backdrop-filter: blur(8px);
+    border: 1.2px solid rgba(56, 189, 248, 0.65);
+    border-radius: 9px;
+    padding: 6px 8px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10.5px;
+    color: #e2e8f0;
+    z-index: 15;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.8);
+    transition: width 0.15s ease;
+  }
+  .coord-radar-hud.minimized {
+    width: auto;
+    min-width: 132px;
+    padding: 4px 7px;
+  }
+  .coord-radar-hud.minimized .radar-body {
+    display: none;
+  }
+  .radar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 9px;
+    font-weight: 900;
+    color: #38bdf8;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #1e2d4a;
+    padding-bottom: 3px;
+  }
+  .coord-radar-hud.minimized .radar-header {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .radar-toggle-btn {
+    background: #172554;
+    border: 1px solid #38bdf8;
+    color: #bae6fd;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 1px 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .radar-toggle-btn:hover {
+    background: #0284c7;
+    color: #ffffff;
+  }
+  .radar-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+  }
+  .radar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .radar-coord-val {
+    color: #38bdf8;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+  .radar-elev-val {
+    color: #fde047;
+    font-weight: 800;
+  }
+  .radar-target-val {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #34d399;
+    font-weight: 800;
+    font-size: 10px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 1px dashed #1e2d4a;
+    padding-top: 3px;
+    margin-top: 1px;
+  }
+  @media (max-width: 640px) {
+    .coord-radar-hud {
+      top: 8px;
+      right: 8px;
+      width: 155px;
+      font-size: 9.5px;
+      padding: 5px 7px;
+    }
+    .radar-target-val { max-width: 138px; }
+  }
+
+  /* ================= VS KARŞILAŞTIRMA MODU STİLLERİ ================= */
+  .btn.vs-on {
+    background: linear-gradient(135deg, #a855f7, #7e22ce);
+    border-color: #e9d5ff;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.5);
+  }
+  .hud-card.vs-expanded {
+    max-width: 470px;
+    width: 455px;
+  }
+  @media (max-width: 640px) {
+    .hud-card.vs-expanded {
+      width: auto;
+      max-width: none;
+    }
+  }
+  .vs-header-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid #3b5078;
+    border-radius: 8px;
+    padding: 6px 8px;
+    margin-bottom: 6px;
+  }
+  .vs-side-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 900;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .vs-side-title.right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+  .vs-badge-center {
+    background: linear-gradient(135deg, #f59e0b, #dc2626);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 12px;
+    border: 1px solid #fde047;
+    letter-spacing: 0.6px;
+  }
+  .vs-compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid #1e2d4a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .vs-compare-table tr {
+    border-bottom: 1px dashed #1e2d4a;
+  }
+  .vs-compare-table tr:last-child {
+    border-bottom: none;
+  }
+  .vs-compare-table td {
+    padding: 4.5px 6px;
+    vertical-align: middle;
+  }
+  .vs-col-left {
+    width: 39%;
+    text-align: left;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  .vs-col-mid {
+    width: 22%;
+    text-align: center;
+    font-size: 9.5px;
+    font-weight: 900;
+    color: #38bdf8;
+    text-transform: uppercase;
+    background: rgba(11, 17, 30, 0.55);
+  }
+  .vs-col-right {
+    width: 39%;
+    text-align: right;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+  .vs-winner-val {
+    color: #34d399 !important;
+    font-weight: 900 !important;
+  }
+  .vs-ratio-pill {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid #10b981;
+    color: #6ee7b7;
+    font-size: 9.5px;
+    font-weight: 900;
+    padding: 0 4px;
+    border-radius: 4px;
+    margin: 0 3px;
   }
 
 </style>
@@ -702,12 +952,20 @@
           ✈️ Mesafe Ölçer: Kapalı
         </button>
 
+        <button class="btn" id="btnVsToggle" onclick="toggleVsCompareMode()" style="grid-column: 1 / -1;" title="İki ülkeyi veya iki Türkiye ilini yan yana kıyaslar (Kısayol: Haritada Shift + Sol Tık)">
+          ⚖️ VS Kıyaslama Modu: Kapalı (Shift+Tık)
+        </button>
+
         <button class="btn" id="btnTerminatorToggle" onclick="toggleTerminatorMode()" title="Dünya üzerindeki anlık gece/gündüz gölgesini, alacakaranlık kuşağını ve Güneş konumunu gösterir/gizler">
           🌗 Gece/Gündüz: Kapalı
         </button>
 
         <button class="btn active" id="btnGridToggle" onclick="toggleCoordGridMode()" title="Meridyen/paralel derecelerini, Ekvator (0°), Başlangıç Meridyeni (0°) ve Dönence çizgilerini gösterir/gizler">
           🧭 Koordinat Ağı: Açık
+        </button>
+
+        <button class="btn active" id="btnRadarHudToggle" onclick="toggleCoordRadarHud()" style="grid-column: 1 / -1;" title="Sağ üstteki canlı fare koordinat, saat dilimi ve uydu rakım radarını açar/kapatır">
+          📡 Canlı Rakım Radarı: Açık
         </button>
 
         <div class="menu-sec-title">🗺️ Coğrafi & İdari Katmanlar</div>
@@ -763,10 +1021,39 @@
   <canvas id="globeFastCanvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:none;z-index:5;"></canvas>
   <svg id="worldMap" viewBox="0 0 2400 1250" preserveAspectRatio="xMidYMid meet"></svg>
 
-  <div class="hud-card">
+  <!-- DİKEY CANLI FARE KOORDİNAT & UYDU RAKIM RADARI -->
+  <div class="coord-radar-hud" id="coordRadarHud">
+    <div class="radar-header">
+      <span>📡 CANLI RADAR</span>
+      <div style="display:flex;gap:3px;">
+        <button class="radar-toggle-btn" id="btnRadarMinimize" onclick="toggleMinimizeCoordRadar()" title="Radarı Küçült / Büyüt">▾</button>
+        <button class="radar-toggle-btn" onclick="toggleCoordRadarHud()" title="Radarı Tamamen Kapat">✖</button>
+      </div>
+    </div>
+    <div class="radar-body">
+      <div class="radar-row">
+        <span>🧭</span>
+        <span class="radar-coord-val" id="radarCoordText">--.--°K, --.--°D</span>
+      </div>
+      <div class="radar-row">
+        <span>🕒 Saat:</span>
+        <span id="radarUtcText" style="color:#cbd5e1;font-weight:800;">UTC+0</span>
+      </div>
+      <div class="radar-row">
+        <span>⛰️ Rakım:</span>
+        <span class="radar-elev-val" id="radarElevText">—</span>
+      </div>
+      <div class="radar-target-val" id="radarTargetText">🎯 Harita Üzerinde Gezin</div>
+    </div>
+  </div>
+
+  <div class="hud-card" id="mainHudCard">
     <div class="hud-title">
       <span id="hudStatusTitle">SEÇİLİ BÖLGE BİLGİSİ</span>
-      <span id="zoomBadge" style="color:#fbbf24;">Zoom: 1.0x</span>
+      <span class="hud-title-right">
+        <span id="zoomBadge" style="color:#fbbf24;">Zoom: 1.0x</span>
+        <button type="button" class="hud-close-btn" id="hudCloseBtn" onclick="closeHudCard(event)" title="Paneli kapat" aria-label="Bilgi panelini kapat">✕</button>
+      </span>
     </div>
     <div class="hud-country" id="hudName">Henüz bölge seçilmedi</div>
     <div class="hud-details" id="hudInfo">
@@ -784,6 +1071,22 @@
 </div>
 
 <script>
+function closeHudCard(ev) {
+  if (ev) { ev.stopPropagation(); }
+  const card = document.getElementById("mainHudCard");
+  if (card) card.classList.add("hud-hidden");
+}
+function openHudCard() {
+  const card = document.getElementById("mainHudCard");
+  if (card) card.classList.remove("hud-hidden");
+}
+// Panel içeriği yeniden yazıldığında (ülke / il / göl tıklaması, VS modu vb.) kapalı panel geri gelir.
+// Yalnızca doğrudan alt öğe değişimleri izlenir; saniyelik saat güncellemesi paneli açmaz.
+const hudReopenObserver = new MutationObserver(openHudCard);
+["hudStatusTitle", "hudName", "hudInfo"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) hudReopenObserver.observe(el, { childList: true });
+});
 const svg = d3.select("#worldMap");
 const width = 2400;
 const height = 1250;
@@ -5514,6 +5817,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
   const cPath = d3.geoPath(activeProj, ctx);
   const statesActive = !morphState && isUsStatesActive();
   const trActive = !morphState && isTrProvincesActive() && allTrProvinceFeatures.length > 0;
+  const ruActive = !morphState && (typeof isRuRegionsActive === "function" && isRuRegionsActive()) && (typeof allRuRegionFeatures !== "undefined" && allRuRegionFeatures.length > 0);
   const camVec = !morphState ? getCameraVec3() : null;
 
   // 1) Atmosfer Halesi ve Okyanus Küresi
@@ -5550,7 +5854,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
 
   // 3) Ülkeler (Orijinal kusursuz topoloji + tek seferde toplu sınır çizimi)
   const countryStrokeW = 0.65 / Math.pow(k, 0.85);
-  const canBatchCountryBorders = !!fastWorldBordersMesh && !statesActive && !trActive;
+  const canBatchCountryBorders = !!fastWorldBordersMesh && !statesActive && !trActive && !ruActive;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.miterLimit = 2;
@@ -5559,7 +5863,8 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
 
   for (let i = 0; i < allCountryFeatures.length; i++) {
     const f = allCountryFeatures[i];
-    if ((f.isUSA && statesActive) || (f.isTurkey && trActive)) continue;
+    const isRuCountry = f.isRussia || f.enName === "Russia" || f.enName === "Russian Federation" || f.trName === "RUSYA";
+    if ((f.isUSA && statesActive) || (f.isTurkey && trActive) || (isRuCountry && ruActive)) continue;
     if (camVec && f._vec3) {
       const dot = camVec[0] * f._vec3[0] + camVec[1] * f._vec3[1] + camVec[2] * f._vec3[2];
       if (dot < (f._cullDot ?? -2)) continue;
@@ -5578,7 +5883,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
     ctx.stroke();
   }
 
-  // 4) Türkiye 81 İl ve ABD Eyaletleri (Aktifse)
+  // 4) Türkiye 81 İl, ABD Eyaletleri ve Rusya Federe Bölgeleri (Aktifse)
   if (trActive) {
     ctx.strokeStyle = theme.trBorder || theme.stateBorder || theme.border;
     ctx.lineWidth = 0.48 / Math.pow(k, 0.82);
@@ -5608,6 +5913,23 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       ctx.fillStyle = getStateBaseFill(s);
       ctx.beginPath();
       cPath(s);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  if (ruActive) {
+    ctx.strokeStyle = theme.stateBorder;
+    ctx.lineWidth = 0.45 / Math.pow(k, 0.82);
+    for (let i = 0; i < allRuRegionFeatures.length; i++) {
+      const r = allRuRegionFeatures[i];
+      if (camVec && r._vec3) {
+        const dot = camVec[0] * r._vec3[0] + camVec[1] * r._vec3[1] + camVec[2] * r._vec3[2];
+        if (dot < (r._cullDot ?? -2)) continue;
+      }
+      ctx.fillStyle = getRuRegionBaseFill(r);
+      ctx.beginPath();
+      cPath(r);
       ctx.fill();
       ctx.stroke();
     }
@@ -5753,56 +6075,79 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       }
     }
 
-    ctx.fillStyle = theme.textFill;
-    ctx.strokeStyle = theme.textStroke;
-    const baseCountryFont = 14 / Math.pow(k, 0.65);
-    for (let i = 0; i < allCountryFeatures.length; i++) {
-      const f = allCountryFeatures[i];
-      if (!f.trName || (f.isUSA && statesActive) || (f.isTurkey && trActive)) continue;
-      if (!f._vec3 || !isVec3Visible(f._vec3, camVec, 0.14)) continue;
-      const fSize = Math.min(f.maxFitFont, baseCountryFont);
-      if (fSize * k < 3.4) continue;
-      const pt = activeProj(f.geoCenter);
-      if (!pt) continue;
-      ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
-      ctx.lineWidth = fSize * 0.16;
-      ctx.strokeText(f.trName, pt[0], pt[1]);
-      ctx.fillText(f.trName, pt[0], pt[1]);
-    }
+    const quizHideLabels = (typeof quizState !== "undefined" && quizState.active);
 
-    if (trActive) {
-      ctx.fillStyle = theme.trTextFill || theme.stateTextFill || theme.textFill;
-      ctx.strokeStyle = theme.trTextStroke || theme.stateTextStroke || theme.textStroke;
-      const baseTrFont = 11.5 / Math.pow(k, 0.74);
-      for (let i = 0; i < allTrProvinceFeatures.length; i++) {
-        const p = allTrProvinceFeatures[i];
-        if (!p.trName || !p._vec3 || !isVec3Visible(p._vec3, camVec, 0.10)) continue;
-        const fSize = Math.min(p.maxFitFont, baseTrFont);
-        if (fSize * k < 3.0) continue;
-        const pt = activeProj(p.geoCenter);
-        if (!pt) continue;
-        ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
-        ctx.lineWidth = fSize * 0.18;
-        ctx.strokeText(p.trName, pt[0], pt[1]);
-        ctx.fillText(p.trName, pt[0], pt[1]);
-      }
-    }
-
-    if (statesActive) {
-      ctx.fillStyle = theme.stateTextFill;
-      ctx.strokeStyle = theme.stateTextStroke;
-      const baseStFont = 10.5 / Math.pow(k, 0.68);
-      for (let i = 0; i < allUsStateFeatures.length; i++) {
-        const s = allUsStateFeatures[i];
-        if (!s.trName || !s._vec3 || !isVec3Visible(s._vec3, camVec, 0.12)) continue;
-        const fSize = Math.min(s.maxFitFont, baseStFont);
-        if (fSize * k < 3.0) continue;
-        const pt = activeProj(s.geoCenter);
+    if (!quizHideLabels) {
+      ctx.fillStyle = theme.textFill;
+      ctx.strokeStyle = theme.textStroke;
+      const baseCountryFont = 14 / Math.pow(k, 0.65);
+      for (let i = 0; i < allCountryFeatures.length; i++) {
+        const f = allCountryFeatures[i];
+        const isRuCountry = f.isRussia || f.enName === "Russia" || f.enName === "Russian Federation" || f.trName === "RUSYA";
+        if (!f.trName || (f.isUSA && statesActive) || (f.isTurkey && trActive) || (isRuCountry && ruActive)) continue;
+        if (!f._vec3 || !isVec3Visible(f._vec3, camVec, 0.14)) continue;
+        const fSize = Math.min(f.maxFitFont, baseCountryFont);
+        if (fSize * k < 3.4) continue;
+        const pt = activeProj(f.geoCenter);
         if (!pt) continue;
         ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
         ctx.lineWidth = fSize * 0.16;
-        ctx.strokeText(s.trName, pt[0], pt[1]);
-        ctx.fillText(s.trName, pt[0], pt[1]);
+        ctx.strokeText(f.trName, pt[0], pt[1]);
+        ctx.fillText(f.trName, pt[0], pt[1]);
+      }
+
+      if (trActive) {
+        ctx.fillStyle = theme.trTextFill || theme.stateTextFill || theme.textFill;
+        ctx.strokeStyle = theme.trTextStroke || theme.stateTextStroke || theme.textStroke;
+        const baseTrFont = 11.5 / Math.pow(k, 0.74);
+        for (let i = 0; i < allTrProvinceFeatures.length; i++) {
+          const p = allTrProvinceFeatures[i];
+          if (!p.trName || !p._vec3 || !isVec3Visible(p._vec3, camVec, 0.10)) continue;
+          const fSize = Math.min(p.maxFitFont, baseTrFont);
+          if (fSize * k < 3.0) continue;
+          const pt = activeProj(p.geoCenter);
+          if (!pt) continue;
+          ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
+          ctx.lineWidth = fSize * 0.18;
+          ctx.strokeText(p.trName, pt[0], pt[1]);
+          ctx.fillText(p.trName, pt[0], pt[1]);
+        }
+      }
+
+      if (statesActive) {
+        ctx.fillStyle = theme.stateTextFill;
+        ctx.strokeStyle = theme.stateTextStroke;
+        const baseStFont = 10.5 / Math.pow(k, 0.68);
+        for (let i = 0; i < allUsStateFeatures.length; i++) {
+          const s = allUsStateFeatures[i];
+          if (!s.trName || !s._vec3 || !isVec3Visible(s._vec3, camVec, 0.12)) continue;
+          const fSize = Math.min(s.maxFitFont, baseStFont);
+          if (fSize * k < 3.0) continue;
+          const pt = activeProj(s.geoCenter);
+          if (!pt) continue;
+          ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
+          ctx.lineWidth = fSize * 0.16;
+          ctx.strokeText(s.trName, pt[0], pt[1]);
+          ctx.fillText(s.trName, pt[0], pt[1]);
+        }
+      }
+
+      if (ruActive) {
+        ctx.fillStyle = theme.stateTextFill || theme.textFill;
+        ctx.strokeStyle = theme.stateTextStroke || theme.textStroke;
+        const baseRuFont = 10.5 / Math.pow(k, 0.68);
+        for (let i = 0; i < allRuRegionFeatures.length; i++) {
+          const r = allRuRegionFeatures[i];
+          if (!r.trName || !r._vec3 || !isVec3Visible(r._vec3, camVec, 0.12)) continue;
+          const fSize = Math.min(r.maxFitFont, baseRuFont);
+          if (fSize * k < 3.0) continue;
+          const pt = activeProj(r.geoCenter);
+          if (!pt) continue;
+          ctx.font = `800 ${fSize}px "Segoe UI", sans-serif`;
+          ctx.lineWidth = fSize * 0.16;
+          ctx.strokeText(r.trName, pt[0], pt[1]);
+          ctx.fillText(r.trName, pt[0], pt[1]);
+        }
       }
     }
 
@@ -6952,11 +7297,36 @@ function loadAllMapData() {
         f.centroid2D = polarPt;
         f.centroid = polarPt;
         f.maxFitFont = 12.5;
+      } else if (f.enName === "Vietnam" || f.trName === "VİETNAM") {
+        // Vietnam ismini Kızıl Nehir (Song Hong) yazısının üstündeki kuzey boşluğuna sabitle
+        const vnCoord = [105.05, 22.15];
+        const vnPt = projection2D(vnCoord);
+        f.geoCenter = vnCoord;
+        f.centroid2D = vnPt;
+        f.centroid = vnPt;
+        f.maxFitFont = fit.maxFitFont;
       } else {
         f.centroid = fit.centroid;
         f.maxFitFont = fit.maxFitFont;
       }
-      f.colorIndex = idx;
+
+      // Güney ve Güneydoğu Asya komşu ülkelerinin renklerinin birbirine karışmasını önleyen tam zıt renk ataması
+      const customColorOffsets = {
+        "HİNDİSTAN": 0,  // Mercan Kırmızısı / Somon (#fca5a5)
+        "BANGLADEŞ": 5,  // Nane / Turkuaz Yeşili (#6ee7b7)
+        "ÇİN": 6,        // Açık Şeftali / Krem (#fed7aa)
+        "MYANMAR": 10,   // Eflatun / Açık Mor (#c4b5fd)
+        "TAYLAND": 2,    // Parlak Sarı (#fde047)
+        "LAOS": 1,       // Canlı Turuncu (#fdba74)
+        "KAMBOÇYA": 12,  // Canlı Pembe / Fuşya (#f9a8d4)
+        "VİETNAM": 3,     // Limon Yeşili (#bef264)
+        "BUTAN": 2,     // Limon Sari (#00BFFF)
+
+      };
+      f.colorIndex = (customColorOffsets[f.trName] !== undefined)
+        ? customColorOffsets[f.trName]
+        : idx;
+
       if (f.fullTrName) uniqueNames.add(f.fullTrName);
     });
 
@@ -8018,6 +8388,7 @@ function startTerminatorAutoUpdate() {
   terminatorIntervalId = setInterval(() => {
     if (showDayNightTerminator && !isMorphing) {
       updateDayNightTerminator();
+      hudReopenObserver.takeRecords(); // otomatik yenileme kapatılmış paneli tekrar açmasın
     }
   }, 30000);
 }
@@ -8890,6 +9261,11 @@ function routeSearchOrFocus(lonLat, labelText, normalAction) {
 }
 
 function handleCountrySearch(rawText, allowPlateNumber = false) {
+  // Quiz aktifken veya quiz menüsündeyken üst arama çubuğundan kopya çekilmesini engelle
+  if (typeof quizState !== "undefined" && (quizState.active || quizState.inMenu)) {
+    return false;
+  }
+
   const val = (rawText || "").trim().toLocaleUpperCase('tr-TR');
   if (!val) return false;
 
@@ -9781,8 +10157,23 @@ let quizState = {
   locked: false,
   savedLayers: null,
   downPt: null,
-  qStartTime: 0
+  qStartTime: 0,
+  sessionId: 0
 };
+
+let quizTimers = [];
+
+function registerQuizTimeout(fn, delay) {
+  const id = setTimeout(fn, delay);
+  quizTimers.push(id);
+  return id;
+}
+
+function clearQuizTimers() {
+  while (quizTimers.length > 0) {
+    clearTimeout(quizTimers.pop());
+  }
+}
 
 const quizCountryDatalist = document.createElement("datalist");
 quizCountryDatalist.id = "quizCountryOnlyList";
@@ -9953,6 +10344,15 @@ function toggleGeoQuizMenu() {
     btn.innerHTML = "✖ Quizi Kapat";
   }
 
+  // Quiz süresince üst arama kutusunu kilitle (Kopya koruması)
+  if (searchInputEl) {
+    searchInputEl.value = "";
+    searchInputEl.disabled = true;
+    searchInputEl.placeholder = "🔒 Quiz modunda arama kilitlidir...";
+    searchInputEl.style.opacity = "0.5";
+    searchInputEl.style.cursor = "not-allowed";
+  }
+
   const lb = getQuizLeaderboard();
   const top1Score = lb.length > 0 ? lb[0].score : 0;
   const lastPlayerName = localStorage.getItem("secovvv_quiz_player_name") || "Coğrafyacı";
@@ -10049,6 +10449,10 @@ function startGeoQuizWithPlayerName(mode) {
 }
 
 function startGeoQuiz(mode) {
+  clearQuizTimers();
+  svg.interrupt();
+  quizState.sessionId++;
+
   const pool = getEligibleQuizCountries();
   if (pool.length < 10) return;
 
@@ -10086,6 +10490,10 @@ function startGeoQuiz(mode) {
   quizState.firstTryCount = 0;
   quizState.locked = false;
   quizState.revealingAnswer = false;
+  quizState.revealTargetTr = null;
+
+  countriesGroup.selectAll("path.country-shape").classed("quiz-skip-country-highlight", false);
+  labelsGroup.selectAll(".country-label").classed("quiz-label-flashing", false).style("display", null).style("opacity", null);
 
   document.getElementById("mapStage").classList.add("quiz-cursor");
   lastTypographyStateKey = "";
@@ -10098,10 +10506,18 @@ function startGeoQuiz(mode) {
 }
 
 function exitGeoQuiz() {
+  clearQuizTimers();
+  svg.interrupt();
+  quizState.sessionId++;
+
   quizState.active = false;
   quizState.inMenu = false;
   quizState.locked = false;
   quizState.revealingAnswer = false;
+  quizState.revealTargetTr = null;
+
+  countriesGroup.selectAll("path.country-shape").classed("quiz-skip-country-highlight", false);
+  labelsGroup.selectAll(".country-label").classed("quiz-label-flashing", false).style("display", null).style("opacity", null);
 
   clearQuizHighlights();
   document.getElementById("mapStage").classList.remove("quiz-cursor");
@@ -10110,6 +10526,14 @@ function exitGeoQuiz() {
   if (btn) {
     btn.classList.remove("quiz-on");
     btn.innerHTML = "🎮 Coğrafya Quizi";
+  }
+
+  // Quizden çıkınca üst arama kutusunu tekrar aktif et
+  if (searchInputEl) {
+    searchInputEl.disabled = false;
+    searchInputEl.placeholder = "🔍 Ülke, 81 İl / Plaka, Başkent, Deniz, Nehir, Göl ara...";
+    searchInputEl.style.opacity = "1";
+    searchInputEl.style.cursor = "text";
   }
 
   if (quizState.savedLayers) {
@@ -10225,10 +10649,16 @@ function renderQuizHudQuestion(feedbackHtml = "") {
 function focusMysteryTarget() {
   const q = quizState.questions[quizState.qIndex];
   if (!q) return;
-  const targetK = getFeatureFocusK(q.feature, 2.2, 5.2, 0.34);
+  // Küçük ülkelerin (Katar, Lüksemburg, KKTC, Kuveyt vb.) net seçilmesi için üst zoom limiti 7.8x yapıldı
+  const isSmallCountry = (q.feature.area || 0) < 2.5;
+  const maxAllowedK = isSmallCountry ? 7.8 : 5.6;
+  const targetK = getFeatureFocusK(q.feature, 2.2, maxAllowedK, 0.38);
+
   focusGeoTarget(q.feature.geoCenter, q.feature.centroid2D || q.feature.centroid, targetK, () => {
     const pt = projection(q.feature.geoCenter);
-    if (pt) triggerRadarRings(pt[0], pt[1], "#fde047");
+    if (pt) {
+      triggerRadarRings(pt[0], pt[1], "#fde047");
+    }
   });
 }
 
@@ -10264,6 +10694,8 @@ function evaluateQuizMapGuess(guessedFeature, guessedLabelTr) {
 
   if (isCorrect) {
     quizState.locked = true;
+    clearQuizTimers();
+    const activeSession = quizState.sessionId;
     playQuizTone("correct");
 
     const attemptNumber = quizState.wrongClicks + 1;
@@ -10299,8 +10731,8 @@ function evaluateQuizMapGuess(guessedFeature, guessedLabelTr) {
     const focusK = Math.min(4.2, getFeatureFocusK(q.feature, 1.8, 4.2, 0.35));
     focusGeoTarget(q.feature.geoCenter, q.feature.centroid2D || q.feature.centroid, focusK);
 
-    setTimeout(() => {
-      if (!quizState.active) return;
+    registerQuizTimeout(() => {
+      if (!quizState.active || quizState.sessionId !== activeSession) return;
       quizState.qIndex++;
       loadCurrentQuizQuestion();
     }, 1850);
@@ -10357,6 +10789,8 @@ function submitMysteryGuess() {
 function skipQuizQuestion() {
   if (!quizState.active || quizState.locked) return;
   quizState.locked = true;
+  clearQuizTimers();
+  const activeSession = quizState.sessionId;
   quizState.revealingAnswer = false;
   quizState.revealTargetTr = null;
   const q = quizState.questions[quizState.qIndex];
@@ -10383,7 +10817,7 @@ function skipQuizQuestion() {
   // 2) Önce kamerayı sarsıntısız şekilde ülkeye odakla, vardığında ismi 3 kez yakıp söndür
   const focusK = Math.min(6.5, getFeatureFocusK(q.feature, 2.2, 6.5, 0.35));
   focusGeoTarget(q.feature.geoCenter, q.feature.centroid2D || q.feature.centroid, focusK, () => {
-    if (!quizState.active) return;
+    if (!quizState.active || quizState.sessionId !== activeSession) return;
 
     // Kamera hedefe vardı: Şimdi ülke ismini aç ve 3 kez yanıp söndür
     quizState.revealingAnswer = true;
@@ -10430,8 +10864,8 @@ function skipQuizQuestion() {
     }
 
     // 3 kez yanıp sönme (3 x 0.50sn = 1.50sn) biter bitmez yazıyı gizle
-    setTimeout(() => {
-      if (!quizState.active) return;
+    registerQuizTimeout(() => {
+      if (!quizState.active || quizState.sessionId !== activeSession) return;
       quizState.revealingAnswer = false;
       quizState.revealTargetTr = null;
       labelsGroup.selectAll(".country-label")
@@ -10441,8 +10875,8 @@ function skipQuizQuestion() {
     }, 1550);
 
     // Efekt tamamlandıktan hemen sonra sıradaki soruya geç
-    setTimeout(() => {
-      if (!quizState.active) return;
+    registerQuizTimeout(() => {
+      if (!quizState.active || quizState.sessionId !== activeSession) return;
       countriesGroup.selectAll("path.country-shape").classed("quiz-skip-country-highlight", false);
       labelsGroup.selectAll(".country-label").style("display", null).style("opacity", null);
       labelsGroup.style("display", "none");
@@ -10531,6 +10965,543 @@ function finishGeoQuizRound() {
       event.preventDefault();
       evaluateQuizMapGuess(clickedCountryFeature, clickedCountryFeature.trName);
     }
+  }, true);
+})();
+
+// ============================================================================
+// 🧭 1) CANLI FARE KOORDİNAT, UTC SAAT DİLİMİ & UYDU DEM RAKIM RADARI
+// ============================================================================
+let showCoordRadarHud = true;
+let isCoordRadarMinimized = false;
+
+function toggleCoordRadarHud(forceState) {
+  showCoordRadarHud = typeof forceState === "boolean" ? forceState : !showCoordRadarHud;
+  const hud = document.getElementById("coordRadarHud");
+  const btn = document.getElementById("btnRadarHudToggle");
+  if (hud) {
+    hud.style.display = showCoordRadarHud ? "flex" : "none";
+  }
+  if (btn) {
+    btn.classList.toggle("active", showCoordRadarHud);
+    btn.innerHTML = showCoordRadarHud
+      ? "📡 Canlı Rakım Radarı: Açık"
+      : "📡 Canlı Rakım Radarı: Kapalı";
+  }
+}
+
+function toggleMinimizeCoordRadar() {
+  isCoordRadarMinimized = !isCoordRadarMinimized;
+  const hud = document.getElementById("coordRadarHud");
+  const minBtn = document.getElementById("btnRadarMinimize");
+  if (hud) {
+    hud.classList.toggle("minimized", isCoordRadarMinimized);
+  }
+  if (minBtn) {
+    minBtn.innerText = isCoordRadarMinimized ? "▴" : "▾";
+  }
+}
+
+(function initTacticalCoordinateRadar() {
+  const svgDom = document.getElementById("worldMap");
+  const coordEl = document.getElementById("radarCoordText");
+  const utcEl = document.getElementById("radarUtcText");
+  const elevEl = document.getElementById("radarElevText");
+  const targetEl = document.getElementById("radarTargetText");
+  if (!svgDom || !coordEl) return;
+
+  const demCache = new Map();
+  let demDebounceTimer = null;
+  let lastDemKey = "";
+  let radarRafPending = false;
+  let latestMouseEvent = null;
+
+  function resolveHoverTargetName(targetNode) {
+    if (!targetNode) return { name: "🌊 Açık Deniz / Okyanus", isOcean: true };
+    const datum = d3.select(targetNode).datum();
+    const cl = targetNode.classList;
+    if (!cl) return { name: "🌊 Açık Deniz / Okyanus", isOcean: true };
+
+    if (cl.contains("tr-province-shape") && datum) {
+      return { name: `🇹🇷 ${datum.trName} (${datum.plateCode})`, isOcean: false };
+    }
+    if (cl.contains("us-state-shape") && datum) {
+      return { name: `🇺🇸 ${datum.trName}, ABD`, isOcean: false };
+    }
+    if (cl.contains("ru-region-shape") && datum) {
+      return { name: `🇷🇺 ${datum.trName}`, isOcean: false };
+    }
+    if (cl.contains("country-shape") && datum) {
+      if (quizState && quizState.active) {
+        return { name: "🔒 [Quiz Gizli Bölge]", isOcean: false };
+      }
+      return { name: `🌍 ${datum.trName}`, isOcean: false };
+    }
+    if ((cl.contains("lake-shape") || cl.contains("lake-label")) && datum) {
+      return { name: `💧 ${datum.trName}`, isOcean: false };
+    }
+    if ((cl.contains("river-hit") || cl.contains("river-label")) && datum) {
+      return { name: `🏞️ ${datum.trName}`, isOcean: false };
+    }
+    if (cl.contains("capital-dot") && datum) {
+      return { name: `🏛️ ${datum.cap} (${datum.country})`, isOcean: false };
+    }
+    if (cl.contains("sea-label") && datum) {
+      return { name: `🌊 ${datum.name}`, isOcean: true };
+    }
+    return { name: "🌊 Açık Deniz / Okyanus", isOcean: true };
+  }
+
+  async function queryCursorElevation(lat, lon, isOcean) {
+    if (!showCoordRadarHud || isCoordRadarMinimized) return;
+    if (isOcean) {
+      elevEl.textContent = "0 m (Deniz)";
+      return;
+    }
+    const gridKey = `${lat.toFixed(2)}_${lon.toFixed(2)}`;
+    if (demCache.has(gridKey)) {
+      elevEl.textContent = demCache.get(gridKey);
+      return;
+    }
+    if (!navigator.onLine) {
+      elevEl.textContent = "Çevrimdışı";
+      return;
+    }
+    lastDemKey = gridKey;
+    elevEl.textContent = "Ölçülüyor...";
+
+    try {
+      const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}`);
+      if (!resp.ok) throw new Error("DEM_ERR");
+      const json = await resp.json();
+      if (json && Array.isArray(json.elevation) && isFinite(json.elevation[0])) {
+        const m = Math.round(json.elevation[0]);
+        const formatted = `${m.toLocaleString("tr-TR")} m`;
+        demCache.set(gridKey, formatted);
+        if (lastDemKey === gridKey) {
+          elevEl.textContent = formatted;
+        }
+      }
+    } catch (e) {
+      if (lastDemKey === gridKey) elevEl.textContent = "—";
+    }
+  }
+
+  function processRadarMove() {
+    radarRafPending = false;
+    if (!showCoordRadarHud || isCoordRadarMinimized) return;
+    const ev = latestMouseEvent;
+    if (!ev || isMorphing) return;
+
+    const localPt = d3.pointer(ev, mapGroup.node());
+    if (isGlobeMode) {
+      const dist = Math.hypot(localPt[0] - width / 2, localPt[1] - GLOBE_CENTER_Y);
+      if (dist > GLOBE_BASE_SCALE) {
+        coordEl.textContent = "UZAY BOŞLUĞU";
+        utcEl.textContent = "—";
+        elevEl.textContent = "—";
+        targetEl.textContent = "🌌 Yörünge Dışı";
+        return;
+      }
+    }
+
+    if (!projection || !projection.invert) return;
+    const inv = projection.invert(localPt);
+    if (!inv || isNaN(inv[0]) || isNaN(inv[1])) return;
+
+    const lon = normalizeLon180(inv[0]);
+    const lat = Math.max(-90, Math.min(90, inv[1]));
+    if (Math.abs(lat) > 89.9) return;
+
+    const latDir = lat >= 0 ? "K" : "G";
+    const lonDir = lon >= 0 ? "D" : "B";
+    coordEl.textContent = `${Math.abs(lat).toFixed(2)}°${latDir}, ${Math.abs(lon).toFixed(2)}°${lonDir}`;
+
+    const utcOffset = Math.round(lon / 15);
+    const utcSign = utcOffset >= 0 ? "+" : "";
+    utcEl.textContent = `UTC${utcSign}${utcOffset === 0 ? "0" : utcOffset}`;
+
+    const hoverInfo = resolveHoverTargetName(ev.target);
+    targetEl.textContent = hoverInfo.name;
+
+    if (demDebounceTimer) clearTimeout(demDebounceTimer);
+    if (hoverInfo.isOcean) {
+      elevEl.textContent = "0 m (Deniz)";
+    } else {
+      const immediateKey = `${lat.toFixed(2)}_${lon.toFixed(2)}`;
+      if (demCache.has(immediateKey)) {
+        elevEl.textContent = demCache.get(immediateKey);
+      } else {
+        demDebounceTimer = setTimeout(() => {
+          queryCursorElevation(lat, lon, hoverInfo.isOcean);
+        }, 340);
+      }
+    }
+  }
+
+  svgDom.addEventListener("pointermove", (e) => {
+    if (!showCoordRadarHud || isCoordRadarMinimized) return;
+    latestMouseEvent = e;
+    if (!radarRafPending) {
+      radarRafPending = true;
+      requestAnimationFrame(processRadarMove);
+    }
+  }, { passive: true });
+})();
+
+
+// ============================================================================
+// ⚖️ 2) İKİ ÜLKE VEYA İKİ TÜRKİYE İLİ KARŞILAŞTIRMA (VS) MOTORU (Shift + Tık)
+// ============================================================================
+let vsCompareMode = false;
+let vsSlots = []; // En fazla 2 öğe: { kind: 'country' | 'trProvince', data: ... }
+let vsClockTimer = null;
+
+// Normal bir ülkeye veya ile tıklandığında HUD kartının genişliğini standart boyuta döndür
+const _origClearLiveCountryClock = clearLiveCountryClock;
+clearLiveCountryClock = function() {
+  if (vsClockTimer) {
+    clearInterval(vsClockTimer);
+    vsClockTimer = null;
+  }
+  const hudCard = document.getElementById("mainHudCard") || document.querySelector(".hud-card");
+  if (hudCard && !vsCompareMode) {
+    hudCard.classList.remove("vs-expanded");
+  }
+  return _origClearLiveCountryClock();
+};
+
+function parseTurkishPopString(str) {
+  if (!str) return 0;
+  const s = String(str).trim();
+  if (s.includes("Milyar")) {
+    return (parseFloat(s.replace(/\./g, "").replace(",", ".")) || 0) * 1e9;
+  }
+  if (s.includes("Milyon")) {
+    return (parseFloat(s.replace(/\./g, "").replace(",", ".")) || 0) * 1e6;
+  }
+  if (s.includes("Bin")) {
+    return (parseFloat(s.replace(/\./g, "").replace(",", ".")) || 0) * 1e3;
+  }
+  const digitsOnly = s.replace(/\./g, "").replace(/,/g, ".");
+  const m = digitsOnly.match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : 0;
+}
+
+function computeFeatureRealAreaKm2(feature) {
+  if (!feature) return 0;
+  // Küresel steradyan alanından gerçek Dünya yüzey alanı (km²) hesabı
+  const steradians = d3.geoArea(feature);
+  if (steradians <= 0 || steradians > 2 * Math.PI) return 0;
+  return Math.round(steradians * EARTH_MEAN_RADIUS_KM * EARTH_MEAN_RADIUS_KM);
+}
+
+function parseAreaTextKm2(areaStr, fallbackFeature) {
+  if (areaStr) {
+    const clean = String(areaStr).replace(/\./g, "").replace(",", ".");
+    const m = clean.match(/[\d.]+/);
+    if (m && parseFloat(m[0]) > 0) return Math.round(parseFloat(m[0]));
+  }
+  return computeFeatureRealAreaKm2(fallbackFeature);
+}
+
+function buildComparisonRatioBadge(valA, valB) {
+  if (!valA || !valB || valA <= 0 || valB <= 0) return { winA: false, winB: false, pillA: "", pillB: "" };
+  if (Math.abs(valA - valB) / Math.max(valA, valB) < 0.02) {
+    return { winA: false, winB: false, pillA: `<span class="vs-ratio-pill">≈ Eşit</span>`, pillB: `<span class="vs-ratio-pill">≈ Eşit</span>` };
+  }
+  if (valA > valB) {
+    const ratio = (valA / valB) >= 10 ? Math.round(valA / valB) : (valA / valB).toFixed(1).replace(".", ",");
+    return {
+      winA: true,
+      winB: false,
+      pillA: `<span class="vs-ratio-pill">▲ ${ratio}x</span>`,
+      pillB: ""
+    };
+  } else {
+    const ratio = (valB / valA) >= 10 ? Math.round(valB / valA) : (valB / valA).toFixed(1).replace(".", ",");
+    return {
+      winA: false,
+      winB: true,
+      pillA: "",
+      pillB: `<span class="vs-ratio-pill">▲ ${ratio}x</span>`
+    };
+  }
+}
+
+function extractVsEntityInfo(kind, feature) {
+  if (kind === "trProvince") {
+    const popNum = parseTurkishPopString(feature.population);
+    const areaNum = parseAreaTextKm2(feature.area, feature);
+    return {
+      kind: "trProvince",
+      feature,
+      title: feature.trName,
+      subTitle: `Plaka: ${feature.plateCode}`,
+      flagIso: "tr",
+      popText: feature.population || "—",
+      popNum,
+      areaText: `${areaNum.toLocaleString("tr-TR")} km²`,
+      areaNum,
+      capitalOrRegion: feature.region || "Türkiye",
+      extraLabel: `Alan Kodu: ${feature.phone || "—"}`,
+      tz: "Europe/Istanbul",
+      geoCenter: feature.geoCenter || d3.geoCentroid(feature)
+    };
+  }
+
+  const lookupKey = COUNTRY_DETAIL_ALIASES[feature.enName] || feature.enName;
+  const row = COUNTRY_DETAILS_DB[lookupKey] || ["", "Bilinmiyor", "Bilinmiyor", "Bilinmiyor", "—", "UTC"];
+  const popNum = parseTurkishPopString(row[1]);
+  const areaNum = computeFeatureRealAreaKm2(feature);
+
+  return {
+    kind: "country",
+    feature,
+    title: feature.trName,
+    subTitle: feature.fullTrName || feature.trName,
+    flagIso: row[0],
+    popText: row[1],
+    popNum,
+    areaText: areaNum > 0 ? `~${areaNum.toLocaleString("tr-TR")} km²` : "—",
+    areaNum,
+    capitalOrRegion: feature.capital || "—",
+    extraLabel: `${row[2]} • ${row[4]}`,
+    langText: row[3] || "—",
+    tz: row[5] || "UTC",
+    geoCenter: feature.geoCenter || d3.geoCentroid(feature)
+  };
+}
+
+function renderVsHudCard() {
+  clearLiveCountryClock();
+  const hudCard = document.getElementById("mainHudCard") || document.querySelector(".hud-card");
+  const titleEl = document.getElementById("hudStatusTitle");
+  const nameEl = document.getElementById("hudName");
+  const infoEl = document.getElementById("hudInfo");
+
+  if (vsSlots.length === 0) {
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+    titleEl.innerText = "⚖️ VS KIYASLAMA MODU AKTİF (SHIFT + TIK)";
+    nameEl.innerText = "1. Ülkeyi veya İli Seçin (1/2)";
+    infoEl.innerHTML = `
+      <div class="source-pill pill-Cached" style="background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:#e9d5ff;">
+        ⚡ Haritada herhangi bir ülkeye veya Türkiye iline tıklayın
+      </div>
+      <div>💡 İpucu: VS modu kapalıyken bile haritada istediğiniz zaman <b>Shift + Sol Tık</b> yaparak iki bölgeyi anında kıyaslayabilirsiniz.</div>
+      <div class="hud-route-actions">
+        <button class="hud-mini-btn danger" onclick="toggleVsCompareMode(false)">✖ VS Modunu Kapat</button>
+      </div>
+    `;
+    return;
+  }
+
+  if (vsSlots.length === 1) {
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+    const a = vsSlots[0];
+    const flagA = getFlagSources(a.flagIso);
+    const kindLabel = a.kind === "trProvince" ? "2. Türkiye İlini Seçin" : "2. Ülkeyi Seçin";
+    titleEl.innerText = "⚖️ 1. BÖLGE SEÇİLDİ • RAKİP BEKLENİYOR (2/2)";
+    nameEl.innerHTML = `
+      <div class="hud-country-header">
+        ${flagA.primary ? `<img class="hud-flag-img" src="${flagA.primary}">` : ""}
+        <span>${escapeHudHtml(a.title)} <span style="color:#fde047;">vs [ ? ]</span></span>
+      </div>
+    `;
+    infoEl.innerHTML = `
+      <div class="source-pill pill-online">🎯 Şimdi kıyaslamak için <b>${kindLabel}</b> (Tık veya Shift+Tık)</div>
+      <div>👥 <b>Nüfus:</b> ${escapeHudHtml(a.popText)} &nbsp;|&nbsp; 📐 <b>Alan:</b> ${escapeHudHtml(a.areaText)}</div>
+      <div class="hud-route-actions">
+        <button class="hud-mini-btn danger" onclick="clearVsSelection()">🗑️ Seçimi Sıfırla</button>
+        <button class="hud-mini-btn" onclick="toggleVsCompareMode(false)">✖ Kapat</button>
+      </div>
+    `;
+    return;
+  }
+
+  // 2 Bölge Seçildi: Tam VS Karşılaştırma Tablosu
+  if (hudCard) hudCard.classList.add("vs-expanded");
+  const a = vsSlots[0];
+  const b = vsSlots[1];
+  const flagA = getFlagSources(a.flagIso);
+  const flagB = getFlagSources(b.flagIso);
+
+  const popCmp = buildComparisonRatioBadge(a.popNum, b.popNum);
+  const areaCmp = buildComparisonRatioBadge(a.areaNum, b.areaNum);
+
+  const distRad = d3.geoDistance(a.geoCenter, b.geoCenter);
+  const distKm = Math.round(distRad * EARTH_MEAN_RADIUS_KM).toLocaleString("tr-TR");
+  const isProv = a.kind === "trProvince" && b.kind === "trProvince";
+
+  titleEl.innerText = isProv
+    ? "⚖️ TÜRKİYE 81 İL KARŞILAŞTIRMASI (VS ANALİZİ)"
+    : "⚖️ KÜRESEL ÜLKE KARŞILAŞTIRMASI (VS ANALİZİ)";
+
+  nameEl.innerHTML = `
+    <div class="vs-header-bar">
+      <div class="vs-side-title">
+        ${flagA.primary ? `<img class="hud-flag-img" style="width:26px;height:18px;" src="${flagA.primary}">` : ""}
+        <span>${escapeHudHtml(a.title)}</span>
+      </div>
+      <span class="vs-badge-center">VS</span>
+      <div class="vs-side-title right">
+        <span>${escapeHudHtml(b.title)}</span>
+        ${flagB.primary ? `<img class="hud-flag-img" style="width:26px;height:18px;" src="${flagB.primary}">` : ""}
+      </div>
+    </div>
+  `;
+
+  infoEl.innerHTML = `
+    <table class="vs-compare-table">
+      <tr>
+        <td class="vs-col-left ${popCmp.winA ? 'vs-winner-val' : ''}">${escapeHudHtml(a.popText)} ${popCmp.pillA}</td>
+        <td class="vs-col-mid">👥 Nüfus</td>
+        <td class="vs-col-right ${popCmp.winB ? 'vs-winner-val' : ''}">${popCmp.pillB} ${escapeHudHtml(b.popText)}</td>
+      </tr>
+      <tr>
+        <td class="vs-col-left ${areaCmp.winA ? 'vs-winner-val' : ''}">${escapeHudHtml(a.areaText)} ${areaCmp.pillA}</td>
+        <td class="vs-col-mid">📐 Yüzölçümü</td>
+        <td class="vs-col-right ${areaCmp.winB ? 'vs-winner-val' : ''}">${areaCmp.pillB} ${escapeHudHtml(b.areaText)}</td>
+      </tr>
+      <tr>
+        <td class="vs-col-left">${escapeHudHtml(a.capitalOrRegion)}</td>
+        <td class="vs-col-mid">${isProv ? '🗺️ Bölge' : '🏛️ Başkent'}</td>
+        <td class="vs-col-right">${escapeHudHtml(b.capitalOrRegion)}</td>
+      </tr>
+      <tr>
+        <td class="vs-col-left">${escapeHudHtml(a.extraLabel)}</td>
+        <td class="vs-col-mid">${isProv ? '📞 Kod / Plaka' : '💱 Para / Tel'}</td>
+        <td class="vs-col-right">${escapeHudHtml(b.extraLabel)}</td>
+      </tr>
+      <tr>
+        <td class="vs-col-left"><span id="vsClockA" class="hud-live-clock" style="font-size:10.5px;">--:--:--</span></td>
+        <td class="vs-col-mid">🕒 Yerel Saat</td>
+        <td class="vs-col-right"><span id="vsClockB" class="hud-live-clock" style="font-size:10.5px;">--:--:--</span></td>
+      </tr>
+      <tr>
+        <td colspan="3" style="text-align:center;color:#fde047;font-weight:800;background:rgba(2,132,199,0.14);">
+          ✈️ İki Merkez Arası Kuş Uçuşu Mesafe: <b>${distKm} km</b>
+        </td>
+      </tr>
+    </table>
+    <div class="hud-route-actions">
+      <button class="hud-mini-btn" onclick="drawVsFlightArc()">✈️ Aralarında Uçuş Rotası Çiz</button>
+      <button class="hud-mini-btn danger" onclick="clearVsSelection()">🗑️ Yeni Kıyaslama</button>
+      <button class="hud-mini-btn" onclick="toggleVsCompareMode(false)">✖ Kapat</button>
+    </div>
+  `;
+
+  const updateDualClocks = () => {
+    const elA = document.getElementById("vsClockA");
+    const elB = document.getElementById("vsClockB");
+    if (!elA || !elB) {
+      if (vsClockTimer) { clearInterval(vsClockTimer); vsClockTimer = null; }
+      return;
+    }
+    elA.textContent = formatCapitalClockText(a.tz);
+    elB.textContent = formatCapitalClockText(b.tz);
+  };
+  updateDualClocks();
+  vsClockTimer = setInterval(updateDualClocks, 1000);
+}
+
+function drawVsFlightArc() {
+  if (vsSlots.length !== 2) return;
+  const a = vsSlots[0];
+  const b = vsSlots[1];
+  vsCompareMode = false;
+  updateVsButtonUI();
+  if (!measureMode) toggleMeasureMode();
+  measurePoints = [];
+  measureRouteCache = null;
+  addMeasurePoint(a.geoCenter[0], a.geoCenter[1], a.title);
+  addMeasurePoint(b.geoCenter[0], b.geoCenter[1], b.title);
+  fitMeasureRouteView();
+}
+
+function clearVsSelection() {
+  vsSlots = [];
+  renderVsHudCard();
+}
+
+function updateVsButtonUI() {
+  const btn = document.getElementById("btnVsToggle");
+  if (!btn) return;
+  btn.classList.toggle("vs-on", vsCompareMode);
+  btn.innerHTML = vsCompareMode
+    ? "⚖️ VS Kıyaslama Modu: AKTİF"
+    : "⚖️ VS Kıyaslama Modu: Kapalı (Shift+Tık)";
+}
+
+function toggleVsCompareMode(forceState) {
+  if (typeof quizState !== "undefined" && quizState.active) return;
+  vsCompareMode = typeof forceState === "boolean" ? forceState : !vsCompareMode;
+  if (vsCompareMode && measureMode) {
+    toggleMeasureMode();
+  }
+  updateVsButtonUI();
+
+  if (vsCompareMode) {
+    renderVsHudCard();
+  } else {
+    vsSlots = [];
+    const hudCard = document.getElementById("mainHudCard") || document.querySelector(".hud-card");
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+    document.getElementById("hudStatusTitle").innerText = "SEÇİLİ BÖLGE BİLGİSİ";
+    document.getElementById("hudName").innerText = "VS Kıyaslama kapatıldı";
+    document.getElementById("hudInfo").innerHTML = `
+      <div>🌐 Haritadan ülke, 81 il, başkent, deniz, göl veya nehir seçebilirsiniz.</div>
+    `;
+  }
+}
+
+function handleVsSelection(kind, feature) {
+  const item = extractVsEntityInfo(kind, feature);
+  if (vsSlots.length === 1 && vsSlots[0].kind !== kind) {
+    vsSlots = [item];
+  } else if (vsSlots.length >= 2) {
+    vsSlots = [item];
+  } else if (vsSlots.length === 1 && vsSlots[0].title === item.title) {
+    return;
+  } else {
+    vsSlots.push(item);
+  }
+
+  const pt = projection(item.geoCenter);
+  if (pt) triggerRadarRings(pt[0], pt[1], vsSlots.length === 1 ? "#a855f7" : "#10b981");
+  renderVsHudCard();
+}
+
+(function bindVsCompareShiftClickInterceptor() {
+  const svgDom = document.getElementById("worldMap");
+  if (!svgDom) return;
+
+  svgDom.addEventListener("click", (event) => {
+    if (typeof quizState !== "undefined" && quizState.active) return;
+    if (measureMode) return;
+    if (!vsCompareMode && !event.shiftKey) return;
+
+    const targetEl = event.target;
+    if (!targetEl || !targetEl.classList) return;
+    const datum = d3.select(targetEl).datum();
+    if (!datum) return;
+
+    let kind = null;
+    if (targetEl.classList.contains("tr-province-shape")) {
+      kind = "trProvince";
+    } else if (targetEl.classList.contains("country-shape")) {
+      kind = "country";
+    }
+
+    if (!kind) return;
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (!vsCompareMode) {
+      vsCompareMode = true;
+      updateVsButtonUI();
+    }
+    handleVsSelection(kind, datum);
   }, true);
 })();
 
