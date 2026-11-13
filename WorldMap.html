@@ -1146,8 +1146,8 @@
           🌊 Gerçek Okyanus: Açık
         </button>
 
-        <button class="btn active" id="btnOrcaToggle" onclick="toggleOrca()" title="Okyanuslarda 5, 10 veya 15 saniye aralıklarla rastgele yerde yüzen katil balina belirir">
-          🐋 Balina: Açık
+        <button class="btn" id="btnOrcaToggle" onclick="toggleOrca()" title="Okyanuslarda 5, 10 veya 15 saniye aralıklarla rastgele yerde yüzen katil balina belirir">
+          🐋 Balina: Kapalı
         </button>
 
         <button class="btn active" id="btnMicroToggle" onclick="toggleAllLabels()" style="grid-column: 1 / -1;" title="Mikro ada devletlerinin nokta etiketlerini açar/kapatır">
@@ -5240,7 +5240,7 @@ function toggleSeaAnim() {
 // ===== Kesin Boyut Sıralaması: Mavi Balina (840) > İspermeçet (460) > Katil Balina Sürüsü (340) =====
 const ACTOR_INTERVALS = [0, 2, 4];
 const ORCA_TRAVEL = 0.22;
-let orcaEnabled = true, orcaMask = null, orcaRaf = 0;
+let orcaEnabled = false, orcaMask = null, orcaRaf = 0;
 
 function getRandomActorDelayMs() {
   return ACTOR_INTERVALS[Math.floor(Math.random() * ACTOR_INTERVALS.length)] * 1000;
@@ -5758,7 +5758,7 @@ function toggleOrca() {
     });
   }
 }
-startIndependentActors();
+if (orcaEnabled) startIndependentActors();
 
 
 const spherePath = mapGroup.append("path")
