@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /secovvv2/
+
+Sitemap: https://secovvv.github.io/sitemap.xml
