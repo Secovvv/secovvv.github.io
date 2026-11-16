@@ -3203,7 +3203,7 @@
             return;
         }
         try {
-            const res = await fetch(`${temizFirebaseUrl()}/rekorlar_titan_oyuncular.json`);
+            const res = await fetch(`${temizFirebaseUrl()}/rekorlar_titan_oyuncular.json`, { cache: "no-store" });
             if (!res.ok) {
                 baglantiEtiketiniGuncelle(false);
                 return;
@@ -3211,31 +3211,16 @@
             const bulutData = await res.json();
             baglantiEtiketiniGuncelle(true);
 
+            // Bulut verisini tek otorite kabul et (tablo sıfırlandıysa yerel hafızayı da temizle)
             if (bulutData && typeof bulutData === "object") {
-                Object.keys(bulutData).forEach(key => {
-                    let bOyuncu = bulutData[key];
-                    if (bOyuncu && bOyuncu.name) {
-                        if (!oyuncularMap[key]) {
-                            oyuncularMap[key] = bOyuncu;
-                        } else {
-                            oyuncularMap[key].name = bOyuncu.name;
-                            if ((bOyuncu.bestScore || 0) >= (oyuncularMap[key].bestScore || 0)) {
-                                oyuncularMap[key].bestScore = bOyuncu.bestScore || 0;
-                                oyuncularMap[key].bestPrize = bOyuncu.bestPrize || oyuncularMap[key].bestPrize || "0 TL";
-                            }
-                            oyuncularMap[key].bestLevel = Math.max(oyuncularMap[key].bestLevel || 0, bOyuncu.bestLevel || 0);
-                        }
-                    }
-                });
+                oyuncularMap = bulutData;
                 localStorage.setItem("secoTitanPlayers", JSON.stringify(oyuncularMap));
+            } else {
+                oyuncularMap = {};
+                localStorage.removeItem("secoTitanPlayers");
+                localStorage.removeItem("milyonerRekor");
+                localStorage.removeItem("milyonerRekorSahibi");
             }
-
-            // Yerelde olup bulutta olmayan kayıtları senkronize et
-            Object.keys(oyuncularMap).forEach(k => {
-                if (!bulutData || !bulutData[k]) {
-                    bulutaOyuncuKaydet(k, oyuncularMap[k]);
-                }
-            });
 
             rekorYukle();
             if (document.getElementById("liderlik-modal").style.display === "flex") {
