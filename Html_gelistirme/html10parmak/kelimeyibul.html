@@ -1453,7 +1453,7 @@
                 return;
             }
             try {
-                const res = await fetch(`${temizFirebaseUrl()}/rekorlar_kelimeyibul_oyuncular.json`);
+                const res = await fetch(`${temizFirebaseUrl()}/rekorlar_kelimeyibul_oyuncular.json`, { cache: "no-store" });
                 if (!res.ok) {
                     baglantiEtiketiniGuncelle(false);
                     return;
@@ -1461,29 +1461,17 @@
                 const bulutData = await res.json();
                 baglantiEtiketiniGuncelle(true);
 
+                // Bulut verisini tek otorite kabul et (bulut sıfırlandıysa yerel hafızayı da temizle)
                 if (bulutData && typeof bulutData === "object") {
-                    Object.keys(bulutData).forEach(key => {
-                        let bOyuncu = bulutData[key];
-                        if (bOyuncu && bOyuncu.name) {
-                            if (!oyuncularMap[key]) {
-                                oyuncularMap[key] = bOyuncu;
-                            } else {
-                                oyuncularMap[key].name = bOyuncu.name;
-                                oyuncularMap[key].bestScore = Math.max(oyuncularMap[key].bestScore || 0, bOyuncu.bestScore || 0);
-                                oyuncularMap[key].bestStreak = Math.max(oyuncularMap[key].bestStreak || 0, bOyuncu.bestStreak || 0);
-                                oyuncularMap[key].accuracy = Math.max(oyuncularMap[key].accuracy || 0, bOyuncu.accuracy || 0);
-                            }
-                        }
-                    });
+                    oyuncularMap = bulutData;
                     localStorage.setItem("secoKelimeAvPlayers", JSON.stringify(oyuncularMap));
+                } else {
+                    oyuncularMap = {};
+                    localStorage.removeItem("secoKelimeAvPlayers");
+                    localStorage.removeItem("secoRekor");
+                    localStorage.removeItem("secoSeriRekor");
+                    localStorage.removeItem("secoRekorSahibi");
                 }
-
-                // Yerelde olup bulutta olmayan kayıtları otomatik buluta senkronize et
-                Object.keys(oyuncularMap).forEach(k => {
-                    if (!bulutData || !bulutData[k]) {
-                        bulutaOyuncuKaydet(k, oyuncularMap[k]);
-                    }
-                });
 
                 ustLiderleriHesapla();
                 if (document.getElementById("liderlik-modal").style.display === "flex") {
