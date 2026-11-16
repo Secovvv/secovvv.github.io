@@ -1463,7 +1463,7 @@
             return;
         }
         try {
-            const res = await fetch(`${temizFirebaseUrl()}/rekorlar_10parmak_oyuncular.json`);
+            const res = await fetch(`${temizFirebaseUrl()}/rekorlar_10parmak_oyuncular.json`, { cache: "no-store" });
             if (!res.ok) {
                 baglantiEtiketiniGuncelle(false);
                 return;
@@ -1471,29 +1471,18 @@
             const bulutData = await res.json();
             baglantiEtiketiniGuncelle(true);
 
+            // Bulut verisini tek otorite kabul et (bulut sıfırlandıysa yerel hafızayı da temizle)
             if (bulutData && typeof bulutData === "object") {
-                Object.keys(bulutData).forEach(key => {
-                    let bOyuncu = bulutData[key];
-                    if (bOyuncu && bOyuncu.name) {
-                        if (!oyuncularMap[key]) {
-                            oyuncularMap[key] = bOyuncu;
-                        } else {
-                            oyuncularMap[key].name = bOyuncu.name;
-                            oyuncularMap[key].bestWPM = Math.max(oyuncularMap[key].bestWPM || 0, bOyuncu.bestWPM || 0);
-                            oyuncularMap[key].bestCorrect = Math.max(oyuncularMap[key].bestCorrect || 0, bOyuncu.bestCorrect || 0);
-                            oyuncularMap[key].accuracy = Math.max(oyuncularMap[key].accuracy || 0, bOyuncu.accuracy || 0);
-                        }
-                    }
-                });
+                oyuncularMap = bulutData;
                 localStorage.setItem("seco10ParmakPlayers", JSON.stringify(oyuncularMap));
+            } else {
+                oyuncularMap = {};
+                localStorage.removeItem("seco10ParmakPlayers");
+                localStorage.removeItem("secoBestCorrect");
+                localStorage.removeItem("secoBestCorrectName");
+                localStorage.removeItem("secoBestWPM");
+                localStorage.removeItem("secoBestWPMName");
             }
-
-            // Eğer yerelde daha önceden kırılmış rekor varsa ve bulutta henüz yoksa otomatik buluta senkronize et
-            Object.keys(oyuncularMap).forEach(k => {
-                if (!bulutData || !bulutData[k]) {
-                    bulutaOyuncuKaydet(k, oyuncularMap[k]);
-                }
-            });
 
             ustSampiyonBariniGuncelle();
             if (document.getElementById("liderlik-modal").style.display === "flex") {
