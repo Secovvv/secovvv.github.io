@@ -1202,8 +1202,8 @@
           🔴 Başkentler: Açık
         </button>
 
-        <button class="btn active" id="btnRiverToggle" onclick="toggleRiversMode()" title="Dünyanın büyük nehirlerini yakınlaşmaya göre akıllı veya sürekli gösterir">
-          🏞️ Nehirler: Akıllı Zoom
+        <button class="btn" id="btnRiverToggle" onclick="toggleRiversMode()" title="Dünyanın büyük nehirlerini yakınlaşmaya göre akıllı veya sürekli gösterir">
+          🏞️ Nehirler: Kapalı
         </button>
 
         <button class="btn" id="btnMountainsToggle" onclick="toggleMountainsMode()" title="Dünya zirvelerini (Everest, K2 vb.), Türkiye dağlarını ve derin okyanus çukurlarını (Mariana Çukuru vb.) gösterir/gizler">
@@ -1361,7 +1361,7 @@ let showCapitals = false;
 let trProvinceDisplayMode = 'off';
 let usStateDisplayMode = 'off';
 let seaDisplayMode = 'auto';
-let riverDisplayMode = 'auto';
+let riverDisplayMode = 'off';
 let currentZoomK = 1;
 
 // ================= CANLI BAĞLANTI (ONLINE / OFFLINE) MERKEZİ KONTROL SİSTEMİ =================
@@ -10829,6 +10829,7 @@ function renderMap() {
   trProvinceLabelsGroup.style("display", "none");
   usStatesGroup.style("display", "none");
   stateLabelsGroup.style("display", "none");
+  riversGroup.style("display", "none");
   riverLabelsGroup.style("display", "none");
   lakeLabelsGroup.style("display", "none");
   seaLabelsGroup.style("display", "none");
@@ -15050,7 +15051,7 @@ function exitGeoQuiz() {
   if (quizState.savedLayers) {
     setTrDisplayMode(quizState.savedLayers.tr);
     usStateDisplayMode = quizState.savedLayers.us;
-    riverDisplayMode = quizState.savedLayers.river || "auto";
+    riverDisplayMode = quizState.savedLayers.river || "off";
     if (typeof ruRegionDisplayMode !== "undefined") ruRegionDisplayMode = quizState.savedLayers.ru;
     showCapitals = quizState.savedLayers.capitals ?? true;
     showAllMicroLabels = quizState.savedLayers.micro ?? true;
