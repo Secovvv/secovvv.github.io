@@ -3323,7 +3323,7 @@
             const seviyeler = hedefLevel ? [hedefLevel] : ['A', 'B', 'C'];
             try {
                 for (const lvl of seviyeler) {
-                    const res = await fetch(`${temizFirebaseUrl()}/rekorlar_words_oyuncular/${lvl}.json`);
+                    const res = await fetch(`${temizFirebaseUrl()}/rekorlar_words_oyuncular/${lvl}.json`, { cache: "no-store" });
                     if (!res.ok) {
                         baglantiEtiketiniGuncelle(false);
                         continue;
@@ -3331,30 +3331,15 @@
                     const bulutData = await res.json();
                     baglantiEtiketiniGuncelle(true);
 
-                    if (!oyuncularByLevel[lvl]) oyuncularByLevel[lvl] = {};
-
+                    // Bulut verisini tek otorite kabul et (o seviye sıfırlandıysa yerel hafızayı da temizle)
                     if (bulutData && typeof bulutData === "object") {
-                        Object.keys(bulutData).forEach(key => {
-                            let bOyuncu = bulutData[key];
-                            if (bOyuncu && bOyuncu.name) {
-                                if (!oyuncularByLevel[lvl][key]) {
-                                    oyuncularByLevel[lvl][key] = bOyuncu;
-                                } else {
-                                    oyuncularByLevel[lvl][key].name = bOyuncu.name;
-                                    oyuncularByLevel[lvl][key].bestScore = Math.max(oyuncularByLevel[lvl][key].bestScore || 0, bOyuncu.bestScore || 0);
-                                    oyuncularByLevel[lvl][key].bestWords = Math.max(oyuncularByLevel[lvl][key].bestWords || 0, bOyuncu.bestWords || 0);
-                                }
-                            }
-                        });
+                        oyuncularByLevel[lvl] = bulutData;
                         localStorage.setItem(`secoWordsPlayers_${lvl}`, JSON.stringify(oyuncularByLevel[lvl]));
+                    } else {
+                        oyuncularByLevel[lvl] = {};
+                        localStorage.removeItem(`secoWordsPlayers_${lvl}`);
+                        localStorage.removeItem(`wordGameLeaderboard_${lvl}`);
                     }
-
-                    // Yerelde olup bulutta olmayan kayıtları senkronize et
-                    Object.keys(oyuncularByLevel[lvl]).forEach(k => {
-                        if (!bulutData || !bulutData[k]) {
-                            bulutaOyuncuKaydet(lvl, k, oyuncularByLevel[lvl][k]);
-                        }
-                    });
                 }
 
                 updateHighScoreDisplay();
