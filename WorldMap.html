@@ -50,10 +50,9 @@
   }
 }
 </script>
-<script type="text/plain" id="maviNefesVideoData">GkXfo59Ch... (mavi nefes base64 verisi)</script>
-<script type="text/plain" id="ispermecetVideoData">GkXfo59Ch... (ispermecet base64 verisi)</script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -747,7 +746,7 @@
     position: absolute;
     top: 12px;
     left: 14px;
-    width: 178px;
+    width:235px;
     background: rgba(9, 14, 26, 0.94);
     backdrop-filter: blur(8px);
     border: 1.2px solid rgba(56, 189, 248, 0.65);
@@ -832,7 +831,7 @@
     color: #34d399;
     font-weight: 800;
     font-size: 10px;
-    max-width: 160px;
+    max-width: 215px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -844,7 +843,7 @@
     .coord-radar-hud {
       top: 8px;
       left: 8px;
-      width: 155px;
+      width: 205px;
       font-size: 9.5px;
       padding: 5px 7px;
     }
@@ -1227,8 +1226,8 @@
           🐋 Balina: Kapalı
         </button>
 
-        <button class="btn active" id="btnMicroToggle" onclick="toggleAllLabels()" style="grid-column: 1 / -1;" title="Mikro ada devletlerinin nokta etiketlerini açar/kapatır">
-          🔎 Mikro Adalar: Açık
+        <button class="btn" id="btnMicroToggle" onclick="toggleAllLabels()" style="grid-column: 1 / -1;" title="Mikro ada devletlerinin nokta etiketlerini açar/kapatır">
+          🔎 Mikro Adalar: Kapalı
         </button>
 
         <div class="menu-sec-title">🌋 Yer Bilimi: Deprem, Fay & Volkan</div>
@@ -1357,7 +1356,7 @@ const svg = d3.select("#worldMap");
 const width = 2400;
 const height = 1250;
 
-let showAllMicroLabels = true;
+let showAllMicroLabels = false;
 let showCapitals = false;
 let trProvinceDisplayMode = 'off';
 let usStateDisplayMode = 'off';
@@ -1751,15 +1750,21 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // ================= INDEXED-DB HARİTA ÖNBELLEĞİ (MANUEL OFFLINE MODA TAM DUYARLI) =================
+let _geoCacheDbInstance = null;
 function openGeoCacheDB() {
-  return new Promise((resolve, reject) => {
+  if (_geoCacheDbInstance) return _geoCacheDbInstance;
+  _geoCacheDbInstance = new Promise((resolve, reject) => {
     const req = indexedDB.open("SecovvvGeoCacheDB", 1);
     req.onupgradeneeded = (e) => {
       e.target.result.createObjectStore("datasets");
     };
     req.onsuccess = (e) => resolve(e.target.result);
-    req.onerror = (e) => reject(e);
+    req.onerror = (e) => {
+      _geoCacheDbInstance = null;
+      reject(e);
+    };
   });
+  return _geoCacheDbInstance;
 }
 
 async function readFromGeoCacheDB(key) {
@@ -1777,9 +1782,16 @@ async function fetchWithOfflineBackup(key, url) {
     return await readFromGeoCacheDB(key);
   }
   try {
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error("HTTP " + resp.status);
-    const data = await resp.json();
+    let data;
+    const _fetchCtrl = new AbortController();
+    const _fetchTimer = setTimeout(() => _fetchCtrl.abort(), 20000); // 20 sn zaman aşımı: sunucu asılı kalırsa yedeğe düş
+    try {
+      const resp = await fetch(url, { signal: _fetchCtrl.signal });
+      if (!resp.ok) throw new Error("HTTP " + resp.status);
+      data = await resp.json();
+    } finally {
+      clearTimeout(_fetchTimer);
+    }
     try {
       const db = await openGeoCacheDB();
       const tx = db.transaction("datasets", "readwrite");
@@ -3765,6 +3777,7 @@ const COUNTRY_DATA = {
   "China": { tr: "ÇİN", cap: "Pekin" },
   "Germany": { tr: "ALMANYA", cap: "Berlin" },
   "France": { tr: "FRANSA", cap: "Paris" },
+  "French Guiana": { tr: "FRANSIZ GUYANASI", fullTr: "FRANSIZ GUYANASI (FRANSA)", cap: "Cayenne" },
   "Italy": { tr: "İTALYA", cap: "Roma" },
   "Spain": { tr: "İSPANYA", cap: "Madrid" },
   "Portugal": { tr: "PORTEKİZ", cap: "Lizbon" },
@@ -3949,6 +3962,7 @@ const COUNTRY_DATA = {
 // Format: [iso2Kodu, Nüfus, ParaBirimi, ResmiDil, TelefonKodu, BaşkentSaatDilimi]
 const COUNTRY_DETAILS_DB = {
   // Türkiye, Antarktika, Kıbrıs, Kafkasya ve Orta Doğu
+  "French Guiana": ["gf", "310 Bin", "Euro (€ · EUR)", "Fransızca", "+594", "America/Cayenne"],
   "Turkey": ["tr", "85,7 Milyon", "Türk Lirası (₺ · TRY)", "Türkçe", "+90", "Europe/Istanbul"],
   "Antarctica": ["aq", "~1.000 Kış / ~5.000 Yaz (Araştırmacı)", "Resmi Para Birimi Yok", "Resmi Dil Yok (Bilim Üsleri)", "+672", "Antarctica/McMurdo"],
   "Northern Cyprus": ["kktc", "476 Bin", "Türk Lirası (₺ · TRY)", "Türkçe", "+90 392", "Asia/Nicosia"],
@@ -4527,6 +4541,7 @@ const STRATEGIC_STRAITS = [
 
 // DÜNYA BAŞKENTLERİ KOORDİNAT VERİTABANI (KIRMIZI NOKTALAR)
 const WORLD_CAPITALS = [
+  { cap: "Cayenne", country: "FRANSIZ GUYANASI", lon: -52.33, lat: 4.93 },
   { cap: "Ankara", country: "TÜRKİYE", lon: 32.85, lat: 39.93 },
   { cap: "Lefkoşa", country: "KUZEY KIBRIS (KKTC)", lon: 33.36, lat: 35.19 },
   { cap: "Washington, D.C.", country: "AMERİKA BİRLEŞİK DEVLETLERİ", lon: -77.04, lat: 38.90 },
@@ -5245,18 +5260,35 @@ function setSeaAnimatedMode(on) {
   spherePath.style("fill-opacity", on ? 0 : null);
 }
 
+const _reusableSeaMatrix = typeof DOMMatrix !== "undefined" ? new DOMMatrix() : null;
+let _lastSeaFrameTime = 0;
+const _seaBaseMatrix = typeof DOMMatrix !== "undefined" ? new DOMMatrix() : null;
+
 function drawSeaLayer(ctx, pat, scale, ox, oy) {
-  pat.setTransform(new DOMMatrix([scale, 0, 0, scale, ox, oy]));
+  if (_reusableSeaMatrix) {
+    _reusableSeaMatrix.a = scale;
+    _reusableSeaMatrix.b = 0;
+    _reusableSeaMatrix.c = 0;
+    _reusableSeaMatrix.d = scale;
+    _reusableSeaMatrix.e = ox;
+    _reusableSeaMatrix.f = oy;
+    pat.setTransform(_reusableSeaMatrix);
+  }
   ctx.fillStyle = pat;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
 function seaFrame(now) {
-  requestAnimationFrame(seaFrame);
-  if (document.hidden) return;
+  // Sekme gizliyken veya animasyon kapalıyken rAF döngüsünü çalıştırma; seyrek yoklama yap
+  if (document.hidden) { setTimeout(() => requestAnimationFrame(seaFrame), 500); return; }
   const want = !!(seaCtx && seaAnimEnabled && !isMorphing);
   setSeaAnimatedMode(want);
-  if (!want || seaSize.w < 10 || seaSize.h < 10) return;
+  if (!want) { setTimeout(() => requestAnimationFrame(seaFrame), 120); return; }
+  requestAnimationFrame(seaFrame);
+  if (isCanvasMotionActive) return; // globe canvas kendi okyanusunu çiziyor; görünmeyen katmana çizme
+  if (seaSize.w < 10 || seaSize.h < 10) return;
+  if (now - _lastSeaFrameTime < 32) return; // 30 FPS kilidi (GPU yükünü yarıya indirir)
+  _lastSeaFrameTime = now;
 
   const dpr = seaSize.dpr;
   const W = Math.round(seaSize.w * dpr), H = Math.round(seaSize.h * dpr);
@@ -5293,7 +5325,12 @@ function seaFrame(now) {
     seaGeoPath({ type: "Sphere" });
     seaCtx.clip();
     // Temel derinlik renkleri haritayla birlikte kayar/zoom olur
-    A.base.setTransform(new DOMMatrix([width / 1200, 0, 0, height / 625, 0, 0]));
+    if (_seaBaseMatrix) {
+      _seaBaseMatrix.a = width / 1200; _seaBaseMatrix.d = height / 625;
+      A.base.setTransform(_seaBaseMatrix);
+    } else {
+      A.base.setTransform(new DOMMatrix([width / 1200, 0, 0, height / 625, 0, 0]));
+    }
     seaCtx.fillStyle = A.base;
     seaCtx.fillRect(0, 0, width, height);
   }
@@ -5404,6 +5441,14 @@ function buildOrcaMask() {
   }
   orcaMask = { W, H, data: g.getImageData(0, 0, W, H).data };
   return true;
+}
+
+function isLandByMask(lon, lat) {
+  if (!buildOrcaMask() || !orcaMask) return false;
+  const { W, H, data } = orcaMask;
+  const cx = Math.max(0, Math.min(W - 1, Math.round((lon + 180) / 360 * W)));
+  const cy = Math.max(0, Math.min(H - 1, Math.round((90 - lat) / 180 * H)));
+  return data[(cy * W + cx) * 4 + 3] > 40;
 }
 
 function isOrcaOcean(lon, lat) {
@@ -6491,6 +6536,13 @@ syncGraticuleProjectedPositions(null);
 applyGraticuleTheme();
 
 let allCountryFeatures = [];
+
+// Harita verisi hazır olduğunda (loadAllMapData sonunda) bir kez çalıştırır. Eski setInterval yoklamalarının yerini alır.
+function onMapDataReady(fn) {
+  if (allCountryFeatures.length > 0) { fn(); return; }
+  const h = () => { document.removeEventListener("secovvv:mapready", h); fn(); };
+  document.addEventListener("secovvv:mapready", h);
+}
 let allTrProvinceFeatures = [];
 let allUsStateFeatures = [];
 let allLakeFeatures = [];
@@ -7909,20 +7961,243 @@ function ensureGlobePrecomputed() {
   globePrecomputed = true;
 }
 
+// ===== YÜKSEK AYRINTI (10m) KATMANI =====
+// Hareket sırasında (sürükleme/zoom/geçiş) hafif 50m geometri, durağanken ve yakınlaştırınca ayrıntılı 10m geometri çizilir.
+function hiK() { return isGlobeMode ? 2.5 : 2.2; }
+let _suppressHiGlobe = false;
+let _rotKey = "";
+let hiGlobeUpgradeTimer = null;
+let hiDetailReady = false;
+let hiDetailRefreshTimer = null;
+let _pathGeomKey = "";
+
+function updatePathGeomKey() {
+  const hi = hiDetailReady && currentZoomK >= hiK();
+  _rotKey = isGlobeMode ? (globeRotation[0].toFixed(4) + "," + globeRotation[1].toFixed(4) + "," + projection3D.scale().toFixed(2)) : "2d";
+  if (isGlobeMode) {
+    _pathGeomKey = globeRotation[0].toFixed(4) + "," + globeRotation[1].toFixed(4) + "," + projection3D.scale().toFixed(2) + "," + (hi ? currentZoomK.toFixed(3) : "0");
+  } else if (hi) {
+    const t = d3.zoomTransform(svg.node());
+    _pathGeomKey = "2d|" + Math.round(t.x) + "," + Math.round(t.y) + "," + t.k.toFixed(3);
+  } else {
+    _pathGeomKey = "2d";
+  }
+}
+
+// Ülkenin her poligon parçası için küre merkezi, açısal yarıçap ve lon/lat kutusu (bir kez, tembel hesaplanır)
+function buildHiParts(d) {
+  const g = d._hi.geometry;
+  const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+  const parts = polys.map(poly => {
+    const ring = poly[0] || [];
+    let sx = 0, sy = 0, sz = 0, minLon = 999, maxLon = -999, minLat = 999, maxLat = -999;
+    for (let i = 0; i < ring.length; i++) {
+      const lon = ring[i][0], lat = ring[i][1];
+      const v = lonLatToVec3(lon, lat);
+      sx += v[0]; sy += v[1]; sz += v[2];
+      if (lon < minLon) minLon = lon; if (lon > maxLon) maxLon = lon;
+      if (lat < minLat) minLat = lat; if (lat > maxLat) maxLat = lat;
+    }
+    let vec = [0, 0, 1], ang = Math.PI, lonlat = [0, 90];
+    const len = Math.hypot(sx, sy, sz);
+    if (ring.length && len > ring.length * 0.02) {
+      vec = [sx / len, sy / len, sz / len];
+      let minDot = 1;
+      for (let i = 0; i < ring.length; i++) {
+        const v = lonLatToVec3(ring[i][0], ring[i][1]);
+        const dd = vec[0] * v[0] + vec[1] * v[1] + vec[2] * v[2];
+        if (dd < minDot) minDot = dd;
+      }
+      ang = Math.acos(Math.max(-1, Math.min(1, minDot))) + 0.01;
+      lonlat = [Math.atan2(vec[1], vec[0]) / DEG2RAD, Math.asin(Math.max(-1, Math.min(1, vec[2]))) / DEG2RAD];
+    }
+    // 2B ekran kutusu: lon/lat kutusunun ızgara örneklerinin izdüşümü (NaturalEarth yarı-silindirik)
+    let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+    for (let i = 0; i <= 4; i++) {
+      for (let j = 0; j <= 2; j++) {
+        const pt = projection2D([minLon + (maxLon - minLon) * i / 4, minLat + (maxLat - minLat) * j / 2]);
+        if (!pt) continue;
+        if (pt[0] < bx0) bx0 = pt[0]; if (pt[0] > bx1) bx1 = pt[0];
+        if (pt[1] < by0) by0 = pt[1]; if (pt[1] > by1) by1 = pt[1];
+      }
+    }
+    const padX = (bx1 - bx0) * 0.03 + 2, padY = (by1 - by0) * 0.03 + 2;
+    const b2 = isFinite(bx0) ? [[bx0 - padX, by0 - padY], [bx1 + padX, by1 + padY]] : [[-1e9, -1e9], [1e9, 1e9]];
+    return { poly, vec, ang, lonlat, b2 };
+  });
+  d._hiParts = parts;
+  return parts;
+}
+
+function getHiVisibleGeometry(d) {
+  const parts = d._hiParts || buildHiParts(d);
+  const sel = [];
+  if (!isGlobeMode) {
+    const t = d3.zoomTransform(svg.node()), mx = width * 0.75, my = height * 0.75;
+    for (let i = 0; i < parts.length; i++) {
+      const b = parts[i].b2;
+      if (b[1][0] * t.k + t.x < -mx || b[0][0] * t.k + t.x > width + mx || b[1][1] * t.k + t.y < -my || b[0][1] * t.k + t.y > height + my) continue;
+      sel.push(parts[i].poly);
+    }
+  } else {
+    const cam = getCameraVec3(), k = currentZoomK, m = 120;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      if (p.ang < Math.PI / 2 - 0.02 && (cam[0] * p.vec[0] + cam[1] * p.vec[1] + cam[2] * p.vec[2]) < -Math.sin(p.ang)) continue;
+      if (p.ang < 1.2) {
+        const pt = projection3D(p.lonlat);
+        if (pt) {
+          const sx = width / 2 + (pt[0] - width / 2) * k, sy = GLOBE_CENTER_Y + (pt[1] - GLOBE_CENTER_Y) * k;
+          const r = p.ang * GLOBE_BASE_SCALE * k + m;
+          if (sx + r < 0 || sx - r > width || sy + r < 0 || sy - r > height) continue;
+        }
+      }
+      sel.push(p.poly);
+    }
+  }
+  if (sel.length === parts.length) return d._hi;
+  return { type: "MultiPolygon", coordinates: sel };
+}
+
+function isFeatureInViewport(d) {
+  const k = currentZoomK, m = 120, mx = width * 0.75, my = height * 0.75;
+  if (!isGlobeMode) {
+    const b = d._b2D || (d._b2D = path2DRef.bounds(d));
+    if (!b || isNaN(b[0][0]) || !isFinite(b[0][0])) return true;
+    const t = d3.zoomTransform(svg.node());
+    return !(b[1][0] * t.k + t.x < -mx || b[0][0] * t.k + t.x > width + mx ||
+             b[1][1] * t.k + t.y < -my || b[0][1] * t.k + t.y > height + my);
+  }
+  if (d._cullDot === undefined || d._cullDot <= -1.99 || !d.geoCenter) return true;
+  const pt = projection3D(d.geoCenter);
+  if (!pt) return true;
+  const angR = Math.asin(Math.min(1, -d._cullDot));
+  const rpx = angR * GLOBE_BASE_SCALE * k + m;
+  const sx = width / 2 + (pt[0] - width / 2) * k;
+  const sy = GLOBE_CENTER_Y + (pt[1] - GLOBE_CENTER_Y) * k;
+  return !(sx + rpx < 0 || sx - rpx > width || sy + rpx < 0 || sy - rpx > height);
+}
+
+function wantHiDetail(d) {
+  if (!hiDetailReady || !d._hi || isMorphing || currentZoomK < hiK()) { d._hiOn = false; return false; }
+  const v = isFeatureInViewport(d);
+  d._hiOn = v;
+  return v;
+}
+
 function updatePathFast(el, d, camVec, forceWrite) {
+  updatePathGeomKey();
+  let useHi = !!(d._hi && wantHiDetail(d));
+  if (useHi && _suppressHiGlobe && isGlobeMode) {
+    if (el._pgHi && el._pgRot === _rotKey) return; // dönüş değişmedi: mevcut ayrıntılı yol hâlâ geçerli
+    useHi = false;                                  // dönüş değişti: önce hafif yol, ayrıntı boşta yüklenir
+  }
+  // Dönüş/ayrıntı değişmediyse yolu yeniden üretme (tekerlek zoom sonrası gereksiz yeniden projeksiyonu engeller)
+  if (!forceWrite && el._pgKey === _pathGeomKey && el._pgHi === useHi && (isGlobeMode || d._hi)) return;
+  const geom = useHi ? getHiVisibleGeometry(d) : d;
   let nextD = "";
   if (!isGlobeMode) {
-    nextD = pathGenerator(d) || "";
+    nextD = pathGenerator(geom) || "";
   } else {
     const v = d._vec3;
     const dot = v ? (camVec[0] * v[0] + camVec[1] * v[1] + camVec[2] * v[2]) : 1;
     if (dot >= (d._cullDot ?? -2)) {
-      nextD = pathGenerator(d) || "";
+      nextD = pathGenerator(geom) || "";
     }
   }
+  el._pgKey = _pathGeomKey;
+  el._pgHi = useHi;
+  el._pgRot = _rotKey;
   if (forceWrite || el._lastD !== nextD) {
     el._lastD = nextD;
     el.setAttribute("d", nextD);
+  }
+}
+
+function scheduleHiDetailRefresh() {
+  if (!hiDetailReady) return;
+  if (hiDetailRefreshTimer) clearTimeout(hiDetailRefreshTimer);
+  hiDetailRefreshTimer = setTimeout(() => {
+    hiDetailRefreshTimer = null;
+    if (isMorphing || isGlobeMode) return;
+    countriesGroup.selectAll("path.country-shape").each(function(d) {
+      if (d._hi) updatePathFast(this, d, null, false);
+    });
+  }, 220);
+}
+
+function scheduleGlobeHiUpgrade() {
+  if (!hiDetailReady || !isGlobeMode || currentZoomK < hiK()) return;
+  if (hiGlobeUpgradeTimer) clearTimeout(hiGlobeUpgradeTimer);
+  hiGlobeUpgradeTimer = setTimeout(() => {
+    hiGlobeUpgradeTimer = null;
+    if (!isGlobeMode || isMorphing || isCanvasMotionActive || isDraggingGlobe) return;
+    const run = () => {
+      if (!isGlobeMode || isMorphing || isCanvasMotionActive || isDraggingGlobe) return;
+      refreshAllProjectedPositions(false);
+    };
+    if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 400 }); else run();
+  }, 180);
+}
+
+function buildHiGeometryMap(topo) {
+  const ENCLAVES = { "Dhekelia": "Cyprus", "Akrotiri": "Cyprus", "Cyprus U.N. Buffer Zone": "Cyprus", "Baikonur": "Kazakhstan", "USNB Guantanamo Bay": "Cuba", "Gibraltar": "Spain" };
+  const geoms = topo.objects.countries.geometries;
+  const byName = new Map();
+  geoms.forEach(g => { const n = g.properties && g.properties.name; if (n && !byName.has(n)) byName.set(n, g); });
+  const kids = {};
+  Object.keys(ENCLAVES).forEach(k => { if (byName.has(k)) (kids[ENCLAVES[k]] = kids[ENCLAVES[k]] || []).push(byName.get(k)); });
+  const out = new Map();
+  byName.forEach((g, name) => {
+    if (ENCLAVES[name]) return;
+    try {
+      if (kids[name]) out.set(name, topojson.merge(topo, [g].concat(kids[name])));
+      else out.set(name, topojson.feature(topo, g).geometry);
+    } catch (e) {}
+  });
+  // Kuantizasyon artığı dejenere küçük halkalar (ör. Maldivler) d3'te tüm küreyi boyar: ele
+  out.forEach((g, name) => {
+    if (!g) return;
+    const bad = poly => poly[0] && poly[0].length <= 16 && d3.geoArea({ type: "Polygon", coordinates: poly }) > Math.PI * 2;
+    if (g.type === "MultiPolygon") {
+      const keep = g.coordinates.filter(poly => !bad(poly));
+      if (keep.length !== g.coordinates.length) out.set(name, keep.length ? { type: "MultiPolygon", coordinates: keep } : null);
+    } else if (g.type === "Polygon" && bad(g.coordinates)) out.set(name, null);
+  });
+  const fr = out.get("France");
+  if (fr && fr.type === "MultiPolygon") {
+    const main = [], guiana = [];
+    fr.coordinates.forEach(poly => {
+      const c = d3.geoCentroid({ type: "Polygon", coordinates: poly });
+      (c[0] > -60 && c[0] < -50 && c[1] > 0 && c[1] < 10 ? guiana : main).push(poly);
+    });
+    out.set("France", { type: "MultiPolygon", coordinates: main });
+    if (guiana.length) out.set("French Guiana", { type: "MultiPolygon", coordinates: guiana });
+  }
+  return out;
+}
+
+async function loadHighDetailCountries() {
+  if (hiDetailReady || allCountryFeatures.length === 0) return;
+  try {
+    const topo = await fetchWithOfflineBackup("world_10m", "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-10m.json");
+    if (!topo || !topo.objects || !topo.objects.countries) return;
+    const hiMap = buildHiGeometryMap(topo);
+    let n = 0;
+    allCountryFeatures.forEach(f => {
+      const nm = f.properties && f.properties.name;
+      const g = nm ? hiMap.get(nm) : null;
+      if (g) { f._hi = { type: "Feature", properties: f.properties, geometry: g }; n++; }
+    });
+    if (!n) return;
+    hiDetailReady = true;
+    console.info("[Harita] 10m yüksek ayrıntı katmanı hazır:", n, "ülke");
+    if (currentZoomK >= hiK() && !isMorphing && !isCanvasMotionActive) {
+      if (isGlobeMode) scheduleGlobeHiUpgrade();
+      else scheduleHiDetailRefresh();
+    }
+  } catch (e) {
+    console.warn("[Harita] 10m ayrıntı katmanı yüklenemedi, 50m ile devam:", e);
   }
 }
 
@@ -7932,8 +8207,8 @@ function getGlobeCenteredTransform(k) {
     .scale(k);
 }
 
-if (typeof path2DRef.digits === "function") path2DRef.digits(1);
-if (typeof pathGenerator.digits === "function") pathGenerator.digits(1);
+if (typeof path2DRef.digits === "function") path2DRef.digits(3);
+if (typeof pathGenerator.digits === "function") pathGenerator.digits(3);
 const fastGraticuleGeo = d3.geoGraticule().step([15, 15]).precision(5)();
 graticulePath.datum(fastGraticuleGeo);
 
@@ -7978,6 +8253,7 @@ function stopGlobeInertia() {
 }
 
 function enterFastGlobeCanvas() {
+  if (hiGlobeUpgradeTimer) { clearTimeout(hiGlobeUpgradeTimer); hiGlobeUpgradeTimer = null; }
   ensureGlobePrecomputed();
   const canvas = document.getElementById("globeFastCanvas");
   if (!canvas) return;
@@ -8014,9 +8290,11 @@ function exitFastGlobeCanvas(syncSvgNow = true) {
   mapGroup.style("display", null);
 
   if (syncSvgNow && !isMorphing) {
-    refreshAllProjectedPositions(false);
+    _suppressHiGlobe = true;
+    try { refreshAllProjectedPositions(false); } finally { _suppressHiGlobe = false; }
     lastTypographyStateKey = "";
     updateDynamicTypography();
+    scheduleGlobeHiUpgrade();
   }
 
   isCanvasMotionActive = false;
@@ -8030,7 +8308,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
 
   const rect = stage.getBoundingClientRect();
   if (rect.width < 10 || rect.height < 10) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   const targetW = Math.round(rect.width * dpr);
   const targetH = Math.round(rect.height * dpr);
   if (canvas.width !== targetW || canvas.height !== targetH) {
@@ -8151,7 +8429,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       const dot = camVec[0] * f._vec3[0] + camVec[1] * f._vec3[1] + camVec[2] * f._vec3[2];
       if (dot < (f._cullDot ?? -2)) continue;
     }
-    ctx.fillStyle = getCountryBaseFill(f);
+    ctx.fillStyle = getCountryBaseFillT(f, themeKey, theme);
     ctx.beginPath();
     cPath(f);
     ctx.fill();
@@ -8321,7 +8599,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       }
     }
 
-    if (showAllMicroLabels || k >= 2.0) {
+    if (showAllMicroLabels) {
       const mR = 3.2 / Math.pow(k, 0.80);
       ctx.fillStyle = "#f43f5e";
       ctx.strokeStyle = "#ffffff";
@@ -8576,8 +8854,11 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
   ctx.restore();
 }
 
+let zoomShelfFilterTimer = null;
+let typographyRafPending = false; // 2B zoom'da tipografi hesabını kare başına en fazla 1 kez yap
+
 const zoom = d3.zoom()
-  .scaleExtent([1, 65])
+  .scaleExtent([1, 100])
   .filter((event) => {
     if (isMorphing) return false;
     if (isGlobeMode) {
@@ -8613,8 +8894,24 @@ const zoom = d3.zoom()
         if (!isCanvasMotionActive) updateDynamicTypography();
       }
     } else {
+      if (event.sourceEvent && seaAnimEnabled) {
+        countriesGroup.attr("filter", null);
+        trProvincesGroup.attr("filter", null);
+        if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
+        if (zoomShelfFilterTimer) clearTimeout(zoomShelfFilterTimer);
+        zoomShelfFilterTimer = setTimeout(() => {
+          syncLandShelfFilter();
+        }, 150);
+      }
       mapGroup.attr("transform", event.transform);
-      updateDynamicTypography();
+      scheduleHiDetailRefresh();
+      if (!typographyRafPending) {
+        typographyRafPending = true;
+        requestAnimationFrame(() => {
+          typographyRafPending = false;
+          updateDynamicTypography();
+        });
+      }
     }
   });
 
@@ -8646,7 +8943,6 @@ const globeDrag = d3.drag()
       }
       didActualGlobeDrag = true;
       isDraggingGlobe = true;
-      projection3D.precision(0.25);
       enterFastGlobeCanvas();
     }
     if (!didActualGlobeDrag) return;
@@ -8774,6 +9070,7 @@ function syncUsStatesPathsAndLabels(camVec = getCameraVec3(), forceWrite = false
 
 function refreshAllProjectedPositions(syncAllSubdivisions = false) {
   globeRotStamp++;
+  updatePathGeomKey();
   if (isGlobeMode) ensureGlobePrecomputed();
   const camVec = isGlobeMode ? getCameraVec3() : null;
 
@@ -8821,7 +9118,9 @@ function refreshAllProjectedPositions(syncAllSubdivisions = false) {
           return;
         }
       }
+      if (isGlobeMode && !syncAllSubdivisions && rv._pgKey === _pathGeomKey && rv._cachedPath) return;
       rv._cachedPath = pathGenerator(rv) || "";
+      rv._pgKey = isGlobeMode ? _pathGeomKey : null;
     });
 
     riversGroup.selectAll("path.river-vein").each(function(d) {
@@ -8946,7 +9245,7 @@ function refreshAllProjectedPositions(syncAllSubdivisions = false) {
   labelsGroup.selectAll(".micro-label").each(function(d) {
     if ((!isGlobeMode || d._globeVis) && d._pt) {
       this.setAttribute("x", d._pt[0]);
-      this.setAttribute("y", d._pt[1] - 2.5);
+      this.setAttribute("y", d._pt[1]);
     }
   });
 
@@ -9171,7 +9470,7 @@ function syncPeaksAndStraitsTypography(k) {
         this.style.display = "none";
         return;
       }
-      const pt = projection([d.lon, d.lat]);
+      const pt = isGlobeMode ? projection([d.lon, d.lat]) : (d._pt2D || (d._pt2D = projection2D([d.lon, d.lat])));
       if (!pt || isNaN(pt[0]) || isNaN(pt[1])) {
         this.style.display = "none";
         return;
@@ -9195,7 +9494,7 @@ function syncPeaksAndStraitsTypography(k) {
         this.style.display = "none";
         return;
       }
-      const pt = projection([d.lon, d.lat]);
+      const pt = isGlobeMode ? projection([d.lon, d.lat]) : (d._pt2D || (d._pt2D = projection2D([d.lon, d.lat])));
       if (!pt || isNaN(pt[0]) || isNaN(pt[1])) {
         this.style.display = "none";
         return;
@@ -9284,11 +9583,11 @@ function updateDynamicTypography() {
       }
       setInlineDisplay(this, vis ? "block" : "none");
     });
-    const microLabelZoomOk = (showAllMicroLabels && k >= 1.8) || k >= 3.5;
-    labelsGroup.selectAll(".micro-label").each(function(d) {
-      setInlineDisplay(this, (microLabelZoomOk && d._globeVis !== false) ? "block" : "none");
-    });
-    const microPinZoomOk = showAllMicroLabels || k >= 2.0;
+    const microLabelZoomOk = showAllMicroLabels && k >= 1.8;
+  labelsGroup.selectAll(".micro-label").each(function(d) {
+    setInlineDisplay(this, (microLabelZoomOk && d._globeVis !== false) ? "block" : "none");
+  });
+  const microPinZoomOk = showAllMicroLabels;
     microPinsGroup.selectAll("circle").each(function(d) {
       setInlineDisplay(this, (microPinZoomOk && d._globeVis !== false) ? "block" : "none");
     });
@@ -9456,13 +9755,16 @@ function updateDynamicTypography() {
       return screenPx >= 2.6 ? "block" : "none";
     });
 
-  const microLabelZoomOk = (showAllMicroLabels && k >= 1.8) || k >= 3.5;
-  labelsGroup.selectAll(".micro-label")
-    .attr("font-size", (13 / k) + "px")
-    .attr("stroke-width", ((13 / k) * STD_HALO_RATIO) + "px")
-    .style("display", d => (microLabelZoomOk && (!isGlobeMode || d._globeVis !== false)) ? "block" : "none");
+const microLabelZoomOk = showAllMicroLabels && k >= 1.8;
+const microFontPx = 13 / Math.pow(k, 0.85);
+const microDy = -((3.2 * Math.pow(k, 0.2) + 1.5) / k);
+labelsGroup.selectAll(".micro-label")
+  .attr("font-size", microFontPx + "px")
+  .attr("dy", microDy)
+  .attr("stroke-width", (microFontPx * STD_HALO_RATIO) + "px")
+  .style("display", d => (microLabelZoomOk && (!isGlobeMode || d._globeVis !== false)) ? "block" : "none");
 
-  const microPinZoomOk = showAllMicroLabels || k >= 2.0;
+const microPinZoomOk = showAllMicroLabels;
   microPinsGroup.selectAll("circle")
     .attr("r", 3.2 / Math.pow(k, 0.80))
     .attr("stroke-width", 0.8 / Math.pow(k, 0.80))
@@ -9622,23 +9924,272 @@ function loadAllMapData() {
     { name: "Lake Sapanca", coords: [[30.14, 40.73], [30.25, 40.74], [30.32, 40.72], [30.30, 40.69], [30.18, 40.69], [30.14, 40.73]] }
   ];
 
+  let _mapDataFetched = false;
   Promise.all([
     fetchWithOfflineBackup("world_50m", "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json"),
-    fetchTrProvincesGeoJSON(),
-    fetchWithOfflineBackup("us_states_10m", "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),
+    fetchTrProvincesGeoJSON().catch(() => ({ features: [] })),
+    fetchWithOfflineBackup("us_states_10m", "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json").catch(() => null),
     fetchWithOfflineBackup("lakes_50m", "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_lakes.geojson").catch(() => ({ features: [] })),
     fetchWithOfflineBackup("rivers_50m", "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_rivers_lake_centerlines.geojson").catch(() => ({ features: [] }))
   ]).then(([worldTopo, trGeo, usTopo, lakesGeo, riversGeo]) => {
-    document.getElementById("loader").style.display = "none";
+    _mapDataFetched = true; // Ağ aşaması bitti; bundan sonraki hatalar işleme hatasıdır, "internet yok" değildir
+    trGeo = trGeo || { features: [] };
+    lakesGeo = lakesGeo || { features: [] };
+    riversGeo = riversGeo || { features: [] };
 
     const worldGeo = topojson.feature(worldTopo, worldTopo.objects.countries);
-    allCountryFeatures = worldGeo.features;
+
+    // Fransız Guyanası'nı Fransa'dan ayırıp bağımsız ülke/bölge yap
+    const splitFeatures = [];
+    worldGeo.features.forEach(f => {
+      const rName = f.properties && (f.properties.name || f.properties.NAME || f.properties.admin);
+      if (rName === "France" && f.geometry && f.geometry.type === "MultiPolygon") {
+        const mainFranceCoords = [];
+        const guianaCoords = [];
+        f.geometry.coordinates.forEach(poly => {
+          const [lon, lat] = d3.geoCentroid({ type: "Polygon", coordinates: poly });
+          if (lon > -60 && lon < -50 && lat > 0 && lat < 10) {
+            guianaCoords.push(poly);
+          } else {
+            mainFranceCoords.push(poly);
+          }
+        });
+        f.geometry.coordinates = mainFranceCoords;
+        splitFeatures.push(f);
+        if (guianaCoords.length > 0) {
+          splitFeatures.push({
+            type: "Feature",
+            id: "GUF_SEC",
+            properties: { name: "French Guiana" },
+            geometry: { type: "MultiPolygon", coordinates: guianaCoords }
+          });
+        }
+      } else {
+        splitFeatures.push(f);
+      }
+    });
+    allCountryFeatures = splitFeatures;
+    hiDetailReady = false;
     fastWorldBordersMesh = topojson.mesh(worldTopo, worldTopo.objects.countries);
 
     allTrProvinceFeatures = (trGeo.features || []).map(f => ensureD3GeoWinding(f));
 
-    const usGeo = topojson.feature(usTopo, usTopo.objects.states);
-    allUsStateFeatures = usGeo.features.filter(f => US_STATES_DATA[f.properties.name]);
+    // Harita maksimum zoom sınırını 100x'e çıkar
+    zoom.scaleExtent([1, 100]);
+
+    // ================= EGE, MARMARA VE KARADENİZ ADALARI (BARBADOS ÖLÇEKLENDİRME MANTIĞI) =================
+    const TURKEY_AND_BLACKSEA_ISLANDS = [
+      // --- TÜRKİYE'YE AİT EGE ADALARI ---
+      {
+        id: "ISL_GOKCEADA", name: "Gokceada", tr: "GÖKÇEADA", fullTr: "GÖKÇEADA • İMROZ (ÇANAKKALE)",
+        cap: "Gökçeada / Çanakkale", iso: "tr", pop: "10.700", dial: "+90 286", tz: "Europe/Istanbul",
+        areaKm2: 279.0, isTrIsland: true,
+        coords: [[25.66, 40.13], [25.72, 40.20], [25.85, 40.23], [25.98, 40.21], [26.01, 40.15], [25.91, 40.11], [25.76, 40.10], [25.66, 40.13]]
+      },
+      {
+        id: "ISL_BOZCAADA", name: "Bozcaada", tr: "BOZCAADA", fullTr: "BOZCAADA (ÇANAKKALE)",
+        cap: "Bozcaada / Çanakkale", iso: "tr", pop: "3.100", dial: "+90 286", tz: "Europe/Istanbul",
+        areaKm2: 37.6, isTrIsland: true,
+        coords: [[25.96, 39.83], [26.02, 39.85], [26.08, 39.83], [26.07, 39.79], [25.99, 39.80], [25.96, 39.83]]
+      },
+      {
+        id: "ISL_KARAYER", name: "Karayer Tavsan Adalari", tr: "TAVŞAN ADALARI", fullTr: "KARAYER (TAVŞAN) ADALARI (ÇANAKKALE)",
+        cap: "Bozcaada / Çanakkale", iso: "tr", pop: "Issız Doğal Ada Grubu", dial: "+90 286", tz: "Europe/Istanbul",
+        areaKm2: 0.4, isTrIsland: true,
+        coords: [[26.045, 39.940], [26.075, 39.942], [26.078, 39.922], [26.048, 39.920], [26.045, 39.940]]
+      },
+      {
+        id: "ISL_CUNDA", name: "Cunda Alibey Adasi", tr: "CUNDA ADASI", fullTr: "CUNDA (ALİBEY) ADASI (BALIKESİR - AYVALIK)",
+        cap: "Ayvalık / Balıkesir", iso: "tr", pop: "3.500", dial: "+90 266", tz: "Europe/Istanbul",
+        areaKm2: 23.4, isTrIsland: true,
+        coords: [[26.605, 39.355], [26.645, 39.380], [26.685, 39.360], [26.675, 39.320], [26.620, 39.325], [26.605, 39.355]]
+      },
+      {
+        id: "ISL_UZUNADA", name: "Uzunada Izmir", tr: "UZUNADA", fullTr: "UZUNADA • KÖSTEN ADASI (İZMİR - URLA)",
+        cap: "Urla / İzmir", iso: "tr", pop: "Askeri & Özel Bölge", dial: "+90 232", tz: "Europe/Istanbul",
+        areaKm2: 25.4, isTrIsland: true,
+        coords: [[26.685, 38.545], [26.720, 38.560], [26.745, 38.525], [26.735, 38.485], [26.695, 38.495], [26.685, 38.545]]
+      },
+      {
+        id: "ISL_FOCA", name: "Foca Adalari", tr: "FOÇA ADALARI", fullTr: "FOÇA ADALARI • ORAK & İNCİR (İZMİR)",
+        cap: "Foça / İzmir", iso: "tr", pop: "Akdeniz Foku Koruma Alanı", dial: "+90 232", tz: "Europe/Istanbul",
+        areaKm2: 1.2, isTrIsland: true,
+        coords: [[26.695, 38.685], [26.722, 38.690], [26.725, 38.665], [26.698, 38.662], [26.695, 38.685]]
+      },
+      {
+        id: "ISL_SALIH", name: "Salih Adasi", tr: "SALİH ADASI", fullTr: "SALİH ADASI (MUĞLA - MİLAS)",
+        cap: "Milas / Muğla", iso: "tr", pop: "Turizm & Zeytinlik Alanı", dial: "+90 252", tz: "Europe/Istanbul",
+        areaKm2: 5.7, isTrIsland: true,
+        coords: [[27.485, 37.165], [27.522, 37.168], [27.525, 37.140], [27.488, 37.138], [27.485, 37.165]]
+      },
+      {
+        id: "ISL_KARAADA", name: "Karaada Bodrum", tr: "KARAADA", fullTr: "KARAADA (MUĞLA - BODRUM)",
+        cap: "Bodrum / Muğla", iso: "tr", pop: "Termal Mağara & Yat Rotası", dial: "+90 252", tz: "Europe/Istanbul",
+        areaKm2: 9.1, isTrIsland: true,
+        coords: [[27.435, 36.992], [27.485, 36.988], [27.498, 36.968], [27.450, 36.965], [27.435, 36.992]]
+      },
+      {
+        id: "ISL_SEDIR", name: "Sedir Kleopatra Adasi", tr: "SEDİR ADASI", fullTr: "SEDİR (KLEOPATRA) ADASI (MUĞLA - GÖKOVA)",
+        cap: "Ula / Muğla", iso: "tr", pop: "Kedrai Antik Kenti & Sit Alanı", dial: "+90 252", tz: "Europe/Istanbul",
+        areaKm2: 0.3, isTrIsland: true,
+        coords: [[28.192, 37.002], [28.215, 37.002], [28.215, 36.985], [28.192, 36.985], [28.192, 37.002]]
+      },
+
+      // --- MARMARA DENİZİ ADALARI ---
+      {
+        id: "ISL_MARMARA", name: "Marmara Adasi", tr: "MARMARA ADASI", fullTr: "MARMARA ADASI (BALIKESİR)",
+        cap: "Marmara İlçesi / Balıkesir", iso: "tr", pop: "7.000", dial: "+90 266", tz: "Europe/Istanbul",
+        areaKm2: 117.8, isTrIsland: true,
+        coords: [[27.49, 40.61], [27.53, 40.65], [27.62, 40.67], [27.71, 40.65], [27.75, 40.61], [27.70, 40.58], [27.58, 40.57], [27.49, 40.61]]
+      },
+      {
+        id: "ISL_AVSA", name: "Avsa Adasi", tr: "AVŞA ADASI", fullTr: "AVŞA (TÜRKELİ) ADASI (BALIKESİR)",
+        cap: "Marmara İlçesi / Balıkesir", iso: "tr", pop: "3.600 (Yazın ~100 Bin)", dial: "+90 266", tz: "Europe/Istanbul",
+        areaKm2: 20.6, isTrIsland: true,
+        coords: [[27.46, 40.51], [27.49, 40.53], [27.52, 40.51], [27.51, 40.47], [27.47, 40.48], [27.46, 40.51]]
+      },
+      {
+        id: "ISL_PASALIMANI", name: "Pasalimani Adasi", tr: "PAŞALİMANI ADASI", fullTr: "PAŞALİMANI ADASI (BALIKESİR)",
+        cap: "Erdek / Balıkesir", iso: "tr", pop: "1.100", dial: "+90 266", tz: "Europe/Istanbul",
+        areaKm2: 21.4, isTrIsland: true,
+        coords: [[27.56, 40.49], [27.61, 40.51], [27.66, 40.49], [27.65, 40.46], [27.58, 40.46], [27.56, 40.49]]
+      },
+      {
+        id: "ISL_EKINLIK", name: "Ekinlik Adasi", tr: "EKİNLİK ADASI", fullTr: "EKİNLİK ADASI (BALIKESİR)",
+        cap: "Marmara İlçesi / Balıkesir", iso: "tr", pop: "150", dial: "+90 266", tz: "Europe/Istanbul",
+        areaKm2: 2.47, isTrIsland: true,
+        coords: [[27.46, 40.55], [27.49, 40.56], [27.51, 40.55], [27.49, 40.54], [27.46, 40.55]]
+      },
+      {
+        id: "ISL_IMRALI", name: "Imrali Adasi", tr: "İMRALI ADASI", fullTr: "İMRALI ADASI (BURSA)",
+        cap: "Mudanya / Bursa", iso: "tr", pop: "Özel Güvenlik Bölgesi", dial: "+90 224", tz: "Europe/Istanbul",
+        areaKm2: 10.0, isTrIsland: true,
+        coords: [[28.51, 40.56], [28.54, 40.57], [28.56, 40.53], [28.54, 40.50], [28.51, 40.51], [28.51, 40.56]]
+      },
+      {
+        id: "ISL_BUYUKADA", name: "Buyukada", tr: "BÜYÜKADA", fullTr: "BÜYÜKADA • PRENS ADALARI (İSTANBUL)",
+        cap: "Adalar / İstanbul", iso: "tr", pop: "8.500", dial: "+90 216", tz: "Europe/Istanbul",
+        areaKm2: 5.4, isTrIsland: true,
+        coords: [[29.115, 40.870], [29.138, 40.872], [29.144, 40.848], [29.125, 40.836], [29.112, 40.848], [29.115, 40.870]]
+      },
+      {
+        id: "ISL_HEYBELIADA", name: "Heybeliada", tr: "HEYBELİADA", fullTr: "HEYBELİADA • PRENS ADALARI (İSTANBUL)",
+        cap: "Adalar / İstanbul", iso: "tr", pop: "4.500", dial: "+90 216", tz: "Europe/Istanbul",
+        areaKm2: 2.4, isTrIsland: true,
+        coords: [[29.082, 40.884], [29.102, 40.884], [29.104, 40.868], [29.084, 40.866], [29.082, 40.884]]
+      },
+      {
+        id: "ISL_BURGAZADA", name: "Burgazada", tr: "BURGAZADA", fullTr: "BURGAZADA • PRENS ADALARI (İSTANBUL)",
+        cap: "Adalar / İstanbul", iso: "tr", pop: "1.600", dial: "+90 216", tz: "Europe/Istanbul",
+        areaKm2: 1.5, isTrIsland: true,
+        coords: [[29.054, 40.888], [29.070, 40.888], [29.071, 40.875], [29.055, 40.875], [29.054, 40.888]]
+      },
+      {
+        id: "ISL_KINALIADA", name: "Kinaliada", tr: "KINALIADA", fullTr: "KINALIADA • PRENS ADALARI (İSTANBUL)",
+        cap: "Adalar / İstanbul", iso: "tr", pop: "2.000", dial: "+90 216", tz: "Europe/Istanbul",
+        areaKm2: 1.3, isTrIsland: true,
+        coords: [[29.040, 40.914], [29.056, 40.914], [29.056, 40.901], [29.040, 40.901], [29.040, 40.914]]
+      },
+
+      // --- KARADENİZ ADALARI ---
+      {
+        id: "ISL_KEFKEN", name: "Kefken Adasi", tr: "KEFKEN ADASI", fullTr: "KEFKEN ADASI (KOCAELİ - KANDIRA)",
+        cap: "Kandıra / Kocaeli", iso: "tr", pop: "Kıyı Emniyeti & Tarihi Ceneviz Kalesi", dial: "+90 262", tz: "Europe/Istanbul",
+        areaKm2: 0.11, isTrIsland: true,
+        coords: [[30.245, 41.248], [30.275, 41.250], [30.278, 41.232], [30.248, 41.230], [30.245, 41.248]]
+      },
+      {
+        id: "ISL_GIRESUN", name: "Giresun Adasi", tr: "GİRESUN ADASI", fullTr: "GİRESUN ADASI • ARETİAS (GİRESUN)",
+        cap: "Merkez / Giresun", iso: "tr", pop: "Arkeolojik & Doğal Sit Alanı", dial: "+90 454", tz: "Europe/Istanbul",
+        areaKm2: 0.04, isTrIsland: true,
+        coords: [[38.422, 40.964], [38.450, 40.965], [38.452, 40.945], [38.424, 40.944], [38.422, 40.964]]
+      },
+      {
+        id: "ISL_HOYNAT", name: "Hoynat Adasi", tr: "HOYNAT ADASI", fullTr: "HOYNAT ADASI (ORDU - PERŞEMBE)",
+        cap: "Perşembe / Ordu", iso: "tr", pop: "Kuş Cenneti & Tarihi Kale Kalıntısı", dial: "+90 452", tz: "Europe/Istanbul",
+        areaKm2: 0.01, isTrIsland: true,
+        coords: [[37.715, 41.153], [37.742, 41.153], [37.742, 41.137], [37.715, 41.137], [37.715, 41.153]]
+      },
+      {
+        id: "ISL_AMASRA_TAVSAN", name: "Tavsan Adasi Amasra", tr: "TAVŞAN ADASI", fullTr: "AMASRA TAVŞAN ADASI (BARTIN)",
+        cap: "Amasra / Bartın", iso: "tr", pop: "Ceneviz Manastır Kalıntıları", dial: "+90 378", tz: "Europe/Istanbul",
+        areaKm2: 0.03, isTrIsland: true,
+        coords: [[32.368, 41.793], [32.396, 41.793], [32.396, 41.777], [32.368, 41.777], [32.368, 41.793]]
+      },
+      {
+        id: "ISL_OREKE", name: "Oreke Adasi", tr: "ÖREKE ADASI", fullTr: "ÖREKE ADASI (İSTANBUL - RUMELİFENERİ)",
+        cap: "Sarıyer / İstanbul", iso: "tr", pop: "Boğaz Girişi Kayalık Ada", dial: "+90 212", tz: "Europe/Istanbul",
+        areaKm2: 0.01, isTrIsland: true,
+        coords: [[29.114, 41.262], [29.136, 41.262], [29.136, 41.248], [29.114, 41.248], [29.114, 41.262]]
+      },
+      {
+        id: "ISL_YILAN", name: "Snake Island Black Sea", tr: "YILAN ADASI", fullTr: "YILAN ADASI • ZMİİNİY (KARADENİZ)",
+        cap: "İzmail / Odessa (Ukrayna)", iso: "ua", pop: "Sınır Karakolu (~50)", dial: "+380", tz: "Europe/Kyiv",
+        curr: "Ukrayna Grivnası (₴ · UAH)", lang: "Ukraynaca", areaKm2: 0.17, isTrIsland: false,
+        coords: [[30.186, 45.266], [30.222, 45.266], [30.222, 45.244], [30.186, 45.244], [30.186, 45.266]]
+      }
+    ];
+
+    if (!window._islandsHooked) {
+      window._islandsHooked = true;
+      const _origRealArea = computeFeatureRealAreaKm2;
+      computeFeatureRealAreaKm2 = function(f) {
+        if (f && f.properties && f.properties.customAreaKm2 !== undefined) {
+          return f.properties.customAreaKm2;
+        }
+        return _origRealArea(f);
+      };
+      const _origBaseFill = getCountryBaseFill;
+      getCountryBaseFill = function(d) {
+        if (d && d.properties && d.properties.isTrIsland && !isTrProvincesActive()) {
+          return "#ef4444";
+        }
+        return _origBaseFill(d);
+      };
+    }
+
+    TURKEY_AND_BLACKSEA_ISLANDS.forEach(isl => {
+      COUNTRY_DATA[isl.name] = { tr: isl.tr, fullTr: isl.fullTr, cap: isl.cap };
+      COUNTRY_DETAILS_DB[isl.name] = [
+        isl.iso,
+        isl.pop,
+        isl.curr || "Türk Lirası (₺ · TRY)",
+        isl.lang || "Türkçe",
+        isl.dial,
+        isl.tz
+      ];
+      const islFeature = ensureD3GeoWinding({
+        type: "Feature",
+        id: isl.id,
+        properties: {
+          name: isl.name,
+          customAreaKm2: isl.areaKm2,
+          isTrIsland: isl.isTrIsland
+        },
+        geometry: { type: "Polygon", coordinates: [isl.coords] }
+      });
+
+      // Doğal Barbados ölçeklendirmesini koru + "🔎 Mikro Adalar: Açık/Kapalı" butonuna bağla
+      Object.defineProperty(islFeature, "maxFitFont", {
+        get() {
+          return showAllMicroLabels ? (this._naturalFitFont || 0.08) : 0;
+        },
+        set(val) {
+          this._naturalFitFont = val;
+        },
+        configurable: true
+      });
+
+      allCountryFeatures.push(islFeature);
+    });
+
+    let usGeoFeatures = [];
+    try {
+      if (usTopo && usTopo.objects && usTopo.objects.states) {
+        usGeoFeatures = topojson.feature(usTopo, usTopo.objects.states).features || [];
+      }
+    } catch (e) { usGeoFeatures = []; }
+    allUsStateFeatures = usGeoFeatures.filter(f => US_STATES_DATA[f.properties.name]);
 
     const rawLakes = (lakesGeo.features || []).filter(lk => {
       const area = path2DRef.area(lk);
@@ -9863,13 +10414,32 @@ function loadAllMapData() {
     });
 
     renderMap();
-  }).catch(() => {
-    document.getElementById("loaderText").innerHTML = "⚠️ <b>İnternet Bağlantısı Bulunamadı!</b><br>Harita sınır verileri yüklenemedi. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.";
+    document.getElementById("loader").style.display = "none";
+    document.dispatchEvent(new CustomEvent("secovvv:mapready"));
+    setTimeout(loadHighDetailCountries, 400);
+  }).catch((err) => {
+    document.getElementById("loader").style.display = "flex";
+    if (_mapDataFetched) {
+      console.error("Harita verisi işlenirken hata:", err);
+      const msg = String((err && err.message) || err || "Bilinmeyen hata").replace(/[<>&]/g, "");
+      document.getElementById("loaderText").innerHTML = "⚠️ <b>Harita verisi işlenirken bir hata oluştu.</b><br><span style=\"font-size:11px;opacity:.8;\">" + msg + "</span>";
+    } else {
+      document.getElementById("loaderText").innerHTML = "⚠️ <b>İnternet Bağlantısı Bulunamadı!</b><br>Harita sınır verileri yüklenemedi. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.";
+    }
     document.getElementById("retryBtn").style.display = "inline-flex";
   });
 }
 
 loadAllMapData();
+
+function getCountryBaseFillT(d, themeKey, theme) {
+  if (d.isAntarctica || d.enName === "Antarctica") {
+    if (themeKey === "dark") return "#1e3a5f";
+    if (themeKey === "warm") return "#f5efe6";
+    return "#f0f9ff";
+  }
+  return d.trName === "TÜRKİYE" ? "#ef4444" : theme.palette[d.colorIndex % theme.palette.length];
+}
 
 function getCountryBaseFill(d) {
   const themeKey = document.getElementById("themeSelect").value;
@@ -10665,7 +11235,8 @@ function renderMap() {
     .attr("class", "micro-label")
     .style("display", "none")
     .attr("x", d => projection([d.lon, d.lat])[0])
-    .attr("y", d => projection([d.lon, d.lat])[1] - 2.5)
+    .attr("y", d => projection([d.lon, d.lat])[1])
+    .attr("dy", -4.7)
     .attr("text-anchor", "middle")
     .attr("font-family", "Segoe UI, sans-serif")
     .attr("font-weight", "800")
@@ -11232,7 +11803,8 @@ function buildSafeAntiCircle(antiLon, antiLat, radiusDeg) {
   if (Math.abs((Math.abs(antiLat) + r) - 90) < 0.22) {
     r += 0.25;
   }
-  return d3.geoCircle().center([antiLon, antiLat]).radius(r).precision(0.8)();
+  const prec = (typeof solarSimState !== "undefined" && solarSimState.playing) ? 2.4 : 0.8;
+  return d3.geoCircle().center([antiLon, antiLat]).radius(r).precision(prec)();
 }
 
 function getTerminatorThemeColors(themeKey) {
@@ -11477,6 +12049,7 @@ function showSubsolarHudPanel(solar) {
 
   const utcStr = formatMinutesAsHHMM(solarSimState.minutesUTC);
   const tsiStr = formatMinutesAsHHMM(solarSimState.minutesUTC + 180);
+  const initTsiMins = ((Math.round(solarSimState.minutesUTC) + 180) % 1440 + 1440) % 1440;
   const dateStr = dayOfYearToTrDateStr(solarSimState.dayOfYear);
 
   document.getElementById("hudStatusTitle").innerText = "GÜNEŞ, MEVSİM & GECE IŞIKLARI SİMÜLATÖRÜ";
@@ -11496,10 +12069,10 @@ function showSubsolarHudPanel(solar) {
       <div class="solar-slider-row">
         <div class="solar-slider-label">
           <span>🕒 Saat Sürgüsü (24 Saat):</span>
-          <b id="solarTimeSliderVal">${utcStr} UTC • ${tsiStr} TSİ</b>
+          <b id="solarTimeSliderVal">${tsiStr} TSİ (${utcStr} UTC)</b>
         </div>
         <input type="range" id="solarTimeSlider" class="solar-range-input" min="0" max="1439" step="1"
-               value="${Math.round(solarSimState.minutesUTC)}" oninput="onSolarTimeSliderInput(this.value)">
+               value="${initTsiMins}" oninput="onSolarTimeSliderInput(this.value)">
       </div>
 
       <div class="solar-slider-row">
@@ -12026,8 +12599,14 @@ function focusGeoTarget(lonLat, pt2D, targetK, onArrive) {
     });
 }
 
-function getFeatureFocusK(feature, minK = 1.8, maxK = 6.0, padFactor = 0.38) {
+function getFeatureFocusK(feature, minK = 1.8, maxK = 6.0, padFactor = 0.38, tinyMaxK = maxK) {
   if (!feature || !feature.geometry) return minK;
+  let effMaxK = maxK;
+  if (tinyMaxK > maxK) {
+    const wb = path2DRef.bounds(feature);
+    const wSize = Math.max(wb[1][0] - wb[0][0], wb[1][1] - wb[0][1]);
+    if (isFinite(wSize) && wSize < 40) effMaxK = tinyMaxK;
+  }
   let mainGeom = feature;
   if (feature.geometry.type === "MultiPolygon") {
     let maxPoly = feature.geometry.coordinates[0];
@@ -12042,11 +12621,11 @@ function getFeatureFocusK(feature, minK = 1.8, maxK = 6.0, padFactor = 0.38) {
   const bw = Math.max(8, b[1][0] - b[0][0]);
   const bh = Math.max(8, b[1][1] - b[0][1]);
   const ideal = Math.min(width / bw, height / bh) * padFactor;
-  return Math.max(minK, Math.min(maxK, ideal));
+  return Math.max(minK, Math.min(effMaxK, ideal));
 }
 
 function focusSearchCountry(country) {
-  let targetK = getFeatureFocusK(country, 1.8, 5.8, 0.38);
+  let targetK = getFeatureFocusK(country, 1.8, 5.8, 0.38, 45);
   if (country.isTurkey && getTrDisplayMode() === "auto") {
     targetK = Math.min(targetK, 3.1);
   }
@@ -12192,7 +12771,7 @@ function formatMinutesToDuration(totalMins) {
 }
 
 function estimateLegFlightTelemetry(distKm, interp, profileKey = measureAircraftProfile) {
-  const prof = AIRCRAFT_PROFILES[profileKey] || AIRCRAFT_PROFILES.airliner;
+  const prof = (Object.prototype.hasOwnProperty.call(AIRCRAFT_PROFILES, profileKey) && AIRCRAFT_PROFILES[profileKey]) || AIRCRAFT_PROFILES.airliner;
   if (distKm < 1) {
     return {
       corridorKm: 0,
@@ -12683,7 +13262,7 @@ function renderMeasureOverlay() {
 }
 
 function setMeasureAircraftProfile(profileKey) {
-  if (!AIRCRAFT_PROFILES[profileKey]) return;
+  if (!Object.prototype.hasOwnProperty.call(AIRCRAFT_PROFILES, profileKey)) return;
   measureAircraftProfile = profileKey;
   if (measurePoints.length >= 2) {
     measureRouteCache = computeMultiStopRouteMetrics(measurePoints);
@@ -12779,7 +13358,7 @@ function updateMeasureHudPanel() {
   }
 
   const m = measureRouteCache;
-  const prof = AIRCRAFT_PROFILES[measureAircraftProfile] || AIRCRAFT_PROFILES.airliner;
+  const prof = (Object.prototype.hasOwnProperty.call(AIRCRAFT_PROFILES, measureAircraftProfile) && AIRCRAFT_PROFILES[measureAircraftProfile]) || AIRCRAFT_PROFILES.airliner;
   if (hudCard) {
     hudCard.classList.toggle("vs-expanded", measurePoints.length >= 3);
   }
@@ -13333,7 +13912,7 @@ searchInputEl.addEventListener("keydown", (e) => {
 function zoomBy(factor) {
   if (isMorphing) return;
   if (isGlobeMode) {
-    const nextK = Math.max(1, Math.min(65, currentZoomK * factor));
+    const nextK = Math.max(1, Math.min(100, currentZoomK * factor));
     focusGeoTarget([-globeRotation[0], -globeRotation[1]], null, nextK);
   } else {
     svg.transition().duration(300).call(zoom.scaleBy, factor);
@@ -13364,14 +13943,18 @@ function serializeSvgStringRaw() {
 
 function serializeSvgString() {
   const wasAnimated = !!seaAnimState;
+  const prevSphereFill = spherePath.attr("fill");
+  const themeKey = document.getElementById("themeSelect").value;
   if (wasAnimated) {
     bgRect.style("fill-opacity", null);
     spherePath.style("fill-opacity", null);
+    spherePath.attr("fill", (THEMES[themeKey] || THEMES.classic).sphereFill);
   }
   try {
     return serializeSvgStringRaw();
   } finally {
     if (wasAnimated) {
+      spherePath.attr("fill", prevSphereFill);
       bgRect.style("fill-opacity", 0);
       spherePath.style("fill-opacity", 0);
     }
@@ -13391,47 +13974,83 @@ function exportMapSVG() {
 }
 
 function exportMapPNG(outW, outH) {
-  document.getElementById("hudStatusTitle").innerText = "⏳ 8K PNG İŞLENİYOR...";
-  const themeKey = document.getElementById("themeSelect").value;
-  const fillBg = isGlobeMode
-    ? getGlobeSpaceColor(themeKey)
-    : ((THEMES[themeKey] && THEMES[themeKey].ocean) || "#092238");
-  const source = serializeSvgString();
-  const svgBlob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(svgBlob);
+  const titleEl = document.getElementById("hudStatusTitle");
+  const prevTitle = titleEl.innerText;
+  const finish = (msg) => {
+    titleEl.innerText = msg;
+    setTimeout(() => { titleEl.innerText = prevTitle; }, 4000);
+  };
+  titleEl.innerText = "⏳ PNG İŞLENİYOR...";
 
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = outW;
-    canvas.height = outH;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = fillBg;
-    ctx.fillRect(0, 0, outW, outH);
-    ctx.drawImage(img, 0, 0, outW, outH);
-    URL.revokeObjectURL(url);
+  // Tarayıcının canvas sınırını aşmamak için çözünürlüğü kademeli düşür (özellikle mobil Safari ~16 MP)
+  const trySizes = [[outW, outH], [5120, 2880], [3840, 2160], [2560, 1440], [1920, 1080]]
+    .filter((sz, i, arr) => sz[0] <= outW && arr.findIndex(o => o[0] === sz[0]) === i);
+  function makeCanvas() {
+    for (const [w, h] of trySizes) {
+      try {
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        const g = c.getContext("2d");
+        if (!g) continue;
+        g.fillStyle = "#ff0000";
+        g.fillRect(w - 1, h - 1, 1, 1);
+        if (g.getImageData(w - 1, h - 1, 1, 1).data[3] !== 255) continue; // sessizce başarısız olan büyük canvas
+        return { canvas: c, ctx: g, w, h };
+      } catch (e) { /* bir sonraki boyutu dene */ }
+    }
+    return null;
+  }
 
-    canvas.toBlob((pngBlob) => {
-      if (!pngBlob) {
-        document.getElementById("hudStatusTitle").innerText = "⚠️ PNG OLUŞTURULAMADI";
-        return;
+  let url = null;
+  try {
+    const themeKey = document.getElementById("themeSelect").value;
+    const fillBg = isGlobeMode
+      ? getGlobeSpaceColor(themeKey)
+      : ((THEMES[themeKey] && THEMES[themeKey].ocean) || "#092238");
+    const source = serializeSvgString();
+    const svgBlob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+    url = URL.createObjectURL(svgBlob);
+
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const made = makeCanvas();
+        if (!made) { URL.revokeObjectURL(url); finish("⚠️ TARAYICI BU BOYUTTA PNG ÜRETEMİYOR"); return; }
+        const { canvas, ctx, w, h } = made;
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = fillBg;
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+
+        canvas.toBlob((pngBlob) => {
+          if (!pngBlob) { finish("⚠️ PNG OLUŞTURULAMADI"); return; }
+          const pngUrl = URL.createObjectURL(pngBlob);
+          const a = document.createElement("a");
+          a.href = pngUrl;
+          a.download = isGlobeMode
+            ? `SECOVVV-Turkce-Dunya-Kuresi-3D-${w}x${h}.png`
+            : `SECOVVV-Turkce-Dunya-Haritasi-${w}x${h}.png`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(pngUrl), 2000);
+          finish(w < outW ? `✅ PNG İNDİRİLDİ (${w}x${h}, tarayıcı sınırı nedeniyle düşürüldü)` : "✅ 8K HARİTA İNDİRİLDİ!");
+        }, "image/png");
+      } catch (e) {
+        try { URL.revokeObjectURL(url); } catch (_) {}
+        console.error("PNG dışa aktarma hatası:", e);
+        finish("⚠️ PNG İŞLEME HATASI");
       }
-      const pngUrl = URL.createObjectURL(pngBlob);
-      const a = document.createElement("a");
-      a.href = pngUrl;
-      a.download = isGlobeMode
-        ? `SECOVVV-Turkce-Dunya-Kuresi-3D-8K-${outW}x${outH}.png`
-        : `SECOVVV-Turkce-Dunya-Haritasi-8K-${outW}x${outH}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(pngUrl), 2000);
-      document.getElementById("hudStatusTitle").innerText = "✅ 8K HARİTA İNDİRİLDİ!";
-    }, "image/png");
-  };
-  img.onerror = () => {
-    URL.revokeObjectURL(url);
-    document.getElementById("hudStatusTitle").innerText = "⚠️ PNG İŞLEME HATASI";
-  };
-  img.src = url;
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      finish("⚠️ PNG İŞLEME HATASI");
+    };
+    img.src = url;
+  } catch (e) {
+    if (url) { try { URL.revokeObjectURL(url); } catch (_) {} }
+    console.error("PNG dışa aktarma hatası:", e);
+    finish("⚠️ PNG İŞLEME HATASI");
+  }
 }
 
 // ============================================================================
@@ -13964,9 +14583,8 @@ async function fetchRuSubjectsGeoJSON() {
 
   allRuRegionFeatures = processed;
 
-  const waitCountries = setInterval(() => {
-    if (allCountryFeatures.length > 0) {
-      clearInterval(waitCountries);
+  onMapDataReady(() => {
+    {
 
       allCountryFeatures.forEach(c => {
         if (c.enName === "Russia" || c.enName === "Russian Federation" || c.trName === "RUSYA") {
@@ -13985,7 +14603,7 @@ async function fetchRuSubjectsGeoJSON() {
 
       renderRuRegionsLayer();
     }
-  }, 100);
+  });
 })();
 
 // AÇILIR KONTROL MENÜSÜ YÖNETİMİ
@@ -14985,6 +15603,7 @@ function toggleMinimizeCoordRadar() {
     return { name: "🌊 Açık Deniz / Okyanus", isOcean: true };
   }
 
+  let demFetchAbort = null;
   async function queryCursorElevation(lat, lon, isOcean) {
     if (!showCoordRadarHud || isCoordRadarMinimized) return;
     if (isOcean) {
@@ -15004,7 +15623,9 @@ function toggleMinimizeCoordRadar() {
     elevEl.textContent = "Ölçülüyor...";
 
     try {
-      const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}`);
+      if (demFetchAbort) { try { demFetchAbort.abort(); } catch (_) {} }
+      demFetchAbort = new AbortController();
+      const resp = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}`, { signal: demFetchAbort.signal });
       if (!isNetworkAllowed()) {
         elevEl.textContent = manualOfflineOverride ? "Manuel Offline" : "Çevrimdışı";
         return;
@@ -15020,6 +15641,7 @@ function toggleMinimizeCoordRadar() {
         }
       }
     } catch (e) {
+      if (e && e.name === "AbortError") return; // daha yeni bir sorgu bunu iptal etti
       if (lastDemKey === gridKey) {
         elevEl.textContent = !isNetworkAllowed()
           ? (manualOfflineOverride ? "Manuel Offline" : "Çevrimdışı")
@@ -15064,7 +15686,11 @@ function toggleMinimizeCoordRadar() {
     const utcSign = utcOffset >= 0 ? "+" : "";
     utcEl.textContent = `UTC${utcSign}${utcOffset === 0 ? "0" : utcOffset}`;
 
-    const hoverInfo = resolveHoverTargetName(ev.target);
+    let hoverInfo = resolveHoverTargetName(ev.target);
+    // Hedef tanınmayan bir öğeyse (etiket, işaretçi vb.) varsayılan "deniz" sonucunu kara maskesiyle doğrula
+    if (hoverInfo.isOcean && hoverInfo.name.indexOf("Açık Deniz") !== -1 && isLandByMask(lon, lat)) {
+      hoverInfo = { name: "🌍 Kara", isOcean: false };
+    }
     targetEl.textContent = hoverInfo.name;
 
     if (demDebounceTimer) clearTimeout(demDebounceTimer);
@@ -17360,9 +17986,8 @@ function handleVsSelection(kind, feature) {
   });
 
   // ---------- 17. ÜST ARAMA KUTUSU (#searchInput) ENTEGRASYONU ----------
-  const waitSearchDatalist = setInterval(() => {
-    if (typeof allCountryFeatures !== "undefined" && allCountryFeatures.length > 0) {
-      clearInterval(waitSearchDatalist);
+  onMapDataReady(() => {
+    {
       const datalist = document.getElementById("countryList");
       if (!datalist) return;
       FAULT_DEFS.forEach(m => {
@@ -17376,7 +18001,7 @@ function handleVsSelection(kind, feature) {
         datalist.appendChild(opt);
       });
     }
-  }, 200);
+  });
 
   const _prevHandleCountrySearch = handleCountrySearch;
   handleCountrySearch = function (rawText, allowPlateNumber = false) {
@@ -17725,7 +18350,7 @@ function handleVsSelection(kind, feature) {
 
   // Kamera Konumunu (lat, lon, z) 2D veya 3D Küreye Doğrudan Uygular
   function applyCameraPosition(lon, lat, targetZ) {
-    const safeZ = Math.max(1, Math.min(65, isFinite(targetZ) ? targetZ : 1));
+    const safeZ = Math.max(1, Math.min(100, isFinite(targetZ) ? targetZ : 1));
     if (isGlobeMode) {
       globeRotation = [-lon, -Math.max(-84, Math.min(84, lat)), 0];
       projection3D.precision(0.4).rotate(globeRotation);
@@ -17850,7 +18475,7 @@ function handleVsSelection(kind, feature) {
 
     // 5) Çok Duraklı Uçuş Rotası Varsa Çiz veya Seçili Bölgeyi Aç
     if (rtRaw) {
-      if (acRaw && typeof setMeasureAircraftProfile === "function") {
+      if (acRaw && typeof AIRCRAFT_PROFILES !== "undefined" && Object.prototype.hasOwnProperty.call(AIRCRAFT_PROFILES, acRaw)) {
         measureAircraftProfile = acRaw;
       }
       if (!measureMode) toggleMeasureMode();
@@ -17886,14 +18511,11 @@ function handleVsSelection(kind, feature) {
   }
 
   // Harita verileri (allCountryFeatures) yüklendiği anda URL'deki konumu otomatik uygula
-  const waitMapLoadForDeepLink = setInterval(() => {
-    if (typeof allCountryFeatures !== "undefined" && allCountryFeatures.length > 0) {
-      clearInterval(waitMapLoadForDeepLink);
-      if (window.location.hash && window.location.hash.length > 3) {
-        setTimeout(restoreStateFromUrlHash, 120);
-      }
+  onMapDataReady(() => {
+    if (window.location.hash && window.location.hash.length > 3) {
+      setTimeout(restoreStateFromUrlHash, 120);
     }
-  }, 150);
+  });
 
   window.addEventListener("hashchange", () => {
     if (typeof allCountryFeatures !== "undefined" && allCountryFeatures.length > 0) {
@@ -17901,7 +18523,6 @@ function handleVsSelection(kind, feature) {
     }
   });
 })();
-</script>
 </script>
 
 <section aria-label="İnteraktif Dünya Haritası Hakkında" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">
