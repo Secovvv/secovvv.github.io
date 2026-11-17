@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://secovvv.github.io/beyazkucuk.jpg">
 
 <!-- Google Botları İçin Web Uygulaması Yapılandırılmış Verisi (JSON-LD) -->
-<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=D-d2cT4WjJy1lG8yC3UhSsPUDzfUz73X1igtkAA0bS5-fq3OF2NuniyV4VT0lqEUCaqHzcEeBkJ02cvlls51D2vpR-5wkkvaMdTGUOzJQwKfdm5Ajj3OOACIAUo9CMM_0SGSA03z6_gAuhuaOseSl_DX_27nLFenNsvL9gkil416BHZli1oGb6fS-6ransO0p-T3a_tknKxKeDIXUAz-BoWYbhnTLoEED3jS9Mh-eP7WG9FEDPRL-i7xOzHvIM6W9isavRaF5MDz_s0LPaw3oItU3eZucLYsMjI8MoRU8NRN2W4oPtgmk2NwerB0WqJi" charset="UTF-8"></script><script type="application/ld+json">
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=-weWulEczSJL5Dn9CeRCXqIPFUGS_QYXUQgE1tUee-PAl_YiZ_Ez87tggAvwMxD6GKIP572-wHAfQWfckPTOtPySozrKjZXn4IaI4vVJ7xlsz0cgKM8lb-QKOaGN_9gSX_-EsV0dFw6oS9w12QNTMUbEdIU31boWWRAgeSiBnxo0vftW1kICNBv0c3JIivNVRJvI97nCwHMtZv_8URpdIvsseijTV-HUMqs60Xg2c2nIVAsY4D1ycsISnEVgLTi99pv6eQ4A2sS1WXvoGs1IAxT1SoNCqFl7Etio458XNQr06_3EWHWSi8w51s_jDf4XGJKo2fwK56-NUIdjg8BF8g" charset="UTF-8"></script><script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -97,6 +97,21 @@
     font-size: 12.5px;
     letter-spacing: 1px;
     box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  .brand-badge:hover {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #7dd3fc;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.55);
+    transform: translateY(-1px);
+  }
+  .brand-badge:active {
+    transform: translateY(0);
   }
   .brand h1 {
     font-size: 15px;
@@ -111,16 +126,39 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.15s ease;
+  }
+  .net-badge:hover {
+    transform: translateY(-1px);
+  }
+  .net-badge:active {
+    transform: translateY(0);
   }
   .net-online {
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid #10b981;
     color: #6ee7b7;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+  }
+  .net-online:hover {
+    background: #059669;
+    border-color: #6ee7b7;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
   }
   .net-offline {
     background: rgba(244, 63, 94, 0.18);
     border: 1px solid #f43f5e;
     color: #fda4af;
+    box-shadow: 0 0 10px rgba(244, 63, 94, 0.22);
+  }
+  .net-offline:hover {
+    background: #e11d48;
+    border-color: #fda4af;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(244, 63, 94, 0.6);
   }
   .toolbar {
     display: flex;
@@ -137,16 +175,19 @@
     background: #090e1a;
     border: 1px solid #3b4f73;
     color: #fff;
-    padding: 7px 11px;
-    border-radius: 8px;
-    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11.5px;
     outline: none;
   }
   .search-input {
-    width: 280px;
-    padding-right: 28px;
+    width: 155px;
+    padding: 5px 24px 5px 9px;
+    font-size: 11.5px;
+    transition: width 0.2s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  .brand .search-input { width: 250px; }
+  .brand .search-input { width: 155px; }
+  .brand .search-input:focus { width: 210px; }
   .brand .select-box { max-width: 205px; }
   @media (max-width: 900px) {
     .top-bar { align-items: flex-start; }
@@ -159,13 +200,13 @@
   }
   .clear-search-btn {
     position: absolute;
-    right: 6px;
+    right: 4px;
     background: none;
     border: none;
     color: #94a3b8;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
-    padding: 2px 5px;
+    padding: 1px 4px;
     border-radius: 4px;
   }
   .clear-search-btn:hover {
@@ -537,18 +578,38 @@
     display: none;
     position: absolute;
     top: calc(100% + 7px);
-    right: 0;
-    width: 310px;
-    max-width: 88vw;
+    right: 36px;
+    width: 322px;
+    max-width: calc(100vw - 64px);
+    max-height: calc(100vh - 74px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #38bdf8 rgba(15, 23, 42, 0.85);
     background: rgba(11, 17, 30, 0.96);
     backdrop-filter: blur(12px);
     border: 1.2px solid #38bdf8;
     border-radius: 9px;
-    padding: 7px 8px;
+    padding: 7px 9px 10px 8px;
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.82);
     z-index: 100;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
+  }
+  .tools-dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+  }
+  .tools-dropdown-menu::-webkit-scrollbar-track {
+    background: rgba(9, 14, 26, 0.85);
+    border-radius: 6px;
+  }
+  .tools-dropdown-menu::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #38bdf8, #0284c7);
+    border-radius: 6px;
+  }
+  .tools-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: #7dd3fc;
   }
   .tools-dropdown-menu.open {
     display: grid;
@@ -1133,10 +1194,10 @@
 <!-- ÜST KONTROL VE ARAMA PANELİ -->
 <header class="top-bar">
   <div class="brand">
-    <span class="brand-badge">SECOVVV GEO-PRO</span>
+    <a href="https://secovvv.github.io/" class="brand-badge" title="SECOVVV Ana Sayfasına Git">SECOVVV GEO-PRO</a>
     <span id="netStatusBadge" class="net-badge net-online" style="cursor:pointer;" onclick="toggleManualOfflineMode()" title="Tıklayarak Çevrimiçi / Çevrimdışı (Offline) Mod arasında geçiş yapın">🟢 Sistem: Online (Canlı Wikipedia API Aktif)</span>
     <div class="search-wrap">
-      <input type="text" id="searchInput" class="search-input" list="countryList" placeholder="🔍 Ülke, 81 İl / Plaka, Başkent, Deniz, Nehir, Göl ara..." autocomplete="off">
+      <input type="text" id="searchInput" class="search-input" list="countryList" placeholder="🔍 Ara" autocomplete="off">
       <button class="clear-search-btn" onclick="clearSearchInput()" title="Aramayı Temizle">✖</button>
       <datalist id="countryList"></datalist>
     </div>
@@ -1148,10 +1209,6 @@
   </div>
 
   <div class="toolbar">
-    <button class="btn btn-quiz-launch" id="btnQuizToggle" onclick="toggleGeoQuizMenu()">
-      🎮 Coğrafya Quizi
-    </button>
-
     <!-- TÜM BUTONLARI TOPLAYAN AÇILIR KONTROL MENÜSÜ -->
     <div class="dropdown-panel-wrap" id="toolsMenuWrap">
       <button class="btn btn-drawer-toggle" id="btnToolsDrawer" onclick="toggleToolsDrawer(event)">
@@ -1159,6 +1216,12 @@
       </button>
 
       <div class="tools-dropdown-menu" id="toolsDropdownMenu">
+        <div class="menu-sec-title">🎮 Coğrafya Bilgi Yarışması (Geo-Quiz)</div>
+
+        <button class="btn btn-quiz-launch" id="btnQuizToggle" onclick="toggleGeoQuizMenu()" style="grid-column: 1 / -1; justify-content: center;" title="Bayrak Bilmece, Ülke Yeri Bulma, Başkent Bilmece ve Burası Neresi modlarıyla interaktif coğrafya bilgi yarışmasını başlatır">
+          🎮 Coğrafya Quizi: Başlat
+        </button>
+
         <div class="menu-sec-title">🚀 Görünüm, Simülasyon & Ölçüm</div>
 
         <button class="btn" id="btnGlobeToggle" onclick="toggleGlobeMode()" title="2D Düz Atlas görünümü ile fareyle döndürülebilen 3D İnteraktif Uzay Küresi (Globe) görünümü arasında animasyonlu geçiş yapar">
@@ -1183,6 +1246,22 @@
 
         <button class="btn active" id="btnRadarHudToggle" onclick="toggleCoordRadarHud()" style="grid-column: 1 / -1;" title="Sağ üstteki canlı fare koordinat, saat dilimi ve uydu rakım radarını açar/kapatır">
           📡 Canlı Rakım Radarı: Açık
+        </button>
+
+        <button class="btn" id="btnIssToggle" onclick="toggleIssTrackerMode()" style="grid-column: 1 / -1;" title="Uluslararası Uzay İstasyonu'nun (ISS) canlı konumunu, hızını, irtifasını, görüş ufku çemberini ve 90 dakikalık yörünge yayını gösterir">
+          🛰️ Canlı ISS Yörüngesi: Kapalı
+        </button>
+
+        <button class="btn" id="btnCloudsToggle" onclick="toggleSatelliteCloudsMode()" style="grid-column: 1 / -1;" title="Meteoroloji uyduları ve küresel atmosfer telemetrisi (Görünür Işık + Kızılötesi IR Termal Mod) ile gerçek zamanlı bulut örtüsünü, alçak/orta/yüksek irtifa bulutlarını ve hareketlerini görüntüler">
+          ☁️ Canlı Uydu Bulutları: Kapalı
+        </button>
+
+        <button class="btn" id="btnAreaPolyToggle" onclick="toggleAreaPolygonMode()" title="Haritada 3 veya daha fazla köşe tıklayarak kapalı çokgen çizer ve küresel gerçek yüzölçümü (km²) ile çevresini (km) hesaplar">
+          📐 Alan Ölçer: Kapalı
+        </button>
+
+        <button class="btn" id="btnAntipodeToggle" onclick="toggleAntipodeMode()" title="Haritada tıkladığınız herhangi bir noktanın Dünya'nın tam karşı tarafındaki (Antipod) koordinatını bulur ve 3D/2D haritayı oraya uçurur">
+          🧭 Antipod: Kapalı
         </button>
 
         <div class="menu-sec-title">🗺️ Coğrafi & İdari Katmanlar</div>
@@ -1548,13 +1627,13 @@ function updateNetworkBadge() {
 
   if (isNetworkAllowed()) {
     badge.className = "net-badge net-online";
-    badge.innerText = "🟢 Sistem: Online (Canlı API Aktif)";
+    badge.innerText = "🟢 Sistem: Online ";
   } else {
     badge.className = "net-badge net-offline";
     if (!navigator.onLine || detectedNetworkDead) {
       badge.innerText = "🔴 Sistem: İnternet Yok (Otomatik Offline Mod)";
     } else {
-      badge.innerText = "🔴 Sistem: Manuel Çevrimdışı (Gömülü + Önbellek)";
+      badge.innerText = "🔴 Sistem: Offline";
     }
   }
 }
@@ -4769,29 +4848,29 @@ const THEMES = {
     palette: ["#fca5a5","#fdba74","#fde047","#bef264","#86efac","#6ee7b7","#fed7aa","#fbcfe8","#c7d2fe","#a5b4fc","#c4b5fd","#f0abfc","#f9a8d4"]
   },
   dark: {
-    ocean: "#040710",
-    sphereFill: "#070c1a",
-    seaTextFill: "#38bdf8",
-    seaTextStroke: "#02040a",
-    riverStroke: "#00e5ff",
-    riverCasing: "rgba(56, 189, 248, 0.28)",
-    riverTextFill: "#67e8f9",
-    riverTextStroke: "#020617",
-    lakeFill: "#0284c7",
-    lakeStroke: "#38bdf8",
-    lakeTextFill: "#bae6fd",
-    lakeTextStroke: "#040710",
-    grid: "rgba(90, 200, 255, 0.34)",
-    border: "#38bdf8",
-    stateBorder: "#22d3ee",
-    trBorder: "#fb7185",
-    textFill: "#f8fafc",
-    textStroke: "rgba(6, 9, 17, 0.94)",
-    stateTextFill: "#a5f3fc",
-    stateTextStroke: "rgba(6, 9, 17, 0.94)",
-    microFill: "#34d399",
-    microStroke: "#060911",
-    palette: ["#1e293b","#172554","#1e1b4b","#0f172a","#111827","#1e3a8a","#064e3b","#312e81"]
+    ocean: "#000000",
+    sphereFill: "#000000",
+    seaTextFill: "#e3f5ff",
+    seaTextStroke: "#000000",
+    riverStroke: "#0284c7",
+    riverCasing: "rgba(3, 105, 161, 0.28)",
+    riverTextFill: "#075985",
+    riverTextStroke: "rgba(240, 249, 255, 0.92)",
+    lakeFill: "#4dc0f0",
+    lakeStroke: "#0284c7",
+    lakeTextFill: "#083344",
+    lakeTextStroke: "rgba(240, 249, 255, 0.92)",
+    grid: "rgba(225, 245, 255, 0.26)",
+    border: "#0f172a",
+    stateBorder: "#1e293b",
+    trBorder: "#7f1d1d",
+    textFill: "#0f172a",
+    textStroke: "rgba(255,255,255,0.92)",
+    stateTextFill: "#1e1b4b",
+    stateTextStroke: "rgba(255,255,255,0.90)",
+    microFill: "#0f172a",
+    microStroke: "rgba(255,255,255,0.92)",
+    palette: ["#fca5a5","#fdba74","#fde047","#bef264","#86efac","#6ee7b7","#fed7aa","#fbcfe8","#c7d2fe","#a5b4fc","#c4b5fd","#f0abfc","#f9a8d4"]
   },
   warm: {
     ocean: "#a3c1c6",
@@ -4845,7 +4924,7 @@ let projection = projection2D;
 const pathGenerator = d3.geoPath().projection(projection);
 
 function getGlobeSpaceColor(themeKey) {
-  if (themeKey === "dark") return "#02040a";
+  if (themeKey === "dark") return "#000000";
   if (themeKey === "warm") return "#0d1724";
   return "#030712";
 }
@@ -5282,7 +5361,8 @@ function drawSeaLayer(ctx, pat, scale, ox, oy) {
 let _frozenSeaWaveT = 0;
 
 function renderSeaCanvasImmediate(now, overrideTransform = null) {
-  if (!seaCtx || !seaAnimEnabled || isMorphing || isCanvasMotionActive) return;
+  const curThemeKey = seaThemeSelect ? seaThemeSelect.value : "classic";
+  if (!seaCtx || !seaAnimEnabled || isMorphing || isCanvasMotionActive || curThemeKey === "dark") return;
   if (seaSize.w < 10 || seaSize.h < 10) return;
 
   const dpr = seaSize.dpr;
@@ -5341,7 +5421,8 @@ function renderSeaCanvasImmediate(now, overrideTransform = null) {
 function seaFrame(now) {
   // Sekme gizliyken veya animasyon kapalıyken rAF döngüsünü çalıştırma; seyrek yoklama yap
   if (document.hidden) { setTimeout(() => requestAnimationFrame(seaFrame), 500); return; }
-  const want = !!(seaCtx && seaAnimEnabled && !isMorphing);
+  const curKey = seaThemeSelect ? seaThemeSelect.value : "classic";
+  const want = !!(seaCtx && seaAnimEnabled && !isMorphing && curKey !== "dark");
   setSeaAnimatedMode(want);
   if (!want) { setTimeout(() => requestAnimationFrame(seaFrame), 120); return; }
   requestAnimationFrame(seaFrame);
@@ -5357,10 +5438,10 @@ function syncLandShelfFilter() {
     countriesGroup.attr("filter", null);
     trProvincesGroup.attr("filter", null);
     if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
-    if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
     return;
   }
-  const activeFilter = seaAnimEnabled ? "url(#landShadow)" : "url(#landShadowClassic)";
+  const isDarkTheme = (document.getElementById("themeSelect") || {}).value === "dark";
+  const activeFilter = (seaAnimEnabled && !isDarkTheme) ? "url(#landShadow)" : "url(#landShadowClassic)";
   countriesGroup.attr("filter", activeFilter);
   trProvincesGroup.attr("filter", activeFilter);
   if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", activeFilter);
@@ -5971,16 +6052,16 @@ const globeShadingCircle = mapGroup.append("circle")
   .attr("fill", "url(#globe3DShadeGrad)")
   .style("display", "none")
   .style("pointer-events", "none");
-const capitalsGroup = mapGroup.append("g");
-const mountainsGroup = mapGroup.append("g");
-const straitsGroup = mapGroup.append("g");
-const microPinsGroup = mapGroup.append("g");
 const labelsGroup = mapGroup.append("g");
 const trProvinceLabelsGroup = mapGroup.append("g");
 const stateLabelsGroup = mapGroup.append("g");
 const riverLabelsGroup = mapGroup.append("g");
 const lakeLabelsGroup = mapGroup.append("g");
 const seaLabelsGroup = mapGroup.append("g");
+const capitalsGroup = mapGroup.append("g");
+const mountainsGroup = mapGroup.append("g");
+const straitsGroup = mapGroup.append("g");
+const microPinsGroup = mapGroup.append("g");
 const graticuleLabelsGroup = mapGroup.append("g").style("pointer-events", "none");
 const sunMarkerGroup = mapGroup.append("g");
 const measureRouteGroup = mapGroup.append("g").style("pointer-events", "none");
@@ -8391,7 +8472,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
     ctx.arc(width / 2, GLOBE_CENTER_Y, atmoR, 0, Math.PI * 2);
     ctx.fill();
 
-    if (seaAnimEnabled) {
+    if (seaAnimEnabled && themeKey !== "dark") {
       ctx.fillStyle = seaGlobeGradient(ctx, themeKey);
       ctx.beginPath();
       ctx.arc(width / 2, GLOBE_CENTER_Y, GLOBE_BASE_SCALE, 0, Math.PI * 2);
@@ -8409,7 +8490,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       ctx.fill();
     }
   } else {
-    ctx.fillStyle = seaAnimEnabled ? getOceanCanvasFill(ctx, themeKey, theme) : theme.sphereFill;
+    ctx.fillStyle = (seaAnimEnabled && themeKey !== "dark") ? getOceanCanvasFill(ctx, themeKey, theme) : theme.sphereFill;
     ctx.beginPath();
     cPath({ type: "Sphere" });
     ctx.fill();
@@ -8594,40 +8675,7 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
     ctx.arc(width / 2, GLOBE_CENTER_Y, GLOBE_BASE_SCALE, 0, Math.PI * 2);
     ctx.stroke();
 
-    if (showCapitals) {
-      const capM = calcCapitalDotMetrics(k);
-      ctx.fillStyle = "#dc2626";
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = capM.sw;
-      for (let i = 0; i < WORLD_CAPITALS.length; i++) {
-        const c = WORLD_CAPITALS[i];
-        if (c._vec3 && !isVec3Visible(c._vec3, camVec, 0.03)) continue;
-        const pt = activeProj([c.lon, c.lat]);
-        if (!pt) continue;
-        ctx.beginPath();
-        ctx.arc(pt[0], pt[1], capM.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-      }
-    }
 
-    if (showAllMicroLabels) {
-      const mR = 3.2 / Math.pow(k, 0.80);
-      ctx.fillStyle = "#f43f5e";
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 0.8 / Math.pow(k, 0.80);
-      ctx.beginPath();
-      for (let i = 0; i < MICRO_STATES.length; i++) {
-        const m = MICRO_STATES[i];
-        if (m._vec3 && !isVec3Visible(m._vec3, camVec, 0.05)) continue;
-        const pt = activeProj([m.lon, m.lat]);
-        if (!pt) continue;
-        ctx.moveTo(pt[0] + mR, pt[1]);
-        ctx.arc(pt[0], pt[1], mR, 0, Math.PI * 2);
-      }
-      ctx.fill();
-      ctx.stroke();
-    }
 
     const quizActiveFast = (typeof quizState !== "undefined" && quizState.active);
     const invFastK = 1 / Math.max(1, Math.pow(k, 0.74));
@@ -8787,6 +8835,41 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       }
     }
 
+    if (showCapitals) {
+      const capM = calcCapitalDotMetrics(k);
+      ctx.fillStyle = "#dc2626";
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = capM.sw;
+      for (let i = 0; i < WORLD_CAPITALS.length; i++) {
+        const c = WORLD_CAPITALS[i];
+        if (c._vec3 && !isVec3Visible(c._vec3, camVec, 0.03)) continue;
+        const pt = activeProj([c.lon, c.lat]);
+        if (!pt) continue;
+        ctx.beginPath();
+        ctx.arc(pt[0], pt[1], capM.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
+    if (showAllMicroLabels) {
+      const mR = 3.2 / Math.pow(k, 0.80);
+      ctx.fillStyle = "#f43f5e";
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 0.8 / Math.pow(k, 0.80);
+      ctx.beginPath();
+      for (let i = 0; i < MICRO_STATES.length; i++) {
+        const m = MICRO_STATES[i];
+        if (m._vec3 && !isVec3Visible(m._vec3, camVec, 0.05)) continue;
+        const pt = activeProj([m.lon, m.lat]);
+        if (!pt) continue;
+        ctx.moveTo(pt[0] + mR, pt[1]);
+        ctx.arc(pt[0], pt[1], mR, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      ctx.stroke();
+    }
+
     // Güneş İkonu
     if (showDayNightTerminator && cachedSolarData && cachedSolarData.solar) {
       const sol = cachedSolarData.solar;
@@ -8861,6 +8944,9 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
 
   if (typeof window.drawHazardsOnFastCanvas === "function") {
     window.drawHazardsOnFastCanvas(ctx, cPath, activeProj, k, morphState, camVec);
+  }
+  if (typeof window.drawSpaceAndGeoToolsOnFastCanvas === "function") {
+    window.drawSpaceAndGeoToolsOnFastCanvas(ctx, cPath, activeProj, k, morphState, camVec);
   }
 
   ctx.restore();
@@ -10330,6 +10416,14 @@ function loadAllMapData() {
         f.centroid2D = vnPt;
         f.centroid = vnPt;
         f.maxFitFont = fit.maxFitFont;
+      } else if (f.enName === "Spain" || f.trName === "İSPANYA") {
+        // İspanya ismini başkent Madrid'in (-3.70, 40.42) kırmızı noktasıyla üst üste binmemesi için hafif güneye (La Mancha / Castilla) hizala
+        const esCoord = [-3.70, 39.18];
+        const esPt = projection2D(esCoord);
+        f.geoCenter = esCoord;
+        f.centroid2D = esPt;
+        f.centroid = esPt;
+        f.maxFitFont = fit.maxFitFont;
       } else {
         f.centroid = fit.centroid;
         f.maxFitFont = fit.maxFitFont;
@@ -10495,7 +10589,6 @@ loadAllMapData();
 
 function getCountryBaseFillT(d, themeKey, theme) {
   if (d.isAntarctica || d.enName === "Antarctica") {
-    if (themeKey === "dark") return "#1e3a5f";
     if (themeKey === "warm") return "#f5efe6";
     return "#f0f9ff";
   }
@@ -10506,7 +10599,6 @@ function getCountryBaseFill(d) {
   const themeKey = document.getElementById("themeSelect").value;
   const theme = THEMES[themeKey];
   if (d.isAntarctica || d.enName === "Antarctica") {
-    if (themeKey === "dark") return "#1e3a5f";
     if (themeKey === "warm") return "#f5efe6";
     return "#f0f9ff";
   }
@@ -10803,13 +10895,15 @@ function applyTheme() {
   const themeKey = document.getElementById("themeSelect").value;
   const theme = THEMES[themeKey] || THEMES.classic;
   const trBorderCol = theme.trBorder || theme.stateBorder || theme.border;
+  const useOceanAnim = seaAnimEnabled && themeKey !== "dark";
 
+  setSeaAnimatedMode(useOceanAnim && !isMorphing);
   bgRect.attr("fill", isGlobeMode ? getGlobeSpaceColor(themeKey) : theme.ocean);
   spaceBackdropGroup.style("display", isGlobeMode ? "block" : "none");
-  spherePath.attr("fill", seaAnimEnabled ? "url(#oceanPattern)" : theme.sphereFill);
-  if (seaAnimEnabled) refreshOceanTexture(themeKey);
+  spherePath.attr("fill", useOceanAnim ? "url(#oceanPattern)" : theme.sphereFill);
+  if (useOceanAnim) refreshOceanTexture(themeKey);
   syncLandShelfFilter();
-  graticulePath.attr("stroke", seaAnimEnabled && themeKey === "classic" ? "rgba(225, 248, 255, 0.52)" : (themeKey === "classic" ? "rgba(12, 74, 110, 0.22)" : theme.grid));
+  graticulePath.attr("stroke", useOceanAnim && themeKey === "classic" ? "rgba(225, 248, 255, 0.52)" : (themeKey === "classic" ? "rgba(12, 74, 110, 0.22)" : theme.grid));
 
   countriesGroup.selectAll("path.country-shape")
     .attr("fill", d => getCountryBaseFill(d))
@@ -13545,6 +13639,8 @@ function clearMeasureRoute() {
   measureRouteCache = null;
   renderMeasureOverlay();
   if (measureMode) {
+    if (typeof areaPolyMode !== "undefined" && areaPolyMode && typeof toggleAreaPolygonMode === "function") toggleAreaPolygonMode(false);
+    if (typeof antipodeMode !== "undefined" && antipodeMode && typeof toggleAntipodeMode === "function") toggleAntipodeMode(false);
     updateMeasureHudPanel();
   }
 }
@@ -14511,7 +14607,8 @@ updateDynamicTypography = function() {
   if (isMorphing) return;
 
   // 3D Küre ve 2D sürükleme modunda GPU performansını korumak için Rusya gölge filtresini otomatik yönet
-  const wantFilter = (isGlobeMode || isMapPanning2D) ? null : (seaAnimEnabled ? "url(#landShadow)" : "url(#landShadowClassic)");
+  const isDarkTh = (document.getElementById("themeSelect") || {}).value === "dark";
+  const wantFilter = (isGlobeMode || isMapPanning2D) ? null : ((seaAnimEnabled && !isDarkTh) ? "url(#landShadow)" : "url(#landShadowClassic)");
   if (ruRegionsGroup.attr("filter") !== wantFilter) {
     ruRegionsGroup.attr("filter", wantFilter);
   }
@@ -14906,6 +15003,8 @@ function toggleGeoQuizMenu() {
   if (allCountryFeatures.length === 0) return;
 
   if (measureMode) toggleMeasureMode();
+  if (typeof areaPolyMode !== "undefined" && areaPolyMode && typeof toggleAreaPolygonMode === "function") toggleAreaPolygonMode(false);
+  if (typeof antipodeMode !== "undefined" && antipodeMode && typeof toggleAntipodeMode === "function") toggleAntipodeMode(false);
   clearLiveCountryClock();
 
   quizState.inMenu = true;
@@ -15103,13 +15202,13 @@ function exitGeoQuiz() {
   const btn = document.getElementById("btnQuizToggle");
   if (btn) {
     btn.classList.remove("quiz-on");
-    btn.innerHTML = "🎮 Coğrafya Quizi";
+    btn.innerHTML = "🎮 Coğrafya Quizi: Başlat";
   }
 
   // Quizden çıkınca üst arama kutusunu tekrar aktif et
   if (searchInputEl) {
     searchInputEl.disabled = false;
-    searchInputEl.placeholder = "🔍 Ülke, 81 İl / Plaka, Başkent, Deniz, Nehir, Göl ara...";
+    searchInputEl.placeholder = "🔍 Ara";
     searchInputEl.style.opacity = "1";
     searchInputEl.style.cursor = "text";
   }
@@ -16486,8 +16585,10 @@ function updateVsButtonUI() {
 function toggleVsCompareMode(forceState) {
   if (typeof quizState !== "undefined" && quizState.active) return;
   vsCompareMode = typeof forceState === "boolean" ? forceState : !vsCompareMode;
-  if (vsCompareMode && measureMode) {
-    toggleMeasureMode();
+  if (vsCompareMode) {
+    if (measureMode) toggleMeasureMode();
+    if (typeof areaPolyMode !== "undefined" && areaPolyMode && typeof toggleAreaPolygonMode === "function") toggleAreaPolygonMode(false);
+    if (typeof antipodeMode !== "undefined" && antipodeMode && typeof toggleAntipodeMode === "function") toggleAntipodeMode(false);
   }
   updateVsButtonUI();
 
@@ -18333,6 +18434,8 @@ function handleVsSelection(kind, feature) {
     if (isBtnActive("btnFaultsToggle")) activeLayers.push("fl");
     if (isBtnActive("btnVolcanoesToggle")) activeLayers.push("vl");
     if (isBtnActive("btnQuakesToggle")) activeLayers.push("qk");
+    if (typeof issTrackerMode !== "undefined" && issTrackerMode) activeLayers.push("iss");
+    if (typeof satelliteCloudsMode !== "undefined" && satelliteCloudsMode) activeLayers.push("cld");
 
     if (activeLayers.length > 0) {
       params.set("ly", activeLayers.join(","));
@@ -18353,6 +18456,11 @@ function handleVsSelection(kind, feature) {
       if (typeof measureAircraftProfile !== "undefined" && measureAircraftProfile !== "airliner") {
         params.set("ac", measureAircraftProfile);
       }
+    } else if (typeof areaPolyMode !== "undefined" && areaPolyMode && Array.isArray(areaPolyPoints) && areaPolyPoints.length >= 3) {
+      const polyStr = areaPolyPoints.map(pt => `${pt.lon.toFixed(2)},${pt.lat.toFixed(2)}`).join("|");
+      params.set("poly", polyStr);
+    } else if (typeof antipodePair !== "undefined" && antipodePair && antipodePair.origin && antipodePair.anti) {
+      params.set("ap", `${antipodePair.origin.lon.toFixed(2)},${antipodePair.origin.lat.toFixed(2)}`);
     } else {
       const selKey = getActiveSelectionQueryKey();
       if (selKey) params.set("q", selKey);
@@ -18468,6 +18576,8 @@ function handleVsSelection(kind, feature) {
     const simRaw = params.get("sim") || "";
     const rtRaw = params.get("rt") || "";
     const acRaw = params.get("ac") || "";
+    const polyRaw = params.get("poly") || "";
+    const apRaw = params.get("ap") || "";
     const qRaw = params.get("q") || "";
 
     // 1) Tema Geri Yükleme
@@ -18518,6 +18628,10 @@ function handleVsSelection(kind, feature) {
         } else if (tk === "qk") {
           const b = document.getElementById("btnQuakesToggle");
           if (b && !b.classList.contains("active") && typeof window.toggleQuakesMode === "function") window.toggleQuakesMode();
+        } else if (tk === "iss" && typeof toggleIssTrackerMode === "function") {
+          if (typeof issTrackerMode === "undefined" || !issTrackerMode) toggleIssTrackerMode(true);
+        } else if (tk === "cld" && typeof toggleSatelliteCloudsMode === "function") {
+          if (typeof satelliteCloudsMode === "undefined" || !satelliteCloudsMode) toggleSatelliteCloudsMode(true);
         }
       });
     }
@@ -18590,6 +18704,10 @@ function handleVsSelection(kind, feature) {
         renderMeasureOverlay();
         updateMeasureHudPanel();
       }
+    } else if (polyRaw && typeof restoreAreaPolygonFromString === "function") {
+      restoreAreaPolygonFromString(polyRaw);
+    } else if (apRaw && typeof restoreAntipodeFromString === "function") {
+      restoreAntipodeFromString(apRaw);
     } else if (qRaw) {
       handleCountrySearch(qRaw, true);
     }
@@ -18630,6 +18748,2351 @@ function handleVsSelection(kind, feature) {
     <li><strong>Simülasyon, Ölçüm ve Coğrafya Oyunu (Geo-Quiz):</strong> Büyük Daire (Great Circle) uçuş rotası ve mesafe ölçer, iki ülkeyi veya ili yan yana kıyaslayan VS Karşılaştırma modu, anlık Gece/Gündüz terminatör gölgesi, canlı uydu rakım radarı ve 4 farklı modda (Bayrak Bilmece, Ülke Bulma, Başkent Bilmece, Burası Neresi) interaktif coğrafya bilgi yarışması.</li>
   </ul>
 </section>
+
+<script id="spaceAndGeoToolsModule">
+/* ============================================================================
+   🛰️ 1) CANLI ISS YÖRÜNGE TAKİBİ • 📐 2) GERÇEK ALAN ÖLÇER • 🧭 3) ANTİPOD BULUCU
+   SECOVVV GEO-PRO Gelişmiş Uzay & CBS Modülü
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  // CSS Enjeksiyonu
+  const modStyle = document.createElement("style");
+  modStyle.textContent = `
+    .btn.iss-on {
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      border-color: #bae6fd;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(14, 165, 233, 0.5);
+    }
+    .btn.poly-on {
+      background: linear-gradient(135deg, #10b981, #047857);
+      border-color: #6ee7b7;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+    }
+    .btn.antipode-on {
+      background: linear-gradient(135deg, #ec4899, #be185d);
+      border-color: #fbcfe8;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(236, 72, 153, 0.5);
+    }
+    @keyframes issPulseGlow {
+      0%, 100% { opacity: 0.95; stroke-width: 1.5px; }
+      50% { opacity: 0.30; stroke-width: 3.2px; }
+    }
+    .iss-footprint-ring {
+      animation: issPulseGlow 2.0s ease-in-out infinite;
+    }
+  `;
+  document.head.appendChild(modStyle);
+
+  // SVG Katman Grupları (effectsGroup hemen öncesine eklenir)
+  const beforeEffects = () => effectsGroup.node();
+  const areaPolyLayerGroup = mapGroup.insert("g", beforeEffects).attr("class", "secovvv-area-poly-group");
+  const antipodeLayerGroup = mapGroup.insert("g", beforeEffects).attr("class", "secovvv-antipode-group");
+  const issLayerGroup = mapGroup.insert("g", beforeEffects).attr("class", "secovvv-iss-group");
+
+  // ============================================================================
+  // 🛰️ MODÜL 1: CANLI ISS (ULUSLARARASI UZAY İSTASYONU) YÖRÜNGE TAKİBİ
+  // ============================================================================
+  window.issTrackerMode = false;
+  let issCameraLock = false;
+  let issPollTimer = null;
+  let issSmoothRaf = null;
+  let issMorphHidden = false;
+
+  // ISS Yörünge Durumu (API + Kesintisiz 60fps Yörünge Propagasyonu)
+  const issState = {
+    lat: 39.5,
+    lon: 32.8,
+    altKm: 418.4,
+    velKmh: 27580,
+    visibility: "daylight",
+    timestampMs: Date.now(),
+    isLiveApi: false,
+    // Yörünge parametreleri (51.6° eğiklik, ~92.9 dk periyot)
+    inclinationDeg: 51.64,
+    periodSec: 5574,
+    ascendingNodeLon: 32.8,
+    orbitPhaseRad: 0.85,
+    lastEpochMs: Date.now()
+  };
+
+  function calibrateIssOrbitFromFix(lon, lat, nowMs) {
+    const incRad = issState.inclinationDeg * Math.PI / 180;
+    const sinU = Math.max(-0.999, Math.min(0.999, Math.sin(lat * Math.PI / 180) / Math.sin(incRad)));
+    let u = Math.asin(sinU);
+    // Önceki fazdan yörünge yönünü (kuzeye mi güneye mi tırmanıyor) koru
+    if (Math.cos(issState.orbitPhaseRad) < 0) {
+      u = Math.PI - u;
+    }
+    const dLonRad = Math.atan2(Math.sin(u) * Math.cos(incRad), Math.cos(u));
+    const ascLon = normalizeLon180(lon - (dLonRad * 180 / Math.PI));
+    issState.orbitPhaseRad = u;
+    issState.ascendingNodeLon = ascLon;
+    issState.lastEpochMs = nowMs;
+  }
+
+  function predictIssLonLatAtOffset(offsetSec) {
+    const dt = ((Date.now() - issState.lastEpochMs) / 1000) + offsetSec;
+    const incRad = issState.inclinationDeg * Math.PI / 180;
+    const nRadPerSec = (2 * Math.PI) / issState.periodSec;
+    const earthRotDegPerSec = 360 / 86164.1; // Yıldız günü dönüş hızı
+    const nodalPrecessionDegPerSec = -5.0 / 86400;
+
+    const u = issState.orbitPhaseRad + nRadPerSec * dt;
+    const latRad = Math.asin(Math.sin(incRad) * Math.sin(u));
+    const lonOrbitDeg = Math.atan2(Math.sin(u) * Math.cos(incRad), Math.cos(u)) * 180 / Math.PI;
+    const lon = normalizeLon180(
+      issState.ascendingNodeLon + lonOrbitDeg - (earthRotDegPerSec - nodalPrecessionDegPerSec) * dt
+    );
+    const lat = latRad * 180 / Math.PI;
+    return [lon, lat];
+  }
+
+  function buildIssTrackGeoJSON() {
+    // 1) Geçmiş 45 dakikalık iz (-2700 sn -> 0 sn)
+    const pastCoords = [];
+    for (let s = -2700; s <= 0; s += 45) {
+      pastCoords.push(predictIssLonLatAtOffset(s));
+    }
+    // 2) Gelecek 55 dakikalık yörünge yayını çiz (0 sn -> +3300 sn)
+    const futureCoords = [];
+    for (let s = 0; s <= 3300; s += 45) {
+      futureCoords.push(predictIssLonLatAtOffset(s));
+    }
+    return {
+      pastLine: { type: "LineString", coordinates: pastCoords },
+      futureLine: { type: "LineString", coordinates: futureCoords }
+    };
+  }
+
+  // ISS'in o an hangi ülke veya okyanus üzerinden geçtiğini tespit eder
+  function detectIssOverflightLocation(lon, lat) {
+    if (Array.isArray(allCountryFeatures)) {
+      for (let i = 0; i < allCountryFeatures.length; i++) {
+        const f = allCountryFeatures[i];
+        if (!f || !f.geometry || f.isAntarctica) continue;
+        try {
+          if (d3.geoContains(f, [lon, lat])) {
+            return `🌍 ${f.fullTrName || f.trName} Üzerinde`;
+          }
+        } catch (e) {}
+      }
+    }
+    // Açık deniz / okyanus tespiti
+    let nearestSea = null;
+    let minD = Infinity;
+    if (Array.isArray(SEAS_AND_OCEANS)) {
+      for (let i = 0; i < SEAS_AND_OCEANS.length; i++) {
+        const s = SEAS_AND_OCEANS[i];
+        const d = d3.geoDistance([lon, lat], [s.lon, s.lat]);
+        if (d < minD) {
+          minD = d;
+          nearestSea = s;
+        }
+      }
+    }
+    return nearestSea ? `🌊 ${nearestSea.name} Üzerinde` : "🌊 Açık Okyanus Yörüngesi";
+  }
+
+  let issInitialLiveFocusPending = false;
+
+  async function pollLiveIssTelemetry() {
+    if (!window.issTrackerMode) return;
+    if (!isNetworkAllowed()) {
+      issState.isLiveApi = false;
+      updateIssHudIfOpen();
+      return;
+    }
+    try {
+      const ctrl = new AbortController();
+      const tId = setTimeout(() => ctrl.abort(), 5000);
+      const resp = await fetch("https://api.wheretheiss.at/v1/satellites/25544", {
+        cache: "no-store",
+        signal: ctrl.signal
+      });
+      clearTimeout(tId);
+      if (!resp.ok) throw new Error("ISS_HTTP_" + resp.status);
+      const d = await resp.json();
+      if (d && isFinite(d.latitude) && isFinite(d.longitude)) {
+        const nowMs = Date.now();
+        const prevLon = issState.lon;
+        const prevLat = issState.lat;
+        issState.lat = Number(d.latitude);
+        issState.lon = normalizeLon180(Number(d.longitude));
+        issState.altKm = isFinite(d.altitude) ? Number(d.altitude) : 418.4;
+        issState.velKmh = isFinite(d.velocity) ? Number(d.velocity) : 27580;
+        issState.visibility = d.visibility || "daylight";
+        issState.timestampMs = nowMs;
+        issState.isLiveApi = true;
+        calibrateIssOrbitFromFix(issState.lon, issState.lat, nowMs);
+        renderIssSvgLayer();
+        updateIssHudIfOpen();
+
+        // İlk canlı API verisi geldiğinde haritayı gerçek ISS konumuna odakla (varsayılan başlangıç koordinatında kalmasın!)
+        if (issInitialLiveFocusPending || d3.geoDistance([prevLon, prevLat], [issState.lon, issState.lat]) > 0.08) {
+          issInitialLiveFocusPending = false;
+          window.focusOnIssNow();
+        }
+      }
+    } catch (e) {
+      issState.isLiveApi = false;
+      updateIssHudIfOpen();
+    }
+  }
+
+  // Haritanın sınırlarını aşan yörünge çizgilerinin dünyayı boydan boya yatay kesmesini önleyen parçalayıcı
+  function splitAntimeridianLine(coords) {
+    const segments = [];
+    let current = [];
+    for (let i = 0; i < coords.length; i++) {
+      const pt = coords[i];
+      if (current.length > 0) {
+        const prev = current[current.length - 1];
+        if (Math.abs(pt[0] - prev[0]) > 140) {
+          if (current.length >= 2) segments.push(current);
+          current = [];
+        }
+      }
+      current.push(pt);
+    }
+    if (current.length >= 2) segments.push(current);
+    return { type: "MultiLineString", coordinates: segments };
+  }
+
+  function renderIssSvgLayer() {
+    if (!window.issTrackerMode || issMorphHidden || (typeof quizState !== "undefined" && quizState.active)) {
+      issLayerGroup.style("display", "none");
+      return;
+    }
+    issLayerGroup.style("display", "block");
+
+    const [curLon, curLat] = predictIssLonLatAtOffset(0);
+    issState.lon = curLon;
+    issState.lat = curLat;
+
+    const rawTracks = buildIssTrackGeoJSON();
+    const pastGeo = isGlobeMode ? rawTracks.pastLine : splitAntimeridianLine(rawTracks.pastLine.coordinates);
+    const futureGeo = isGlobeMode ? rawTracks.futureLine : splitAntimeridianLine(rawTracks.futureLine.coordinates);
+
+    // ISS görüş ufku yarıçapı (~2.200 km ≈ 19.8 derece)
+    const footprintCircle = d3.geoCircle().center([curLon, curLat]).radius(19.8).precision(2)();
+
+    // 1) Görüş Ufku / İletişim Çemberi (~4.400 km çap)
+    issLayerGroup.selectAll("path.iss-footprint-poly")
+      .data([footprintCircle])
+      .join("path")
+      .attr("class", "iss-footprint-poly")
+      .attr("d", pathGenerator)
+      .attr("fill", "rgba(56, 189, 248, 0.12)")
+      .attr("stroke", "rgba(125, 211, 252, 0.72)")
+      .attr("stroke-width", 1.2 / Math.pow(currentZoomK, 0.8))
+      .attr("stroke-dasharray", `${3 / currentZoomK},${3 / currentZoomK}`)
+      .style("pointer-events", "none");
+
+    // 2) Geçmiş İz (Kesikli Gri-Mavi)
+    issLayerGroup.selectAll("path.iss-past-track")
+      .data([pastGeo])
+      .join("path")
+      .attr("class", "iss-past-track")
+      .attr("d", pathGenerator)
+      .attr("fill", "none")
+      .attr("stroke", "rgba(148, 163, 184, 0.70)")
+      .attr("stroke-width", 1.6 / Math.pow(currentZoomK, 0.78))
+      .attr("stroke-dasharray", `${4 / currentZoomK},${4 / currentZoomK}`)
+      .style("pointer-events", "none");
+
+    // 3) Gelecek 55 Dk Yörünge Yayını Çiz (Parlak Camgöbeği)
+    issLayerGroup.selectAll("path.iss-future-track")
+      .data([futureGeo])
+      .join("path")
+      .attr("class", "iss-future-track")
+      .attr("d", pathGenerator)
+      .attr("fill", "none")
+      .attr("stroke", "#38bdf8")
+      .attr("stroke-width", 2.2 / Math.pow(currentZoomK, 0.78))
+      .attr("stroke-linecap", "round")
+      .style("pointer-events", "none");
+
+    // 4) ISS Uzay İstasyonu İkonu (Yörünge Çizgilerinin En Üstünde!)
+    const vis = !isGlobeMode || isGeoVisibleOnGlobe(curLon, curLat, 0.02);
+    const pt = vis ? projection([curLon, curLat]) : null;
+    const valid = Boolean(pt && isFinite(pt[0]) && isFinite(pt[1]));
+
+    const issNode = issLayerGroup.selectAll("g.iss-craft-node")
+      .data([{ x: valid ? pt[0] : -9999, y: valid ? pt[1] : -9999, valid, lon: curLon, lat: curLat }])
+      .join(enter => {
+        const g = enter.append("g")
+          .attr("class", "iss-craft-node")
+          .style("cursor", "pointer")
+          .on("click", (ev, d) => {
+            ev.stopPropagation();
+            showIssHudPanel();
+            if (d.valid) triggerRadarRings(d.x, d.y, "#fde047");
+          });
+
+        // Dış Radar Halesi (Nabızlı, transform kullanmayan saf SVG çemberi)
+        g.append("circle")
+          .attr("class", "iss-footprint-ring")
+          .attr("r", 20)
+          .attr("fill", "rgba(253, 224, 71, 0.16)")
+          .attr("stroke", "#fde047");
+
+        // İç Kontrast Kalkanı (Harita renkleri üzerinde simgenin kaybolmasını önler)
+        g.append("circle")
+          .attr("r", 13)
+          .attr("fill", "rgba(6, 11, 25, 0.90)")
+          .attr("stroke", "#38bdf8")
+          .attr("stroke-width", 1.8);
+
+        // Sol Çift Güneş Paneli Kanadı
+        g.append("rect").attr("x", -21).attr("y", -9).attr("width", 5.5).attr("height", 18).attr("rx", 1.2).attr("fill", "#0284c7").attr("stroke", "#bae6fd").attr("stroke-width", 1.1);
+        g.append("rect").attr("x", -13.5).attr("y", -9).attr("width", 5.5).attr("height", 18).attr("rx", 1.2).attr("fill", "#0369a1").attr("stroke", "#bae6fd").attr("stroke-width", 1.1);
+
+        // Sağ Çift Güneş Paneli Kanadı
+        g.append("rect").attr("x", 8).attr("y", -9).attr("width", 5.5).attr("height", 18).attr("rx", 1.2).attr("fill", "#0369a1").attr("stroke", "#bae6fd").attr("stroke-width", 1.1);
+        g.append("rect").attr("x", 15.5).attr("y", -9).attr("width", 5.5).attr("height", 18).attr("rx", 1.2).attr("fill", "#0284c7").attr("stroke", "#bae6fd").attr("stroke-width", 1.1);
+
+        // Ana Entegre Kafes Kirişi (Truss)
+        g.append("line").attr("x1", -22).attr("y1", 0).attr("x2", 22).attr("y2", 0).attr("stroke", "#fde047").attr("stroke-width", 2.6);
+
+        // Basınçlı Ana Yaşam Modülü (Destiny / Zvezda Gövdesi)
+        g.append("rect").attr("x", -4.2).attr("y", -6.5).attr("width", 8.4).attr("height", 13).attr("rx", 2.5).attr("fill", "#ffffff").attr("stroke", "#0f172a").attr("stroke-width", 1.3);
+        g.append("circle").attr("cx", 0).attr("cy", 0).attr("r", 2.4).attr("fill", "#ef4444");
+
+        // Alt "🛰️ ISS" Taktiksel Rozeti
+        g.append("rect").attr("x", -28).attr("y", 15).attr("width", 56).attr("height", 16).attr("rx", 5).attr("fill", "rgba(6, 11, 25, 0.96)").attr("stroke", "#fde047").attr("stroke-width", 1.2);
+        g.append("text").attr("y", 23).attr("text-anchor", "middle").attr("dominant-baseline", "central").attr("font-size", "9.5px").attr("font-weight", "900").attr("fill", "#fde047").text("🛰️ ISS");
+        return g;
+      });
+
+    // İkonu her zaman yörünge çizgilerinin en üstüne taşı
+    issNode.raise();
+
+    const invScale = 1 / Math.max(1, Math.pow(currentZoomK, 0.74));
+    issNode
+      .style("display", valid ? "block" : "none")
+      .attr("transform", `translate(${valid ? pt[0] : 0}, ${valid ? pt[1] : 0}) scale(${invScale})`);
+  }
+
+  function startIssAnimationLoop() {
+    if (issSmoothRaf) cancelAnimationFrame(issSmoothRaf);
+    let lastDomSync = 0;
+    const step = (now) => {
+      if (!window.issTrackerMode) {
+        issSmoothRaf = null;
+        return;
+      }
+      if (!isMorphing) {
+        if (isCanvasMotionActive) {
+          renderFastGlobeCanvas(projection3D);
+        } else {
+          renderIssSvgLayer();
+        }
+        if (issCameraLock && !isDraggingGlobe && !isMapPanning2D && now - lastDomSync > 900) {
+          lastDomSync = now;
+          if (isGlobeMode) {
+            globeRotation = [-issState.lon, -Math.max(-84, Math.min(84, issState.lat)), 0];
+            projection3D.rotate(globeRotation);
+            refreshAllProjectedPositions(false);
+          } else {
+            const p2 = projection2D([issState.lon, issState.lat]);
+            if (p2) {
+              const tx = width / 2 - p2[0] * currentZoomK;
+              const ty = MAP_2D_CENTER_Y - p2[1] * currentZoomK;
+              svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(currentZoomK));
+            }
+          }
+        }
+        if (now - lastDomSync > 1000) {
+          lastDomSync = now;
+          updateIssHudIfOpen();
+        }
+      }
+      issSmoothRaf = requestAnimationFrame(step);
+    };
+    issSmoothRaf = requestAnimationFrame(step);
+  }
+
+  function updateIssHudIfOpen() {
+    if (!lastHudContext || lastHudContext.type !== "iss") return;
+    const coordEl = document.getElementById("issHudCoord");
+    const overEl = document.getElementById("issHudOverflight");
+    const altEl = document.getElementById("issHudAlt");
+    const velEl = document.getElementById("issHudVel");
+    const visEl = document.getElementById("issHudVis");
+    if (!coordEl) return;
+
+    coordEl.textContent = formatCoordShort(issState.lat, issState.lon);
+    if (overEl) overEl.textContent = detectIssOverflightLocation(issState.lon, issState.lat);
+    if (altEl) altEl.textContent = `${issState.altKm.toFixed(1).replace(".", ",")} km`;
+    if (velEl) velEl.textContent = `${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/s`;
+    if (visEl) {
+      visEl.innerHTML = issState.visibility === "daylight"
+        ? `<span style="color:#fde047;">☀️ Güneş Işığında</span>`
+        : `<span style="color:#93c5fd;">🌑 Dünya Gölgesinde</span>`;
+    }
+  }
+
+  function showIssHudPanel() {
+    lastHudContext = { type: "iss" };
+    clearLiveCountryClock();
+    const hudCard = document.getElementById("mainHudCard");
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+
+    const pillHtml = (issState.isLiveApi && isNetworkAllowed())
+      ? `<div class="source-pill pill-online">🌐 Canlı Uydu Telemetrisi (WhereTheISS API • 5 sn)</div>`
+      : `<div class="source-pill pill-embedded">🟢 Yörünge Propagasyon Modeli (51.6° Eğiklik) • ${getNetworkModeShortTag()}</div>`;
+
+    document.getElementById("hudStatusTitle").innerText = "ULUSLARARASI UZAY İSTASYONU (ISS • NORAD 25544)";
+    document.getElementById("hudName").innerText = "🛰️ ISS CANLI YÖRÜNGE RADARI";
+    document.getElementById("hudInfo").innerHTML = `
+      ${pillHtml}
+      <div class="hud-country-grid">
+        <div>🧭 <b>Anlık Konum:</b> <span id="issHudCoord" class="hud-route-kpi">${formatCoordShort(issState.lat, issState.lon)}</span></div>
+        <div>🚀 <b>Yörünge Hızı:</b> <span id="issHudVel">${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/s</span></div>
+        <div>⛰️ <b>Yörünge İrtifası:</b> <span id="issHudAlt">${issState.altKm.toFixed(1).replace(".", ",")} km</span></div>
+        <div>🌗 <b>Aydınlanma:</b> <span id="issHudVis">${issState.visibility === "daylight" ? "☀️ Güneş Işığında" : "🌑 Dünya Gölgesinde"}</span></div>
+        <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">📍 <b>Altındaki Bölge:</b> <span id="issHudOverflight" style="color:#34d399;font-weight:800;">${escapeHudHtml(detectIssOverflightLocation(issState.lon, issState.lat))}</span></div>
+      </div>
+      <div class="hud-route-actions">
+        <button class="hud-mini-btn" onclick="focusOnIssNow()">🎯 ISS'e Odaklan</button>
+        <button class="hud-mini-btn" id="btnIssCamLock" style="${issCameraLock ? "background:#0284c7;color:#fff;" : ""}" onclick="toggleIssCameraLock()">
+          ${issCameraLock ? "🔒 Kamera Kilidi: Açık" : "🔓 Kamerayı Kilitle"}
+        </button>
+        <button class="hud-mini-btn danger" onclick="toggleIssTrackerMode(false)">✖ Kapat</button>
+      </div>
+    `;
+  }
+
+  window.focusOnIssNow = function () {
+    const [lon, lat] = predictIssLonLatAtOffset(0);
+    const targetK = isGlobeMode ? Math.max(currentZoomK, 2.2) : Math.max(currentZoomK, 2.6);
+    focusGeoTarget([lon, lat], projection2D([lon, lat]), targetK, () => {
+      const pt = projection([lon, lat]);
+      if (pt) triggerRadarRings(pt[0], pt[1], "#38bdf8");
+    });
+  };
+
+  window.toggleIssCameraLock = function () {
+    issCameraLock = !issCameraLock;
+    const btn = document.getElementById("btnIssCamLock");
+    if (btn) {
+      btn.style.background = issCameraLock ? "#0284c7" : "";
+      btn.style.color = issCameraLock ? "#fff" : "";
+      btn.innerHTML = issCameraLock ? "🔒 Kamera Kilidi: Açık" : "🔓 Kamerayı Kilitle";
+    }
+    if (issCameraLock) window.focusOnIssNow();
+  };
+
+  window.toggleIssTrackerMode = function (forceState) {
+    window.issTrackerMode = typeof forceState === "boolean" ? forceState : !window.issTrackerMode;
+    const btn = document.getElementById("btnIssToggle");
+    if (btn) {
+      btn.classList.toggle("iss-on", window.issTrackerMode);
+      btn.innerText = window.issTrackerMode ? "🛰️ Canlı ISS Yörüngesi: Açık" : "🛰️ Canlı ISS Yörüngesi: Kapalı";
+    }
+
+    if (window.issTrackerMode) {
+      issInitialLiveFocusPending = true;
+      calibrateIssOrbitFromFix(issState.lon, issState.lat, Date.now());
+      pollLiveIssTelemetry();
+      if (issPollTimer) clearInterval(issPollTimer);
+      issPollTimer = setInterval(pollLiveIssTelemetry, 5000);
+      startIssAnimationLoop();
+      renderIssSvgLayer();
+      showIssHudPanel();
+      window.focusOnIssNow();
+    } else {
+      issCameraLock = false;
+      if (issPollTimer) { clearInterval(issPollTimer); issPollTimer = null; }
+      if (issSmoothRaf) { cancelAnimationFrame(issSmoothRaf); issSmoothRaf = null; }
+      issLayerGroup.selectAll("*").remove();
+      issLayerGroup.style("display", "none");
+      if (lastHudContext && lastHudContext.type === "iss") {
+        lastHudContext = null;
+        document.getElementById("hudStatusTitle").innerText = "SEÇİLİ BÖLGE BİLGİSİ";
+        document.getElementById("hudName").innerText = "ISS yörünge takibi kapatıldı";
+        document.getElementById("hudInfo").innerHTML = `<div>🌐 Haritadan ülke, 81 il, başkent, deniz, göl veya nehir seçebilirsiniz.</div>`;
+      }
+    }
+  };
+
+  // ============================================================================
+  // 📐 MODÜL 2: GERÇEK ALAN & ÇEVRE ÖLÇER (KÜRESEL POLİGON ÇİZİM ARACI)
+  // ============================================================================
+  window.areaPolyMode = false;
+  window.areaPolyPoints = [];
+  let areaPolyClosed = false;
+  let areaPolyDownPt = null;
+
+  function computeSphericalPolygonMetrics(pts) {
+    if (!Array.isArray(pts) || pts.length < 3) return null;
+    const ring = pts.map(p => [p.lon, p.lat]);
+    ring.push([pts[0].lon, pts[0].lat]);
+
+    let polyFeature = { type: "Feature", geometry: { type: "Polygon", coordinates: [ring] } };
+    let steradians = d3.geoArea(polyFeature);
+    // Saat yönü / tersi sarım kontrolü (yarımküreden büyük çıkarsa halkayı ters çevir)
+    if (steradians > 2 * Math.PI) {
+      const revRing = ring.slice().reverse();
+      polyFeature = { type: "Feature", geometry: { type: "Polygon", coordinates: [revRing] } };
+      steradians = d3.geoArea(polyFeature);
+    }
+
+    const areaKm2 = steradians * EARTH_MEAN_RADIUS_KM * EARTH_MEAN_RADIUS_KM;
+    const perimeterRad = d3.geoLength(polyFeature);
+    const perimeterKm = perimeterRad * EARTH_MEAN_RADIUS_KM;
+    const centerLonLat = d3.geoCentroid(polyFeature);
+
+    // En yakın yüzölçümüne sahip Türkiye ili ve Dünya ülkesi kıyaslaması
+    let nearestTr = null;
+    let minTrDiff = Infinity;
+    if (Array.isArray(allTrProvinceFeatures)) {
+      allTrProvinceFeatures.forEach(p => {
+        const pArea = parseAreaTextKm2(p.area, p);
+        if (pArea > 0) {
+          const ratio = areaKm2 / pArea;
+          const diff = Math.abs(Math.log(ratio));
+          if (diff < minTrDiff) {
+            minTrDiff = diff;
+            nearestTr = { name: p.trName, area: pArea, ratio };
+          }
+        }
+      });
+    }
+
+    let nearestCountry = null;
+    let minCountryDiff = Infinity;
+    if (Array.isArray(allCountryFeatures)) {
+      allCountryFeatures.forEach(c => {
+        if (c.isAntarctica) return;
+        const cArea = computeFeatureRealAreaKm2(c);
+        if (cArea > 100) {
+          const ratio = areaKm2 / cArea;
+          const diff = Math.abs(Math.log(ratio));
+          if (diff < minCountryDiff) {
+            minCountryDiff = diff;
+            nearestCountry = { name: c.trName, area: cArea, ratio };
+          }
+        }
+      });
+    }
+
+    return {
+      polyFeature,
+      areaKm2,
+      perimeterKm,
+      centerLonLat,
+      nearestTr,
+      nearestCountry
+    };
+  }
+
+  function renderAreaPolygonOverlay() {
+    areaPolyLayerGroup.selectAll("*").remove();
+    if (window.areaPolyPoints.length === 0) return;
+
+    const k = currentZoomK;
+    const invK = 1 / k;
+
+    // 1) 2 nokta varsa çizgi, 3+ nokta varsa kapalı çokgen alanı çiz
+    if (window.areaPolyPoints.length === 2) {
+      const lineGeo = {
+        type: "LineString",
+        coordinates: [
+          [window.areaPolyPoints[0].lon, window.areaPolyPoints[0].lat],
+          [window.areaPolyPoints[1].lon, window.areaPolyPoints[1].lat]
+        ]
+      };
+      areaPolyLayerGroup.append("path")
+        .datum(lineGeo)
+        .attr("class", "area-poly-shape")
+        .attr("d", pathGenerator)
+        .attr("fill", "none")
+        .attr("stroke", "#10b981")
+        .attr("stroke-width", 2.4 / k)
+        .attr("stroke-dasharray", `${6 / k},${4 / k}`);
+    } else if (window.areaPolyPoints.length >= 3) {
+      const metrics = computeSphericalPolygonMetrics(window.areaPolyPoints);
+      if (metrics) {
+        areaPolyLayerGroup.append("path")
+          .datum(metrics.polyFeature)
+          .attr("class", "area-poly-shape")
+          .attr("d", pathGenerator)
+          .attr("fill", areaPolyClosed ? "rgba(16, 185, 129, 0.26)" : "rgba(16, 185, 129, 0.16)")
+          .attr("stroke", "#34d399")
+          .attr("stroke-width", 2.4 / k)
+          .attr("stroke-linejoin", "round");
+
+        // Merkezde Alan Rozeti
+        const midVis = !isGlobeMode || isGeoVisibleOnGlobe(metrics.centerLonLat[0], metrics.centerLonLat[1], 0.05);
+        const mPt = midVis ? projection(metrics.centerLonLat) : null;
+        if (mPt && isFinite(mPt[0]) && isFinite(mPt[1])) {
+          const areaStr = metrics.areaKm2 >= 100
+            ? `${Math.round(metrics.areaKm2).toLocaleString("tr-TR")} km²`
+            : `${metrics.areaKm2.toLocaleString("tr-TR", { maximumFractionDigits: 2 })} km²`;
+          const bw = Math.max(96, areaStr.length * 6.4 + 16);
+          const badgeG = areaPolyLayerGroup.append("g")
+            .attr("class", "area-poly-ui")
+            .attr("transform", `translate(${mPt[0]}, ${mPt[1]}) scale(${invK})`);
+          badgeG.append("rect")
+            .attr("x", -bw / 2).attr("y", -11).attr("width", bw).attr("height", 22).attr("rx", 6)
+            .attr("fill", "rgba(6, 11, 25, 0.94)").attr("stroke", "#34d399").attr("stroke-width", 1.2);
+          badgeG.append("text")
+            .attr("text-anchor", "middle").attr("dominant-baseline", "central")
+            .attr("font-size", "10.5px").attr("font-weight", "900").attr("fill", "#6ee7b7")
+            .text(`📐 ${areaStr}`);
+        }
+      }
+    }
+
+    // 2) Köşe Noktaları (1, 2, 3...)
+    window.areaPolyPoints.forEach((pt, idx) => {
+      const vis = !isGlobeMode || isGeoVisibleOnGlobe(pt.lon, pt.lat, 0.02);
+      if (!vis) return;
+      const sPt = projection([pt.lon, pt.lat]);
+      if (!sPt || !isFinite(sPt[0]) || !isFinite(sPt[1])) return;
+
+      const vG = areaPolyLayerGroup.append("g")
+        .attr("class", "area-poly-ui")
+        .attr("transform", `translate(${sPt[0]}, ${sPt[1]}) scale(${invK})`);
+
+      vG.append("circle")
+        .attr("r", idx === 0 ? 5.5 : 4.2)
+        .attr("fill", idx === 0 ? "#fde047" : "#10b981")
+        .attr("stroke", "#090e1a")
+        .attr("stroke-width", 1.4);
+
+      vG.append("text")
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "9px")
+        .attr("font-weight", "900")
+        .attr("fill", "#ffffff")
+        .attr("stroke", "rgba(6,9,17,0.95)")
+        .attr("stroke-width", "2.2px")
+        .attr("paint-order", "stroke")
+        .text(`P${idx + 1}`);
+    });
+  }
+
+  function updateAreaPolygonHud() {
+    clearLiveCountryClock();
+    const hudCard = document.getElementById("mainHudCard");
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+    const T = document.getElementById("hudStatusTitle");
+    const N = document.getElementById("hudName");
+    const I = document.getElementById("hudInfo");
+
+    const cnt = window.areaPolyPoints.length;
+    if (cnt < 3) {
+      T.innerText = `📐 GERÇEK ALAN & ÇEVRE ÖLÇER (${cnt}/3 KÖŞE)`;
+      N.innerText = cnt === 0 ? "1. Poligon Köşesini Seçin" : `${cnt} Köşe Seçildi • En Az ${3 - cnt} Köşe Daha Tıklayın`;
+      I.innerHTML = `
+        <div class="source-pill pill-embedded">🟢 Küresel Elipsoid Yüzölçümü Motoru Aktif</div>
+        <div>🖱️ Harita üzerinde sınırlarını ölçmek istediğiniz bölgenin <b>köşe noktalarına</b> sırayla sol tıklayın.</div>
+        <div class="hud-route-actions">
+          ${cnt > 0 ? `<button class="hud-mini-btn danger" onclick="clearAreaPolygon()">🗑️ Sıfırla</button>` : ""}
+          <button class="hud-mini-btn" onclick="toggleAreaPolygonMode(false)">✖ Kapat</button>
+        </div>
+      `;
+      return;
+    }
+
+    const m = computeSphericalPolygonMetrics(window.areaPolyPoints);
+    const areaKm2Str = m.areaKm2 >= 100
+      ? `${Math.round(m.areaKm2).toLocaleString("tr-TR")} km²`
+      : `${m.areaKm2.toLocaleString("tr-TR", { maximumFractionDigits: 2 })} km²`;
+    const perimStr = `${Math.round(m.perimeterKm).toLocaleString("tr-TR")} km`;
+    const hektarStr = `${Math.round(m.areaKm2 * 100).toLocaleString("tr-TR")} ha`;
+
+    let compHtml = "";
+    if (m.nearestTr) {
+      const rTxt = m.nearestTr.ratio >= 10 ? Math.round(m.nearestTr.ratio) : m.nearestTr.ratio.toFixed(1).replace(".", ",");
+      compHtml += `<div>🇹🇷 <b>İl Kıyaslaması:</b> ${escapeHudHtml(m.nearestTr.name)} ilinin <b>~${rTxt} katı</b></div>`;
+    }
+    if (m.nearestCountry) {
+      const rTxt = m.nearestCountry.ratio >= 10 ? Math.round(m.nearestCountry.ratio) : m.nearestCountry.ratio.toFixed(1).replace(".", ",");
+      compHtml += `<div>🌍 <b>Ülke Kıyaslaması:</b> ${escapeHudHtml(m.nearestCountry.name)} yüzölçümünün <b>~${rTxt} katı</b></div>`;
+    }
+
+    T.innerText = `📐 KÜRESEL POLİGON ANALİZİ (${cnt} KÖŞE)`;
+    N.innerText = `📐 Alan: ${areaKm2Str} • Çevre: ${perimStr}`;
+    I.innerHTML = `
+      <div class="source-pill pill-embedded">🟢 Gerçek Küresel Yüzölçümü (Yeni köşe tıklayarak genişletebilirsiniz)</div>
+      <div class="hud-country-grid">
+        <div>📐 <b>Yüzölçümü:</b> <span class="hud-route-kpi">${areaKm2Str}</span></div>
+        <div>📏 <b>Çevre Uzunluğu:</b> <b>${perimStr}</b></div>
+        <div class="hud-grid-full">🌾 <b>Hektar Karşılığı:</b> ${hektarStr}</div>
+        <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">${compHtml}</div>
+      </div>
+      <div class="hud-route-actions">
+        <button class="hud-mini-btn" onclick="popLastAreaPolygonPoint()">↩️ Son Köşeyi Sil</button>
+        <button class="hud-mini-btn danger" onclick="clearAreaPolygon()">🗑️ Temizle</button>
+        <button class="hud-mini-btn" onclick="toggleAreaPolygonMode(false)">✖ Kapat</button>
+      </div>
+    `;
+  }
+
+  window.popLastAreaPolygonPoint = function () {
+    if (window.areaPolyPoints.length === 0) return;
+    window.areaPolyPoints.pop();
+    renderAreaPolygonOverlay();
+    updateAreaPolygonHud();
+  };
+
+  window.clearAreaPolygon = function () {
+    window.areaPolyPoints = [];
+    areaPolyClosed = false;
+    renderAreaPolygonOverlay();
+    if (window.areaPolyMode) updateAreaPolygonHud();
+  };
+
+  window.restoreAreaPolygonFromString = function (polyStr) {
+    const parts = polyStr.split("|");
+    const pts = [];
+    parts.forEach(p => {
+      const [lo, la] = p.split(",").map(Number);
+      if (isFinite(lo) && isFinite(la)) pts.push({ lon: lo, lat: la });
+    });
+    if (pts.length >= 3) {
+      window.areaPolyMode = true;
+      window.areaPolyPoints = pts;
+      areaPolyClosed = true;
+      const btn = document.getElementById("btnAreaPolyToggle");
+      if (btn) { btn.classList.add("poly-on"); btn.innerText = "📐 Alan Ölçer: Açık"; }
+      document.getElementById("mapStage").classList.add("measure-cursor");
+      renderAreaPolygonOverlay();
+      updateAreaPolygonHud();
+    }
+  };
+
+  window.toggleAreaPolygonMode = function (forceState) {
+    window.areaPolyMode = typeof forceState === "boolean" ? forceState : !window.areaPolyMode;
+    const btn = document.getElementById("btnAreaPolyToggle");
+    const stage = document.getElementById("mapStage");
+    if (btn) {
+      btn.classList.toggle("poly-on", window.areaPolyMode);
+      btn.innerText = window.areaPolyMode ? "📐 Alan Ölçer: Açık" : "📐 Alan Ölçer: Kapalı";
+    }
+    if (window.areaPolyMode) {
+      if (measureMode) toggleMeasureMode();
+      if (window.antipodeMode) window.toggleAntipodeMode(false);
+      if (vsCompareMode) toggleVsCompareMode(false);
+      if (stage) stage.classList.add("measure-cursor");
+      updateAreaPolygonHud();
+    } else {
+      if (stage && !measureMode && !window.antipodeMode) stage.classList.remove("measure-cursor");
+      window.clearAreaPolygon();
+      document.getElementById("hudStatusTitle").innerText = "SEÇİLİ BÖLGE BİLGİSİ";
+      document.getElementById("hudName").innerText = "Alan ölçer kapatıldı";
+      document.getElementById("hudInfo").innerHTML = `<div>🌐 Haritadan ülke, 81 il, başkent, deniz, göl veya nehir seçebilirsiniz.</div>`;
+    }
+  };
+
+  // ============================================================================
+  // 🧭 MODÜL 3: ANTİPOD (DÜNYANIN TAM ÖBÜR UCU) BULUCU
+  // ============================================================================
+  window.antipodeMode = false;
+  window.antipodePair = null; // { origin: {lon, lat, label}, anti: {lon, lat, label, isLand} }
+  let antipodeDownPt = null;
+
+  function describePointGeography(lon, lat) {
+    // 1) Türkiye İli mi?
+    if (Array.isArray(allTrProvinceFeatures)) {
+      for (let i = 0; i < allTrProvinceFeatures.length; i++) {
+        const p = allTrProvinceFeatures[i];
+        try {
+          if (p.geometry && d3.geoContains(p, [lon, lat])) {
+            return { label: `🇹🇷 ${p.trName}, TÜRKİYE`, isLand: true };
+          }
+        } catch (e) {}
+      }
+    }
+    // 2) Dünya Ülkesi mi?
+    if (Array.isArray(allCountryFeatures)) {
+      for (let i = 0; i < allCountryFeatures.length; i++) {
+        const f = allCountryFeatures[i];
+        try {
+          if (f.geometry && d3.geoContains(f, [lon, lat])) {
+            return { label: `🌍 ${f.fullTrName || f.trName}`, isLand: true };
+          }
+        } catch (e) {}
+      }
+    }
+    // 3) Okyanus / Deniz
+    let nearestSea = null;
+    let minD = Infinity;
+    if (Array.isArray(SEAS_AND_OCEANS)) {
+      for (let i = 0; i < SEAS_AND_OCEANS.length; i++) {
+        const s = SEAS_AND_OCEANS[i];
+        const d = d3.geoDistance([lon, lat], [s.lon, s.lat]);
+        if (d < minD) { minD = d; nearestSea = s; }
+      }
+    }
+    return {
+      label: nearestSea ? `🌊 ${nearestSea.name}` : "🌊 Açık Okyanus",
+      isLand: false
+    };
+  }
+
+  function renderAntipodeOverlay() {
+    antipodeLayerGroup.selectAll("*").remove();
+    if (!window.antipodePair) return;
+
+    const { origin, anti } = window.antipodePair;
+    const k = currentZoomK;
+    const invK = 1 / k;
+
+    // Jeodezik yay çizgisi (antipod tünel yayı) kullanıcı isteğiyle gizlendi; yalnızca başlangıç ve antipod pinleri gösterilir.
+
+    const drawPin = (ptObj, color, tag) => {
+      const vis = !isGlobeMode || isGeoVisibleOnGlobe(ptObj.lon, ptObj.lat, 0.02);
+      if (!vis) return;
+      const sPt = projection([ptObj.lon, ptObj.lat]);
+      if (!sPt || !isFinite(sPt[0]) || !isFinite(sPt[1])) return;
+
+      const g = antipodeLayerGroup.append("g")
+        .attr("transform", `translate(${sPt[0]}, ${sPt[1]}) scale(${invK})`);
+      g.append("circle").attr("r", 9).attr("fill", "none").attr("stroke", color).attr("stroke-width", 1.4);
+      g.append("circle").attr("r", 4.5).attr("fill", color).attr("stroke", "#ffffff").attr("stroke-width", 1.3);
+      const w = Math.max(76, tag.length * 6.2 + 12);
+      g.append("rect").attr("x", -w / 2).attr("y", 11).attr("width", w).attr("height", 15).attr("rx", 4).attr("fill", "rgba(9,14,26,0.92)").attr("stroke", color).attr("stroke-width", 1);
+      g.append("text").attr("y", 18.5).attr("text-anchor", "middle").attr("dominant-baseline", "central").attr("font-size", "9px").attr("font-weight", "900").attr("fill", "#fff").text(tag);
+    };
+
+    drawPin(origin, "#38bdf8", "📍 BAŞLANGIÇ");
+    drawPin(anti, "#ec4899", "🧭 ANTİPOD (ÖBÜR UÇ)");
+  }
+
+  function computeAndShowAntipode(lon, lat, autoFly = true) {
+    const antiLat = -lat;
+    const antiLon = normalizeLon180(lon + 180);
+    const origDesc = describePointGeography(lon, lat);
+    const antiDesc = describePointGeography(antiLon, antiLat);
+
+    window.antipodePair = {
+      origin: { lon, lat, label: origDesc.label, isLand: origDesc.isLand },
+      anti: { lon: antiLon, lat: antiLat, label: antiDesc.label, isLand: antiDesc.isLand }
+    };
+
+    renderAntipodeOverlay();
+    updateAntipodeHud();
+
+    if (autoFly) {
+      window.flyToAntipodeTarget();
+    }
+  }
+
+  window.flyToAntipodeTarget = function () {
+    if (!window.antipodePair) return;
+    const { anti } = window.antipodePair;
+    const targetK = isGlobeMode ? Math.max(currentZoomK, 2.2) : Math.max(currentZoomK, 2.6);
+    focusGeoTarget([anti.lon, anti.lat], projection2D([anti.lon, anti.lat]), targetK, () => {
+      const pt = projection([anti.lon, anti.lat]);
+      if (pt) triggerRadarRings(pt[0], pt[1], "#ec4899");
+    });
+  };
+
+  window.flyToAntipodeOrigin = function () {
+    if (!window.antipodePair) return;
+    const { origin } = window.antipodePair;
+    const targetK = isGlobeMode ? Math.max(currentZoomK, 2.2) : Math.max(currentZoomK, 2.6);
+    focusGeoTarget([origin.lon, origin.lat], projection2D([origin.lon, origin.lat]), targetK, () => {
+      const pt = projection([origin.lon, origin.lat]);
+      if (pt) triggerRadarRings(pt[0], pt[1], "#38bdf8");
+    });
+  };
+
+  function updateAntipodeHud() {
+    clearLiveCountryClock();
+    const hudCard = document.getElementById("mainHudCard");
+    if (hudCard) hudCard.classList.remove("vs-expanded");
+    const T = document.getElementById("hudStatusTitle");
+    const N = document.getElementById("hudName");
+    const I = document.getElementById("hudInfo");
+
+    if (!window.antipodePair) {
+      T.innerText = "🧭 ANTİPOD (DÜNYANIN TAM ÖBÜR UCU) BULUCU";
+      N.innerText = "Haritada Bir Nokta Seçin";
+      I.innerHTML = `
+        <div class="source-pill pill-embedded">🟢 Küresel Tam Karşıt Koordinat Motoru (−Enlem, Boylam ± 180°)</div>
+        <div>🖱️ Haritada herhangi bir şehre, ülkeye veya noktaya tıklayın; yer kürenin merkezinden geçen <b>tam öbür ucunu</b> anında bulun.</div>
+        <div class="hud-route-actions">
+          <button class="hud-mini-btn" onclick="computeAndShowAntipode(28.98, 41.01, true)">🇹🇷 İstanbul'un Öbür Ucu</button>
+          <button class="hud-mini-btn danger" onclick="toggleAntipodeMode(false)">✖ Kapat</button>
+        </div>
+      `;
+      return;
+    }
+
+    const { origin, anti } = window.antipodePair;
+    T.innerText = "🧭 ANTİPOD ANALİZİ • 20.037 KM YER ÇAPI TÜNELİ";
+    N.innerText = `🧭 ${escapeHudHtml(anti.label)}`;
+    I.innerHTML = `
+      <div class="source-pill pill-embedded">🟢 ${anti.isLand ? "Kara → Kara Antipodu (Nadir!)" : "Kara → Okyanus Antipodu"}</div>
+      <div class="hud-country-grid">
+        <div>📍 <b>Seçilen Nokta:</b> ${escapeHudHtml(origin.label)}</div>
+        <div>🧭 <b>Koordinat:</b> ${formatCoordShort(origin.lat, origin.lon)}</div>
+        <div>🎯 <b>Tam Öbür Uç:</b> <span class="hud-route-kpi">${escapeHudHtml(anti.label)}</span></div>
+        <div>🌐 <b>Antipod Koor.:</b> ${formatCoordShort(anti.lat, anti.lon)}</div>
+        <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">🌡️ <b>Antipod Canlı Hava:</b> <span id="hudLiveWeatherVal" style="color:#7dd3fc;font-weight:800;">Ölçülüyor...</span></div>
+      </div>
+      <div class="hud-route-actions">
+        <button class="hud-mini-btn" onclick="flyToAntipodeTarget()">🎯 Öbür Uca Git</button>
+        <button class="hud-mini-btn" onclick="flyToAntipodeOrigin()">↩️ Başlangıca Dön</button>
+        <button class="hud-mini-btn danger" onclick="toggleAntipodeMode(false)">✖ Kapat</button>
+      </div>
+    `;
+    if (typeof updateHudLiveWeather === "function") {
+      updateHudLiveWeather([anti.lon, anti.lat]);
+    }
+  }
+
+  window.restoreAntipodeFromString = function (apStr) {
+    const [lo, la] = apStr.split(",").map(Number);
+    if (isFinite(lo) && isFinite(la)) {
+      window.antipodeMode = true;
+      const btn = document.getElementById("btnAntipodeToggle");
+      if (btn) { btn.classList.add("antipode-on"); btn.innerText = "🧭 Antipod: Açık"; }
+      document.getElementById("mapStage").classList.add("measure-cursor");
+      computeAndShowAntipode(lo, la, false);
+    }
+  };
+
+  window.toggleAntipodeMode = function (forceState) {
+    window.antipodeMode = typeof forceState === "boolean" ? forceState : !window.antipodeMode;
+    const btn = document.getElementById("btnAntipodeToggle");
+    const stage = document.getElementById("mapStage");
+    if (btn) {
+      btn.classList.toggle("antipode-on", window.antipodeMode);
+      btn.innerText = window.antipodeMode ? "🧭 Antipod: Açık" : "🧭 Antipod: Kapalı";
+    }
+    if (window.antipodeMode) {
+      if (measureMode) toggleMeasureMode();
+      if (window.areaPolyMode) window.toggleAreaPolygonMode(false);
+      if (vsCompareMode) toggleVsCompareMode(false);
+      if (stage) stage.classList.add("measure-cursor");
+      updateAntipodeHud();
+    } else {
+      if (stage && !measureMode && !window.areaPolyMode) stage.classList.remove("measure-cursor");
+      window.antipodePair = null;
+      antipodeLayerGroup.selectAll("*").remove();
+      document.getElementById("hudStatusTitle").innerText = "SEÇİLİ BÖLGE BİLGİSİ";
+      document.getElementById("hudName").innerText = "Antipod bulucu kapatıldı";
+      document.getElementById("hudInfo").innerHTML = `<div>🌐 Haritadan ülke, 81 il, başkent, deniz, göl veya nehir seçebilirsiniz.</div>`;
+    }
+  };
+
+  // ============================================================================
+  // HARİTA TIKLAMA YAKALAYICISI (ALAN ÖLÇER & ANTİPOD MODLARI İÇİN)
+  // ============================================================================
+  const svgDom = document.getElementById("worldMap");
+  svgDom.addEventListener("pointerdown", (e) => {
+    areaPolyDownPt = [e.clientX, e.clientY];
+    antipodeDownPt = [e.clientX, e.clientY];
+  }, true);
+
+  svgDom.addEventListener("click", (event) => {
+    if (isMorphing || (typeof quizState !== "undefined" && quizState.active)) return;
+    if (!window.areaPolyMode && !window.antipodeMode) return;
+
+    const refDown = window.areaPolyMode ? areaPolyDownPt : antipodeDownPt;
+    if (refDown && Math.hypot(event.clientX - refDown[0], event.clientY - refDown[1]) > 5) return;
+
+    const localPt = d3.pointer(event, mapGroup.node());
+    if (isGlobeMode && Math.hypot(localPt[0] - width / 2, localPt[1] - GLOBE_CENTER_Y) > GLOBE_BASE_SCALE) return;
+    if (!projection || !projection.invert) return;
+    const inv = projection.invert(localPt);
+    if (!inv || !isFinite(inv[0]) || !isFinite(inv[1])) return;
+
+    const lon = normalizeLon180(inv[0]);
+    const lat = Math.max(-89.5, Math.min(89.5, inv[1]));
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (window.areaPolyMode) {
+      window.areaPolyPoints.push({ lon, lat });
+      const sPt = projection([lon, lat]);
+      if (sPt) triggerRadarRings(sPt[0], sPt[1], "#34d399");
+      renderAreaPolygonOverlay();
+      updateAreaPolygonHud();
+    } else if (window.antipodeMode) {
+      const sPt = projection([lon, lat]);
+      if (sPt) triggerRadarRings(sPt[0], sPt[1], "#38bdf8");
+      computeAndShowAntipode(lon, lat, true);
+    }
+  }, true);
+
+  // ============================================================================
+  // 3D HIZLI CANVAS ÇİZİMİ & PROJEKSİYON / ZOOM SENKRONİZASYONU
+  // ============================================================================
+  window.drawSpaceAndGeoToolsOnFastCanvas = function (ctx, cPath, activeProj, k, morphState, camVec) {
+    // 1) Alan Poligonu
+    if (window.areaPolyPoints.length >= 2) {
+      ctx.save();
+      if (window.areaPolyPoints.length === 2) {
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 2.2 / k;
+        ctx.beginPath();
+        cPath({
+          type: "LineString",
+          coordinates: [
+            [window.areaPolyPoints[0].lon, window.areaPolyPoints[0].lat],
+            [window.areaPolyPoints[1].lon, window.areaPolyPoints[1].lat]
+          ]
+        });
+        ctx.stroke();
+      } else {
+        const m = computeSphericalPolygonMetrics(window.areaPolyPoints);
+        if (m) {
+          ctx.fillStyle = "rgba(16, 185, 129, 0.24)";
+          ctx.strokeStyle = "#34d399";
+          ctx.lineWidth = 2.2 / k;
+          ctx.beginPath();
+          cPath(m.polyFeature);
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    // 2) Antipod Pinleri (Jeodezik yay çizgisi gizlendi)
+    if (window.antipodePair && !morphState) {
+      const { origin, anti } = window.antipodePair;
+      [
+        { pt: origin, col: "#38bdf8" },
+        { pt: anti, col: "#ec4899" }
+      ].forEach(item => {
+        if (!camVec || isVec3Visible(lonLatToVec3(item.pt.lon, item.pt.lat), camVec, 0.02)) {
+          const p = activeProj([item.pt.lon, item.pt.lat]);
+          if (p) {
+            ctx.fillStyle = item.col;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.3 / k;
+            ctx.beginPath();
+            ctx.arc(p[0], p[1], 4.5 / k, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+          }
+        }
+      });
+    }
+
+    // 3) ISS Yörünge & İkon (3D Hızlı Küre Canvas Çizimi)
+    if (window.issTrackerMode && !morphState) {
+      const [curLon, curLat] = predictIssLonLatAtOffset(0);
+      const tracks = buildIssTrackGeoJSON();
+      ctx.save();
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.70)";
+      ctx.lineWidth = 1.6 / k;
+      ctx.setLineDash([4 / k, 4 / k]);
+      ctx.beginPath();
+      cPath(tracks.pastLine);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 2.2 / k;
+      ctx.beginPath();
+      cPath(tracks.futureLine);
+      ctx.stroke();
+
+      const footprint = d3.geoCircle().center([curLon, curLat]).radius(19.8).precision(3)();
+      ctx.fillStyle = "rgba(56, 189, 248, 0.12)";
+      ctx.strokeStyle = "rgba(125, 211, 252, 0.70)";
+      ctx.lineWidth = 1.1 / k;
+      ctx.beginPath();
+      cPath(footprint);
+      ctx.fill();
+      ctx.stroke();
+
+      if (!camVec || isVec3Visible(lonLatToVec3(curLon, curLat), camVec, 0.02)) {
+        const pt = activeProj([curLon, curLat]);
+        if (pt) {
+          const invFast = 1 / Math.max(1, Math.pow(k, 0.74));
+          ctx.translate(pt[0], pt[1]);
+          ctx.scale(invFast, invFast);
+
+          // Kalkan Çemberi
+          ctx.fillStyle = "rgba(6, 11, 25, 0.90)";
+          ctx.strokeStyle = "#fde047";
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(0, 0, 12, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+
+          // Güneş Panelleri ve Ana Modül
+          ctx.strokeStyle = "#fde047";
+          ctx.lineWidth = 2.4;
+          ctx.beginPath();
+          ctx.moveTo(-19, 0);
+          ctx.lineTo(19, 0);
+          ctx.stroke();
+
+          ctx.fillStyle = "#0284c7";
+          ctx.strokeStyle = "#bae6fd";
+          ctx.lineWidth = 1;
+          ctx.fillRect(-19, -8, 9, 16);
+          ctx.strokeRect(-19, -8, 9, 16);
+          ctx.fillRect(10, -8, 9, 16);
+          ctx.strokeRect(10, -8, 9, 16);
+
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(-3.8, -5.5, 7.6, 11);
+        }
+      }
+      ctx.restore();
+    }
+  };
+
+  const _prevUpdateTypo = updateDynamicTypography;
+  updateDynamicTypography = function () {
+    _prevUpdateTypo.apply(this, arguments);
+    if (!isMorphing) {
+      if (window.issTrackerMode) renderIssSvgLayer();
+      if (window.areaPolyPoints.length > 0) renderAreaPolygonOverlay();
+      if (window.antipodePair) renderAntipodeOverlay();
+    }
+  };
+
+  const _prevRefreshAll = refreshAllProjectedPositions;
+  refreshAllProjectedPositions = function (syncAll) {
+    _prevRefreshAll.apply(this, arguments);
+    if (window.issTrackerMode) renderIssSvgLayer();
+    if (window.areaPolyPoints.length > 0) renderAreaPolygonOverlay();
+    if (window.antipodePair) renderAntipodeOverlay();
+  };
+
+  const _prevMorphVis = setMorphLabelsVisibility;
+  setMorphLabelsVisibility = function (visible) {
+    _prevMorphVis.apply(this, arguments);
+    issMorphHidden = !visible;
+    const disp = visible ? null : "none";
+    issLayerGroup.style("display", disp);
+    areaPolyLayerGroup.style("display", disp);
+    antipodeLayerGroup.style("display", disp);
+  };
+})();
+</script>
+
+
+<script id="satelliteCloudsModule">
+/* ============================================================================
+   ☁️ SECOVVV GEO-PRO // GERÇEK UYDU BULUT MOTORU v2.2 (BAĞIMSIZ SAĞ PANEL)
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  const FW = 2048, FH = 1024;
+  const FRAME_COUNT = 6;
+  const FRAME_STEP_MIN = 30;
+  const LATENCY_MIN = 45;
+  const FADE_MS = 750;
+  const GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi";
+  const EUM_WMS = "https://view.eumetsat.int/geoserver/wms";
+  const DEG = Math.PI / 180;
+
+  const SATS = [
+    { id: "goes-w",   name: "GOES-West",     lon: -137.0, src: "gibs", layer: "GOES-West_ABI_Band13_Clean_Infrared",  stepMin: 10 },
+    { id: "goes-e",   name: "GOES-East",     lon: -75.2,  src: "gibs", layer: "GOES-East_ABI_Band13_Clean_Infrared",  stepMin: 10 },
+    { id: "mtg",      name: "Meteosat",      lon: 0.0,    src: "eum",  find: [/^mtg_fd:ir105/i, /^mtg_fd:.*ir.?10/i],   stepMin: 10 },
+    { id: "iodc",     name: "Meteosat-IODC", lon: 45.5,   src: "eum",  find: [/^msg_iodc:ir108/i, /^msg_iodc:.*ir.?10/i], stepMin: 15 },
+    { id: "himawari", name: "Himawari",      lon: 140.7,  src: "gibs", layer: "Himawari_AHI_Band13_Clean_Infrared",   stepMin: 10 }
+  ];
+  const SAT_BY_ID = {};
+  SATS.forEach(s => { SAT_BY_ID[s.id] = s; });
+
+  window.satelliteCloudsMode = false;
+  let cloudSpectrumMode = "visible";
+  let cloudOpacityLevel = 0.92;
+  let cloudPlaying = true;
+  let cloudPanelMinimized = false;
+  let frames = [];
+  let curIdx = 0;
+  let loopTimer = null;
+  let pollTimer = null;
+  let loadingBusy = false;
+  let frameUid = 0;
+  let eumDiscovered = false;
+  let pendingRebake = false;
+  let rebakeTimer = null;
+  let shownViewKey = "";
+  const state = { kind: "idle", prov: {}, msg: "", fetchedAt: 0, headT: 0 };
+
+  const cldStyle = document.createElement("style");
+  cldStyle.textContent = `
+    .btn.clouds-on { background: linear-gradient(135deg,#0284c7,#0ea5e9); border-color:#e0f2fe; color:#fff; box-shadow:0 0 14px rgba(56,189,248,.55); }
+    .cld-floating-panel {
+      position: absolute;
+      bottom: 14px;
+      right: 48px;
+      width: 285px;
+      max-width: calc(100vw - 68px);
+      background: rgba(11, 17, 30, 0.96);
+      backdrop-filter: blur(10px);
+      border: 1.2px solid #38bdf8;
+      border-radius: 10px;
+      padding: 6px 8px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.88);
+      z-index: 15;
+      display: none;
+      color: #cbd5e1;
+      font-size: 10.5px;
+    }
+    .cld-floating-panel.minimized .cld-panel-body { display: none; }
+    .cld-floating-panel.minimized { width: auto; min-width: 195px; }
+    .cld-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9px;
+      font-weight: 900;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #1e2d4a;
+      padding-bottom: 3px;
+      margin-bottom: 4px;
+      gap: 6px;
+    }
+    .cld-floating-panel.minimized .cld-panel-head { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .cloud-spec-bar { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-top:5px; }
+    .cloud-spec-btn { background:#0f172a; border:1px solid #334155; color:#cbd5e1; font-size:9.5px; font-weight:800; padding:4.5px 4px; border-radius:6px; cursor:pointer; text-align:center; transition:.14s; }
+    .cloud-spec-btn:hover { border-color:#38bdf8; color:#fff; }
+    .cloud-spec-btn.active { background:#0284c7; border-color:#fde047; color:#fff; box-shadow:0 0 8px rgba(56,189,248,.4); }
+    .cld-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+    .cld-chip { font-size:9px; font-weight:800; padding:2px 6px; border-radius:99px; border:1px solid #334155; background:#0f172a; color:#94a3b8; }
+    .cld-chip.ok { border-color:#10b981; color:#6ee7b7; }
+    .cld-chip.bad { border-color:#f43f5e; color:#fda4af; }
+    .cld-timeline { display:flex; align-items:center; gap:6px; margin-top:4px; }
+    .cld-timeline input[type=range] { flex:1; }
+    .cld-play { background:#0284c7; color:#fff; border:none; border-radius:6px; width:26px; height:22px; font-size:11px; cursor:pointer; }
+    @media (max-width: 780px) {
+      .cld-floating-panel { top: 12px; bottom: auto; right: 12px; width: 255px; }
+    }
+  `;
+  document.head.appendChild(cldStyle);
+
+  /* Sağ Alt/Sağ Taraf Bağımsız Bulut Paneli Konteyneri */
+  const cloudPanelEl = document.createElement("div");
+  cloudPanelEl.id = "secovvvCloudsPanel";
+  cloudPanelEl.className = "cld-floating-panel";
+  document.getElementById("mapStage").appendChild(cloudPanelEl);
+
+  const beforeLabels = () => labelsGroup.node();
+  const cloudsSvgGroup = mapGroup.insert("g", beforeLabels)
+    .attr("class", "secovvv-satellite-clouds-group")
+    .attr("clip-path", "url(#sphereClip)")
+    .style("display", "none")
+    .style("pointer-events", "none");
+
+  const mkImg = () => cloudsSvgGroup.append("image")
+    .attr("class", "satellite-cloud-bitmap")
+    .attr("x", 0).attr("y", 0).attr("width", width).attr("height", height)
+    .attr("preserveAspectRatio", "none")
+    .attr("opacity", 0);
+  const imgA = mkImg();
+  const imgB = mkImg();
+  let activeImg = imgA;
+
+  function setImg(sel, url, g) {
+    sel.attr("x", g.x).attr("y", g.y).attr("width", g.w).attr("height", g.h)
+      .attr("href", url).attr("xlink:href", url);
+  }
+
+  const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+  function smooth(a, b, x) { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); }
+  const tick = () => new Promise(r => setTimeout(r, 0));
+  const fmtUTC = (ms) => new Date(ms).toISOString().slice(11, 16) + " UTC";
+  const fmtLocal = (ms) => new Date(ms).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+  const isoZ = (ms) => new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
+  const snapMs = (ms, stepMin) => Math.floor(ms / (stepMin * 60000)) * (stepMin * 60000);
+
+  const cosLatArr = new Float32Array(FH);
+  for (let y = 0; y < FH; y++) cosLatArr[y] = Math.cos((90 - (y + 0.5) / FH * 180) * DEG);
+  const satCosCols = {};
+  function cosColFor(sat) {
+    if (satCosCols[sat.id]) return satCosCols[sat.id];
+    const a = new Float32Array(FW);
+    for (let x = 0; x < FW; x++) a[x] = Math.cos(((x + 0.5) / FW * 360 - 180 - sat.lon) * DEG);
+    return (satCosCols[sat.id] = a);
+  }
+
+  function tap(arr, W, H, u, v) {
+    let x0 = Math.floor(u), y0 = Math.floor(v);
+    const fx = u - x0, fy = v - y0;
+    let x1 = x0 + 1, y1 = y0 + 1;
+    x0 = ((x0 % W) + W) % W; x1 = ((x1 % W) + W) % W;
+    y0 = y0 < 0 ? 0 : y0 >= H ? H - 1 : y0;
+    y1 = y1 < 0 ? 0 : y1 >= H ? H - 1 : y1;
+    const a = arr[y0 * W + x0], b = arr[y0 * W + x1], c = arr[y1 * W + x0], d = arr[y1 * W + x1];
+    return (a + (b - a) * fx) * (1 - fy) + (c + (d - c) * fx) * fy;
+  }
+
+  const netQ = { active: 0, max: 4, q: [] };
+  function runLimited(fn) {
+    return new Promise((res, rej) => { netQ.q.push({ fn, res, rej }); pumpQ(); });
+  }
+  function pumpQ() {
+    while (netQ.active < netQ.max && netQ.q.length) {
+      const j = netQ.q.shift();
+      netQ.active++;
+      j.fn().then(j.res, j.rej).finally(() => { netQ.active--; pumpQ(); });
+    }
+  }
+
+  async function fetchWithTimeout(url, ms) {
+    const ctrl = new AbortController();
+    const tm = setTimeout(() => ctrl.abort(), ms);
+    try { return await fetch(url, { mode: "cors", signal: ctrl.signal }); }
+    finally { clearTimeout(tm); }
+  }
+
+  async function fetchImagePixels(url) {
+    const r = await fetchWithTimeout(url, 25000);
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const ct = (r.headers.get("content-type") || "").toLowerCase();
+    if (ct.indexOf("image/") !== 0) throw new Error("GÖRÜNTÜ_DEĞİL");
+    const bmp = await createImageBitmap(await r.blob());
+    const c = document.createElement("canvas");
+    c.width = FW; c.height = FH;
+    const x = c.getContext("2d", { willReadFrequently: true });
+    x.drawImage(bmp, 0, 0, FW, FH);
+    if (bmp.close) bmp.close();
+    const id = x.getImageData(0, 0, FW, FH).data;
+    const N = FW * FH;
+    const v = new Uint8Array(N), a = new Uint8Array(N);
+    let valid = 0;
+    for (let i = 0, p = 0; i < N; i++, p += 4) {
+      const R = id[p], G = id[p + 1], B = id[p + 2];
+      const mx = R > G ? (R > B ? R : B) : (G > B ? G : B);
+      const lum = 0.299 * R + 0.587 * G + 0.114 * B;
+      v[i] = lum > mx * 0.85 ? lum : mx * 0.85;
+      a[i] = id[p + 3];
+      if (id[p + 3] > 24) valid++;
+    }
+    return { v, a, valid };
+  }
+
+  function buildUrl(sat, tMs) {
+    const time = tMs ? "&TIME=" + encodeURIComponent(isoZ(tMs)) : "";
+    if (sat.src === "gibs") {
+      return `${GIBS_WMS}?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=${sat.layer}&STYLES=&FORMAT=image%2Fpng&TRANSPARENT=TRUE&SRS=EPSG%3A4326&BBOX=-180,-90,180,90&WIDTH=${FW}&HEIGHT=${FH}${time}`;
+    }
+    return `${EUM_WMS}?service=WMS&version=1.3.0&request=GetMap&layers=${encodeURIComponent(sat.layerName)}&styles=&format=image%2Fpng&transparent=true&crs=EPSG%3A4326&bbox=-90,-180,90,180&width=${FW}&height=${FH}${time}`;
+  }
+
+  async function fetchSat(sat, tTarget, tries) {
+    const base = snapMs(tTarget, sat.stepMin);
+    const times = [null];
+    for (let k = 0; k < tries; k++) times.push(base - k * sat.stepMin * 60000);
+    let lastErr = null;
+    for (const t of times) {
+      try {
+        const px = await runLimited(() => fetchImagePixels(buildUrl(sat, t)));
+        if (px.valid < FW * FH * 0.008) { lastErr = new Error("BOŞ_GÖRÜNTÜ"); continue; }
+        return { px, t: t || base };
+      } catch (e) {
+        lastErr = e;
+        if (e && (e.name === "TypeError" || e.name === "AbortError")) break;
+      }
+    }
+    throw lastErr || new Error("VERİ_YOK");
+  }
+
+  async function discoverEumet() {
+    if (eumDiscovered) return;
+    eumDiscovered = true;
+    const eum = SATS.filter(s => s.src === "eum");
+    try {
+      const r = await fetchWithTimeout(EUM_WMS + "?service=WMS&version=1.3.0&request=GetCapabilities", 20000);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      const txt = await r.text();
+      const names = [];
+      const re = /<Name>([^<]+)<\/Name>/g;
+      let m;
+      while ((m = re.exec(txt))) names.push(m[1]);
+      eum.forEach(s => {
+        for (const rx of s.find) {
+          const n = names.find(x => rx.test(x));
+          if (n) { s.layerName = n; break; }
+        }
+      });
+    } catch (e) {
+      eum.forEach(s => { s.discoverErr = (e && e.name === "TypeError") ? "CORS/ağ engeli" : String(e && e.message || e); });
+    }
+  }
+
+  function percentiles(px, sat, inv, ps) {
+    const hist = new Uint32Array(256);
+    const cc = cosColFor(sat);
+    let n = 0;
+    for (let y = 0; y < FH; y += 2) {
+      const cl = cosLatArr[y];
+      for (let x = 0; x < FW; x += 2) {
+        const i = y * FW + x;
+        if (px.a[i] < 200 || cl * cc[x] < 0.35) continue;
+        hist[inv ? 255 - px.v[i] : px.v[i]]++; n++;
+      }
+    }
+    return ps.map(p => {
+      let acc = 0; const t = p * n;
+      for (let b = 0; b < 256; b++) { acc += hist[b]; if (acc >= t) return b; }
+      return 255;
+    });
+  }
+
+  function overlapCorr(pa, sa, pb, sb) {
+    const ca = cosColFor(sa), cb = cosColFor(sb);
+    let n = 0, sx = 0, sy = 0, sxx = 0, syy = 0, sxy = 0;
+    for (let y = 0; y < FH; y += 4) {
+      const cl = cosLatArr[y];
+      for (let x = 0; x < FW; x += 4) {
+        const i = y * FW + x;
+        if (pa.a[i] < 200 || pb.a[i] < 200) continue;
+        if (cl * ca[x] < 0.4 || cl * cb[x] < 0.4) continue;
+        const A = pa.v[i], B = pb.v[i];
+        n++; sx += A; sy += B; sxx += A * A; syy += B * B; sxy += A * B;
+      }
+    }
+    if (n < 1500) return { n, r: 0 };
+    const cov = sxy / n - (sx / n) * (sy / n);
+    const vx = sxx / n - (sx / n) * (sx / n), vy = syy / n - (sy / n) * (sy / n);
+    return { n, r: (vx > 1e-6 && vy > 1e-6) ? cov / Math.sqrt(vx * vy) : 0 };
+  }
+
+  function calibrate(pxById) {
+    const cal = {};
+    const trusted = [];
+    const mk = (s, inv) => {
+      const [lo, hi] = percentiles(pxById[s.id], s, inv, [0.05, 0.97]);
+      return { inv, lo, hi: Math.max(hi, lo + 8) };
+    };
+    SATS.filter(s => pxById[s.id] && s.src === "gibs").forEach(s => { cal[s.id] = mk(s, false); trusted.push(s); });
+    SATS.filter(s => pxById[s.id] && s.src !== "gibs").forEach(s => {
+      let best = null;
+      for (const t of trusted) {
+        const o = overlapCorr(pxById[s.id], s, pxById[t.id], t);
+        if (!best || o.n > best.n) best = o;
+      }
+      const inv = !!(best && best.n >= 1500 && best.r < -0.05);
+      cal[s.id] = mk(s, inv);
+      cal[s.id].corr = best ? best.r : 0;
+      trusted.push(s);
+    });
+    return cal;
+  }
+
+  async function composeFrame(pxById, cal) {
+    const N = FW * FH;
+    const thick = new Uint8Array(N), bright = new Uint8Array(N);
+    const items = Object.keys(pxById).map(id => ({ px: pxById[id], cos: cosColFor(SAT_BY_ID[id]), cal: cal[id] }));
+    let areaSum = 0, cloudySum = 0;
+
+    for (let y = 0; y < FH; y++) {
+      const lat = 90 - (y + 0.5) / FH * 180;
+      const aLat = Math.abs(lat);
+      const cl = cosLatArr[y];
+      const polar = 1 - smooth(62, 78, aLat);
+      const latThr = 0.28 + 0.14 * smooth(38, 70, aLat);
+      for (let x = 0; x < FW; x++) {
+        const i = y * FW + x;
+        let ws = 0, sv = 0;
+        for (let k = 0; k < items.length; k++) {
+          const it = items[k];
+          if (it.px.a[i] < 24) continue;
+          const c = cl * it.cos[x] - 0.10;
+          if (c <= 0) continue;
+          const w = c * c * c;
+          const vv = it.cal.inv ? 255 - it.px.v[i] : it.px.v[i];
+          let s = (vv - it.cal.lo) / (it.cal.hi - it.cal.lo);
+          s = s < 0 ? 0 : s > 1 ? 1 : s;
+          ws += w; sv += w * s;
+        }
+        if (ws <= 0) continue;
+        const s = sv / ws;
+        const cov = smooth(0, 0.02, ws);
+        const th = smooth(latThr, 0.78, s) * polar * cov;
+        thick[i] = (th * 255) | 0;
+        bright[i] = (s * 255) | 0;
+        if (aLat < 60) { areaSum += cl; if (th > 0.30) cloudySum += cl; }
+      }
+      if ((y & 127) === 127) await tick();
+    }
+    blur121(thick);
+    return { W: FW, H: FH, thick, bright, src: "sat", coverPct: areaSum > 0 ? Math.round(100 * cloudySum / areaSum) : 0 };
+  }
+
+  function blur121(arr) {
+    const tmp = new Uint8Array(arr.length);
+    for (let y = 0; y < FH; y++) {
+      const o = y * FW;
+      for (let x = 0; x < FW; x++) {
+        const xl = x === 0 ? FW - 1 : x - 1, xr = x === FW - 1 ? 0 : x + 1;
+        tmp[o + x] = (arr[o + xl] + 2 * arr[o + x] + arr[o + xr]) >> 2;
+      }
+    }
+    for (let y = 0; y < FH; y++) {
+      const yu = y === 0 ? 0 : y - 1, yd = y === FH - 1 ? FH - 1 : y + 1;
+      for (let x = 0; x < FW; x++) {
+        arr[y * FW + x] = (tmp[yu * FW + x] + 2 * tmp[y * FW + x] + tmp[yd * FW + x]) >> 2;
+      }
+    }
+  }
+
+  const IR_LUT = (function () {
+    const stops = [
+      [0.00, 20, 24, 40], [0.35, 95, 105, 125], [0.55, 205, 210, 220], [0.68, 255, 255, 255],
+      [0.74, 120, 230, 255], [0.82, 40, 130, 255], [0.88, 255, 235, 70], [0.94, 255, 130, 20], [1.00, 230, 30, 90]
+    ];
+    const lut = new Uint8Array(256 * 3);
+    for (let i = 0; i < 256; i++) {
+      const s = i / 255;
+      let k = 0;
+      while (k < stops.length - 2 && s > stops[k + 1][0]) k++;
+      const a = stops[k], b = stops[k + 1];
+      const t = clamp01((s - a[0]) / (b[0] - a[0]));
+      lut[i * 3] = a[1] + (b[1] - a[1]) * t;
+      lut[i * 3 + 1] = a[2] + (b[2] - a[2]) * t;
+      lut[i * 3 + 2] = a[3] + (b[3] - a[3]) * t;
+    }
+    return lut;
+  })();
+
+  function shadePixel(fr, lon, lat, sinAlt, mode, d, o) {
+    const W = fr.W, H = fr.H;
+    const u = (lon + 180) / 360 * W - 0.5;
+    const v = (90 - lat) / 180 * H - 0.5;
+    const th = tap(fr.thick, W, H, u, v) / 255;
+    const sc = W / FW;
+    const nf = smooth(-0.10, 0.22, sinAlt);
+    const useIR = mode === "ir" || (mode === "hybrid" && sinAlt < -0.02);
+
+    if (th < 0.02) {
+      if (!useIR) {
+        const so = 3.0 * sc;
+        const sh = tap(fr.thick, W, H, u - so, v - so * 1.2) / 255;
+        if (sh > 0.18) {
+          d[o] = 8; d[o + 1] = 14; d[o + 2] = 28;
+          d[o + 3] = Math.min(1, (sh - 0.18) / 0.6) * 0.32 * nf * 255;
+        }
+      }
+      return;
+    }
+
+    if (useIR) {
+      const s = tap(fr.bright, W, H, u, v) | 0;
+      const li = (s > 255 ? 255 : s) * 3;
+      d[o] = IR_LUT[li]; d[o + 1] = IR_LUT[li + 1]; d[o + 2] = IR_LUT[li + 2];
+      d[o + 3] = (0.35 + 0.65 * smooth(0.02, 0.45, th)) * 255;
+      return;
+    }
+
+    const bo = 1.6 * sc;
+    const hi = tap(fr.thick, W, H, u - bo, v - bo) / 255;
+    const lo = tap(fr.thick, W, H, u + bo, v + bo) / 255;
+    const lit = clamp01(0.55 + (hi - lo) * 2.4);
+    const body = 0.5 + 0.5 * Math.pow(th, 0.75);
+    const t = Math.min(1, lit * 0.55 + body * 0.5);
+    let r = 165 + 90 * t, g = 178 + 77 * t, b = 200 + 55 * t;
+    const dim = 0.24 + 0.76 * nf;
+    r = r * dim + 22 * (1 - dim); g = g * dim + 32 * (1 - dim); b = b * dim + 58 * (1 - dim);
+    d[o] = r; d[o + 1] = g; d[o + 2] = b;
+    d[o + 3] = Math.min(255, Math.pow(th, 0.72) * 255);
+  }
+
+  function getSun() {
+    const sol = (typeof cachedSolarData !== "undefined" && cachedSolarData && cachedSolarData.solar)
+      ? cachedSolarData.solar : calculateSolarPosition();
+    const lonR = sol.sunLon * DEG, latR = sol.sunLat * DEG;
+    return { lon: sol.sunLon, lat: sol.sunLat, sinLat: Math.sin(latR), cosLat: Math.cos(latR), vec: lonLatToVec3(sol.sunLon, sol.sunLat), lonR };
+  }
+
+  const C2W = 1600, C2H = 833;
+  const cloud2DCanvas = document.createElement("canvas");
+  cloud2DCanvas.width = C2W; cloud2DCanvas.height = C2H;
+  const cloud2DCtx = cloud2DCanvas.getContext("2d");
+  let lut2D = null;
+
+  function ensure2DLUT() {
+    if (lut2D) return lut2D;
+    const N = C2W * C2H;
+    const lon = new Float32Array(N), lat = new Float32Array(N);
+    const sinL = new Float32Array(N), cosL = new Float32Array(N), ok = new Uint8Array(N);
+    for (let y = 0; y < C2H; y++) {
+      const my = ((y + 0.5) / C2H) * height;
+      for (let x = 0; x < C2W; x++) {
+        const mx = ((x + 0.5) / C2W) * width;
+        const ll = projection2D.invert([mx, my]);
+        if (!ll || !isFinite(ll[0]) || !isFinite(ll[1]) || Math.abs(ll[0]) > 180 || Math.abs(ll[1]) > 89.8) continue;
+        const back = projection2D(ll);
+        if (!back || Math.hypot(back[0] - mx, back[1] - my) > 2.5) continue;
+        const i = y * C2W + x;
+        ok[i] = 1; lon[i] = ll[0]; lat[i] = ll[1];
+        sinL[i] = Math.sin(ll[1] * DEG); cosL[i] = Math.cos(ll[1] * DEG);
+      }
+    }
+    return (lut2D = { lon, lat, sinL, cosL, ok });
+  }
+
+  function bake2D(fr, mode) {
+    const L = ensure2DLUT();
+    const sun = getSun();
+    const img = cloud2DCtx.createImageData(C2W, C2H);
+    const d = img.data;
+    const N = C2W * C2H;
+    for (let i = 0; i < N; i++) {
+      if (!L.ok[i]) continue;
+      const sinAlt = L.sinL[i] * sun.sinLat + L.cosL[i] * sun.cosLat * Math.cos(L.lon[i] * DEG - sun.lonR);
+      shadePixel(fr, L.lon[i], L.lat[i], sinAlt, mode, d, i * 4);
+    }
+    cloud2DCtx.putImageData(img, 0, 0);
+    return { canvas: cloud2DCanvas, geom: { x: 0, y: 0, w: width, h: height } };
+  }
+
+  const c3Cache = {};
+  function get3DCanvas(S) {
+    if (!c3Cache[S]) {
+      const c = document.createElement("canvas");
+      c.width = S; c.height = S;
+      c3Cache[S] = { c, ctx: c.getContext("2d") };
+    }
+    return c3Cache[S];
+  }
+
+  function globeBasis(proj) {
+    const s = proj.scale(), t = proj.translate();
+    const c = proj.invert(t);
+    const r = proj.invert([t[0] + s * 0.999, t[1]]);
+    const u = proj.invert([t[0], t[1] - s * 0.999]);
+    if (!c || !r || !u) return null;
+    const f = lonLatToVec3(c[0], c[1]);
+    const rr = lonLatToVec3(r[0], r[1]);
+    const uu = lonLatToVec3(u[0], u[1]);
+    const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const norm = (a) => { const m = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / m, a[1] / m, a[2] / m]; };
+    let k = dot(rr, f);
+    const right = norm([rr[0] - k * f[0], rr[1] - k * f[1], rr[2] - k * f[2]]);
+    k = dot(uu, f);
+    let up = [uu[0] - k * f[0], uu[1] - k * f[1], uu[2] - k * f[2]];
+    k = dot(up, right);
+    up = norm([up[0] - k * right[0], up[1] - k * right[1], up[2] - k * right[2]]);
+    return { f, right, up, s, t };
+  }
+
+  function bake3D(fr, mode, proj, S) {
+    const B = globeBasis(proj);
+    if (!B) return null;
+    const { c, ctx } = get3DCanvas(S);
+    const img = ctx.createImageData(S, S);
+    const d = img.data;
+    const sun = getSun();
+    const half = S / 2;
+    const { f, right, up } = B;
+    for (let y = 0; y < S; y++) {
+      const ny = (y + 0.5 - half) / half;
+      for (let x = 0; x < S; x++) {
+        const nx = (x + 0.5 - half) / half;
+        const r2 = nx * nx + ny * ny;
+        if (r2 >= 1) continue;
+        const nz = Math.sqrt(1 - r2);
+        const px = nx * right[0] - ny * up[0] + nz * f[0];
+        const py = nx * right[1] - ny * up[1] + nz * f[1];
+        const pz = nx * right[2] - ny * up[2] + nz * f[2];
+        const lon = Math.atan2(py, px) / DEG;
+        const lat = Math.asin(pz > 1 ? 1 : pz < -1 ? -1 : pz) / DEG;
+        const sinAlt = px * sun.vec[0] + py * sun.vec[1] + pz * sun.vec[2];
+        const o = (y * S + x) * 4;
+        shadePixel(fr, lon, lat, sinAlt, mode, d, o);
+        const lf = Math.pow(1 - r2 * 0.88, 0.35);
+        d[o + 3] = d[o + 3] * lf;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return { canvas: c, geom: { x: B.t[0] - B.s, y: B.t[1] - B.s, w: B.s * 2, h: B.s * 2 } };
+  }
+
+  const bakedCache = new Map();
+  function viewKey() {
+    if (!isGlobeMode) return "m";
+    return "g|" + globeRotation[0].toFixed(1) + "|" + globeRotation[1].toFixed(1) + "|" + projection3D.scale().toFixed(0);
+  }
+
+  function getBaked(idx) {
+    const fr = frames[idx];
+    if (!fr) return null;
+    const sun = getSun();
+    const key = viewKey() + "|" + cloudSpectrumMode + "|" + sun.lon.toFixed(1) + "," + sun.lat.toFixed(1) + "|" + fr.uid;
+    if (bakedCache.has(key)) return bakedCache.get(key);
+    const res = isGlobeMode ? bake3D(fr, cloudSpectrumMode, projection3D, 720) : bake2D(fr, cloudSpectrumMode);
+    if (!res) return null;
+    const out = { url: res.canvas.toDataURL("image/png"), geom: res.geom };
+    bakedCache.set(key, out);
+    while (bakedCache.size > 16) bakedCache.delete(bakedCache.keys().next().value);
+    return out;
+  }
+
+  function swapTo(baked, instant) {
+    const front = activeImg, back = (activeImg === imgA) ? imgB : imgA;
+    front.interrupt(); back.interrupt();
+    setImg(back, baked.url, baked.geom);
+    if (instant) {
+      back.attr("opacity", cloudOpacityLevel);
+      front.attr("opacity", 0);
+    } else {
+      front.attr("opacity", cloudOpacityLevel);
+      back.attr("opacity", 0)
+        .transition().duration(FADE_MS).ease(d3.easeCubicInOut)
+        .attr("opacity", cloudOpacityLevel)
+        .on("end", () => { front.attr("opacity", 0); });
+    }
+    activeImg = back;
+  }
+
+  function showFrame(idx, instant) {
+    if (!frames.length) return;
+    curIdx = Math.max(0, Math.min(frames.length - 1, idx));
+    const baked = getBaked(curIdx);
+    if (!baked) return;
+    cloudsSvgGroup.style("display", "block");
+    cloudsSvgGroup.attr("clip-path", isGlobeMode ? null : "url(#sphereClip)");
+    shownViewKey = viewKey();
+    pendingRebake = false;
+    swapTo(baked, instant);
+    updateFrameHud();
+    const nxt = (curIdx + 1) % frames.length;
+    if (frames.length > 1) {
+      setTimeout(() => {
+        if (window.satelliteCloudsMode && !isDraggingGlobe && !isMorphing && viewKey() === shownViewKey) getBaked(nxt);
+      }, 160);
+    }
+  }
+
+  function renderSatelliteCloudsLayer() {
+    const quizActive = (typeof quizState !== "undefined" && quizState.active);
+    if (!window.satelliteCloudsMode || isMorphing || quizActive) {
+      cloudsSvgGroup.style("display", "none");
+      return;
+    }
+    if (!frames.length) return;
+    cloudsSvgGroup.style("display", "block");
+    const vk = viewKey();
+    if (vk === shownViewKey) return;
+    pendingRebake = true;
+    if (isGlobeMode) cloudsSvgGroup.style("display", "none");
+    clearTimeout(rebakeTimer);
+    rebakeTimer = setTimeout(() => {
+      if (!window.satelliteCloudsMode || isMorphing) return;
+      if (isDraggingGlobe) { renderSatelliteCloudsLayer(); return; }
+      showFrame(curIdx, true);
+    }, isGlobeMode ? 110 : 0);
+  }
+
+  function scheduleLoop() {
+    clearTimeout(loopTimer); loopTimer = null;
+    if (!window.satelliteCloudsMode || !cloudPlaying || frames.length < 2) return;
+    const hold = (curIdx === frames.length - 1) ? 2800 : 1050;
+    loopTimer = setTimeout(() => {
+      if (!window.satelliteCloudsMode || !cloudPlaying) return;
+      const busy = document.hidden || isMorphing || isDraggingGlobe || isMapPanning2D || pendingRebake;
+      if (!busy) showFrame((curIdx + 1) % frames.length, false);
+      scheduleLoop();
+    }, hold);
+  }
+
+  /* ───────────────────────── YEDEK MODEL ───────────────────────── */
+  const GRID_LATS = [75, 52, 30, 0, -30, -52, -75];
+  const GRID_LONS = [-165, -135, -105, -75, -45, -15, 15, 45, 75, 105, 135, 165, 180];
+  const model = { t: null, l: null, m: null, h: null, isLive: false };
+
+  function initClimatologyGrid() {
+    const T = [], Lw = [], M = [], Hh = [];
+    const dayPhase = ((Date.now() / 3600000) % 24) * 0.26;
+    for (let r = 0; r < GRID_LATS.length; r++) {
+      const lat = GRID_LATS[r], absLat = Math.abs(lat);
+      const tR = [], lR = [], mR = [], hR = [];
+      for (let c = 0; c < GRID_LONS.length; c++) {
+        const lon = GRID_LONS[c], rl = lon * DEG;
+        const itcz = Math.exp(-Math.pow((lat - 4) / 13, 2)) * (72 + 20 * Math.sin(rl * 2 + dayPhase));
+        const sN = Math.exp(-Math.pow((lat - 52) / 16, 2)) * (75 + 22 * Math.cos(rl * 3 - dayPhase));
+        const sS = Math.exp(-Math.pow((lat + 54) / 15, 2)) * (80 + 18 * Math.sin(rl * 3 + dayPhase));
+        const dry = Math.exp(-Math.pow((absLat - 25) / 11, 2)) * 28;
+        let arid = 0;
+        if (lat > 14 && lat < 33 && lon > -15 && lon < 58) arid = 35;
+        if (lat < -18 && lat > -32 && lon > 115 && lon < 145) arid = 25;
+        const tot = Math.max(12, Math.min(98, itcz + sN + sS - dry * 0.40 - arid));
+        tR.push(tot);
+        hR.push(Math.max(0, Math.min(100, tot * (absLat < 18 ? 0.78 : 0.52) + 15 * Math.sin(rl * 4 + r))));
+        mR.push(tot * 0.65);
+        lR.push(tot * (absLat > 40 ? 0.82 : 0.55));
+      }
+      T.push(tR); Lw.push(lR); M.push(mR); Hh.push(hR);
+    }
+    model.t = T; model.l = Lw; model.m = M; model.h = Hh; model.isLive = false;
+  }
+
+  async function fetchOpenMeteoGrid() {
+    if (!isNetworkAllowed()) return false;
+    try {
+      const la = [], lo = [];
+      for (let r = 0; r < GRID_LATS.length; r++) for (let c = 0; c < GRID_LONS.length - 1; c++) { la.push(GRID_LATS[r]); lo.push(GRID_LONS[c]); }
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${la.join(",")}&longitude=${lo.join(",")}&current=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high`;
+      const resp = await fetchWithTimeout(url, 9000);
+      if (!resp.ok) return false;
+      const data = await resp.json();
+      const list = Array.isArray(data) ? data : [data];
+      if (list.length < la.length) return false;
+      const T = [], Lw = [], M = [], Hh = [];
+      let idx = 0;
+      for (let r = 0; r < GRID_LATS.length; r++) {
+        const tR = [], lR = [], mR = [], hR = [];
+        for (let c = 0; c < GRID_LONS.length - 1; c++) {
+          const cur = (list[idx++] || {}).current || {};
+          const tot = isFinite(cur.cloud_cover) ? +cur.cloud_cover : 45;
+          tR.push(tot);
+          lR.push(isFinite(cur.cloud_cover_low) ? +cur.cloud_cover_low : tot * 0.5);
+          mR.push(isFinite(cur.cloud_cover_mid) ? +cur.cloud_cover_mid : tot * 0.45);
+          hR.push(isFinite(cur.cloud_cover_high) ? +cur.cloud_cover_high : tot * 0.4);
+        }
+        tR.push(tR[0]); lR.push(lR[0]); mR.push(mR[0]); hR.push(hR[0]);
+        T.push(tR); Lw.push(lR); M.push(mR); Hh.push(hR);
+      }
+      model.t = T; model.l = Lw; model.m = M; model.h = Hh; model.isLive = true;
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function sampleModel(lon, lat) {
+    const cl = Math.max(-75, Math.min(75, lat));
+    let nl = normalizeLon180(lon);
+    if (nl < -165) nl += 360;
+    let r0 = 0;
+    for (let r = 0; r < GRID_LATS.length - 1; r++) if (cl <= GRID_LATS[r] && cl >= GRID_LATS[r + 1]) { r0 = r; break; }
+    const r1 = Math.min(GRID_LATS.length - 1, r0 + 1);
+    const ty = (GRID_LATS[r0] - GRID_LATS[r1]) > 0 ? (GRID_LATS[r0] - cl) / (GRID_LATS[r0] - GRID_LATS[r1]) : 0;
+    const lc = Math.max(-165, Math.min(180, nl));
+    let c0 = 0;
+    for (let c = 0; c < GRID_LONS.length - 1; c++) if (lc >= GRID_LONS[c] && lc <= GRID_LONS[c + 1]) { c0 = c; break; }
+    const c1 = Math.min(GRID_LONS.length - 1, c0 + 1);
+    const tx = (GRID_LONS[c1] - GRID_LONS[c0]) > 0 ? (lc - GRID_LONS[c0]) / (GRID_LONS[c1] - GRID_LONS[c0]) : 0;
+    const bl = (g) => {
+      const top = g[r0][c0] + (g[r0][c1] - g[r0][c0]) * tx;
+      const bot = g[r1][c0] + (g[r1][c1] - g[r1][c0]) * tx;
+      return top + (bot - top) * ty;
+    };
+    return { total: bl(model.t), high: bl(model.h) };
+  }
+
+  const NS = 128;
+  const nperm = new Uint8Array(NS * NS);
+  (function () { let s = 19231029; for (let i = 0; i < nperm.length; i++) { s = (s * 1664525 + 1013904223) >>> 0; nperm[i] = s & 255; } })();
+  function pnoise(u, v) {
+    const x = (((u % 1) + 1) % 1) * NS, y = (((v % 1) + 1) % 1) * NS;
+    const x0 = Math.floor(x) & (NS - 1), y0 = Math.floor(y) & (NS - 1), x1 = (x0 + 1) & (NS - 1), y1 = (y0 + 1) & (NS - 1);
+    const fx = x - Math.floor(x), fy = y - Math.floor(y);
+    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+    const a = nperm[y0 * NS + x0] / 255, b = nperm[y0 * NS + x1] / 255, c = nperm[y1 * NS + x0] / 255, d = nperm[y1 * NS + x1] / 255;
+    const top = a + (b - a) * sx, bot = c + (d - c) * sx;
+    return top + (bot - top) * sy;
+  }
+  function fbm(lon, lat) {
+    const u = (lon + 180) / 360, v = (90 - lat) / 180;
+    const wx = pnoise(u * 3, v * 3) - 0.5, wy = pnoise(u * 3 + 0.4, v * 3) - 0.5;
+    const uw = u + wx * 0.08, vw = v + wy * 0.08;
+    return pnoise(uw * 4, vw * 3) * 0.44 + pnoise(uw * 9, vw * 7) * 0.28 + pnoise(uw * 20, vw * 16) * 0.18 + pnoise(uw * 42, vw * 34) * 0.10;
+  }
+
+  async function buildModelFrame() {
+    const W = 1280, H = 640;
+    const thick = new Uint8Array(W * H), bright = new Uint8Array(W * H);
+    for (let y = 0; y < H; y++) {
+      const lat = 90 - (y + 0.5) / H * 180;
+      for (let x = 0; x < W; x++) {
+        const lon = (x + 0.5) / W * 360 - 180;
+        const met = sampleModel(lon, lat);
+        const cn = met.total / 100;
+        const f = fbm(lon, lat);
+        const thr = 0.56 - cn * 0.42;
+        const raw = (f - thr) / Math.max(0.16, 1 - thr);
+        if (raw <= 0.01) continue;
+        const dens = Math.min(1, Math.pow(raw, 0.72) * (0.55 + cn * 0.65));
+        thick[y * W + x] = (dens * 255) | 0;
+        bright[y * W + x] = Math.min(255, ((met.high / Math.max(10, met.total)) * (0.75 + f * 0.55)) * 245) | 0;
+      }
+      if ((y & 63) === 63) await tick();
+    }
+    return { W, H, thick, bright, src: "model", coverPct: Math.round(model.t.reduce((a, r) => a + r.reduce((s, v) => s + v, 0) / r.length, 0) / model.t.length) };
+  }
+
+  function setProv(id, patch) { state.prov[id] = Object.assign(state.prov[id] || {}, patch); }
+
+  async function loadSatelliteFrames() {
+    if (loadingBusy) return;
+    loadingBusy = true;
+    const hadFrames = frames.length > 0;
+    if (!hadFrames) { state.kind = "loading"; state.msg = "Uydu görüntüleri indiriliyor…"; }
+    state.prov = {};
+    SATS.forEach(s => { state.prov[s.id] = { wait: true }; });
+    updateCloudPanelIfOpen();
+
+    try {
+      if (!isNetworkAllowed()) throw new Error("OFFLINE");
+      await discoverEumet();
+      SATS.filter(s => s.src === "eum" && !s.layerName).forEach(s => setProv(s.id, { wait: false, fail: true, note: s.discoverErr || "Katman bulunamadı" }));
+      const active = SATS.filter(s => s.src === "gibs" || s.layerName);
+
+      const tHead = Date.now() - LATENCY_MIN * 60000;
+      const headPx = {}, headT = [];
+      await Promise.all(active.map(async s => {
+        try {
+          const r = await fetchSat(s, tHead, 3);
+          headPx[s.id] = r.px; headT.push(r.t);
+          setProv(s.id, { wait: false, ok: true, t: r.t });
+        } catch (e) {
+          setProv(s.id, { wait: false, fail: true, note: (e && e.name === "TypeError") ? "CORS/ağ engeli" : String(e && e.message || e) });
+        }
+        updateCloudPanelIfOpen();
+      }));
+      const okIds = Object.keys(headPx);
+      if (!okIds.length) throw new Error("UYDU_YOK");
+
+      const cal = calibrate(headPx);
+      okIds.forEach(id => { if (cal[id].inv) setProv(id, { note: "Kutupsallık otomatik düzeltildi" }); });
+      headT.sort((a, b) => a - b);
+      const tHeadUsed = headT[headT.length >> 1];
+
+      const built = [];
+      const f0 = await composeFrame(headPx, cal);
+      f0.t = tHeadUsed; f0.uid = ++frameUid;
+      built.push(f0);
+      if (!frames.length) {
+        frames = [f0]; curIdx = 0; bakedCache.clear(); shownViewKey = "";
+        state.kind = "sat"; state.msg = ""; state.fetchedAt = Date.now(); state.headT = tHeadUsed;
+        if (window.satelliteCloudsMode) { showFrame(0, true); updateCloudPanelIfOpen(); }
+      }
+
+      const lastPx = Object.assign({}, headPx);
+      for (let k = 1; k < FRAME_COUNT && window.satelliteCloudsMode; k++) {
+        const tT = tHeadUsed - k * FRAME_STEP_MIN * 60000;
+        const pxK = {};
+        await Promise.all(okIds.map(async id => {
+          try { const r = await fetchSat(SAT_BY_ID[id], tT, 2); pxK[id] = r.px; lastPx[id] = r.px; }
+          catch (e) { pxK[id] = lastPx[id]; }
+        }));
+        const fk = await composeFrame(pxK, cal);
+        fk.t = tT; fk.uid = ++frameUid;
+        built.push(fk);
+      }
+
+      built.reverse();
+      const wasPlaying = frames.length > 0;
+      frames = built;
+      curIdx = frames.length - 1;
+      bakedCache.clear(); shownViewKey = "";
+      state.kind = "sat"; state.msg = ""; state.fetchedAt = Date.now(); state.headT = tHeadUsed;
+      if (window.satelliteCloudsMode) { showFrame(curIdx, !wasPlaying); scheduleLoop(); }
+    } catch (e) {
+      if (!frames.length || frames[0].src !== "sat") {
+        initClimatologyGrid();
+        await fetchOpenMeteoGrid();
+        const mf = await buildModelFrame();
+        mf.t = Date.now(); mf.uid = ++frameUid;
+        frames = [mf]; curIdx = 0; bakedCache.clear(); shownViewKey = "";
+        state.kind = "model"; state.msg = e && e.message === "OFFLINE" ? "İnternet yok" : "Uydu servislerine ulaşılamadı";
+        state.fetchedAt = Date.now(); state.headT = mf.t;
+        if (window.satelliteCloudsMode) showFrame(0, true);
+      }
+    } finally {
+      loadingBusy = false;
+      updateCloudPanelIfOpen();
+    }
+  }
+
+  /* ───────────────────────── BAĞIMSIZ SAĞ BULUT PANELİ ───────────────────────── */
+  function updateCloudPanelIfOpen() {
+    if (!window.satelliteCloudsMode) return;
+    renderFloatingCloudsPanel();
+  }
+
+  function updateFrameHud() {
+    const lab = document.getElementById("cldFrameLabel");
+    const rng = document.getElementById("cldFrameRange");
+    const fr = frames[curIdx];
+    if (lab && fr) lab.innerHTML = state.kind === "sat"
+      ? `🕒 <b>${fmtUTC(fr.t)}</b> · yerel ${fmtLocal(fr.t)} <span style="color:#94a3b8;">(${curIdx + 1}/${frames.length})</span>`
+      : `🕒 Model • ${fmtLocal(fr.t)}`;
+    if (rng && fr) rng.value = String(curIdx);
+  }
+
+  function renderFloatingCloudsPanel() {
+    if (!window.satelliteCloudsMode) {
+      cloudPanelEl.style.display = "none";
+      return;
+    }
+    cloudPanelEl.style.display = "block";
+    cloudPanelEl.classList.toggle("minimized", cloudPanelMinimized);
+
+    const fr = frames[curIdx];
+    const okN = SATS.filter(s => state.prov[s.id] && state.prov[s.id].ok).length;
+    let pill;
+    if (state.kind === "sat") pill = `<div class="source-pill pill-online" style="font-size:10px;padding:2px 7px;">🛰️ Canlı Uydu • ${okN}/${SATS.length} aktif</div>`;
+    else if (state.kind === "loading") pill = `<div class="source-pill pill-embedded" style="font-size:10px;padding:2px 7px;">⏳ ${state.msg || "Yükleniyor…"}</div>`;
+    else if (state.kind === "model") pill = `<div class="source-pill pill-embedded" style="font-size:10px;padding:2px 7px;">🟠 Tahmini Model (${state.msg || ""})</div>`;
+    else pill = "";
+
+    const chips = SATS.map(s => {
+      const st = state.prov[s.id] || {};
+      const cls = st.ok ? "ok" : (st.fail ? "bad" : "");
+      const ico = st.ok ? "●" : (st.fail ? "✕" : "…");
+      const tip = st.ok ? `Kare: ${fmtUTC(st.t)}${st.note ? " • " + st.note : ""}` : (st.note || "Bekleniyor");
+      return `<span class="cld-chip ${cls}" title="${tip}">${ico} ${s.name}</span>`;
+    }).join("");
+
+    const cover = fr ? `%${fr.coverPct}` : "—";
+    const n = frames.length;
+
+    cloudPanelEl.innerHTML = `
+      <div class="cld-panel-head">
+        <span>☁️ CANLI UYDU BULUT KATMANI</span>
+        <div style="display:flex;gap:3px;">
+          <button type="button" class="radar-toggle-btn" onclick="toggleMinimizeCloudsPanel()" title="Küçült / Büyüt">${cloudPanelMinimized ? "▴" : "▾"}</button>
+          <button type="button" class="radar-toggle-btn" onclick="toggleSatelliteCloudsMode(false)" title="Bulut Katmanını Kapat">✕</button>
+        </div>
+      </div>
+      <div class="cld-panel-body">
+        ${pill}
+        <div class="hud-country-grid" style="padding:5px 7px;">
+          <div>☁️ <b>Bulutluluk:</b> <span class="hud-route-kpi" style="font-size:12px;">${cover}</span></div>
+          <div>📡 <b>Mod:</b> <span style="color:#7dd3fc;font-weight:800;">${cloudSpectrumMode === "visible" ? "Doğal" : (cloudSpectrumMode === "ir" ? "IR Termal" : "Hibrit")}</span></div>
+          <div class="hud-grid-full"><div class="cld-chips">${chips}</div></div>
+          <div class="hud-grid-full" id="cldTimelineBox" style="${n > 1 ? "" : "display:none;"}">
+            <div id="cldFrameLabel" style="font-size:9.5px;color:#e2e8f0;"></div>
+            <div class="cld-timeline">
+              <button type="button" class="cld-play" onclick="toggleSatelliteCloudMotion()">${cloudPlaying ? "⏸" : "▶"}</button>
+              <input type="range" id="cldFrameRange" class="solar-range-input" min="0" max="${Math.max(0, n - 1)}" step="1" value="${curIdx}" oninput="scrubSatelliteCloudFrame(this.value)">
+            </div>
+          </div>
+          <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">
+            <div style="display:flex;justify-content:space-between;font-size:9.5px;font-weight:800;color:#bae6fd;margin-bottom:2px;">
+              <span>🎚️ Opaklık:</span><b style="color:#fde047;">%${Math.round(cloudOpacityLevel * 100)}</b>
+            </div>
+            <input type="range" class="solar-range-input" min="25" max="100" step="5" value="${Math.round(cloudOpacityLevel * 100)}" oninput="setSatelliteCloudOpacity(this.value)">
+          </div>
+        </div>
+        <div class="cloud-spec-bar">
+          <button type="button" class="cloud-spec-btn ${cloudSpectrumMode === "visible" ? "active" : ""}" onclick="setSatelliteCloudSpectrum('visible')">☁️ Doğal</button>
+          <button type="button" class="cloud-spec-btn ${cloudSpectrumMode === "ir" ? "active" : ""}" onclick="setSatelliteCloudSpectrum('ir')">🌡️ Kızılötesi</button>
+          <button type="button" class="cloud-spec-btn ${cloudSpectrumMode === "hybrid" ? "active" : ""}" onclick="setSatelliteCloudSpectrum('hybrid')">🌗 Hibrit</button>
+        </div>
+        <div class="hud-route-actions" style="margin-top:6px;">
+          <button type="button" class="hud-mini-btn" style="padding:4px 8px;font-size:10px;" onclick="refreshSatelliteCloudsNow()">🔄 Yenile</button>
+          <button type="button" class="hud-mini-btn danger" style="padding:4px 8px;font-size:10px;" onclick="toggleSatelliteCloudsMode(false)">✖ Katmanı Kapat</button>
+        </div>
+      </div>
+    `;
+    updateFrameHud();
+  }
+
+  window.toggleMinimizeCloudsPanel = function () {
+    cloudPanelMinimized = !cloudPanelMinimized;
+    renderFloatingCloudsPanel();
+  };
+
+  window.setSatelliteCloudSpectrum = function (mode) {
+    cloudSpectrumMode = mode;
+    bakedCache.clear();
+    showFrame(curIdx, true);
+    renderFloatingCloudsPanel();
+  };
+
+  window.setSatelliteCloudOpacity = function (val) {
+    cloudOpacityLevel = Math.max(0.2, Math.min(1.0, Number(val) / 100));
+    activeImg.interrupt();
+    activeImg.attr("opacity", cloudOpacityLevel);
+    renderFloatingCloudsPanel();
+  };
+
+  window.toggleSatelliteCloudMotion = function () {
+    cloudPlaying = !cloudPlaying;
+    if (cloudPlaying) scheduleLoop(); else { clearTimeout(loopTimer); loopTimer = null; }
+    renderFloatingCloudsPanel();
+  };
+
+  window.scrubSatelliteCloudFrame = function (i) {
+    cloudPlaying = false;
+    clearTimeout(loopTimer); loopTimer = null;
+    showFrame(Number(i), true);
+    const b = document.querySelector(".cld-play"); if (b) b.textContent = "▶";
+  };
+
+  window.refreshSatelliteCloudsNow = function () {
+    eumDiscovered = false;
+    loadSatelliteFrames();
+  };
+
+  window.toggleSatelliteCloudsMode = function (forceState) {
+    window.satelliteCloudsMode = typeof forceState === "boolean" ? forceState : !window.satelliteCloudsMode;
+    const btn = document.getElementById("btnCloudsToggle");
+    if (btn) {
+      btn.classList.toggle("clouds-on", window.satelliteCloudsMode);
+      btn.innerText = window.satelliteCloudsMode ? "☁️ Canlı Uydu Bulutları: Açık" : "☁️ Canlı Uydu Bulutları: Kapalı";
+    }
+
+    if (window.satelliteCloudsMode) {
+      cloudPanelMinimized = false;
+      renderFloatingCloudsPanel();
+      if (frames.length) { shownViewKey = ""; showFrame(curIdx, true); scheduleLoop(); }
+      const stale = !state.fetchedAt || (Date.now() - state.fetchedAt > 10 * 60000);
+      if (!frames.length || stale || state.kind !== "sat") loadSatelliteFrames();
+      clearInterval(pollTimer);
+      pollTimer = setInterval(() => { if (window.satelliteCloudsMode && !document.hidden) loadSatelliteFrames(); }, 15 * 60000);
+    } else {
+      clearInterval(pollTimer); pollTimer = null;
+      clearTimeout(loopTimer); loopTimer = null;
+      cloudsSvgGroup.style("display", "none");
+      cloudPanelEl.style.display = "none";
+    }
+  };
+
+  let fastLastMs = 0;
+  const _origDrawSpaceAndGeo = window.drawSpaceAndGeoToolsOnFastCanvas;
+  window.drawSpaceAndGeoToolsOnFastCanvas = function (ctx, cPath, activeProj, k, morphState, camVec) {
+    if (window.satelliteCloudsMode && frames.length && !morphState && !(typeof quizState !== "undefined" && quizState.active)) {
+      try {
+        const fr = frames[curIdx];
+        const now = performance.now();
+        const S = 400;
+        if (now - fastLastMs > 45) {
+          fastLastMs = now;
+          bake3D(fr, cloudSpectrumMode === "hybrid" ? "visible" : cloudSpectrumMode, activeProj, S);
+        }
+        const B = globeBasis(activeProj);
+        if (B) {
+          ctx.save();
+          ctx.globalAlpha = cloudOpacityLevel;
+          ctx.beginPath();
+          ctx.arc(B.t[0], B.t[1], B.s, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(get3DCanvas(S).c, B.t[0] - B.s, B.t[1] - B.s, B.s * 2, B.s * 2);
+          ctx.restore();
+        }
+      } catch (e) {}
+    }
+    if (typeof _origDrawSpaceAndGeo === "function") {
+      _origDrawSpaceAndGeo(ctx, cPath, activeProj, k, morphState, camVec);
+    }
+  };
+
+  const _origRefreshPosCloud = refreshAllProjectedPositions;
+  refreshAllProjectedPositions = function () {
+    _origRefreshPosCloud.apply(this, arguments);
+    if (window.satelliteCloudsMode && !isMorphing) renderSatelliteCloudsLayer();
+  };
+
+  const _origUpdateTypoCloud = updateDynamicTypography;
+  updateDynamicTypography = function () {
+    _origUpdateTypoCloud.apply(this, arguments);
+    if (window.satelliteCloudsMode && !isMorphing && frames.length) {
+      const quizActive = (typeof quizState !== "undefined" && quizState.active);
+      cloudsSvgGroup.style("display", (quizActive || (pendingRebake && isGlobeMode)) ? "none" : "block");
+    }
+  };
+
+  window.__cloudEngine = { composeFrame, calibrate, shadePixel, bake3D, globeBasis, SATS, FW, FH };
+})();
+</script>
+
+
+<script id="draggablePanelsModule">
+/* ============================================================================
+   🖐️ SECOVVV GEO-PRO // SÜRÜKLENEBİLİR PANEL MOTORU (DRAGGABLE HUD PANELS)
+   - CANLI RADAR (#coordRadarHud)
+   - SEÇİLİ BÖLGE / ÜLKE DETAY KARTI (#mainHudCard)
+   - CANLI DEPREM PANELİ (#hzQuakePanel)
+   - CANLI UYDU BULUT KATMANI PANELİ (#secovvvCloudsPanel)
+   ============================================================================ */
+(function () {
+  "use strict";
+
+  const dragStyle = document.createElement("style");
+  dragStyle.textContent = `
+    #coordRadarHud, #mainHudCard, #hzQuakePanel, #secovvvCloudsPanel {
+      user-select: none;
+      touch-action: none;
+    }
+    #coordRadarHud .radar-header,
+    #mainHudCard .hud-title,
+    #hzQuakePanel .hz-p-head,
+    #secovvvCloudsPanel .cld-panel-head {
+      cursor: move;
+    }
+    .secovvv-panel-dragging {
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.95), 0 0 20px rgba(56, 189, 248, 0.55) !important;
+      opacity: 0.96;
+      transition: none !important;
+    }
+  `;
+  document.head.appendChild(dragStyle);
+
+  const PANEL_IDS = [
+    "coordRadarHud",
+    "mainHudCard",
+    "hzQuakePanel",
+    "secovvvCloudsPanel"
+  ];
+
+  let topPanelZ = 16;
+
+  function bringPanelToFront(panel) {
+    topPanelZ++;
+    if (topPanelZ > 90) {
+      PANEL_IDS.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (el) el.style.zIndex = String(15 + idx);
+      });
+      topPanelZ = 20;
+    }
+    panel.style.zIndex = String(topPanelZ);
+  }
+
+  function isInteractiveTarget(target) {
+    if (!target || !target.closest) return false;
+    return Boolean(
+      target.closest("button, input, select, textarea, a, label, .hz-item, .quiz-mode-btn, .cloud-spec-btn, .solar-preset-btn")
+    );
+  }
+
+  function clampPanelInsideStage(panel) {
+    const stage = document.getElementById("mapStage");
+    if (!stage || !panel || panel.style.display === "none" || panel.classList.contains("hud-hidden")) return;
+    if (!panel.dataset.secovvvMoved) return;
+
+    const stageRect = stage.getBoundingClientRect();
+    const pRect = panel.getBoundingClientRect();
+    if (stageRect.width < 40 || stageRect.height < 40 || pRect.width < 10) return;
+
+    let curLeft = parseFloat(panel.style.left);
+    let curTop = parseFloat(panel.style.top);
+    if (!isFinite(curLeft) || !isFinite(curTop)) return;
+
+    const maxLeft = Math.max(4, stageRect.width - pRect.width - 4);
+    const maxTop = Math.max(4, stageRect.height - pRect.height - 4);
+
+    panel.style.left = Math.max(4, Math.min(maxLeft, curLeft)) + "px";
+    panel.style.top = Math.max(4, Math.min(maxTop, curTop)) + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  }
+
+  function attachDraggableBehavior(panel) {
+    if (!panel || panel.dataset.secovvvDragBound === "1") return;
+    panel.dataset.secovvvDragBound = "1";
+
+    let dragging = false;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let initialLeft = 0;
+    let initialTop = 0;
+    let hasMoved = false;
+
+    panel.addEventListener("pointerdown", (e) => {
+      if (e.button !== undefined && e.button !== 0) return;
+      bringPanelToFront(panel);
+
+      if (isInteractiveTarget(e.target)) return;
+
+      const stage = document.getElementById("mapStage");
+      if (!stage) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+
+      initialLeft = panelRect.left - stageRect.left;
+      initialTop = panelRect.top - stageRect.top;
+      startX = e.clientX;
+      startY = e.clientY;
+      pointerId = e.pointerId;
+      dragging = true;
+      hasMoved = false;
+
+      e.stopPropagation();
+    });
+
+    panel.addEventListener("pointermove", (e) => {
+      if (!dragging || e.pointerId !== pointerId) return;
+
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+
+      if (!hasMoved) {
+        if (Math.hypot(dx, dy) < 3) return;
+        hasMoved = true;
+        panel.dataset.secovvvMoved = "1";
+        panel.classList.add("secovvv-panel-dragging");
+        try { panel.setPointerCapture(pointerId); } catch (_) {}
+      }
+
+      const stage = document.getElementById("mapStage");
+      if (!stage) return;
+      const stageRect = stage.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+
+      const maxLeft = Math.max(4, stageRect.width - panelRect.width - 4);
+      const maxTop = Math.max(4, stageRect.height - panelRect.height - 4);
+
+      const nextLeft = Math.max(4, Math.min(maxLeft, initialLeft + dx));
+      const nextTop = Math.max(4, Math.min(maxTop, initialTop + dy));
+
+      panel.style.left = nextLeft + "px";
+      panel.style.top = nextTop + "px";
+      panel.style.right = "auto";
+      panel.style.bottom = "auto";
+
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    const endDrag = (e) => {
+      if (!dragging || (e && e.pointerId !== undefined && e.pointerId !== pointerId)) return;
+      if (hasMoved) {
+        try { panel.releasePointerCapture(pointerId); } catch (_) {}
+      }
+      dragging = false;
+      pointerId = null;
+      hasMoved = false;
+      panel.classList.remove("secovvv-panel-dragging");
+    };
+
+    panel.addEventListener("pointerup", endDrag);
+    panel.addEventListener("pointercancel", endDrag);
+  }
+
+  function initAllDraggablePanels() {
+    PANEL_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) attachDraggableBehavior(el);
+    });
+  }
+
+  initAllDraggablePanels();
+  window.addEventListener("DOMContentLoaded", initAllDraggablePanels);
+  window.addEventListener("resize", () => {
+    PANEL_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) clampPanelInsideStage(el);
+    });
+  });
+})();
+</script>
+
 </body>
 
 </html>
