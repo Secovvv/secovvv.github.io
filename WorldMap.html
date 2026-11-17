@@ -18803,67 +18803,150 @@ function handleVsSelection(kind, feature) {
   let issSmoothRaf = null;
   let issMorphHidden = false;
 
-  // ISS Yörünge Durumu (API + Kesintisiz 60fps Yörünge Propagasyonu)
+  // ISS Yörünge Durumu (API düzeltmeleri + 60fps kesintisiz yörünge propagasyonu)
+  const ISS_DEG = Math.PI / 180;
+  const ISS_MU = 398600.4418;          // km³/s² (Dünya çekim parametresi)
+  const ISS_RE = 6378.137;             // km (WGS84 ekvator yarıçapı)
+  const ISS_J2 = 1.08263e-3;           // Dünya basıklık katsayısı
+  const ISS_E2 = 0.00669437999014;     // WGS84 birinci basıklık²
+  const ISS_EARTH_ROT_DEG_S = 360 / 86164.0905; // yıldız günü dönüş hızı
+  const ISS_BLEND_MS = 3000;           // API düzeltmesinin yumuşak sönümleme süresi
+  // Monoton zaman kaynağı: sistem saati ayarlansa / sekme uyusa bile sıçrama yapmaz
+  const issNowMs = () => performance.timeOrigin + performance.now();
+
   const issState = {
     lat: 39.5,
     lon: 32.8,
     altKm: 418.4,
     velKmh: 27580,
     visibility: "daylight",
-    timestampMs: Date.now(),
+    timestampMs: issNowMs(),
     isLiveApi: false,
-    // Yörünge parametreleri (51.6° eğiklik, ~92.9 dk periyot)
+    // Yörünge parametreleri (51.64° eğiklik, irtifadan türetilen periyot)
     inclinationDeg: 51.64,
-    periodSec: 5574,
+    incEffRad: 51.64 * ISS_DEG,
     ascendingNodeLon: 32.8,
     orbitPhaseRad: 0.85,
-    lastEpochMs: Date.now()
+    lastEpochMs: issNowMs(),
+    nRadPerSec: (2 * Math.PI) / 5574,
+    nodalDegPerSec: -5.0 / 86400,
+    // Yön (kuzeye/güneye) bilgisi güvenilir mi? Çevrimdışı tohum modeli kendi içinde tutarlıdır.
+    headingKnown: true,
+    fixCount: 0,
+    lastFix: null,
+    // API düzeltmesinin yumuşak sönümlenen farkı (derece)
+    corrLon: 0,
+    corrLat: 0,
+    corrT0: 0
   };
 
-  function calibrateIssOrbitFromFix(lon, lat, nowMs) {
-    const incRad = issState.inclinationDeg * Math.PI / 180;
-    const sinU = Math.max(-0.999, Math.min(0.999, Math.sin(lat * Math.PI / 180) / Math.sin(incRad)));
-    let u = Math.asin(sinU);
-    // Önceki fazdan yörünge yönünü (kuzeye mi güneye mi tırmanıyor) koru
-    if (Math.cos(issState.orbitPhaseRad) < 0) {
-      u = Math.PI - u;
+  // Jeodetik (haritadaki/API'deki) enlem  <->  jeosentrik (yörünge geometrisindeki) enlem
+  function issGeodeticToGeocentric(latDeg, hKm) {
+    const phi = latDeg * ISS_DEG;
+    const s = Math.sin(phi);
+    const N = ISS_RE / Math.sqrt(1 - ISS_E2 * s * s);
+    return Math.atan(((N * (1 - ISS_E2) + hKm) / (N + hKm)) * Math.tan(phi));
+  }
+  function issGeocentricToGeodetic(psiRad, hKm) {
+    const tp = Math.tan(psiRad);
+    let phi = psiRad;
+    for (let i = 0; i < 4; i++) {
+      const s = Math.sin(phi);
+      const N = ISS_RE / Math.sqrt(1 - ISS_E2 * s * s);
+      phi = Math.atan(tp * (N + hKm) / (N * (1 - ISS_E2) + hKm));
     }
-    const dLonRad = Math.atan2(Math.sin(u) * Math.cos(incRad), Math.cos(u));
-    const ascLon = normalizeLon180(lon - (dLonRad * 180 / Math.PI));
-    issState.orbitPhaseRad = u;
-    issState.ascendingNodeLon = ascLon;
-    issState.lastEpochMs = nowMs;
+    return phi / ISS_DEG;
   }
 
-  function predictIssLonLatAtOffset(offsetSec) {
-    const dt = ((Date.now() - issState.lastEpochMs) / 1000) + offsetSec;
-    const incRad = issState.inclinationDeg * Math.PI / 180;
-    const nRadPerSec = (2 * Math.PI) / issState.periodSec;
-    const earthRotDegPerSec = 360 / 86164.1; // Yıldız günü dönüş hızı
-    const nodalPrecessionDegPerSec = -5.0 / 86400;
+  // Açısal hız ve düğüm gerilemesi: irtifa + J2 (basıklık) etkisiyle hesaplanır
+  function issUpdateOrbitRates(altKm) {
+    const a = ISS_RE + Math.min(460, Math.max(380, altKm));
+    const n = Math.sqrt(ISS_MU / (a * a * a));
+    const c = Math.cos(issState.incEffRad);
+    const kj = ISS_J2 * Math.pow(ISS_RE / a, 2);
+    issState.nRadPerSec = n * (1 + 0.75 * kj * (8 * c * c - 2)); // argüman-enlem hızı
+    issState.nodalDegPerSec = (-1.5 * n * kj * c) / ISS_DEG;      // düğüm gerilemesi (~ -5°/gün)
+  }
 
-    const u = issState.orbitPhaseRad + nRadPerSec * dt;
-    const latRad = Math.asin(Math.sin(incRad) * Math.sin(u));
-    const lonOrbitDeg = Math.atan2(Math.sin(u) * Math.cos(incRad), Math.cos(u)) * 180 / Math.PI;
+  // Tek bir doğrulanmış API konumundan yörünge fazını ve düğüm boylamını yeniden kalibre eder
+  function issCalibrate(lonDeg, latDeg, altKm, tMs, northbound) {
+    const psi = issGeodeticToGeocentric(latDeg, altKm);
+    const incEff = Math.max(issState.inclinationDeg * ISS_DEG, Math.abs(psi) + 0.0005 * ISS_DEG);
+    issState.incEffRad = incEff;
+    issUpdateOrbitRates(altKm);
+    let u = Math.asin(Math.max(-1, Math.min(1, Math.sin(psi) / Math.sin(incEff))));
+    if (!northbound) u = Math.PI - u;
+    const raDeg = Math.atan2(Math.sin(u) * Math.cos(incEff), Math.cos(u)) / ISS_DEG;
+    issState.orbitPhaseRad = u;
+    issState.ascendingNodeLon = normalizeLon180(lonDeg - raDeg);
+    issState.lastEpochMs = tMs;
+  }
+
+  // Saf yörünge modeli (düzeltme uygulanmamış), verilen mutlak zamanda [lon, lat]
+  function issModelAt(tMs) {
+    const dt = (tMs - issState.lastEpochMs) / 1000;
+    const u = issState.orbitPhaseRad + issState.nRadPerSec * dt;
+    const sinInc = Math.sin(issState.incEffRad);
+    const cosInc = Math.cos(issState.incEffRad);
+    const psi = Math.asin(Math.max(-1, Math.min(1, sinInc * Math.sin(u))));
+    const raDeg = Math.atan2(Math.sin(u) * cosInc, Math.cos(u)) / ISS_DEG;
     const lon = normalizeLon180(
-      issState.ascendingNodeLon + lonOrbitDeg - (earthRotDegPerSec - nodalPrecessionDegPerSec) * dt
+      issState.ascendingNodeLon + raDeg + (issState.nodalDegPerSec - ISS_EARTH_ROT_DEG_S) * dt
     );
-    const lat = latRad * 180 / Math.PI;
-    return [lon, lat];
+    return [lon, issGeocentricToGeodetic(psi, issState.altKm)];
+  }
+
+  function issWrapDelta(d) {
+    return ((d + 540) % 360) - 180;
+  }
+
+  // Sönümlenen API düzeltmesinin o anki değeri
+  function issCorrAt(nowMs) {
+    if (!issState.corrT0) return [0, 0];
+    const f = Math.exp(-(nowMs - issState.corrT0) / ISS_BLEND_MS);
+    if (f < 0.002) return [0, 0];
+    return [issState.corrLon * f, issState.corrLat * f];
+  }
+
+  // Ekranda gösterilen konum = model + sönümlenen düzeltme. İkon, iz ve çember hep BU fonksiyondan beslenir.
+  function issPosAt(offsetSec, nowMs, corr) {
+    const now = (typeof nowMs === "number") ? nowMs : issNowMs();
+    const c = corr || issCorrAt(now);
+    const m = issModelAt(now + (offsetSec || 0) * 1000);
+    return [
+      normalizeLon180(m[0] + c[0]),
+      Math.max(-89.9, Math.min(89.9, m[1] + c[1]))
+    ];
+  }
+  const predictIssLonLatAtOffset = (offsetSec) => issPosAt(offsetSec);
+
+  function issFootprintRadiusDeg() {
+    // Geometrik ufuk açısı: acos(R / (R + h))  (≈ 20.3° @ 418 km)
+    return Math.acos(6371 / (6371 + issState.altKm)) / ISS_DEG;
   }
 
   function buildIssTrackGeoJSON() {
-    // 1) Geçmiş 45 dakikalık iz (-2700 sn -> 0 sn)
+    const now = issNowMs();
+    const corr = issCorrAt(now);
+    const current = issPosAt(0, now, corr);
+    // Yön henüz doğrulanmadıysa (ilk saniyeler) yanlış/ayna yörünge çizmemek için izleri gizle
+    if (!issState.headingKnown) {
+      return {
+        current,
+        pastLine: { type: "LineString", coordinates: [] },
+        futureLine: { type: "LineString", coordinates: [] }
+      };
+    }
+    // Geçmiş 45 dk: tam 60 adım, son nokta = ikonun konumu (offset 0)
     const pastCoords = [];
-    for (let s = -2700; s <= 0; s += 45) {
-      pastCoords.push(predictIssLonLatAtOffset(s));
-    }
-    // 2) Gelecek 55 dakikalık yörünge yayını çiz (0 sn -> +3300 sn)
+    for (let i = 0; i <= 60; i++) pastCoords.push(issPosAt(-2700 + i * 45, now, corr));
+    // Gelecek 55 dk: tam 75 adım, ilk nokta = ikonun konumu (offset 0)
     const futureCoords = [];
-    for (let s = 0; s <= 3300; s += 45) {
-      futureCoords.push(predictIssLonLatAtOffset(s));
-    }
+    for (let i = 0; i <= 75; i++) futureCoords.push(issPosAt(i * 44, now, corr));
+    pastCoords[pastCoords.length - 1] = current;
+    futureCoords[0] = current;
     return {
+      current,
       pastLine: { type: "LineString", coordinates: pastCoords },
       futureLine: { type: "LineString", coordinates: futureCoords }
     };
@@ -18898,53 +18981,121 @@ function handleVsSelection(kind, feature) {
     return nearestSea ? `🌊 ${nearestSea.name} Üzerinde` : "🌊 Açık Okyanus Yörüngesi";
   }
 
-  let issInitialLiveFocusPending = false;
+  let issPollBusy = false;
+  let issQuickPollTimer = null;
+  // İlk GERÇEK ölçüm gelmeden ikon/odak gösterilmez (tohum konum gerçek ISS konumu değildir)
+  let issAwaitingFirstFix = false;
+  let issPendingFocus = false;
+
+  // Yeni bir API ölçümünü modele uygular. Konum SIÇRAMAZ: eski-yeni fark ISS_BLEND_MS içinde sönümlenir.
+  function applyIssFix(d, tFixMs) {
+    const lat = Number(d.latitude);
+    const lon = normalizeLon180(Number(d.longitude));
+    const alt = isFinite(d.altitude) ? Number(d.altitude) : issState.altKm;
+    const apiTs = isFinite(d.timestamp) ? Number(d.timestamp) : 0;
+    const prev = issState.lastFix;
+    if (prev && apiTs && prev.ts === apiTs) return; // API aynı ölçümü tekrar verdi
+
+    const now = issNowMs();
+    const dispBefore = issPosAt(0, now); // güncellemeden önce ekranda görünen konum
+
+    // --- Yön (kuzeye/güneye) tespiti: önce gözlenen enlem değişimi, sonra model ---
+    let north;
+    let resolved = false;
+    if (prev && (tFixMs - prev.t) >= 1200) {
+      const dLat = lat - prev.lat;
+      if (Math.abs(dLat) > 0.01) { north = dLat > 0; resolved = true; }
+    }
+    if (north === undefined) {
+      if (!prev) {
+        north = true; // geçici tahmin; ~1,4 sn sonraki ikinci ölçümle doğrulanır
+      } else {
+        const uPred = issState.orbitPhaseRad + issState.nRadPerSec * ((tFixMs - issState.lastEpochMs) / 1000);
+        north = Math.cos(uPred) >= 0;
+        resolved = issState.headingKnown || issState.fixCount >= 3;
+      }
+    }
+
+    issCalibrate(lon, lat, alt, tFixMs, north);
+    issState.headingKnown = resolved;
+
+    // --- Süreklilik: model yeni kalibrasyonla farklı yere işaret etse bile ikon aynı yerden devam eder ---
+    const modelNew = issModelAt(now);
+    let cLon = issWrapDelta(dispBefore[0] - modelNew[0]);
+    let cLat = dispBefore[1] - modelNew[1];
+    const farDeg = Math.hypot(cLon * Math.cos(lat * ISS_DEG), cLat);
+    if (!prev || farDeg > 3) { cLon = 0; cLat = 0; } // ilk ölçüm / çok büyük fark: doğrudan oturt
+    issState.corrLon = cLon;
+    issState.corrLat = cLat;
+    issState.corrT0 = now;
+
+    issState.altKm = alt;
+    issState.velKmh = isFinite(d.velocity) ? Number(d.velocity) : issState.velKmh;
+    issState.visibility = d.visibility || issState.visibility;
+    issState.timestampMs = tFixMs;
+    issState.isLiveApi = true;
+    issState.lastFix = { t: tFixMs, lat, lon, ts: apiTs };
+    issState.fixCount++;
+    issAwaitingFirstFix = false;
+
+    if (!prev) {
+      // Yönü hemen doğrulamak için hızlı bir ikinci ölçüm iste
+      if (issQuickPollTimer) clearTimeout(issQuickPollTimer);
+      issQuickPollTimer = setTimeout(pollLiveIssTelemetry, 1400);
+    }
+  }
 
   async function pollLiveIssTelemetry() {
     if (!window.issTrackerMode) return;
     if (!isNetworkAllowed()) {
       issState.isLiveApi = false;
+      issAwaitingFirstFix = false;
+      issPendingFocus = false;
+      if (issState.fixCount === 0) issState.headingKnown = true;
       updateIssHudIfOpen();
       return;
     }
+    if (issPollBusy) return; // üst üste binen istekleri engelle (sıra karışması = konum geri sıçraması)
+    issPollBusy = true;
+    const tStart = issNowMs();
+    const ctrl = new AbortController();
+    const tId = setTimeout(() => ctrl.abort(), 5000);
     try {
-      const ctrl = new AbortController();
-      const tId = setTimeout(() => ctrl.abort(), 5000);
       const resp = await fetch("https://api.wheretheiss.at/v1/satellites/25544", {
         cache: "no-store",
         signal: ctrl.signal
       });
-      clearTimeout(tId);
+      const tEnd = issNowMs();
       if (!resp.ok) throw new Error("ISS_HTTP_" + resp.status);
       const d = await resp.json();
+      if (!window.issTrackerMode) return;
       if (d && isFinite(d.latitude) && isFinite(d.longitude)) {
-        const nowMs = Date.now();
-        const prevLon = issState.lon;
-        const prevLat = issState.lat;
-        issState.lat = Number(d.latitude);
-        issState.lon = normalizeLon180(Number(d.longitude));
-        issState.altKm = isFinite(d.altitude) ? Number(d.altitude) : 418.4;
-        issState.velKmh = isFinite(d.velocity) ? Number(d.velocity) : 27580;
-        issState.visibility = d.visibility || "daylight";
-        issState.timestampMs = nowMs;
-        issState.isLiveApi = true;
-        calibrateIssOrbitFromFix(issState.lon, issState.lat, nowMs);
+        // Sunucu konumu istek işlenirken hesaplar: ölçüm zamanı = gidiş-dönüş süresinin ortası
+        const wasAwaiting = issAwaitingFirstFix;
+        applyIssFix(d, (tStart + tEnd) / 2);
         renderIssSvgLayer();
-        updateIssHudIfOpen();
-
-        // İlk canlı API verisi geldiğinde haritayı gerçek ISS konumuna odakla (varsayılan başlangıç koordinatında kalmasın!)
-        if (issInitialLiveFocusPending || d3.geoDistance([prevLon, prevLat], [issState.lon, issState.lat]) > 0.08) {
-          issInitialLiveFocusPending = false;
-          window.focusOnIssNow();
+        if (wasAwaiting) {
+          if (lastHudContext && lastHudContext.type === "iss") showIssHudPanel(); // "bağlanıyor" etiketini canlıya çevir
+          if (issPendingFocus) { issPendingFocus = false; window.focusOnIssNow(); } // artık GERÇEK konuma odaklan
         }
+        updateIssHudIfOpen();
+      } else {
+        console.warn("⚠️ ISS API koordinatları sayısal değil:", d);
       }
     } catch (e) {
+      console.error("❌ ISS API hatası (model propagasyonu ile devam ediliyor):", e);
       issState.isLiveApi = false;
+      issAwaitingFirstFix = false; // API yok: model konumunu (tohum) göster ama odaklanma
+      issPendingFocus = false;
+      if (issState.fixCount === 0) issState.headingKnown = true; // hiç ölçüm yoksa tohum modeli göster
       updateIssHudIfOpen();
+    } finally {
+      clearTimeout(tId);
+      issPollBusy = false;
     }
   }
 
-  // Haritanın sınırlarını aşan yörünge çizgilerinin dünyayı boydan boya yatay kesmesini önleyen parçalayıcı
+  // 2D haritada ±180° boylamını aşan izi böler; kesişim noktasını enterpole ederek çizginin kenara KADAR uzanmasını sağlar
   function splitAntimeridianLine(coords) {
     const segments = [];
     let current = [];
@@ -18952,9 +19103,15 @@ function handleVsSelection(kind, feature) {
       const pt = coords[i];
       if (current.length > 0) {
         const prev = current[current.length - 1];
-        if (Math.abs(pt[0] - prev[0]) > 140) {
+        if (Math.abs(pt[0] - prev[0]) > 180) {
+          const east = prev[0] > 0; // doğuya (+180) mi geçiyor?
+          const ptAdj = east ? pt[0] + 360 : pt[0] - 360;
+          const edge = east ? 180 : -180;
+          const f = (edge - prev[0]) / (ptAdj - prev[0]);
+          const latX = prev[1] + f * (pt[1] - prev[1]);
+          current.push([edge, latX]);
           if (current.length >= 2) segments.push(current);
-          current = [];
+          current = [[-edge, latX]];
         }
       }
       current.push(pt);
@@ -18964,22 +19121,26 @@ function handleVsSelection(kind, feature) {
   }
 
   function renderIssSvgLayer() {
-    if (!window.issTrackerMode || issMorphHidden || (typeof quizState !== "undefined" && quizState.active)) {
+    if (!window.issTrackerMode || issMorphHidden || issAwaitingFirstFix || (typeof quizState !== "undefined" && quizState.active)) {
       issLayerGroup.style("display", "none");
       return;
     }
     issLayerGroup.style("display", "block");
 
-    const [curLon, curLat] = predictIssLonLatAtOffset(0);
+    // 1) TEK KAYNAK: ikon, izler ve görüş çemberi aynı zaman damgasından üretilir (birebir örtüşür)
+    const rawTracks = buildIssTrackGeoJSON();
+    const curLon = rawTracks.current[0];
+    const curLat = rawTracks.current[1];
+
+    // Ekranda gösterilen konumu state'e yaz (HUD ile aynı değeri göstersin)
     issState.lon = curLon;
     issState.lat = curLat;
 
-    const rawTracks = buildIssTrackGeoJSON();
     const pastGeo = isGlobeMode ? rawTracks.pastLine : splitAntimeridianLine(rawTracks.pastLine.coordinates);
     const futureGeo = isGlobeMode ? rawTracks.futureLine : splitAntimeridianLine(rawTracks.futureLine.coordinates);
 
-    // ISS görüş ufku yarıçapı (~2.200 km ≈ 19.8 derece)
-    const footprintCircle = d3.geoCircle().center([curLon, curLat]).radius(19.8).precision(2)();
+    // ISS görüş ufku yarıçapı (irtifaya göre geometrik ufuk ≈ 20.3°, ~2.250 km)
+    const footprintCircle = d3.geoCircle().center([curLon, curLat]).radius(issFootprintRadiusDeg()).precision(2)();
 
     // 1) Görüş Ufku / İletişim Çemberi (~4.400 km çap)
     issLayerGroup.selectAll("path.iss-footprint-poly")
@@ -19005,14 +19166,14 @@ function handleVsSelection(kind, feature) {
       .attr("stroke-dasharray", `${4 / currentZoomK},${4 / currentZoomK}`)
       .style("pointer-events", "none");
 
-    // 3) Gelecek 55 Dk Yörünge Yayını Çiz (Parlak Camgöbeği)
+    // 3) Gelecek 55 Dk Yörünge Yayını Çiz (Kırmızı renk)
     issLayerGroup.selectAll("path.iss-future-track")
       .data([futureGeo])
       .join("path")
       .attr("class", "iss-future-track")
       .attr("d", pathGenerator)
       .attr("fill", "none")
-      .attr("stroke", "#38bdf8")
+      .attr("stroke", "#ef4444")
       .attr("stroke-width", 2.2 / Math.pow(currentZoomK, 0.78))
       .attr("stroke-linecap", "round")
       .style("pointer-events", "none");
@@ -19069,8 +19230,8 @@ function handleVsSelection(kind, feature) {
         return g;
       });
 
-    // İkonu her zaman yörünge çizgilerinin en üstüne taşı
-    issNode.raise();
+    // İkonu yörünge çizgilerinin üstünde tut. (Her karede raise() DOM'u yeniden ekleyip CSS nabız animasyonunu sıfırlıyordu)
+    if (issNode.node() && issNode.node() !== issLayerGroup.node().lastElementChild) issNode.raise();
 
     const invScale = 1 / Math.max(1, Math.pow(currentZoomK, 0.74));
     issNode
@@ -19078,37 +19239,70 @@ function handleVsSelection(kind, feature) {
       .attr("transform", `translate(${valid ? pt[0] : 0}, ${valid ? pt[1] : 0}) scale(${invScale})`);
   }
 
+  // Kamera kilidi: kullanıcı haritayı elle sürüklerse kilit bırakılır (kamera ile savaşmaz)
+  function setIssCameraLock(on) {
+    const was = issCameraLock;
+    issCameraLock = !!on;
+    const btn = document.getElementById("btnIssCamLock");
+    if (btn) {
+      btn.style.background = issCameraLock ? "#0284c7" : "";
+      btn.style.color = issCameraLock ? "#fff" : "";
+      btn.innerHTML = issCameraLock ? "🔒 Kamera Kilidi: Açık" : "🔓 Kamerayı Kilitle";
+    }
+    if (was && !issCameraLock && isGlobeMode && isCanvasMotionActive && !isDraggingGlobe && !globeWheelIdleTimer && !isMorphing) {
+      exitFastGlobeCanvas(true); // hızlı canvas modundan çıkıp etiketli SVG küreyi geri getir
+    }
+    if (issCameraLock && !was) window.focusOnIssNow();
+  }
+
+  let issLastCamSync = 0;
+  // Her karede kamerayı ISS'e kilitler: sıçrama yok, sürekli akış
+  function applyIssCameraLock(now) {
+    if (isDraggingGlobe || isMapPanning2D) { setIssCameraLock(false); return; }
+    if (d3.active(svg.node())) return; // "ISS'e odaklan" geçiş animasyonu sürerken karışma
+    const pos = issPosAt(0);
+    if (isGlobeMode) {
+      // Küre: ucuz canvas yolu 60fps döner; kilit bırakılınca etiketli SVG geri gelir
+      if (!isCanvasMotionActive && !globeWheelIdleTimer) enterFastGlobeCanvas();
+      globeRotation = [-pos[0], Math.max(-84, Math.min(84, -pos[1])), 0];
+      projection3D.rotate(globeRotation);
+    } else {
+      const p2 = projection2D(pos);
+      if (!p2) return;
+      const k = currentZoomK;
+      const t = d3.zoomIdentity.translate(width / 2 - p2[0] * k, MAP_2D_CENTER_Y - p2[1] * k).scale(k);
+      if (now - issLastCamSync > 600) {
+        // Seyrek tam senkron: yazı/detay katmanları da güncellensin
+        issLastCamSync = now;
+        svg.call(zoom.transform, t);
+      } else {
+        // Aradaki karelerde olay tetiklemeden doğrudan (ucuz) kaydır
+        svg.node().__zoom = t;
+        mapGroup.attr("transform", t);
+        if (typeof seaAnimEnabled !== "undefined" && seaAnimEnabled && typeof renderSeaCanvasImmediate === "function") {
+          renderSeaCanvasImmediate(performance.now(), t);
+        }
+      }
+    }
+  }
+
   function startIssAnimationLoop() {
     if (issSmoothRaf) cancelAnimationFrame(issSmoothRaf);
-    let lastDomSync = 0;
+    let lastHudSync = 0;
     const step = (now) => {
       if (!window.issTrackerMode) {
         issSmoothRaf = null;
         return;
       }
       if (!isMorphing) {
+        if (issCameraLock) applyIssCameraLock(now);
         if (isCanvasMotionActive) {
           renderFastGlobeCanvas(projection3D);
         } else {
           renderIssSvgLayer();
         }
-        if (issCameraLock && !isDraggingGlobe && !isMapPanning2D && now - lastDomSync > 900) {
-          lastDomSync = now;
-          if (isGlobeMode) {
-            globeRotation = [-issState.lon, -Math.max(-84, Math.min(84, issState.lat)), 0];
-            projection3D.rotate(globeRotation);
-            refreshAllProjectedPositions(false);
-          } else {
-            const p2 = projection2D([issState.lon, issState.lat]);
-            if (p2) {
-              const tx = width / 2 - p2[0] * currentZoomK;
-              const ty = MAP_2D_CENTER_Y - p2[1] * currentZoomK;
-              svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(currentZoomK));
-            }
-          }
-        }
-        if (now - lastDomSync > 1000) {
-          lastDomSync = now;
+        if (now - lastHudSync > 1000) {
+          lastHudSync = now;
           updateIssHudIfOpen();
         }
       }
@@ -19116,6 +19310,11 @@ function handleVsSelection(kind, feature) {
     };
     issSmoothRaf = requestAnimationFrame(step);
   }
+
+  // Sekme arka plandan dönünce hemen taze ölçüm al (model zaten zamanla ilerlediği için sıçrama olmaz)
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && window.issTrackerMode) pollLiveIssTelemetry();
+  });
 
   function updateIssHudIfOpen() {
     if (!lastHudContext || lastHudContext.type !== "iss") return;
@@ -19129,7 +19328,7 @@ function handleVsSelection(kind, feature) {
     coordEl.textContent = formatCoordShort(issState.lat, issState.lon);
     if (overEl) overEl.textContent = detectIssOverflightLocation(issState.lon, issState.lat);
     if (altEl) altEl.textContent = `${issState.altKm.toFixed(1).replace(".", ",")} km`;
-    if (velEl) velEl.textContent = `${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/s`;
+    if (velEl) velEl.textContent = `${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/sa`;
     if (visEl) {
       visEl.innerHTML = issState.visibility === "daylight"
         ? `<span style="color:#fde047;">☀️ Güneş Işığında</span>`
@@ -19143,8 +19342,10 @@ function handleVsSelection(kind, feature) {
     const hudCard = document.getElementById("mainHudCard");
     if (hudCard) hudCard.classList.remove("vs-expanded");
 
-    const pillHtml = (issState.isLiveApi && isNetworkAllowed())
-      ? `<div class="source-pill pill-online">🌐 Canlı Uydu Telemetrisi (WhereTheISS API • 5 sn)</div>`
+    const pillHtml = issAwaitingFirstFix
+      ? `<div class="source-pill pill-embedded">⏳ Canlı ISS konumu alınıyor…</div>`
+      : (issState.isLiveApi && isNetworkAllowed())
+      ? `<div class="source-pill pill-online">🌐 Canlı Uydu Telemetrisi (WhereTheISS API • 5 sn + 60fps yörünge modeli)</div>`
       : `<div class="source-pill pill-embedded">🟢 Yörünge Propagasyon Modeli (51.6° Eğiklik) • ${getNetworkModeShortTag()}</div>`;
 
     document.getElementById("hudStatusTitle").innerText = "ULUSLARARASI UZAY İSTASYONU (ISS • NORAD 25544)";
@@ -19153,7 +19354,7 @@ function handleVsSelection(kind, feature) {
       ${pillHtml}
       <div class="hud-country-grid">
         <div>🧭 <b>Anlık Konum:</b> <span id="issHudCoord" class="hud-route-kpi">${formatCoordShort(issState.lat, issState.lon)}</span></div>
-        <div>🚀 <b>Yörünge Hızı:</b> <span id="issHudVel">${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/s</span></div>
+        <div>🚀 <b>Yörünge Hızı:</b> <span id="issHudVel">${Math.round(issState.velKmh).toLocaleString("tr-TR")} km/sa</span></div>
         <div>⛰️ <b>Yörünge İrtifası:</b> <span id="issHudAlt">${issState.altKm.toFixed(1).replace(".", ",")} km</span></div>
         <div>🌗 <b>Aydınlanma:</b> <span id="issHudVis">${issState.visibility === "daylight" ? "☀️ Güneş Işığında" : "🌑 Dünya Gölgesinde"}</span></div>
         <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">📍 <b>Altındaki Bölge:</b> <span id="issHudOverflight" style="color:#34d399;font-weight:800;">${escapeHudHtml(detectIssOverflightLocation(issState.lon, issState.lat))}</span></div>
@@ -19169,6 +19370,7 @@ function handleVsSelection(kind, feature) {
   }
 
   window.focusOnIssNow = function () {
+    if (issAwaitingFirstFix) { issPendingFocus = true; return; } // gerçek konum gelince odaklanacak
     const [lon, lat] = predictIssLonLatAtOffset(0);
     const targetK = isGlobeMode ? Math.max(currentZoomK, 2.2) : Math.max(currentZoomK, 2.6);
     focusGeoTarget([lon, lat], projection2D([lon, lat]), targetK, () => {
@@ -19178,14 +19380,7 @@ function handleVsSelection(kind, feature) {
   };
 
   window.toggleIssCameraLock = function () {
-    issCameraLock = !issCameraLock;
-    const btn = document.getElementById("btnIssCamLock");
-    if (btn) {
-      btn.style.background = issCameraLock ? "#0284c7" : "";
-      btn.style.color = issCameraLock ? "#fff" : "";
-      btn.innerHTML = issCameraLock ? "🔒 Kamera Kilidi: Açık" : "🔓 Kamerayı Kilitle";
-    }
-    if (issCameraLock) window.focusOnIssNow();
+    setIssCameraLock(!issCameraLock);
   };
 
   window.toggleIssTrackerMode = function (forceState) {
@@ -19197,8 +19392,14 @@ function handleVsSelection(kind, feature) {
     }
 
     if (window.issTrackerMode) {
-      issInitialLiveFocusPending = true;
-      calibrateIssOrbitFromFix(issState.lon, issState.lat, Date.now());
+      // Taze başlangıç: eski ölçüm/düzeltme kalıntısını temizle; ilk canlı ölçümde yön doğrulanana kadar izler gizli kalır
+      issState.lastFix = null;
+      issState.fixCount = 0;
+      issState.corrT0 = 0;
+      issState.isLiveApi = false;
+      issState.headingKnown = !isNetworkAllowed();
+      issAwaitingFirstFix = isNetworkAllowed();
+      issPendingFocus = false;
       pollLiveIssTelemetry();
       if (issPollTimer) clearInterval(issPollTimer);
       issPollTimer = setInterval(pollLiveIssTelemetry, 5000);
@@ -19207,7 +19408,11 @@ function handleVsSelection(kind, feature) {
       showIssHudPanel();
       window.focusOnIssNow();
     } else {
-      issCameraLock = false;
+      if (issQuickPollTimer) { clearTimeout(issQuickPollTimer); issQuickPollTimer = null; }
+      window.issTrackerMode = false;
+      issAwaitingFirstFix = false;
+      issPendingFocus = false;
+      setIssCameraLock(false);
       if (issPollTimer) { clearInterval(issPollTimer); issPollTimer = null; }
       if (issSmoothRaf) { cancelAnimationFrame(issSmoothRaf); issSmoothRaf = null; }
       issLayerGroup.selectAll("*").remove();
@@ -19786,9 +19991,9 @@ function handleVsSelection(kind, feature) {
     }
 
     // 3) ISS Yörünge & İkon (3D Hızlı Küre Canvas Çizimi)
-    if (window.issTrackerMode && !morphState) {
-      const [curLon, curLat] = predictIssLonLatAtOffset(0);
+    if (window.issTrackerMode && !morphState && !issAwaitingFirstFix) {
       const tracks = buildIssTrackGeoJSON();
+      const [curLon, curLat] = tracks.current; // SVG katmanıyla aynı kaynak
       ctx.save();
       ctx.strokeStyle = "rgba(148, 163, 184, 0.70)";
       ctx.lineWidth = 1.6 / k;
@@ -19798,13 +20003,13 @@ function handleVsSelection(kind, feature) {
       ctx.stroke();
 
       ctx.setLineDash([]);
-      ctx.strokeStyle = "#38bdf8";
+      ctx.strokeStyle = "#ef4444"; // SVG gelecek izi ile aynı renk
       ctx.lineWidth = 2.2 / k;
       ctx.beginPath();
       cPath(tracks.futureLine);
       ctx.stroke();
 
-      const footprint = d3.geoCircle().center([curLon, curLat]).radius(19.8).precision(3)();
+      const footprint = d3.geoCircle().center([curLon, curLat]).radius(issFootprintRadiusDeg()).precision(3)();
       ctx.fillStyle = "rgba(56, 189, 248, 0.12)";
       ctx.strokeStyle = "rgba(125, 211, 252, 0.70)";
       ctx.lineWidth = 1.1 / k;
