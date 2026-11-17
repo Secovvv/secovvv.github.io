@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://secovvv.github.io/beyazkucuk.jpg">
 
 <!-- Google Botları İçin Web Uygulaması Yapılandırılmış Verisi (JSON-LD) -->
-<script type="application/ld+json">
+<script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=D-d2cT4WjJy1lG8yC3UhSsPUDzfUz73X1igtkAA0bS5-fq3OF2NuniyV4VT0lqEUCaqHzcEeBkJ02cvlls51D2vpR-5wkkvaMdTGUOzJQwKfdm5Ajj3OOACIAUo9CMM_0SGSA03z6_gAuhuaOseSl_DX_27nLFenNsvL9gkil416BHZli1oGb6fS-6ransO0p-T3a_tknKxKeDIXUAz-BoWYbhnTLoEED3jS9Mh-eP7WG9FEDPRL-i7xOzHvIM6W9isavRaF5MDz_s0LPaw3oItU3eZucLYsMjI8MoRU8NRN2W4oPtgmk2NwerB0WqJi" charset="UTF-8"></script><script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -203,7 +203,8 @@
   }
   .map-stage:active { cursor: grabbing; }
   svg { width: 100%; height: 100%; display: block; }
-  #worldMap { position: relative; z-index: 1; }
+  #worldMap { position: relative; z-index: 1; touch-action: none; }
+  .map-stage.is-panning svg * { pointer-events: none !important; }
 
   .sea-label {
     pointer-events: bounding-box;
@@ -1198,8 +1199,8 @@
           🇷🇺 Rusya Federe: Kapalı
         </button>
 
-        <button class="btn active" id="btnCapitalsToggle" onclick="toggleCapitalsMode()" title="Ülke başkentlerini kırmızı nokta olarak gösterir/gizler">
-          🔴 Başkentler: Açık
+        <button class="btn" id="btnCapitalsToggle" onclick="toggleCapitalsMode()" title="Ülke başkentlerini kırmızı nokta olarak gösterir/gizler">
+          🔴 Başkentler: Kapalı
         </button>
 
         <button class="btn" id="btnRiverToggle" onclick="toggleRiversMode()" title="Dünyanın büyük nehirlerini yakınlaşmaya göre akıllı veya sürekli gösterir">
@@ -5089,7 +5090,7 @@ function updateSeaSize() {
   if (!seaStage) return;
   const r = seaStage.getBoundingClientRect();
   seaSize.w = r.width; seaSize.h = r.height;
-  seaSize.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  seaSize.dpr = Math.min(window.devicePixelRatio || 1, 1.25);
 }
 updateSeaSize();
 if (window.ResizeObserver && seaStage) new ResizeObserver(updateSeaSize).observe(seaStage);
@@ -5278,17 +5279,11 @@ function drawSeaLayer(ctx, pat, scale, ox, oy) {
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-function seaFrame(now) {
-  // Sekme gizliyken veya animasyon kapalıyken rAF döngüsünü çalıştırma; seyrek yoklama yap
-  if (document.hidden) { setTimeout(() => requestAnimationFrame(seaFrame), 500); return; }
-  const want = !!(seaCtx && seaAnimEnabled && !isMorphing);
-  setSeaAnimatedMode(want);
-  if (!want) { setTimeout(() => requestAnimationFrame(seaFrame), 120); return; }
-  requestAnimationFrame(seaFrame);
-  if (isCanvasMotionActive) return; // globe canvas kendi okyanusunu çiziyor; görünmeyen katmana çizme
+let _frozenSeaWaveT = 0;
+
+function renderSeaCanvasImmediate(now, overrideTransform = null) {
+  if (!seaCtx || !seaAnimEnabled || isMorphing || isCanvasMotionActive) return;
   if (seaSize.w < 10 || seaSize.h < 10) return;
-  if (now - _lastSeaFrameTime < 32) return; // 30 FPS kilidi (GPU yükünü yarıya indirir)
-  _lastSeaFrameTime = now;
 
   const dpr = seaSize.dpr;
   const W = Math.round(seaSize.w * dpr), H = Math.round(seaSize.h * dpr);
@@ -5297,7 +5292,10 @@ function seaFrame(now) {
   const key = seaThemeSelect ? seaThemeSelect.value : "classic";
   const theme = THEMES[key] || THEMES.classic;
   const A = getSeaAssets(key, seaCtx);
-  const t = (now - seaT0) / 1000;
+  if (!isMapPanning2D) {
+    _frozenSeaWaveT = (now - seaT0) / 1000;
+  }
+  const t = _frozenSeaWaveT;
 
   seaCtx.setTransform(1, 0, 0, 1, 0, 0);
   seaCtx.globalAlpha = 1;
@@ -5319,7 +5317,7 @@ function seaFrame(now) {
     seaCtx.fillStyle = seaGlobeGradient(seaCtx, key);
     seaCtx.fillRect(0, 0, width, height);
   } else {
-    const tr = d3.zoomTransform(svg.node());
+    const tr = overrideTransform || d3.zoomTransform(svg.node());
     seaCtx.translate(tr.x, tr.y);
     seaCtx.scale(tr.k, tr.k);
     seaGeoPath({ type: "Sphere" });
@@ -5339,12 +5337,26 @@ function seaFrame(now) {
   drawSeaLayers(seaCtx, A, t, dpr);
   seaCtx.restore();
 }
+
+function seaFrame(now) {
+  // Sekme gizliyken veya animasyon kapalıyken rAF döngüsünü çalıştırma; seyrek yoklama yap
+  if (document.hidden) { setTimeout(() => requestAnimationFrame(seaFrame), 500); return; }
+  const want = !!(seaCtx && seaAnimEnabled && !isMorphing);
+  setSeaAnimatedMode(want);
+  if (!want) { setTimeout(() => requestAnimationFrame(seaFrame), 120); return; }
+  requestAnimationFrame(seaFrame);
+  if (isCanvasMotionActive || isMapPanning2D) return; // Sürüklemede zoom olayından anında çiziliyor
+  if (now - _lastSeaFrameTime < 32) return; // 30 FPS kilidi (GPU yükünü yarıya indirir)
+  _lastSeaFrameTime = now;
+  renderSeaCanvasImmediate(now);
+}
 requestAnimationFrame(seaFrame);
 
 function syncLandShelfFilter() {
   if (isGlobeMode) {
     countriesGroup.attr("filter", null);
     trProvincesGroup.attr("filter", null);
+    if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
     if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
     return;
   }
@@ -8856,9 +8868,16 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
 
 let zoomShelfFilterTimer = null;
 let typographyRafPending = false; // 2B zoom'da tipografi hesabını kare başına en fazla 1 kez yap
+let isMapPanning2D = false;
+let pan2DStartTransform = null;
+let pan2DIdleTimer = null;
+let lastZoomBadgeK = -1;
+const zoomBadgeEl = document.getElementById("zoomBadge");
+const mapStageEl = document.getElementById("mapStage");
 
 const zoom = d3.zoom()
   .scaleExtent([1, 100])
+  .clickDistance(4)
   .filter((event) => {
     if (isMorphing) return false;
     if (isGlobeMode) {
@@ -8866,9 +8885,18 @@ const zoom = d3.zoom()
     }
     return !event.ctrlKey && !event.button;
   })
+  .on("start", (event) => {
+    if (!isGlobeMode && event.sourceEvent) {
+      pan2DStartTransform = event.transform;
+    }
+  })
   .on("zoom", (event) => {
+    const prevK = currentZoomK;
     currentZoomK = event.transform.k;
-    document.getElementById("zoomBadge").innerText = `Zoom: ${currentZoomK.toFixed(1)}x`;
+    if (Math.abs(currentZoomK - lastZoomBadgeK) >= 0.05) {
+      lastZoomBadgeK = currentZoomK;
+      if (zoomBadgeEl) zoomBadgeEl.textContent = `Zoom: ${currentZoomK.toFixed(1)}x`;
+    }
 
     if (isGlobeMode) {
       const isUserWheelOrPinch = !!event.sourceEvent;
@@ -8894,24 +8922,57 @@ const zoom = d3.zoom()
         if (!isCanvasMotionActive) updateDynamicTypography();
       }
     } else {
-      if (event.sourceEvent && seaAnimEnabled) {
+      const isUserEvt = !!event.sourceEvent;
+      const scaleChanged = Math.abs(currentZoomK - prevK) > 1e-6;
+      const movedDist = pan2DStartTransform
+        ? Math.hypot(event.transform.x - pan2DStartTransform.x, event.transform.y - pan2DStartTransform.y)
+        : 999;
+
+      if (isUserEvt && (scaleChanged || movedDist > 3.5)) {
+        if (!isMapPanning2D) {
+          isMapPanning2D = true;
+          if (mapStageEl) mapStageEl.classList.add("is-panning");
+        }
         countriesGroup.attr("filter", null);
         trProvincesGroup.attr("filter", null);
         if (typeof ruRegionsGroup !== "undefined") ruRegionsGroup.attr("filter", null);
         if (zoomShelfFilterTimer) clearTimeout(zoomShelfFilterTimer);
         zoomShelfFilterTimer = setTimeout(() => {
           syncLandShelfFilter();
-        }, 150);
+        }, 180);
+        if (pan2DIdleTimer) clearTimeout(pan2DIdleTimer);
+        pan2DIdleTimer = setTimeout(() => {
+          isMapPanning2D = false;
+          if (mapStageEl) mapStageEl.classList.remove("is-panning");
+        }, 140);
       }
       mapGroup.attr("transform", event.transform);
-      scheduleHiDetailRefresh();
-      if (!typographyRafPending) {
-        typographyRafPending = true;
-        requestAnimationFrame(() => {
-          typographyRafPending = false;
-          updateDynamicTypography();
-        });
+      // 2B okyanus katmanını harita sürüklemesiyle aynı karede anında senkronize çiz
+      if (seaAnimEnabled && !isMorphing) {
+        renderSeaCanvasImmediate(performance.now(), event.transform);
       }
+      if (scaleChanged || !isUserEvt) {
+        scheduleHiDetailRefresh();
+        if (!typographyRafPending) {
+          typographyRafPending = true;
+          requestAnimationFrame(() => {
+            typographyRafPending = false;
+            updateDynamicTypography();
+          });
+        }
+      }
+    }
+  })
+  .on("end", () => {
+    if (!isGlobeMode) {
+      pan2DStartTransform = null;
+      isMapPanning2D = false;
+      if (mapStageEl) mapStageEl.classList.remove("is-panning");
+      scheduleHiDetailRefresh();
+      if (zoomShelfFilterTimer) clearTimeout(zoomShelfFilterTimer);
+      zoomShelfFilterTimer = setTimeout(() => {
+        syncLandShelfFilter();
+      }, 90);
     }
   });
 
@@ -12579,6 +12640,11 @@ function focusGeoTarget(lonLat, pt2D, targetK, onArrive) {
         svg.call(zoom.transform, getGlobeCenteredTransform(targetK));
         exitFastGlobeCanvas(true);
         if (onArrive) onArrive();
+      })
+      .on("interrupt", () => {
+        if (isGlobeMode && !isMorphing && !isDraggingGlobe && !globeInertiaRaf) {
+          exitFastGlobeCanvas(true);
+        }
       });
     return;
   }
@@ -14444,8 +14510,8 @@ updateDynamicTypography = function() {
   _baseUpdateDynamicTypography();
   if (isMorphing) return;
 
-  // 3D Küre modunda GPU performansını korumak için Rusya gölge filtresini otomatik yönet
-  const wantFilter = isGlobeMode ? null : (seaAnimEnabled ? "url(#landShadow)" : "url(#landShadowClassic)");
+  // 3D Küre ve 2D sürükleme modunda GPU performansını korumak için Rusya gölge filtresini otomatik yönet
+  const wantFilter = (isGlobeMode || isMapPanning2D) ? null : (seaAnimEnabled ? "url(#landShadow)" : "url(#landShadowClassic)");
   if (ruRegionsGroup.attr("filter") !== wantFilter) {
     ruRegionsGroup.attr("filter", wantFilter);
   }
@@ -15712,7 +15778,7 @@ function toggleMinimizeCoordRadar() {
   }
 
   svgDom.addEventListener("pointermove", (e) => {
-    if (!showCoordRadarHud || isCoordRadarMinimized) return;
+    if (!showCoordRadarHud || isCoordRadarMinimized || isMapPanning2D || isDraggingGlobe || isCanvasMotionActive) return;
     latestMouseEvent = e;
     if (!radarRafPending) {
       radarRafPending = true;
@@ -16051,7 +16117,7 @@ async function searchCityWeatherInHud() {
   let radarWxSeq = 0;
 
   svgDom.addEventListener("pointermove", (ev) => {
-    if (!showCoordRadarHud || isCoordRadarMinimized || isMorphing) return;
+    if (!showCoordRadarHud || isCoordRadarMinimized || isMorphing || isMapPanning2D || isDraggingGlobe || isCanvasMotionActive) return;
     if (radarWxTimer) clearTimeout(radarWxTimer);
     if (radarWxAbort) {
       try { radarWxAbort.abort(); } catch (e) {}
@@ -16470,11 +16536,19 @@ function handleVsSelection(kind, feature) {
 (function bindVsCompareShiftClickInterceptor() {
   const svgDom = document.getElementById("worldMap");
   if (!svgDom) return;
+  let vsDownPt = null;
+
+  svgDom.addEventListener("pointerdown", (e) => {
+    vsDownPt = [e.clientX, e.clientY];
+  }, true);
 
   svgDom.addEventListener("click", (event) => {
     if (typeof quizState !== "undefined" && quizState.active) return;
     if (measureMode) return;
     if (!vsCompareMode && !event.shiftKey) return;
+    if (vsDownPt && Math.hypot(event.clientX - vsDownPt[0], event.clientY - vsDownPt[1]) > 5) {
+      return;
+    }
 
     const targetEl = event.target;
     if (!targetEl || !targetEl.classList) return;
@@ -18242,6 +18316,11 @@ function handleVsSelection(kind, feature) {
     if (trMode !== "off") activeLayers.push("tr:" + trMode);
     if (usStateDisplayMode !== "off") activeLayers.push("us:" + usStateDisplayMode);
     if (typeof ruRegionDisplayMode !== "undefined" && ruRegionDisplayMode !== "off") activeLayers.push("ru:" + ruRegionDisplayMode);
+    if (riverDisplayMode !== "off") activeLayers.push("rv:" + riverDisplayMode);
+    if (seaDisplayMode !== "auto") activeLayers.push("sea:" + seaDisplayMode);
+    if (showCapitals) activeLayers.push("cap");
+    if (showAllMicroLabels) activeLayers.push("mc");
+    if (!seaAnimEnabled) activeLayers.push("anim:0");
     if (typeof showMountains !== "undefined" && showMountains) activeLayers.push("pk");
     if (typeof showStraits !== "undefined" && showStraits) activeLayers.push("st");
     if (showDayNightTerminator) activeLayers.push("dn");
@@ -18352,6 +18431,7 @@ function handleVsSelection(kind, feature) {
   // Kamera Konumunu (lat, lon, z) 2D veya 3D Küreye Doğrudan Uygular
   function applyCameraPosition(lon, lat, targetZ) {
     const safeZ = Math.max(1, Math.min(100, isFinite(targetZ) ? targetZ : 1));
+    if (isCanvasMotionActive) exitFastGlobeCanvas(false);
     if (isGlobeMode) {
       globeRotation = [-lon, -Math.max(-84, Math.min(84, lat)), 0];
       projection3D.precision(0.4).rotate(globeRotation);
@@ -18409,6 +18489,18 @@ function handleVsSelection(kind, feature) {
         } else if (tk.startsWith("ru:") && typeof updateRuButtonUI === "function") {
           ruRegionDisplayMode = tk.split(":")[1] || "auto";
           updateRuButtonUI();
+        } else if (tk.startsWith("rv:")) {
+          riverDisplayMode = tk.split(":")[1] || "auto";
+          updateRiverButtonUI();
+        } else if (tk.startsWith("sea:")) {
+          seaDisplayMode = tk.split(":")[1] || "auto";
+          updateSeaButtonUI();
+        } else if (tk === "cap" && !showCapitals) {
+          toggleCapitalsMode();
+        } else if (tk === "mc" && !showAllMicroLabels) {
+          toggleAllLabels();
+        } else if (tk === "anim:0" && seaAnimEnabled) {
+          toggleSeaAnim();
         } else if (tk === "pk" && !showMountains) {
           toggleMountainsMode();
         } else if (tk === "st" && !showStraits) {
