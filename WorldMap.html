@@ -11678,16 +11678,339 @@ const GLOBAL_METROPOLIS_LIGHTS = [
   [115.86, -31.95, 2, 3, 0.7], [174.76, -36.85, 2, 3, 0.6]
 ];
 
+// ================= 🌃 DOĞRUDAN ENTEGRE NASA VIIRS (SUOMI-NPP) GERÇEK UYDU + %100 POLİGON KARA MASKELİ GECE IŞIKLARI MOTORU =================
+const VIIRS_W = 2048, VIIRS_H = 1024;
+const NASA_VIIRS_WMS =
+  `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=VIIRS_CityLights_2012&STYLES=&FORMAT=image%2Fjpeg&SRS=EPSG%3A4326&BBOX=-180,-90,180,90&WIDTH=${VIIRS_W}&HEIGHT=${VIIRS_H}`;
+
+let viirsPixels = null;
+let viirsLoading = false;
+let viirsFailed = false;
+let lastViirsBakeKey = "";
+let strictNightLandMask = null; // 2048x1024 harita poligonlarından üretilmiş birebir kara maskesi
+
+const BM2D_W = 1400, BM2D_H = 729;
+const bm2DCanvas = document.createElement("canvas");
+bm2DCanvas.width = BM2D_W;
+bm2DCanvas.height = BM2D_H;
+const bm2DCtx = bm2DCanvas.getContext("2d");
+
+const BM3D_S = 680;
+const bm3DCanvas = document.createElement("canvas");
+bm3DCanvas.width = BM3D_S;
+bm3DCanvas.height = BM3D_S;
+const bm3DCtx = bm3DCanvas.getContext("2d");
+
+let bm2DLut = null;
+
+// Haritada gerçekten çizili olan kara poligonlarından (allCountryFeatures) 2048x1024 kesin kara maskesi üretir.
+// Böylece haritada kara poligonu olmayan hiçbir okyanus noktasında (mikro ada, başkent veya uydu pikseli) ışık yanmaz!
+function ensureStrictNightLandMask() {
+  if (strictNightLandMask) return strictNightLandMask;
+  if (!Array.isArray(allCountryFeatures) || allCountryFeatures.length === 0) return null;
+
+  const c = document.createElement("canvas");
+  c.width = VIIRS_W;
+  c.height = VIIRS_H;
+  const g = c.getContext("2d", { willReadFrequently: true });
+  const proj = d3.geoEquirectangular()
+    .scale(VIIRS_W / (2 * Math.PI))
+    .translate([VIIRS_W / 2, VIIRS_H / 2])
+    .precision(0.2);
+  const gp = d3.geoPath(proj, g);
+
+  g.fillStyle = "#ffffff";
+  for (let i = 0; i < allCountryFeatures.length; i++) {
+    const f = allCountryFeatures[i];
+    if (!f || f.isAntarctica || f.enName === "Antarctica") continue;
+    try {
+      g.beginPath();
+      gp(f);
+      g.fill();
+    } catch (_) {}
+  }
+
+  // Büyük iç göllerin (Hazar, Superior, Viktorya, Van Gölü vb.) üstüne ışık düşmemesi için göl poligonlarını maskeden çıkar
+  if (Array.isArray(allLakeFeatures) && allLakeFeatures.length > 0) {
+    g.globalCompositeOperation = "destination-out";
+    for (let i = 0; i < allLakeFeatures.length; i++) {
+      try {
+        g.beginPath();
+        gp(allLakeFeatures[i]);
+        g.fill();
+      } catch (_) {}
+    }
+    g.globalCompositeOperation = "source-over";
+  }
+
+  const raw = g.getImageData(0, 0, VIIRS_W, VIIRS_H).data;
+  const mask = new Uint8Array(VIIRS_W * VIIRS_H);
+  for (let i = 0, p = 3; i < mask.length; i++, p += 4) {
+    mask[i] = raw[p] > 90 ? 1 : 0;
+  }
+  strictNightLandMask = mask;
+
+  // Eğer VIIRS uydu dokusu daha önce yüklendiyse okyanustaki tüm pikselleri anında sıfırla
+  if (viirsPixels) {
+    for (let i = 0; i < viirsPixels.length; i++) {
+      if (!strictNightLandMask[i]) viirsPixels[i] = 0;
+    }
+    lastViirsBakeKey = "";
+  }
+  return strictNightLandMask;
+}
+
+// Bir koordinatın haritada çizili gerçek bir kara poligonu üzerinde olup olmadığını denetler (kıyı taşmasını önlemek için merkez + 4 yön kontrolü)
+function isStrictlyOnVisibleLand(lon, lat, requireMargin = false) {
+  const mask = ensureStrictNightLandMask();
+  if (!mask) return false;
+  if (!isFinite(lon) || !isFinite(lat) || Math.abs(lat) > 78) return false;
+
+  const toIdx = (lo, la) => {
+    const x = Math.min(VIIRS_W - 1, Math.max(0, Math.floor(((lo + 180) / 360) * VIIRS_W)));
+    const y = Math.min(VIIRS_H - 1, Math.max(0, Math.floor(((90 - la) / 180) * VIIRS_H)));
+    return y * VIIRS_W + x;
+  };
+
+  if (!mask[toIdx(lon, lat)]) return false;
+  if (!requireMargin) return true;
+
+  // Kıyıdaki ışık halesinin denize taşmaması için ~15 km çevresinin de kara olmasını şart koş
+  const d = 0.14;
+  return Boolean(
+    mask[toIdx(lon + d, lat)] &&
+    mask[toIdx(lon - d, lat)] &&
+    mask[toIdx(lon, lat + d)] &&
+    mask[toIdx(lon, lat - d)]
+  );
+}
+
+function ensureBm2DLut() {
+  if (bm2DLut) return bm2DLut;
+  const N = BM2D_W * BM2D_H;
+  const lon = new Float32Array(N), lat = new Float32Array(N);
+  const sinL = new Float32Array(N), cosL = new Float32Array(N);
+  const tx = new Uint16Array(N), ty = new Uint16Array(N), ok = new Uint8Array(N);
+
+  for (let y = 0; y < BM2D_H; y++) {
+    const my = ((y + 0.5) / BM2D_H) * height;
+    for (let x = 0; x < BM2D_W; x++) {
+      const mx = ((x + 0.5) / BM2D_W) * width;
+      const ll = projection2D.invert([mx, my]);
+      if (!ll || !isFinite(ll[0]) || !isFinite(ll[1]) || Math.abs(ll[0]) > 180 || Math.abs(ll[1]) > 89.8) continue;
+      const back = projection2D(ll);
+      if (!back || Math.hypot(back[0] - mx, back[1] - my) > 2.5) continue;
+      const i = y * BM2D_W + x;
+      ok[i] = 1;
+      lon[i] = ll[0];
+      lat[i] = ll[1];
+      sinL[i] = Math.sin(ll[1] * DEG2RAD);
+      cosL[i] = Math.cos(ll[1] * DEG2RAD);
+      tx[i] = Math.min(VIIRS_W - 1, Math.max(0, Math.floor(((ll[0] + 180) / 360) * VIIRS_W)));
+      ty[i] = Math.min(VIIRS_H - 1, Math.max(0, Math.floor(((90 - ll[1]) / 180) * VIIRS_H)));
+    }
+  }
+  return (bm2DLut = { lon, lat, sinL, cosL, tx, ty, ok });
+}
+
+function computeNightGlobeBasis(proj) {
+  const s = proj.scale(), t = proj.translate();
+  const c = proj.invert(t);
+  const r = proj.invert([t[0] + s * 0.999, t[1]]);
+  const u = proj.invert([t[0], t[1] - s * 0.999]);
+  if (!c || !r || !u) return null;
+  const f = lonLatToVec3(c[0], c[1]);
+  const rr = lonLatToVec3(r[0], r[1]);
+  const uu = lonLatToVec3(u[0], u[1]);
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const norm = (a) => { const m = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / m, a[1] / m, a[2] / m]; };
+  let k = dot(rr, f);
+  const right = norm([rr[0] - k * f[0], rr[1] - k * f[1], rr[2] - k * f[2]]);
+  k = dot(uu, f);
+  let up = [uu[0] - k * f[0], uu[1] - k * f[1], uu[2] - k * f[2]];
+  k = dot(up, right);
+  up = norm([up[0] - k * right[0], up[1] - k * right[1], up[2] - k * right[2]]);
+  return { f, right, up, s, t };
+}
+
+async function loadNasaViirsTexture() {
+  if (viirsPixels || viirsLoading || viirsFailed) return;
+  viirsLoading = true;
+  try {
+    let blob = null;
+    try {
+      const cachedBuf = await readFromGeoCacheDB("nasa_viirs_citylights_v1");
+      if (cachedBuf) blob = new Blob([cachedBuf], { type: "image/jpeg" });
+    } catch (_) {}
+
+    if (!blob) {
+      if (!isNetworkAllowed()) { viirsLoading = false; return; }
+      const resp = await fetch(NASA_VIIRS_WMS, { mode: "cors" });
+      if (!resp.ok) throw new Error("VIIRS_HTTP_" + resp.status);
+      const buf = await resp.arrayBuffer();
+      try {
+        const db = await openGeoCacheDB();
+        db.transaction("datasets", "readwrite").objectStore("datasets").put(buf, "nasa_viirs_citylights_v1");
+      } catch (_) {}
+      blob = new Blob([buf], { type: "image/jpeg" });
+    }
+
+    const bmp = await createImageBitmap(blob);
+    const c = document.createElement("canvas");
+    c.width = VIIRS_W;
+    c.height = VIIRS_H;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    g.drawImage(bmp, 0, 0, VIIRS_W, VIIRS_H);
+    if (bmp.close) bmp.close();
+
+    const data = g.getImageData(0, 0, VIIRS_W, VIIRS_H).data;
+    const lum = new Uint8Array(VIIRS_W * VIIRS_H);
+    const landMask = ensureStrictNightLandMask();
+
+    for (let i = 0, p = 0; i < lum.length; i++, p += 4) {
+      // Harita poligonlarında kara olmayan (okyanus/göl) tüm pikselleri %100 sıfırla
+      if (landMask && !landMask[i]) {
+        lum[i] = 0;
+        continue;
+      }
+      const r = data[p], gg = data[p + 1], b = data[p + 2];
+      // Sadece gerçek sarı/turuncu/beyaz şehir ışığı emisyonunu al, zemin rengini tamamen kes
+      const raw = (r * 0.55 + gg * 0.38) - b * 0.65;
+      lum[i] = raw > 24 ? Math.min(255, Math.round((raw - 24) * 1.65)) : 0;
+    }
+    viirsPixels = lum;
+    lastViirsBakeKey = "";
+    if (showDayNightTerminator && showNightCityLights) {
+      renderSvgNightCityLights(currentZoomK);
+    }
+  } catch (e) {
+    viirsFailed = true;
+  } finally {
+    viirsLoading = false;
+  }
+}
+
+// Yerel güneş saatine göre gerçekçi şehir enerjisi eğrisi (Akşam 19:00-23:30 zirve, Gece 01:30-05:00 tasarruf modu)
+function localHourActivityFactor(lon, sunLon) {
+  const localSolarHour = (((lon - sunLon + 180) % 360 + 360) % 360) / 15;
+  if (localSolarHour >= 19 && localSolarHour <= 23.5) return 1.08;
+  if (localSolarHour >= 1.5 && localSolarHour <= 5.0) return 0.74;
+  return 0.90;
+}
+
+// Güneş zenit açısına (sinAlt) göre yumuşak alacakaranlık geçişi
+function nightTwilightFactor(sinAlt) {
+  if (sinAlt > -0.005) return 0;
+  if (sinAlt > -0.155) {
+    const t = (-0.005 - sinAlt) / 0.15;
+    return t * t * (3 - 2 * t);
+  }
+  return 1;
+}
+
+function bakeViirs2D(solar) {
+  if (!viirsPixels) return null;
+  const L = ensureBm2DLut();
+  const landMask = ensureStrictNightLandMask();
+  const img = bm2DCtx.createImageData(BM2D_W, BM2D_H);
+  const d = img.data;
+  const sunSinLat = Math.sin(solar.sunLat * DEG2RAD);
+  const sunCosLat = Math.cos(solar.sunLat * DEG2RAD);
+  const sunLonR = solar.sunLon * DEG2RAD;
+  const N = BM2D_W * BM2D_H;
+
+  for (let i = 0; i < N; i++) {
+    if (!L.ok[i]) continue;
+    const pixIdx = L.ty[i] * VIIRS_W + L.tx[i];
+    if (landMask && !landMask[pixIdx]) continue;
+    const vLum = viirsPixels[pixIdx];
+    if (vLum < 12) continue;
+
+    const sinAlt = L.sinL[i] * sunSinLat + L.cosL[i] * sunCosLat * Math.cos(L.lon[i] * DEG2RAD - sunLonR);
+    const tw = nightTwilightFactor(sinAlt);
+    if (tw <= 0.01) continue;
+
+    const act = localHourActivityFactor(L.lon[i], solar.sunLon);
+    const norm = Math.min(1, (vLum / 255) * act);
+    const o = i * 4;
+    d[o] = 255;
+    d[o + 1] = Math.round(175 + norm * 75);
+    d[o + 2] = Math.round(65 + norm * norm * 165);
+    d[o + 3] = Math.min(255, Math.round(Math.pow(norm, 0.72) * tw * 245));
+  }
+  bm2DCtx.putImageData(img, 0, 0);
+  return { url: bm2DCanvas.toDataURL("image/png"), x: 0, y: 0, w: width, h: height };
+}
+
+function bakeViirs3D(solar, proj) {
+  if (!viirsPixels) return null;
+  const B = computeNightGlobeBasis(proj);
+  if (!B) return null;
+  const landMask = ensureStrictNightLandMask();
+
+  const img = bm3DCtx.createImageData(BM3D_S, BM3D_S);
+  const d = img.data;
+  const sunVec = lonLatToVec3(solar.sunLon, solar.sunLat);
+  const half = BM3D_S / 2;
+  const { f, right, up } = B;
+
+  for (let y = 0; y < BM3D_S; y++) {
+    const ny = (y + 0.5 - half) / half;
+    for (let x = 0; x < BM3D_S; x++) {
+      const nx = (x + 0.5 - half) / half;
+      const r2 = nx * nx + ny * ny;
+      if (r2 >= 1) continue;
+      const nz = Math.sqrt(1 - r2);
+      const px = nx * right[0] - ny * up[0] + nz * f[0];
+      const py = nx * right[1] - ny * up[1] + nz * f[1];
+      const pz = nx * right[2] - ny * up[2] + nz * f[2];
+
+      const sinAlt = px * sunVec[0] + py * sunVec[1] + pz * sunVec[2];
+      const tw = nightTwilightFactor(sinAlt);
+      if (tw <= 0.01) continue;
+
+      const lon = Math.atan2(py, px) / DEG2RAD;
+      const lat = Math.asin(pz > 1 ? 1 : pz < -1 ? -1 : pz) / DEG2RAD;
+      const tx = Math.min(VIIRS_W - 1, Math.max(0, Math.floor(((lon + 180) / 360) * VIIRS_W)));
+      const ty = Math.min(VIIRS_H - 1, Math.max(0, Math.floor(((90 - lat) / 180) * VIIRS_H)));
+      const pixIdx = ty * VIIRS_W + tx;
+      if (landMask && !landMask[pixIdx]) continue;
+      const vLum = viirsPixels[pixIdx];
+      if (vLum < 12) continue;
+
+      const act = localHourActivityFactor(lon, solar.sunLon);
+      const norm = Math.min(1, (vLum / 255) * act);
+      const limb = Math.pow(1 - r2 * 0.85, 0.32);
+      const o = (y * BM3D_S + x) * 4;
+      d[o] = 255;
+      d[o + 1] = Math.round(175 + norm * 75);
+      d[o + 2] = Math.round(65 + norm * norm * 165);
+      d[o + 3] = Math.min(255, Math.round(Math.pow(norm, 0.72) * tw * limb * 245));
+    }
+  }
+  bm3DCtx.putImageData(img, 0, 0);
+  return { url: bm3DCanvas.toDataURL("image/png"), x: B.t[0] - B.s, y: B.t[1] - B.s, w: B.s * 2, h: B.s * 2 };
+}
+
 function buildBlackMarbleNodes() {
-  if (blackMarbleBuilt && blackMarbleNodes.length > 300) return;
+  if (!Array.isArray(allCountryFeatures) || allCountryFeatures.length === 0) return;
+  if (blackMarbleBuilt && blackMarbleNodes.length > 250) return;
+
+  const mask = ensureStrictNightLandMask();
+  if (!mask) return;
+
   const nodes = [];
   const usedGrid = new Set();
 
   const addLightNode = (lon, lat, weight, isCore = true) => {
-    if (!isFinite(lon) || !isFinite(lat) || Math.abs(lat) > 85) return;
+    if (!isFinite(lon) || !isFinite(lat) || Math.abs(lat) > 78) return;
+    // HEM ana merkezler (isCore) HEM ara koridorlar için %100 harita poligonu kara kontrolü!
+    // Haritada kara parçası çizili olmayan hiçbir okyanus adası/başkenti/noktası kabul edilmez.
+    if (!isStrictlyOnVisibleLand(lon, lat, !isCore)) return;
+
     const gridKey = isCore
       ? `c_${lon.toFixed(1)}_${lat.toFixed(1)}`
-      : `s_${(lon * 4).toFixed(0)}_${(lat * 4).toFixed(0)}`;
+      : `s_${(lon * 5).toFixed(0)}_${(lat * 5).toFixed(0)}`;
     if (usedGrid.has(gridKey)) return;
     usedGrid.add(gridKey);
 
@@ -11701,52 +12024,89 @@ function buildBlackMarbleNodes() {
     });
   };
 
-  GLOBAL_METROPOLIS_LIGHTS.forEach((m, idx) => {
-    const [lon, lat, tier, satCount, spread] = m;
-    const baseW = tier === 1 ? 1.0 : (tier === 2 ? 0.72 : 0.50);
-    addLightNode(lon, lat, baseW, true);
+  const coreList = [];
 
-    const cosLat = Math.max(0.35, Math.cos(lat * Math.PI / 180));
-    for (let s = 0; s < satCount; s++) {
-      const ang = ((idx * 137.5 + s * (360 / satCount)) % 360) * Math.PI / 180;
-      const dist = spread * (0.28 + ((s * 37 + idx * 17) % 100) / 140);
-      const sLon = normalizeLon180(lon + (Math.cos(ang) * dist) / cosLat);
-      const sLat = Math.max(-75, Math.min(75, lat + Math.sin(ang) * dist * 0.78));
-      addLightNode(sLon, sLat, baseW * (0.34 + (s % 3) * 0.08), false);
+  GLOBAL_METROPOLIS_LIGHTS.forEach((m) => {
+    const [lon, lat, tier] = m;
+    const baseW = tier === 1 ? 1.0 : (tier === 2 ? 0.76 : 0.54);
+    if (isStrictlyOnVisibleLand(lon, lat, false)) {
+      addLightNode(lon, lat, baseW, true);
+      coreList.push({ lon, lat, w: baseW });
     }
   });
 
-  WORLD_CAPITALS.forEach(c => addLightNode(c.lon, c.lat, 0.78, true));
-  MICRO_STATES.forEach(m => addLightNode(m.lon, m.lat, 0.56, true));
+  WORLD_CAPITALS.forEach(c => {
+    if (isStrictlyOnVisibleLand(c.lon, c.lat, false)) {
+      addLightNode(c.lon, c.lat, 0.82, true);
+      coreList.push({ lon: c.lon, lat: c.lat, w: 0.82 });
+    }
+  });
+
+  // Not: MICRO_STATES (Tuvalu, Kiribati, Nauru, Maldivler vb.) 50m haritada kara poligonu olmadığı için
+  // okyanusun ortasında boşlukta ışık yakmaması adına yalnızca haritada gerçek kara poligonu varsa eklenir.
+  MICRO_STATES.forEach(m => {
+    if (isStrictlyOnVisibleLand(m.lon, m.lat, true)) {
+      addLightNode(m.lon, m.lat, 0.58, true);
+    }
+  });
 
   if (Array.isArray(allTrProvinceFeatures) && allTrProvinceFeatures.length > 0) {
-    allTrProvinceFeatures.forEach((p, idx) => {
+    allTrProvinceFeatures.forEach((p) => {
       const gc = p.geoCenter || d3.geoCentroid(p);
       if (!gc || !isFinite(gc[0]) || !isFinite(gc[1])) return;
       const popVal = typeof parseTurkishPopString === "function" ? parseTurkishPopString(p.population) : 500000;
-      const w = popVal >= 3000000 ? 1.0 : (popVal >= 1000000 ? 0.78 : (popVal >= 450000 ? 0.58 : 0.44));
-      addLightNode(gc[0], gc[1], w, true);
-
-      const subCount = popVal >= 3000000 ? 5 : (popVal >= 1200000 ? 3 : (popVal >= 600000 ? 1 : 0));
-      for (let s = 0; s < subCount; s++) {
-        const ang = ((idx * 97 + s * 115) % 360) * Math.PI / 180;
-        const r = 0.22 + (s * 0.14);
-        addLightNode(gc[0] + Math.cos(ang) * r * 1.2, gc[1] + Math.sin(ang) * r * 0.85, w * 0.42, false);
+      const w = popVal >= 3000000 ? 1.0 : (popVal >= 1000000 ? 0.82 : (popVal >= 450000 ? 0.62 : 0.46));
+      if (isStrictlyOnVisibleLand(gc[0], gc[1], false)) {
+        addLightNode(gc[0], gc[1], w, true);
+        coreList.push({ lon: gc[0], lat: gc[1], w });
       }
     });
-    blackMarbleBuilt = true;
-  } else {
-    [[28.98, 41.01, 1.0], [32.85, 39.93, 0.95], [27.14, 38.42, 0.92], [29.06, 40.19, 0.85],
-     [30.71, 36.90, 0.84], [35.32, 37.00, 0.84], [34.64, 36.81, 0.78], [42.19, 37.07, 0.78],
-     [37.38, 37.06, 0.80], [32.48, 37.87, 0.78], [35.48, 38.73, 0.76], [36.33, 41.29, 0.76],
-     [39.72, 41.00, 0.72], [37.88, 40.98, 0.68], [40.52, 41.02, 0.65], [41.27, 39.90, 0.70],
-     [43.38, 38.50, 0.70], [40.23, 37.91, 0.75]].forEach(t => addLightNode(t[0], t[1], t[2], true));
+  }
+
+  // Yakın şehirleri birbirine bağlayan kara koridorları:
+  // Yalnızca tüm ara adımları %100 kara üzerinde kalan iç koridorlar çizilir (deniz/körfez üstünden atlayan hatlar iptal edilir).
+  for (let i = 0; i < coreList.length; i++) {
+    const A = coreList[i];
+    for (let j = i + 1; j < coreList.length; j++) {
+      const B = coreList[j];
+      const dLon = Math.abs(A.lon - B.lon);
+      const dLat = Math.abs(A.lat - B.lat);
+      if (dLon > 6.0 || dLat > 4.5) continue;
+      const degDist = Math.hypot(dLon * Math.cos(A.lat * DEG2RAD), dLat);
+      if (degDist < 0.45 || degDist > 4.8) continue;
+
+      // İki şehir arasındaki hattın tamamı karadan mı geçiyor kontrol et (deniz/boğaz/körfez kesiyorsa koridor kurma)
+      let allStepsOnLand = true;
+      for (let chk = 1; chk <= 7; chk++) {
+        const u = chk / 8;
+        const testLon = A.lon + (B.lon - A.lon) * u;
+        const testLat = A.lat + (B.lat - A.lat) * u;
+        if (!isStrictlyOnVisibleLand(testLon, testLat, true)) {
+          allStepsOnLand = false;
+          break;
+        }
+      }
+      if (!allStepsOnLand) continue;
+
+      const steps = Math.min(4, Math.max(2, Math.floor(degDist * 1.0)));
+      for (let s = 1; s < steps; s++) {
+        const u = s / steps;
+        const cLon = A.lon + (B.lon - A.lon) * u;
+        const cLat = A.lat + (B.lat - A.lat) * u;
+        const wCorridor = Math.min(A.w, B.w) * (0.36 + 0.14 * Math.sin(u * Math.PI));
+        addLightNode(cLon, cLat, wCorridor, false);
+      }
+    }
   }
 
   blackMarbleNodes = nodes;
+  blackMarbleBuilt = true;
 }
 
 function updateCityLightsLuminance(solar) {
+  if (!viirsPixels && !viirsLoading && !viirsFailed) {
+    loadNasaViirsTexture();
+  }
   buildBlackMarbleNodes();
   const sunVec = lonLatToVec3(solar.sunLon, solar.sunLat);
   let activeNightCities = 0;
@@ -11756,21 +12116,17 @@ function updateCityLightsLuminance(solar) {
     const nd = blackMarbleNodes[i];
     const v = nd._vec3;
     const sinAlt = sunVec[0] * v[0] + sunVec[1] * v[1] + sunVec[2] * v[2];
+    const tw = nightTwilightFactor(sinAlt);
 
-    if (sinAlt > -0.008) {
+    if (tw <= 0.01) {
       nd._lum = 0;
-    } else if (sinAlt > -0.175) {
-      const t = (-0.008 - sinAlt) / 0.167;
-      const smooth = t * t * (3 - 2 * t);
-      nd._lum = smooth * nd.weight;
+    } else {
+      const hourMod = localHourActivityFactor(nd.lon, solar.sunLon);
+      nd._lum = tw * nd.weight * hourMod;
       if (nd._lum > 0.08) {
         activeNightCities++;
         if (nd.isCore) activeCoreCities++;
       }
-    } else {
-      nd._lum = nd.weight;
-      activeNightCities++;
-      if (nd.isCore) activeCoreCities++;
     }
   }
   solar.activeNightCities = activeNightCities;
@@ -11795,6 +12151,11 @@ function renderSvgNightCityLights(k = currentZoomK) {
       .attr("class", "night-city-lights-layer")
       .style("pointer-events", "none");
 
+    lightsG.append("image")
+      .attr("class", "nl-viirs-raster")
+      .attr("preserveAspectRatio", "none")
+      .style("mix-blend-mode", "screen");
+
     lightsG.append("path")
       .attr("class", "nl-outer-halo")
       .attr("fill", "#f59e0b")
@@ -11804,13 +12165,13 @@ function renderSvgNightCityLights(k = currentZoomK) {
     lightsG.append("path")
       .attr("class", "nl-mid-sprawl")
       .attr("fill", "#fbbf24")
-      .attr("fill-opacity", 0.58)
+      .attr("fill-opacity", 0.56)
       .attr("filter", "url(#nightCityGlowFilter)");
 
     lightsG.append("path")
       .attr("class", "nl-core-gold")
       .attr("fill", "#fde047")
-      .attr("fill-opacity", 0.92);
+      .attr("fill-opacity", 0.90);
 
     lightsG.append("path")
       .attr("class", "nl-bright-center")
@@ -11824,8 +12185,40 @@ function renderSvgNightCityLights(k = currentZoomK) {
     terminatorShadeGroup.node().appendChild(horizonNode);
   }
 
+  const solar = (cachedSolarData && cachedSolarData.solar) || calculateSolarPosition();
+  const rasterImg = lightsG.select("image.nl-viirs-raster");
+
+  // 1) NASA VIIRS Gerçek Uydu Görüntüsü Hazırsa (%100 Kara Maskeli) Bas
+  if (viirsPixels && !isDraggingGlobe && !isMorphing) {
+    const viewTag = isGlobeMode
+      ? `3d|${globeRotation[0].toFixed(1)}|${globeRotation[1].toFixed(1)}|${projection3D.scale().toFixed(0)}`
+      : "2d";
+    const bakeKey = `${viewTag}|${solar.sunLon.toFixed(1)}|${solar.sunLat.toFixed(1)}`;
+    if (bakeKey !== lastViirsBakeKey) {
+      lastViirsBakeKey = bakeKey;
+      const baked = isGlobeMode ? bakeViirs3D(solar, projection3D) : bakeViirs2D(solar);
+      if (baked) {
+        rasterImg
+          .style("display", "block")
+          .attr("x", baked.x)
+          .attr("y", baked.y)
+          .attr("width", baked.w)
+          .attr("height", baked.h)
+          .attr("opacity", 0.94)
+          .attr("href", baked.url)
+          .attr("xlink:href", baked.url);
+      }
+    } else {
+      rasterImg.style("display", "block");
+    }
+  } else {
+    rasterImg.style("display", "none");
+  }
+
+  // 2) Vektör Işık Katmanı
   const camVec = isGlobeMode ? getCameraVec3() : null;
   const zoomScale = 1 / Math.pow(Math.max(1, k), 0.68);
+  const hasViirs = Boolean(viirsPixels);
 
   let dOuter = "";
   let dMid = "";
@@ -11835,8 +12228,8 @@ function renderSvgNightCityLights(k = currentZoomK) {
   for (let i = 0; i < blackMarbleNodes.length; i++) {
     const nd = blackMarbleNodes[i];
     const lum = nd._lum || 0;
-    if (lum <= 0.05) continue;
-    if (!nd.isCore && k < 1.35 && (i % 2 === 1)) continue;
+    if (lum <= 0.06) continue;
+    if (hasViirs && !nd.isCore && k < 2.8) continue;
 
     if (isGlobeMode && camVec) {
       const dot = camVec[0] * nd._vec3[0] + camVec[1] * nd._vec3[1] + camVec[2] * nd._vec3[2];
@@ -11848,20 +12241,21 @@ function renderSvgNightCityLights(k = currentZoomK) {
 
     const x = pt[0];
     const y = pt[1];
+    const sizeMod = hasViirs ? 0.70 : 0.92;
 
     if (nd.isCore && lum >= 0.42) {
-      const rHalo = (2.8 + lum * 4.2) * zoomScale;
-      const rMid = (1.4 + lum * 1.9) * zoomScale;
-      const rCore = (0.75 + lum * 0.95) * zoomScale;
+      const rHalo = (2.2 + lum * 3.2) * zoomScale * sizeMod;
+      const rMid = (1.15 + lum * 1.5) * zoomScale * sizeMod;
+      const rCore = (0.65 + lum * 0.78) * zoomScale * sizeMod;
       dOuter += circleArcCmd(x, y, rHalo);
       dMid += circleArcCmd(x, y, rMid);
       dCore += circleArcCmd(x, y, rCore);
-      if (lum >= 0.72) {
-        dCenter += circleArcCmd(x, y, (0.45 + lum * 0.42) * zoomScale);
+      if (lum >= 0.75) {
+        dCenter += circleArcCmd(x, y, (0.38 + lum * 0.34) * zoomScale * sizeMod);
       }
     } else {
-      const rSprawl = (0.95 + lum * 1.65) * zoomScale;
-      const rDot = (0.50 + lum * 0.75) * zoomScale;
+      const rSprawl = (0.78 + lum * 1.25) * zoomScale;
+      const rDot = (0.42 + lum * 0.60) * zoomScale;
       dMid += circleArcCmd(x, y, rSprawl);
       dCore += circleArcCmd(x, y, rDot);
     }
@@ -11889,7 +12283,7 @@ function drawCanvasNightCityLights(ctx, activeProj, k, morphState, camVec) {
     if (camVec && !isVec3Visible(nd._vec3, camVec, 0.04)) continue;
     const pt = activeProj([nd.lon, nd.lat]);
     if (!pt) continue;
-    const r = (2.4 + lum * 3.5) * zoomScale;
+    const r = (2.1 + lum * 3.0) * zoomScale;
     ctx.moveTo(pt[0] + r, pt[1]);
     ctx.arc(pt[0], pt[1], r, 0, Math.PI * 2);
   }
@@ -11904,7 +12298,7 @@ function drawCanvasNightCityLights(ctx, activeProj, k, morphState, camVec) {
     if (camVec && !isVec3Visible(nd._vec3, camVec, 0.04)) continue;
     const pt = activeProj([nd.lon, nd.lat]);
     if (!pt) continue;
-    const r = (0.65 + lum * 1.15) * zoomScale;
+    const r = (0.60 + lum * 1.05) * zoomScale;
     ctx.moveTo(pt[0] + r, pt[1]);
     ctx.arc(pt[0], pt[1], r, 0, Math.PI * 2);
   }
@@ -19193,7 +19587,10 @@ function handleVsSelection(kind, feature) {
             ev.stopPropagation();
             showIssHudPanel();
             if (d.valid) triggerRadarRings(d.x, d.y, "#fde047");
+            window.open("https://www.youtube.com/watch?v=ROboUHfPUrU", "_blank", "noopener,noreferrer");
           });
+
+        g.append("title").text("🛰️ Uluslararası Uzay İstasyonu (ISS)\n📺 Canlı Dünya Yayınını İzlemek İçin Tıklayın!");
 
         // Dış Radar Halesi (Nabızlı, transform kullanmayan saf SVG çemberi)
         g.append("circle")
@@ -19360,6 +19757,7 @@ function handleVsSelection(kind, feature) {
         <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">📍 <b>Altındaki Bölge:</b> <span id="issHudOverflight" style="color:#34d399;font-weight:800;">${escapeHudHtml(detectIssOverflightLocation(issState.lon, issState.lat))}</span></div>
       </div>
       <div class="hud-route-actions">
+        <button class="hud-mini-btn" style="background:#dc2626;border-color:#fca5a5;color:#fff;" onclick="window.open('https://www.youtube.com/watch?v=ROboUHfPUrU', '_blank', 'noopener,noreferrer')">📺 Canlı Yayın</button>
         <button class="hud-mini-btn" onclick="focusOnIssNow()">🎯 ISS'e Odaklan</button>
         <button class="hud-mini-btn" id="btnIssCamLock" style="${issCameraLock ? "background:#0284c7;color:#fff;" : ""}" onclick="toggleIssCameraLock()">
           ${issCameraLock ? "🔒 Kamera Kilidi: Açık" : "🔓 Kamerayı Kilitle"}
@@ -20091,16 +20489,18 @@ function handleVsSelection(kind, feature) {
 
 <script id="satelliteCloudsModule">
 /* ============================================================================
-   ☁️ SECOVVV GEO-PRO // GERÇEK UYDU BULUT MOTORU v2.2 (BAĞIMSIZ SAĞ PANEL)
+   ☁️ SECOVVV GEO-PRO // GERÇEK UYDU BULUT MOTORU v2.5 (24 SAAT • HİBRİT FİNAL)
    ============================================================================ */
 (function () {
   "use strict";
 
   const FW = 2048, FH = 1024;
-  const FRAME_COUNT = 6;
-  const FRAME_STEP_MIN = 30;
+  const HISTORY_HOURS = 24;      // Slider kaç saat geriye gitsin (saatlik kare)
+  const HOUR_MS = 3600000;
+  const PLAY_HOLD_MS = 650;      // Oynatmada her karenin ekranda kalma süresi
+  const PLAY_LAST_HOLD_MS = 1600;// Son karede (şimdi) bekleme süresi
   const LATENCY_MIN = 45;
-  const FADE_MS = 750;
+  const FADE_MS = 420;
   const GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi";
   const EUM_WMS = "https://view.eumetsat.int/geoserver/wms";
   const DEG = Math.PI / 180;
@@ -20118,7 +20518,9 @@ function handleVsSelection(kind, feature) {
   window.satelliteCloudsMode = false;
   let cloudSpectrumMode = "visible";
   let cloudOpacityLevel = 0.92;
-  let cloudPlaying = true;
+  let cloudPlaying = false; // Varsayılan: otomatik oynatma kapalı; kareler slider ile (veya ▶ ile) gezilir
+  let shownUid = -1;
+  let panelPointerDown = false, panelRenderDeferred = false;
   let cloudPanelMinimized = false;
   let frames = [];
   let curIdx = 0;
@@ -20130,7 +20532,7 @@ function handleVsSelection(kind, feature) {
   let pendingRebake = false;
   let rebakeTimer = null;
   let shownViewKey = "";
-  const state = { kind: "idle", prov: {}, msg: "", fetchedAt: 0, headT: 0 };
+  const state = { kind: "idle", prov: {}, msg: "", fetchedAt: 0, headT: 0, histNote: "", histLoading: false, histDone: 0, histTotal: 0 };
 
   const cldStyle = document.createElement("style");
   cldStyle.textContent = `
@@ -20178,7 +20580,9 @@ function handleVsSelection(kind, feature) {
     .cld-chip.bad { border-color:#f43f5e; color:#fda4af; }
     .cld-timeline { display:flex; align-items:center; gap:6px; margin-top:4px; }
     .cld-timeline input[type=range] { flex:1; }
-    .cld-play { background:#0284c7; color:#fff; border:none; border-radius:6px; width:26px; height:22px; font-size:11px; cursor:pointer; }
+    .cld-play { background:#0284c7; color:#fff; border:1px solid #38bdf8; border-radius:6px; width:26px; height:22px; font-size:11px; cursor:pointer; transition:0.15s; }
+    .cld-play:hover { background:#0369a1; border-color:#fde047; }
+    .cld-play.playing { background:#d97706; border-color:#fde047; box-shadow:0 0 8px rgba(245,158,11,0.5); }
     @media (max-width: 780px) {
       .cld-floating-panel { top: 12px; bottom: auto; right: 12px; width: 255px; }
     }
@@ -20241,7 +20645,7 @@ function handleVsSelection(kind, feature) {
     return (a + (b - a) * fx) * (1 - fy) + (c + (d - c) * fx) * fy;
   }
 
-  const netQ = { active: 0, max: 4, q: [] };
+  const netQ = { active: 0, max: 6, q: [] };
   function runLimited(fn) {
     return new Promise((res, rej) => { netQ.q.push({ fn, res, rej }); pumpQ(); });
   }
@@ -20294,10 +20698,11 @@ function handleVsSelection(kind, feature) {
     return `${EUM_WMS}?service=WMS&version=1.3.0&request=GetMap&layers=${encodeURIComponent(sat.layerName)}&styles=&format=image%2Fpng&transparent=true&crs=EPSG%3A4326&bbox=-90,-180,90,180&width=${FW}&height=${FH}${time}`;
   }
 
-  async function fetchSat(sat, tTarget, tries) {
+  async function fetchSat(sat, tTarget, tries, allowLatest) {
     const base = snapMs(tTarget, sat.stepMin);
-    const times = [null];
+    const times = [];
     for (let k = 0; k < tries; k++) times.push(base - k * sat.stepMin * 60000);
+    if (allowLatest) times.push(null);
     let lastErr = null;
     for (const t of times) {
       try {
@@ -20306,7 +20711,7 @@ function handleVsSelection(kind, feature) {
         return { px, t: t || base };
       } catch (e) {
         lastErr = e;
-        if (e && (e.name === "TypeError" || e.name === "AbortError")) break;
+        if (e && e.name === "AbortError") break;
       }
     }
     throw lastErr || new Error("VERİ_YOK");
@@ -20513,9 +20918,9 @@ function handleVsSelection(kind, feature) {
     d[o + 3] = Math.min(255, Math.pow(th, 0.72) * 255);
   }
 
-  function getSun() {
-    const sol = (typeof cachedSolarData !== "undefined" && cachedSolarData && cachedSolarData.solar)
-      ? cachedSolarData.solar : calculateSolarPosition();
+  function getSun(ms) {
+    // Her kare, KENDİ zamanındaki güneş konumuyla gölgelenir (24 saatlik animasyonda gün/gece sınırı da hareket eder)
+    const sol = calculateSolarPosition(new Date(ms || Date.now()));
     const lonR = sol.sunLon * DEG, latR = sol.sunLat * DEG;
     return { lon: sol.sunLon, lat: sol.sunLat, sinLat: Math.sin(latR), cosLat: Math.cos(latR), vec: lonLatToVec3(sol.sunLon, sol.sunLat), lonR };
   }
@@ -20549,7 +20954,7 @@ function handleVsSelection(kind, feature) {
 
   function bake2D(fr, mode) {
     const L = ensure2DLUT();
-    const sun = getSun();
+    const sun = getSun(fr.t);
     const img = cloud2DCtx.createImageData(C2W, C2H);
     const d = img.data;
     const N = C2W * C2H;
@@ -20598,7 +21003,7 @@ function handleVsSelection(kind, feature) {
     const { c, ctx } = get3DCanvas(S);
     const img = ctx.createImageData(S, S);
     const d = img.data;
-    const sun = getSun();
+    const sun = getSun(fr.t);
     const half = S / 2;
     const { f, right, up } = B;
     for (let y = 0; y < S; y++) {
@@ -20630,17 +21035,36 @@ function handleVsSelection(kind, feature) {
     return "g|" + globeRotation[0].toFixed(1) + "|" + globeRotation[1].toFixed(1) + "|" + projection3D.scale().toFixed(0);
   }
 
+  function bakeKey(fr) { return viewKey() + "|" + cloudSpectrumMode + "|" + fr.uid; }
+
+  // Tüm kareleri arka planda sırayla hazırlar; oynatma ve slider akıcı olur
+  let warmToken = 0;
+  function warmCache() {
+    const tok = ++warmToken;
+    const vk = viewKey();
+    let i = 0;
+    const step = () => {
+      if (tok !== warmToken || !window.satelliteCloudsMode || viewKey() !== vk) return;
+      if (isDraggingGlobe || isMorphing || isMapPanning2D || document.hidden) { setTimeout(step, 400); return; }
+      while (i < frames.length && bakedCache.has(bakeKey(frames[i]))) i++;
+      if (i >= frames.length) return;
+      try { getBaked(i); } catch (e) {}
+      i++;
+      setTimeout(step, 30);
+    };
+    setTimeout(step, 250);
+  }
+
   function getBaked(idx) {
     const fr = frames[idx];
     if (!fr) return null;
-    const sun = getSun();
-    const key = viewKey() + "|" + cloudSpectrumMode + "|" + sun.lon.toFixed(1) + "," + sun.lat.toFixed(1) + "|" + fr.uid;
+    const key = bakeKey(fr);
     if (bakedCache.has(key)) return bakedCache.get(key);
     const res = isGlobeMode ? bake3D(fr, cloudSpectrumMode, projection3D, 720) : bake2D(fr, cloudSpectrumMode);
     if (!res) return null;
     const out = { url: res.canvas.toDataURL("image/png"), geom: res.geom };
     bakedCache.set(key, out);
-    while (bakedCache.size > 16) bakedCache.delete(bakedCache.keys().next().value);
+    while (bakedCache.size > 40) bakedCache.delete(bakedCache.keys().next().value);
     return out;
   }
 
@@ -20648,15 +21072,15 @@ function handleVsSelection(kind, feature) {
     const front = activeImg, back = (activeImg === imgA) ? imgB : imgA;
     front.interrupt(); back.interrupt();
     setImg(back, baked.url, baked.geom);
+    back.raise(); // gelen görüntü her zaman üstte
     if (instant) {
       back.attr("opacity", cloudOpacityLevel);
       front.attr("opacity", 0);
     } else {
-      front.attr("opacity", cloudOpacityLevel);
+      front.attr("opacity", cloudOpacityLevel)
+        .transition().duration(FADE_MS).ease(d3.easeLinear).attr("opacity", 0);
       back.attr("opacity", 0)
-        .transition().duration(FADE_MS).ease(d3.easeCubicInOut)
-        .attr("opacity", cloudOpacityLevel)
-        .on("end", () => { front.attr("opacity", 0); });
+        .transition().duration(FADE_MS).ease(d3.easeLinear).attr("opacity", cloudOpacityLevel);
     }
     activeImg = back;
   }
@@ -20670,13 +21094,17 @@ function handleVsSelection(kind, feature) {
     cloudsSvgGroup.attr("clip-path", isGlobeMode ? null : "url(#sphereClip)");
     shownViewKey = viewKey();
     pendingRebake = false;
+    shownUid = frames[curIdx].uid;
     swapTo(baked, instant);
     updateFrameHud();
+    if (isCanvasMotionActive && isGlobeMode) {
+      renderFastGlobeCanvas(projection3D);
+    }
     const nxt = (curIdx + 1) % frames.length;
     if (frames.length > 1) {
       setTimeout(() => {
         if (window.satelliteCloudsMode && !isDraggingGlobe && !isMorphing && viewKey() === shownViewKey) getBaked(nxt);
-      }, 160);
+      }, 120);
     }
   }
 
@@ -20700,21 +21128,23 @@ function handleVsSelection(kind, feature) {
     }, isGlobeMode ? 110 : 0);
   }
 
-  function scheduleLoop() {
+  function scheduleLoop(delay) {
     clearTimeout(loopTimer); loopTimer = null;
     if (!window.satelliteCloudsMode || !cloudPlaying || frames.length < 2) return;
-    const hold = (curIdx === frames.length - 1) ? 2800 : 1050;
+    const hold = (typeof delay === "number") ? delay : ((curIdx === frames.length - 1) ? PLAY_LAST_HOLD_MS : PLAY_HOLD_MS);
     loopTimer = setTimeout(() => {
+      loopTimer = null;
       if (!window.satelliteCloudsMode || !cloudPlaying) return;
-      const busy = document.hidden || isMorphing || isDraggingGlobe || isMapPanning2D || pendingRebake;
-      if (!busy) showFrame((curIdx + 1) % frames.length, false);
+      const busy = document.hidden || isMorphing || isDraggingGlobe || isMapPanning2D;
+      if (busy) { scheduleLoop(300); return; }
+      try { showFrame((curIdx + 1) % frames.length, false); } catch (e) { console.warn("Bulut oynatma hatası:", e); }
       scheduleLoop();
     }, hold);
   }
 
-  /* ───────────────────────── YEDEK MODEL ───────────────────────── */
+  /* ───────────────────────── YEDEK MODEL (24 SAATLİK AKILLI HAREKET DESTEKLİ) ───────────────────────── */
   const GRID_LATS = [75, 52, 30, 0, -30, -52, -75];
-  const GRID_LONS = [-165, -135, -105, -75, -45, -15, 15, 45, 75, 105, 135, 165, 180];
+  const GRID_LONS = [-165, -135, -105, -75, -45, -15, 15, 45, 75, 105, 135, 165, 195];
   const model = { t: null, l: null, m: null, h: null, isLive: false };
 
   function initClimatologyGrid() {
@@ -20782,7 +21212,7 @@ function handleVsSelection(kind, feature) {
     for (let r = 0; r < GRID_LATS.length - 1; r++) if (cl <= GRID_LATS[r] && cl >= GRID_LATS[r + 1]) { r0 = r; break; }
     const r1 = Math.min(GRID_LATS.length - 1, r0 + 1);
     const ty = (GRID_LATS[r0] - GRID_LATS[r1]) > 0 ? (GRID_LATS[r0] - cl) / (GRID_LATS[r0] - GRID_LATS[r1]) : 0;
-    const lc = Math.max(-165, Math.min(180, nl));
+    const lc = Math.max(-165, Math.min(195, nl));
     let c0 = 0;
     for (let c = 0; c < GRID_LONS.length - 1; c++) if (lc >= GRID_LONS[c] && lc <= GRID_LONS[c + 1]) { c0 = c; break; }
     const c1 = Math.min(GRID_LONS.length - 1, c0 + 1);
@@ -20814,16 +21244,20 @@ function handleVsSelection(kind, feature) {
     return pnoise(uw * 4, vw * 3) * 0.44 + pnoise(uw * 9, vw * 7) * 0.28 + pnoise(uw * 20, vw * 16) * 0.18 + pnoise(uw * 42, vw * 34) * 0.10;
   }
 
-  async function buildModelFrame() {
-    const W = 1280, H = 640;
+  async function buildModelFrame(hourOffset = 0) {
+    const W = 1024, H = 512;
     const thick = new Uint8Array(W * H), bright = new Uint8Array(W * H);
     for (let y = 0; y < H; y++) {
       const lat = 90 - (y + 0.5) / H * 180;
+      const absLat = Math.abs(lat);
+      const zonalDegPerHour = (absLat > 24 ? 0.55 : -0.35) * Math.cos(lat * DEG);
+      const shiftLon = hourOffset * zonalDegPerHour;
       for (let x = 0; x < W; x++) {
         const lon = (x + 0.5) / W * 360 - 180;
-        const met = sampleModel(lon, lat);
+        const advLon = normalizeLon180(lon - shiftLon);
+        const met = sampleModel(advLon, lat);
         const cn = met.total / 100;
-        const f = fbm(lon, lat);
+        const f = fbm(advLon, lat);
         const thr = 0.56 - cn * 0.42;
         const raw = (f - thr) / Math.max(0.16, 1 - thr);
         if (raw <= 0.01) continue;
@@ -20831,12 +21265,27 @@ function handleVsSelection(kind, feature) {
         thick[y * W + x] = (dens * 255) | 0;
         bright[y * W + x] = Math.min(255, ((met.high / Math.max(10, met.total)) * (0.75 + f * 0.55)) * 245) | 0;
       }
-      if ((y & 63) === 63) await tick();
+      if ((y & 127) === 127) await tick();
     }
     return { W, H, thick, bright, src: "model", coverPct: Math.round(model.t.reduce((a, r) => a + r.reduce((s, v) => s + v, 0) / r.length, 0) / model.t.length) };
   }
 
   function setProv(id, patch) { state.prov[id] = Object.assign(state.prov[id] || {}, patch); }
+
+  function commitFrames(built) {
+    const arr = built.slice().reverse();
+    const first = !(frames.length && frames[0].src === "sat");
+    const keepUid = (!first && frames[curIdx]) ? frames[curIdx].uid : null;
+    frames = arr;
+    const ni = keepUid != null ? arr.findIndex(f => f.uid === keepUid) : -1;
+    curIdx = ni >= 0 ? ni : arr.length - 1;
+    state.kind = "sat"; state.msg = ""; state.fetchedAt = Date.now(); state.headT = arr[arr.length - 1].t;
+    if (window.satelliteCloudsMode) {
+      if (first || frames[curIdx].uid !== shownUid) { shownViewKey = ""; showFrame(curIdx, first); }
+      else updateFrameHud();
+      if (cloudPlaying && !loopTimer && frames.length > 1) scheduleLoop();
+    }
+  }
 
   async function loadSatelliteFrames() {
     if (loadingBusy) return;
@@ -20857,7 +21306,7 @@ function handleVsSelection(kind, feature) {
       const headPx = {}, headT = [];
       await Promise.all(active.map(async s => {
         try {
-          const r = await fetchSat(s, tHead, 3);
+          const r = await fetchSat(s, tHead, 3, true);
           headPx[s.id] = r.px; headT.push(r.t);
           setProv(s.id, { wait: false, ok: true, t: r.t });
         } catch (e) {
@@ -20873,49 +21322,99 @@ function handleVsSelection(kind, feature) {
       headT.sort((a, b) => a - b);
       const tHeadUsed = headT[headT.length >> 1];
 
-      const built = [];
       const f0 = await composeFrame(headPx, cal);
       f0.t = tHeadUsed; f0.uid = ++frameUid;
-      built.push(f0);
-      if (!frames.length) {
-        frames = [f0]; curIdx = 0; bakedCache.clear(); shownViewKey = "";
-        state.kind = "sat"; state.msg = ""; state.fetchedAt = Date.now(); state.headT = tHeadUsed;
-        if (window.satelliteCloudsMode) { showFrame(0, true); updateCloudPanelIfOpen(); }
-      }
+
+      const reuse = new Map();
+      frames.forEach(f => { if (f.src === "sat" && f.gridT) reuse.set(f.gridT, f); });
+      let g0 = Math.floor(tHeadUsed / HOUR_MS) * HOUR_MS;
+      if (tHeadUsed - g0 < 30 * 60000) g0 -= HOUR_MS;
+      const targets = [];
+      for (let g = g0; g >= tHeadUsed - HISTORY_HOURS * HOUR_MS - 30 * 60000; g -= HOUR_MS) targets.push(g);
+
+      const progressive = !(frames.length && frames[0].src === "sat");
+      const built = [f0];
+      state.histNote = "";
+      state.histLoading = true; state.histDone = 0; state.histTotal = targets.length;
+      commitFrames(built);
+      updateCloudPanelIfOpen();
 
       const lastPx = Object.assign({}, headPx);
-      for (let k = 1; k < FRAME_COUNT && window.satelliteCloudsMode; k++) {
-        const tT = tHeadUsed - k * FRAME_STEP_MIN * 60000;
-        const pxK = {};
-        await Promise.all(okIds.map(async id => {
-          try { const r = await fetchSat(SAT_BY_ID[id], tT, 2); pxK[id] = r.px; lastPx[id] = r.px; }
-          catch (e) { pxK[id] = lastPx[id]; }
-        }));
-        const fk = await composeFrame(pxK, cal);
-        fk.t = tT; fk.uid = ++frameUid;
+      const lastT = {};
+      okIds.forEach(id => { lastT[id] = (state.prov[id] && state.prov[id].t) || tHeadUsed; });
+
+      const fetchFor = (g) => Promise.all(okIds.map(async id => {
+        try { return [id, await fetchSat(SAT_BY_ID[id], g, 2, false)]; }
+        catch (e) { return [id, null]; }
+      }));
+      const LOOKAHEAD = 3;
+      const pend = new Array(targets.length);
+      let launched = 0, misses = 0, stoppedAt = -1;
+
+      for (let j = 0; j < targets.length && window.satelliteCloudsMode; j++) {
+        for (; launched < targets.length && launched <= j + LOOKAHEAD; launched++) {
+          if (!reuse.has(targets[launched])) pend[launched] = fetchFor(targets[launched]);
+        }
+        const g = targets[j];
+        let fk = reuse.get(g);
+        if (!fk) {
+          const res = await pend[j];
+          pend[j] = null;
+          const pxK = {};
+          const newTs = [];
+          res.forEach(([id, r]) => {
+            if (r && r.t < lastT[id]) { pxK[id] = r.px; lastPx[id] = r.px; lastT[id] = r.t; newTs.push(r.t); }
+            else pxK[id] = lastPx[id];
+          });
+          if (!newTs.length) {
+            misses++;
+            state.histDone = j + 1;
+            if (misses >= 2) { stoppedAt = j; break; }
+            continue;
+          }
+          misses = 0;
+          fk = await composeFrame(pxK, cal);
+          newTs.sort((a, b) => a - b);
+          fk.t = newTs[newTs.length >> 1];
+          fk.uid = ++frameUid;
+          fk.gridT = g;
+        }
         built.push(fk);
+        state.histDone = j + 1;
+        if (progressive) commitFrames(built);
       }
 
-      built.reverse();
-      const wasPlaying = frames.length > 0;
-      frames = built;
-      curIdx = frames.length - 1;
-      bakedCache.clear(); shownViewKey = "";
-      state.kind = "sat"; state.msg = ""; state.fetchedAt = Date.now(); state.headT = tHeadUsed;
-      if (window.satelliteCloudsMode) { showFrame(curIdx, !wasPlaying); scheduleLoop(); }
+      if (built.length < 2) state.histNote = "Geçmiş kareler alınamadı (yalnızca en güncel kare)";
+      else if (stoppedAt >= 0) state.histNote = "Uydu servisi yalnızca son ~" + Math.max(1, Math.round((tHeadUsed - built[built.length - 1].t) / HOUR_MS)) + " saati verdi";
+      state.histLoading = false;
+      commitFrames(built);
+      if (window.satelliteCloudsMode) { updateFrameHud(); warmCache(); }
     } catch (e) {
       if (!frames.length || frames[0].src !== "sat") {
         initClimatologyGrid();
         await fetchOpenMeteoGrid();
-        const mf = await buildModelFrame();
-        mf.t = Date.now(); mf.uid = ++frameUid;
-        frames = [mf]; curIdx = 0; bakedCache.clear(); shownViewKey = "";
-        state.kind = "model"; state.msg = e && e.message === "OFFLINE" ? "İnternet yok" : "Uydu servislerine ulaşılamadı";
-        state.fetchedAt = Date.now(); state.headT = mf.t;
-        if (window.satelliteCloudsMode) showFrame(0, true);
+        const nowMs = Date.now();
+        const modelFrames = [];
+        for (let k = HISTORY_HOURS; k >= 0; k--) {
+          const mf = await buildModelFrame(-k);
+          mf.t = nowMs - k * HOUR_MS;
+          mf.uid = ++frameUid;
+          modelFrames.push(mf);
+        }
+        frames = modelFrames;
+        curIdx = frames.length - 1;
+        bakedCache.clear(); shownViewKey = "";
+        state.kind = "model"; state.msg = e && e.message === "OFFLINE" ? "İnternet yok • 24s Model" : "24s Atmosferik Model";
+        state.fetchedAt = Date.now(); state.headT = nowMs;
+        if (window.satelliteCloudsMode) {
+          renderFloatingCloudsPanel();
+          showFrame(curIdx, true);
+          warmCache();
+        }
       }
     } finally {
       loadingBusy = false;
+      state.histLoading = false;
       updateCloudPanelIfOpen();
     }
   }
@@ -20926,14 +21425,29 @@ function handleVsSelection(kind, feature) {
     renderFloatingCloudsPanel();
   }
 
+  const fmtLocalDay = (ms) => new Date(ms).toLocaleString("tr-TR", { weekday: "short", hour: "2-digit", minute: "2-digit" });
+
   function updateFrameHud() {
+    const box = document.getElementById("cldTimelineBox");
     const lab = document.getElementById("cldFrameLabel");
     const rng = document.getElementById("cldFrameRange");
+    const playBtn = document.querySelector(".cld-play");
     const fr = frames[curIdx];
-    if (lab && fr) lab.innerHTML = state.kind === "sat"
-      ? `🕒 <b>${fmtUTC(fr.t)}</b> · yerel ${fmtLocal(fr.t)} <span style="color:#94a3b8;">(${curIdx + 1}/${frames.length})</span>`
-      : `🕒 Model • ${fmtLocal(fr.t)}`;
-    if (rng && fr) rng.value = String(curIdx);
+    if (box) box.style.display = frames.length > 1 ? "" : "none";
+    if (rng) { rng.max = String(Math.max(0, frames.length - 1)); if (fr) rng.value = String(curIdx); }
+    if (playBtn) {
+      playBtn.textContent = cloudPlaying ? "⏸" : "▶";
+      playBtn.classList.toggle("playing", cloudPlaying);
+    }
+    if (lab && fr) {
+      const newest = frames[frames.length - 1];
+      const ago = Math.round((newest.t - fr.t) / HOUR_MS);
+      const agoTxt = ago <= 0 ? "en güncel" : "−" + ago + " sa";
+      const prog = state.histLoading ? ` <span style="color:#fde047;">⏳ geçmiş ${state.histDone}/${state.histTotal}</span>` : "";
+      lab.innerHTML = state.kind === "sat"
+        ? `🕒 <b>${fmtUTC(fr.t)}</b> · yerel ${fmtLocalDay(fr.t)} <span style="color:#94a3b8;">(${agoTxt} · ${curIdx + 1}/${frames.length})</span>${prog}`
+        : `🕒 Model • ${fmtLocalDay(fr.t)} <span style="color:#94a3b8;">(${agoTxt} · ${curIdx + 1}/${frames.length})</span>`;
+    }
   }
 
   function renderFloatingCloudsPanel() {
@@ -20941,6 +21455,7 @@ function handleVsSelection(kind, feature) {
       cloudPanelEl.style.display = "none";
       return;
     }
+    if (panelPointerDown && cloudPanelEl.style.display === "block") { panelRenderDeferred = true; return; }
     cloudPanelEl.style.display = "block";
     cloudPanelEl.classList.toggle("minimized", cloudPanelMinimized);
 
@@ -20973,6 +21488,7 @@ function handleVsSelection(kind, feature) {
       </div>
       <div class="cld-panel-body">
         ${pill}
+        ${(state.kind === "sat" && state.histNote) ? `<div style="font-size:9.5px;color:#fda4af;margin:3px 0 0;">⚠️ ${state.histNote}</div>` : ""}
         <div class="hud-country-grid" style="padding:5px 7px;">
           <div>☁️ <b>Bulutluluk:</b> <span class="hud-route-kpi" style="font-size:12px;">${cover}</span></div>
           <div>📡 <b>Mod:</b> <span style="color:#7dd3fc;font-weight:800;">${cloudSpectrumMode === "visible" ? "Doğal" : (cloudSpectrumMode === "ir" ? "IR Termal" : "Hibrit")}</span></div>
@@ -20980,13 +21496,14 @@ function handleVsSelection(kind, feature) {
           <div class="hud-grid-full" id="cldTimelineBox" style="${n > 1 ? "" : "display:none;"}">
             <div id="cldFrameLabel" style="font-size:9.5px;color:#e2e8f0;"></div>
             <div class="cld-timeline">
-              <button type="button" class="cld-play" onclick="toggleSatelliteCloudMotion()">${cloudPlaying ? "⏸" : "▶"}</button>
+              <button type="button" class="cld-play ${cloudPlaying ? "playing" : ""}" onclick="toggleSatelliteCloudMotion()">${cloudPlaying ? "⏸" : "▶"}</button>
               <input type="range" id="cldFrameRange" class="solar-range-input" min="0" max="${Math.max(0, n - 1)}" step="1" value="${curIdx}" oninput="scrubSatelliteCloudFrame(this.value)">
             </div>
+            <div style="display:flex;justify-content:space-between;font-size:8.5px;color:#64748b;margin-top:1px;padding-left:32px;"><span>◀ 24 sa önce</span><span>şimdi ▶</span></div>
           </div>
           <div class="hud-grid-full" style="border-bottom:none;padding-bottom:0;">
             <div style="display:flex;justify-content:space-between;font-size:9.5px;font-weight:800;color:#bae6fd;margin-bottom:2px;">
-              <span>🎚️ Opaklık:</span><b style="color:#fde047;">%${Math.round(cloudOpacityLevel * 100)}</b>
+              <span>🎚️ Opaklık:</span><b id="cldOpacityVal" style="color:#fde047;">%${Math.round(cloudOpacityLevel * 100)}</b>
             </div>
             <input type="range" class="solar-range-input" min="25" max="100" step="5" value="${Math.round(cloudOpacityLevel * 100)}" oninput="setSatelliteCloudOpacity(this.value)">
           </div>
@@ -21015,27 +21532,49 @@ function handleVsSelection(kind, feature) {
     bakedCache.clear();
     showFrame(curIdx, true);
     renderFloatingCloudsPanel();
+    warmCache();
   };
 
   window.setSatelliteCloudOpacity = function (val) {
     cloudOpacityLevel = Math.max(0.2, Math.min(1.0, Number(val) / 100));
-    activeImg.interrupt();
+    imgA.interrupt(); imgB.interrupt();
     activeImg.attr("opacity", cloudOpacityLevel);
-    renderFloatingCloudsPanel();
+    (activeImg === imgA ? imgB : imgA).attr("opacity", 0);
+    const ov = document.getElementById("cldOpacityVal");
+    if (ov) ov.textContent = "%" + Math.round(cloudOpacityLevel * 100);
   };
 
   window.toggleSatelliteCloudMotion = function () {
+    if (frames.length < 2) return;
     cloudPlaying = !cloudPlaying;
-    if (cloudPlaying) scheduleLoop(); else { clearTimeout(loopTimer); loopTimer = null; }
-    renderFloatingCloudsPanel();
+    const btn = document.querySelector(".cld-play");
+    if (btn) {
+      btn.textContent = cloudPlaying ? "⏸" : "▶";
+      btn.classList.toggle("playing", cloudPlaying);
+    }
+    if (cloudPlaying) { warmCache(); scheduleLoop(60); }
+    else { clearTimeout(loopTimer); loopTimer = null; }
   };
 
+  let scrubRaf = 0, scrubTarget = 0;
   window.scrubSatelliteCloudFrame = function (i) {
     cloudPlaying = false;
     clearTimeout(loopTimer); loopTimer = null;
-    showFrame(Number(i), true);
-    const b = document.querySelector(".cld-play"); if (b) b.textContent = "▶";
+    const b = document.querySelector(".cld-play");
+    if (b) { b.textContent = "▶"; b.classList.remove("playing"); }
+    scrubTarget = Number(i);
+    if (scrubRaf) return;
+    scrubRaf = requestAnimationFrame(() => { scrubRaf = 0; showFrame(scrubTarget, true); });
   };
+
+  cloudPanelEl.addEventListener("pointerdown", () => { panelPointerDown = true; });
+  const endPanelPtr = () => {
+    if (!panelPointerDown) return;
+    panelPointerDown = false;
+    if (panelRenderDeferred) { panelRenderDeferred = false; renderFloatingCloudsPanel(); }
+  };
+  window.addEventListener("pointerup", endPanelPtr);
+  window.addEventListener("pointercancel", endPanelPtr);
 
   window.refreshSatelliteCloudsNow = function () {
     eumDiscovered = false;
@@ -21059,6 +21598,7 @@ function handleVsSelection(kind, feature) {
       clearInterval(pollTimer);
       pollTimer = setInterval(() => { if (window.satelliteCloudsMode && !document.hidden) loadSatelliteFrames(); }, 15 * 60000);
     } else {
+      cloudPlaying = false;
       clearInterval(pollTimer); pollTimer = null;
       clearTimeout(loopTimer); loopTimer = null;
       cloudsSvgGroup.style("display", "none");
@@ -21067,6 +21607,7 @@ function handleVsSelection(kind, feature) {
   };
 
   let fastLastMs = 0;
+  let fastLastFrameUid = -1;
   const _origDrawSpaceAndGeo = window.drawSpaceAndGeoToolsOnFastCanvas;
   window.drawSpaceAndGeoToolsOnFastCanvas = function (ctx, cPath, activeProj, k, morphState, camVec) {
     if (window.satelliteCloudsMode && frames.length && !morphState && !(typeof quizState !== "undefined" && quizState.active)) {
@@ -21074,8 +21615,9 @@ function handleVsSelection(kind, feature) {
         const fr = frames[curIdx];
         const now = performance.now();
         const S = 400;
-        if (now - fastLastMs > 45) {
+        if (now - fastLastMs > 45 || fr.uid !== fastLastFrameUid) {
           fastLastMs = now;
+          fastLastFrameUid = fr.uid;
           bake3D(fr, cloudSpectrumMode === "hybrid" ? "visible" : cloudSpectrumMode, activeProj, S);
         }
         const B = globeBasis(activeProj);
@@ -21111,8 +21653,7 @@ function handleVsSelection(kind, feature) {
   };
 
   window.__cloudEngine = { composeFrame, calibrate, shadePixel, bake3D, globeBasis, SATS, FW, FH };
-})();
-</script>
+})();</script>
 
 
 <script id="draggablePanelsModule">
