@@ -1306,9 +1306,12 @@
           🐋 Balina: Kapalı
         </button>
 
-        <button class="btn" id="btnMicroToggle" onclick="toggleAllLabels()" style="grid-column: 1 / -1;" title="Mikro ada devletlerinin nokta etiketlerini açar/kapatır">
-          🔎 Mikro Adalar: Kapalı
-        </button>
+       <button class="btn" id="btnMicroToggle" onclick="toggleAllLabels()" title="Mikro ada devletlerinin nokta etiketlerini açar/kapatır">
+          🔎 Mikro Ada: Kapalı
+       </button>
+       <button class="btn" id="btnLakesToggle" onclick="toggleLakes()" title="Göller katmanını ve isimlerini açar/kapatır">
+          💧 Göller: Kapalı
+       </button>
 
         <div class="menu-sec-title">🌋 Yer Bilimi: Deprem, Fay & Volkan</div>
 
@@ -1437,6 +1440,7 @@ const width = 2400;
 const height = 1250;
 
 let showAllMicroLabels = false;
+let showLakes = false;
 let showCapitals = false;
 let trProvinceDisplayMode = 'off';
 let usStateDisplayMode = 'off';
@@ -2501,7 +2505,7 @@ const RIVERS_TR_DATA = {
   }
 };
 
-// 50m Natural Earth ölçeğinde yer almayan önemli Türkiye nehirleri için yüksek hassasiyetli vektör koordinatları
+// 1) TÜRKİYE ÖZEL AKARSU KATMANI: 50m Natural Earth ölçeğinde yer almayan Türkiye nehirleri
 const CUSTOM_TURKISH_RIVERS = [
   {
     name: "Kizilirmak",
@@ -2541,6 +2545,22 @@ const CUSTOM_TURKISH_RIVERS = [
     ]
   },
   {
+    name: "Gediz",
+    scalerank: 5,
+    strokeweig: 0.60,
+    coords: [
+      [29.62, 38.92], [28.95, 38.75], [28.35, 38.65], [27.45, 38.65], [26.83, 38.58]
+    ]
+  },
+  {
+    name: "Goksu",
+    scalerank: 5,
+    strokeweig: 0.58,
+    coords: [
+      [32.45, 36.95], [33.05, 36.78], [33.38, 36.64], [34.05, 36.30]
+    ]
+  },
+  {
     name: "Seyhan",
     scalerank: 5,
     strokeweig: 0.60,
@@ -2554,6 +2574,14 @@ const CUSTOM_TURKISH_RIVERS = [
     strokeweig: 0.60,
     coords: [
       [37.20, 38.20], [36.85, 37.75], [36.35, 37.35], [35.80, 37.02], [35.58, 36.58]
+    ]
+  },
+  {
+    name: "Orontes",
+    scalerank: 4,
+    strokeweig: 0.64,
+    coords: [
+      [36.22, 34.25], [36.58, 34.73], [36.75, 35.13], [36.32, 35.81], [36.16, 36.20], [35.96, 36.05]
     ]
   },
   {
@@ -2571,6 +2599,329 @@ const CUSTOM_TURKISH_RIVERS = [
     strokeweig: 0.58,
     coords: [
       [40.25, 40.25], [40.95, 40.50], [41.55, 40.95], [41.82, 41.32], [41.60, 41.60]
+    ]
+  }
+];
+
+// 2) KÜRESEL BÖLGESEL NEHİRLER & MEVSİMLİK ÇÖL VADİLERİ (WADI / OUED) KATMANI:
+// 50m Natural Earth ölçeğinde eksik kalan Kuzey Afrika (Cezayir, Fas, Tunus, Libya), Batı Sahra, Moritanya ve Arap Yarımadası su yolları
+const CUSTOM_REGIONAL_WORLD_RIVERS = [
+  // --- CEZAYİR NEHİR VE SAHRA VADİLERİ ---
+  {
+    name: "Chelif",
+    scalerank: 4,
+    strokeweig: 0.72,
+    coords: [
+      [1.95, 34.05], [2.42, 34.85], [2.85, 35.70], [2.22, 36.26],
+      [1.33, 36.16], [0.80, 36.02], [0.13, 36.04]
+    ]
+  },
+  {
+    name: "Seybouse",
+    scalerank: 5,
+    strokeweig: 0.60,
+    coords: [
+      [7.15, 36.12], [7.43, 36.46], [7.68, 36.68], [7.77, 36.88]
+    ]
+  },
+  {
+    name: "Soummam",
+    scalerank: 5,
+    strokeweig: 0.58,
+    coords: [
+      [3.90, 36.37], [4.35, 36.42], [4.69, 36.61], [5.08, 36.74]
+    ]
+  },
+  {
+    name: "Oued Saoura",
+    scalerank: 4,
+    strokeweig: 0.64,
+    isIntermittent: true,
+    coords: [
+      [-3.20, 32.10], [-2.75, 31.02], [-2.22, 30.45], [-2.17, 30.13],
+      [-1.43, 29.46], [-1.15, 29.05], [-0.55, 28.35]
+    ]
+  },
+  {
+    name: "Oued Djedi",
+    scalerank: 4,
+    strokeweig: 0.62,
+    isIntermittent: true,
+    coords: [
+      [2.65, 33.85], [3.65, 34.05], [5.08, 34.42], [5.75, 34.62], [6.28, 34.25]
+    ]
+  },
+  {
+    name: "Oued Igharghar",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [5.75, 23.60], [5.38, 26.42], [6.10, 28.45], [6.02, 31.20], [6.06, 33.10], [6.25, 34.05]
+    ]
+  },
+
+  // --- FAS VE TUNUS NEHİRLERİ ---
+  {
+    name: "Draa",
+    scalerank: 4,
+    strokeweig: 0.68,
+    coords: [
+      [-6.90, 30.92], [-6.45, 30.70], [-5.84, 30.33], [-5.72, 29.82],
+      [-6.85, 29.45], [-8.25, 29.15], [-9.65, 28.80], [-11.11, 28.68]
+    ]
+  },
+  {
+    name: "Moulouya",
+    scalerank: 4,
+    strokeweig: 0.65,
+    coords: [
+      [-4.95, 32.65], [-3.99, 33.05], [-3.35, 34.23], [-2.85, 34.78], [-2.36, 35.12]
+    ]
+  },
+  {
+    name: "Sebou",
+    scalerank: 4,
+    strokeweig: 0.66,
+    coords: [
+      [-4.85, 33.40], [-4.85, 34.08], [-5.65, 34.48], [-6.15, 34.38], [-6.64, 34.27]
+    ]
+  },
+  {
+    name: "Oum Er-Rbia",
+    scalerank: 4,
+    strokeweig: 0.66,
+    coords: [
+      [-5.66, 32.94], [-6.26, 32.60], [-7.10, 32.45], [-7.64, 32.48], [-8.34, 33.31]
+    ]
+  },
+  {
+    name: "Medjerda",
+    scalerank: 4,
+    strokeweig: 0.66,
+    coords: [
+      [7.95, 36.28], [8.78, 36.50], [9.25, 36.62], [9.61, 36.65], [10.17, 37.11]
+    ]
+  },
+
+  // --- BATI SAHRA VADİLERİ ---
+  {
+    name: "Saguia el-Hamra",
+    scalerank: 4,
+    strokeweig: 0.66,
+    isIntermittent: true,
+    coords: [
+      [-9.85, 26.85], [-10.95, 27.05], [-11.67, 26.74], [-12.55, 26.98], [-13.20, 27.15], [-13.41, 27.18]
+    ]
+  },
+  {
+    name: "Oued Kraa",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [-12.45, 25.15], [-13.20, 25.35], [-13.85, 25.52], [-14.42, 25.68]
+    ]
+  },
+
+  // --- MORİTANYA İÇ NEHİR VE VADİLERİ ---
+  {
+    name: "Gorgol",
+    scalerank: 4,
+    strokeweig: 0.66,
+    coords: [
+      [-11.65, 16.75], [-12.15, 16.35], [-12.58, 16.03], [-13.05, 16.10], [-13.51, 16.14]
+    ]
+  },
+  {
+    name: "Karakoro",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [-11.15, 16.30], [-11.52, 15.85], [-11.79, 15.53], [-12.05, 15.12], [-12.22, 14.78]
+    ]
+  },
+  {
+    name: "Oued Khatt",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [-12.85, 20.15], [-13.65, 19.95], [-14.45, 19.85], [-15.25, 19.72], [-15.95, 19.65]
+    ]
+  },
+
+  // --- LİBYA MEVSİMLİK BÜYÜK VADİLERİ (WADI) ---
+  {
+    name: "Wadi Bay al Kabir",
+    scalerank: 4,
+    strokeweig: 0.64,
+    isIntermittent: true,
+    coords: [
+      [13.40, 29.85], [14.05, 30.25], [14.65, 30.72], [15.05, 30.95], [15.48, 31.38]
+    ]
+  },
+  {
+    name: "Wadi Zamzam",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [13.35, 30.65], [14.10, 30.92], [14.65, 31.15], [15.28, 31.52]
+    ]
+  },
+  {
+    name: "Wadi al Majanin",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [13.02, 32.16], [13.10, 32.45], [13.16, 32.70], [13.20, 32.89]
+    ]
+  },
+  {
+    name: "Wadi Derna",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [22.15, 32.48], [22.42, 32.62], [22.64, 32.77]
+    ]
+  },
+  {
+    name: "Wadi al Farigh",
+    scalerank: 5,
+    strokeweig: 0.56,
+    isIntermittent: true,
+    coords: [
+      [21.65, 29.95], [20.95, 30.25], [20.35, 30.42], [19.78, 30.42]
+    ]
+  },
+
+  // --- NİJER NEHİR KOLLARI VE SAHRA-SAHEL VADİLERİ ---
+  {
+    name: "Komadugu Yobe",
+    scalerank: 4,
+    strokeweig: 0.66,
+    coords: [
+      [10.35, 12.45], [11.20, 12.85], [12.05, 13.12], [12.68, 13.32], [13.28, 13.52], [13.72, 13.68]
+    ]
+  },
+  {
+    name: "Sirba",
+    scalerank: 5,
+    strokeweig: 0.60,
+    coords: [
+      [0.12, 13.12], [0.68, 13.38], [1.18, 13.60], [1.60, 13.77]
+    ]
+  },
+  {
+    name: "Mekrou",
+    scalerank: 5,
+    strokeweig: 0.58,
+    coords: [
+      [1.92, 11.25], [2.16, 11.72], [2.34, 12.15], [2.48, 12.41]
+    ]
+  },
+  {
+    name: "Dallol Bosso",
+    scalerank: 4,
+    strokeweig: 0.64,
+    isIntermittent: true,
+    coords: [
+      [4.85, 17.20], [4.18, 16.12], [3.58, 15.05], [3.16, 14.08], [2.95, 13.25], [2.88, 12.65]
+    ]
+  },
+  {
+    name: "Goulbi de Maradi",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [7.42, 12.85], [7.10, 13.50], [6.72, 13.55], [6.32, 13.28]
+    ]
+  },
+  {
+    name: "Oued Tafassasset",
+    scalerank: 4,
+    strokeweig: 0.60,
+    isIntermittent: true,
+    coords: [
+      [8.85, 21.80], [9.65, 20.45], [10.45, 19.10], [11.35, 17.75], [12.25, 16.45]
+    ]
+  },
+
+  // --- ÇAD NEHİR SİSTEMLERİ VE BÜYÜK VADİLERİ ---
+  {
+    name: "Logone",
+    scalerank: 4,
+    strokeweig: 0.70,
+    coords: [
+      [15.65, 8.20], [16.08, 8.56], [16.30, 9.40], [15.42, 10.28], [15.16, 11.20], [15.04, 12.11]
+    ]
+  },
+  {
+    name: "Bahr Aouk",
+    scalerank: 4,
+    strokeweig: 0.62,
+    coords: [
+      [21.35, 9.65], [20.25, 9.40], [19.15, 9.10], [18.42, 9.15]
+    ]
+  },
+  {
+    name: "Bahr Salamat",
+    scalerank: 4,
+    strokeweig: 0.62,
+    coords: [
+      [21.45, 12.10], [20.75, 11.45], [20.28, 11.04], [19.45, 10.25], [18.65, 9.65]
+    ]
+  },
+  {
+    name: "Batha",
+    scalerank: 4,
+    strokeweig: 0.64,
+    isIntermittent: true,
+    coords: [
+      [21.15, 13.75], [19.70, 13.30], [18.35, 13.21], [17.58, 12.82]
+    ]
+  },
+  {
+    name: "Bahr el Ghazal Soro",
+    scalerank: 4,
+    strokeweig: 0.60,
+    isIntermittent: true,
+    coords: [
+      [14.65, 13.25], [15.65, 13.45], [16.49, 13.64], [17.35, 14.85], [18.25, 16.35]
+    ]
+  },
+  {
+    name: "Wadi Howar",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [22.35, 16.10], [24.10, 16.45], [26.50, 17.15], [28.90, 17.65], [30.85, 18.05]
+    ]
+  },
+
+  // --- ARAP YARIMADASI ANA ÇÖL VADİLERİ ---
+  {
+    name: "Wadi al-Rummah",
+    scalerank: 4,
+    strokeweig: 0.62,
+    isIntermittent: true,
+    coords: [
+      [40.40, 25.65], [42.20, 25.85], [43.95, 26.25], [45.96, 28.43], [47.55, 30.25]
+    ]
+  },
+  {
+    name: "Wadi Hadhramaut",
+    scalerank: 5,
+    strokeweig: 0.58,
+    isIntermittent: true,
+    coords: [
+      [47.45, 15.75], [48.95, 15.98], [50.15, 15.65], [51.23, 15.20]
     ]
   }
 ];
@@ -2733,7 +3084,45 @@ const EXTRA_RIVERS_TR_DATA = {
   "Shire": { tr: "SHİRE NEHRİ", discharge: "~486 m³/sn", length: "402 km", outflow: "Zambezi Nehri", source: "Malavi Gölü çıkışı", basinCountries: "Malavi, Mozambik" },
   "Jubba": { tr: "CUBBA (JUBBA) NEHRİ", discharge: "~187 m³/sn", length: "1.808 km", outflow: "Hint Okyanusu (Somali)", source: "Etiyopya Yaylaları", basinCountries: "Etiyopya, Somali" },
   "Shebelle": { tr: "ŞABELLE NEHRİ", discharge: "~68 m³/sn", length: "2.526 km", outflow: "Cubba Nehri havzası", source: "Bale Dağları (Etiyopya)", basinCountries: "Etiyopya, Somali" },
-  "Vaal": { tr: "VAAL NEHRİ", discharge: "~125 m³/sn", length: "1.458 km", outflow: "Orange Nehri", source: "Drakensberg Dağları", basinCountries: "Güney Afrika" }
+  "Vaal": { tr: "VAAL NEHRİ", discharge: "~125 m³/sn", length: "1.458 km", outflow: "Orange Nehri", source: "Drakensberg Dağları", basinCountries: "Güney Afrika" },
+  "Gediz": { tr: "GEDİZ NEHRİ", discharge: "~49 m³/sn", length: "401 km", outflow: "Ege Denizi (İzmir Körfezi - Foça güneyi)", source: "Murat Dağı (Kütahya)", basinCountries: "Türkiye" },
+  "Goksu": { tr: "GÖKSU NEHRİ", discharge: "~110 m³/sn", length: "260 km", outflow: "Akdeniz (Silifke Deltası - Mersin)", source: "Orta Toroslar (Geyik Dağları)", basinCountries: "Türkiye", aliases: ["göksu"] },
+  "Orontes": { tr: "ASİ NEHRİ", discharge: "~80 m³/sn", length: "571 km", outflow: "Akdeniz (Samandağ Deltası - Hatay)", source: "Bekaa Vadisi (Lübnan)", basinCountries: "Lübnan, Suriye, Türkiye", aliases: ["asi"] },
+  "Chelif": { tr: "ŞELİF NEHRİ (OUED CHELİF)", discharge: "~45 m³/sn (Kış taşkınlarında >1.000 m³/sn)", length: "700 km (Cezayir'in en uzun kalıcı nehri)", outflow: "Akdeniz (Mostaganem kuzeyi)", source: "Sahra Atlasları / Cebel Amur", basinCountries: "Cezayir", aliases: ["ouedchelif", "shelif"] },
+  "Seybouse": { tr: "SEYBOUSE NEHRİ", discharge: "~15 m³/sn", length: "240 km", outflow: "Akdeniz (Annaba Körfezi)", source: "Cezayir Yüksek Platoları (Cherf & Bou Hamdane)", basinCountries: "Cezayir" },
+  "Soummam": { tr: "SOUMMAM NEHRİ", discharge: "~25 m³/sn", length: "195 km", outflow: "Akdeniz (Béjaïa Körfezi)", source: "Tell Atlasları (Kabylie, Cezayir)", basinCountries: "Cezayir" },
+  "Oued Saoura": { tr: "SAOURA - GUİR VADİSİ", discharge: "Mevsimsel / Geçici Çöl Akışı", length: "680 km (Guir koluyla ~1.000 km)", outflow: "Sebkha el Melah (Sahra Kapalı Havzası)", source: "Yüksek Atlas Dağları (Guir ve Zousfana kolları)", basinCountries: "Fas, Cezayir" },
+  "Oued Djedi": { tr: "CEDİ VADİSİ (OUED DJEDİ)", discharge: "Mevsimsel Kış-İlkbahar Akışı", length: "480 km (Kuzey Sahra ana doğu-batı vadisi)", outflow: "Şott Melrhir Tuz Gölü (-40 m Kapalı Havza)", source: "Sahra Atlasları (Laghouat batısı)", basinCountries: "Cezayir" },
+  "Oued Igharghar": { tr: "İĞARĞAR SAHRA VADİSİ", discharge: "Mevsimsel / Nadir Çöl Taşkını (Yeraltı Akiferi)", length: "~850 km", outflow: "Şott Melrhir Kapalı Havzası", source: "Ahaggar (Hoggar) Dağları (Güney Cezayir)", basinCountries: "Cezayir" },
+  "Draa": { tr: "DRAA NEHRİ", discharge: "~25 m³/sn (Üst havza daimi, alt havza mevsimsel)", length: "1.100 km (Fas'ın en uzun akarsuyu)", outflow: "Atlas Okyanusu (Tan-Tan kuzeyi)", source: "Yüksek Atlas Dağları (Dadès ve Imini birleşimi)", basinCountries: "Fas (Cezayir sınırı)" },
+  "Moulouya": { tr: "MULUYE (MOULOUYA) NEHRİ", discharge: "~50 m³/sn", length: "520 km", outflow: "Akdeniz (Saidia batısı - Fas)", source: "Orta ve Yüksek Atlas Dağları birleşimi", basinCountries: "Fas" },
+  "Sebou": { tr: "SEBU (SEBOU) NEHRİ", discharge: "~137 m³/sn (Fas'ın su hacmi en yüksek nehri)", length: "496 km", outflow: "Atlas Okyanusu (Mehdia / Kenitra)", source: "Orta Atlas Dağları (Guigou Nehri)", basinCountries: "Fas" },
+  "Oum Er-Rbia": { tr: "ÜMMÜ'R-REBİA NEHRİ", discharge: "~105 m³/sn", length: "555 km", outflow: "Atlas Okyanusu (Azemmour - Fas)", source: "Orta Atlas Dağları (Khenifra)", basinCountries: "Fas", aliases: ["oumerrbia"] },
+  "Medjerda": { tr: "MECERDA NEHRİ", discharge: "~30 m³/sn (Taşkında ~1.000 m³/sn)", length: "450 km (Tunus'un tek büyük daimi nehri)", outflow: "Akdeniz (Tunus Körfezi / Utique)", source: "Tell Atlasları (Souk Ahras, Doğu Cezayir)", basinCountries: "Cezayir, Tunus" },
+  "Saguia el-Hamra": { tr: "SAKİYETÜ'L-HAMRA VADİSİ", discharge: "Mevsimsel / Geçici Akış (Kış yağışları)", length: "350 km (Bölgeye adını veren ana vadi)", outflow: "Atlas Okyanusu (Layun / Foum El Oued)", source: "Farsia / Doğu Batı Sahra Platosu", basinCountries: "Batı Sahra" },
+  "Oued Kraa": { tr: "KRAA VADİSİ (OUED KRAA)", discharge: "Mevsimsel / Kurak Çöl Vadisi", length: "260 km", outflow: "Atlas Okyanusu (Boujdour güneyi)", source: "Guelta Zemmur Batı Platosu", basinCountries: "Batı Sahra" },
+  "Gorgol": { tr: "GORGOL NEHRİ", discharge: "~28 m³/sn (Foum Gleita Baraj Havzası)", length: "345 km (Moritanya iç kesiminin ana nehri)", outflow: "Senegal Nehri (Kaédi - Moritanya)", source: "Assaba ve Tagant Platoları (Kara & Beyaz Gorgol)", basinCountries: "Moritanya" },
+  "Karakoro": { tr: "KARAKORO NEHRİ", discharge: "Mevsimsel Muson Akışı (~15 m³/sn)", length: "310 km", outflow: "Senegal Nehri (Bakel doğusu)", source: "Kiffa / Hodh el Gharbi Platosu", basinCountries: "Moritanya, Mali" },
+  "Oued Khatt": { tr: "HATT - ATUİ VADİSİ", discharge: "Mevsimsel / Geçici Çöl Akışı", length: "~430 km", outflow: "Atlas Okyanusu / Banc d'Arguin Havzası", source: "Adrar Platosu (Atar güneyi, Moritanya)", basinCountries: "Moritanya" },
+  "Wadi Bay al Kabir": { tr: "VADİ BEY EL-KEBİR", discharge: "Mevsimsel Akış (Libya'da daimi nehir bulunmaz)", length: "350 km (Batı Libya'nın en geniş vadisi)", outflow: "Akdeniz (Sirte Körfezi batısı)", source: "Hamada el-Hamra Platosu (Libya)", basinCountries: "Libya" },
+  "Wadi Zamzam": { tr: "VADİ ZEMZEM", discharge: "Mevsimsel / Geçici Çöl Akışı", length: "280 km", outflow: "Akdeniz (Sirte Körfezi / Buerat)", source: "Gheriat ve Mizda Yaylaları (Batı Libya)", basinCountries: "Libya" },
+  "Wadi al Majanin": { tr: "VADİ EL-MEJENİN", discharge: "Mevsimsel Kış Akışı (Baraj Kontrollü)", length: "140 km", outflow: "Akdeniz (Trablus - Libya)", source: "Nefuse Dağları / Garyan Tepeleri", basinCountries: "Libya" },
+  "Wadi Derna": { tr: "VADİ DERNA", discharge: "Mevsimsel Akış (Fırtınalarda ani taşkın debisi)", length: "75 km", outflow: "Akdeniz (Derna - Doğu Libya)", source: "Cebel Ahdar / Yeşil Dağ (Sirenayka)", basinCountries: "Libya" },
+  "Wadi al Farigh": { tr: "VADİ EL-FARİĞ", discharge: "Mevsimsel / Kuru Vadi Yatağı", length: "260 km", outflow: "Sirte Körfezi (Brega doğusu)", source: "Sirenayka Güney Platosu (Doğu Libya)", basinCountries: "Libya" },
+  "Wadi al-Rummah": { tr: "VADİ ER-RUMMA / EL-BATİN", discharge: "Mevsimsel / Nadir Sel Akışı", length: "1.000+ km (Arabistan'ın en uzun vadi sistemi)", outflow: "Basra Havzası / Şattülarap Batısı", source: "Harrat Hayber (Medine doğusu)", basinCountries: "Suudi Arabistan, Kuveyt, Irak" },
+  "Wadi Hadhramaut": { tr: "VADİ HADRAMUT (MESİLE)", discharge: "Mevsimsel Muson/Taşkın Akışı", length: "600 km", outflow: "Umman Denizi (Seyhut - Yemen)", source: "Hadramut Platosu / Şebve", basinCountries: "Yemen" },
+  "Komadugu Yobe": { tr: "KOMADUGU YOBE NEHRİ", discharge: "~15 - 45 m³/sn (Mevsimsel zirve >200 m³/sn)", length: "1.200 km (Nijer - Nijerya sınır nehri)", outflow: "Çad Gölü Kuzey Havzası", source: "Hadejia ve Jama'are nehirleri birleşimi", basinCountries: "Nijerya, Nijer", aliases: ["yobe", "komadougouyobe"] },
+  "Sirba": { tr: "SİRBA NEHRİ", discharge: "~25 m³/sn (Yaz musonunda yüksek debi)", length: "439 km (Nijer Nehri'nin Nijer'deki ana sağ kolu)", outflow: "Nijer Nehri (Niamey kuzeyi)", source: "Doğu Burkina Faso Platosu", basinCountries: "Burkina Faso, Nijer" },
+  "Mekrou": { tr: "MÉKROU NEHRİ", discharge: "~22 m³/sn", length: "410 km (W Milli Parkı sınır nehri)", outflow: "Nijer Nehri", source: "Atakora Dağları (Benin)", basinCountries: "Benin, Burkina Faso, Nijer", aliases: ["mékrou"] },
+  "Dallol Bosso": { tr: "DALLOL BOSSO (AZAOUAK) VADİSİ", discharge: "Mevsimsel Akış / Fosil Nehir Yatağı", length: "1.600 km (Azawagh sistemiyle Nijer'in en uzun vadisi)", outflow: "Nijer Nehri Vadisi", source: "Aïr Dağları ve Azawagh Havzası", basinCountries: "Mali, Nijer" },
+  "Goulbi de Maradi": { tr: "GOULBİ DE MARADİ VADİSİ", discharge: "Mevsimsel Yağış Rejimi", length: "320 km (Güney Nijer tarım kuşağı vadisi)", outflow: "Sokoto / Rima Havzası", source: "Katsina Yaylası", basinCountries: "Nijerya, Nijer" },
+  "Oued Tafassasset": { tr: "TAFASSASSET SAHRA VADİSİ", discharge: "Mevsimsel / Nadir Çöl Akışı (Antik Çad Gölü Kolu)", length: "~750 km", outflow: "Ténéré Çölü / Çad Havzası (Nijer)", source: "Tassili n'Ajjer / Ahaggar Dağları", basinCountries: "Cezayir, Nijer" },
+  "Logone": { tr: "LOGONE NEHRİ", discharge: "~490 m³/sn (Şari Nehri'nin en büyük batı kolu)", length: "1.000 km", outflow: "Şari Nehri → Çad Gölü (Encemine)", source: "vina ve Mbéré kolları (Adamawa / OAC)", basinCountries: "Orta Afrika Cum., Kamerun, Çad" },
+  "Bahr Aouk": { tr: "BAHR AOUK (AUK) NEHRİ", discharge: "~75 m³/sn", length: "650 km (Çad'ın güneydoğu sınır nehri)", outflow: "Şari (Chari) Nehri (Sarh yakınları)", source: "Sudan - OAC - Çad sınır üçgeni", basinCountries: "Çad, Orta Afrika Cumhuriyeti" },
+  "Bahr Salamat": { tr: "BAHR SALAMAT NEHRİ", discharge: "~35 - 150 m³/sn (Taşkın kuşağı)", length: "1.200 km (Bahr Azoum üst koluyla)", outflow: "Şari Nehri (Güney Çad)", source: "Darfur / Cebel Marra Etekleri", basinCountries: "Sudan, Çad" },
+  "Batha": { tr: "BATHA NEHRİ (VADİSİ)", discharge: "Mevsimsel Muson Akışı (Temmuz - Ekim)", length: "500 km (Orta Çad'ın ana doğu-batı su damarı)", outflow: "Fitri Gölü (Kapalı Havza - Orta Çad)", source: "Ouaddaï Yaylaları (Doğu Çad)", basinCountries: "Çad" },
+  "Bahr el Ghazal Soro": { tr: "BAHRÜ'L-GAZAL (SORO) VADİSİ", discharge: "Mevsimsel Taşkın Yatağı / Yeraltı Akışı", length: "700 km", outflow: "Bodélé Çöküntüsü (Kuzey Çad)", source: "Çad Gölü taşkın eşiği", basinCountries: "Çad" },
+  "Wadi Howar": { tr: "VADİ HOVAR (SARI NİL)", discharge: "Mevsimsel Üst Havza Akışı (Antik Nil Kolu)", length: "1.100 km (Doğu Sahra'nın en büyük vadisi)", outflow: "Nil Vadisi (Old Dongola karşısı - Sudan)", source: "Ennedi Platosu ve Ouaddaï (Doğu Çad)", basinCountries: "Çad, Sudan" }
 };
 
 function normalizeRiverLookupKey(str) {
@@ -3700,7 +4089,43 @@ const EXTRA_LAKES_TR_DATA = {
   "Lake Kossou": { tr: "KOSSOU BARAJ GÖLÜ", waterType: "Tatlı Su (Fildişi Sahili)", area: "1.780 km²", volume: "27.7 km³", maxDepth: "54 m", avgDepth: "15 m", elevation: "206 m (676 ft)", aliases: ["kossou"] },
   "Chott el Djerid": { tr: "ŞOTTÜ'L-CERİD TUZ GÖLÜ", waterType: "Sahra Mevsimsel Tuz Gölü (Tunus)", area: "7.000 km²", volume: "Mevsimsel", maxDepth: "1 - 2 m", avgDepth: "0.3 m", elevation: "15 m (49 ft)", aliases: ["chotteldjerid", "djerid"] },
   "Lake Tharthar": { tr: "SERSAR (THARTHAR) GÖLÜ", waterType: "Hafif Tuzlu Su (Dicle - Fırat Arası, Irak)", area: "2.710 km²", volume: "35 - 85 km³", maxDepth: "65 m", avgDepth: "25 m", elevation: "46 m (151 ft)", aliases: ["tharthar"] },
-  "Lake Assad": { tr: "ESAD (TABKA) BARAJ GÖLÜ", waterType: "Tatlı Su (Fırat Nehri - Suriye)", area: "610 km²", volume: "11.7 km³", maxDepth: "60 m", avgDepth: "19 m", elevation: "304 m (997 ft)", aliases: ["assad", "buhayratalassad"] }
+  "Lake Assad": { tr: "ESAD (TABKA) BARAJ GÖLÜ", waterType: "Tatlı Su (Fırat Nehri - Suriye)", area: "610 km²", volume: "11.7 km³", maxDepth: "60 m", avgDepth: "19 m", elevation: "304 m (997 ft)", aliases: ["assad", "buhayratalassad"] },
+
+  // Kuzey Afrika, Sahra, Sahel (Cezayir, Fas, Tunus, Libya, Çad, Nijer) ve Bölgesel Afrika Gölleri
+  "Chott Melrhir": { tr: "ŞOTT MELRHİR TUZ GÖLÜ", waterType: "Mevsimsel Tuz Gölü / Kapalı Havza (Cezayir'in en büyük gölü ve en alçak noktası)", area: "6.700 km²", volume: "Mevsimsel (Kış yağışlarıyla dolar)", maxDepth: "2.5 m", avgDepth: "0.6 m", elevation: "-40 m (-131 ft — Deniz seviyesi altı)", aliases: ["melrhir", "chottmelrhir"] },
+  "Chott el Hodna": { tr: "ŞOTTÜ'L-HODNA GÖLÜ", waterType: "Tuzlu / Mevsimsel Kapalı Havza Gölü (Cezayir Yüksek Platoları)", area: "1.100 km²", volume: "Mevsimsel", maxDepth: "2 m", avgDepth: "0.5 m", elevation: "400 m (1.312 ft)", aliases: ["hodna", "chottelhodna"] },
+  "Chott Ech Chergui": { tr: "ŞOTT EŞ-ŞERGİ GÖLÜ", waterType: "Tuzlu / Acı Su (Ramsar Sulak Alanı - Kuzeybatı Cezayir)", area: "2.000 km² (havza)", volume: "Mevsimsel", maxDepth: "1.5 m", avgDepth: "0.4 m", elevation: "1.000 m (3.281 ft)", aliases: ["echchergui", "chergui"] },
+  "Sebkha d'Oran": { tr: "ORAN (VAHRAN) SEBKHASI", waterType: "Tuzlu Kapalı Havza Gölü (Kuzeybatı Cezayir)", area: "568 km²", volume: "Mevsimsel", maxDepth: "1.8 m", avgDepth: "0.5 m", elevation: "80 m (262 ft)", aliases: ["sebkhaoran", "oran"] },
+  "Lake Ichkeul": { tr: "İŞKÖL (ICHKEUL) GÖLÜ", waterType: "Tatlı / Acı Su (UNESCO Dünya Mirası - Kuzey Tunus)", area: "85 - 120 km²", volume: "0.15 km³", maxDepth: "3 m", avgDepth: "1.5 m", elevation: "1.5 m (5 ft)", aliases: ["ichkeul", "iskol"] },
+  "Al Wahda Reservoir": { tr: "EL-VAHDA BARAJ GÖLÜ", waterType: "Tatlı Su (Fas'ın en büyük baraj gölü - Ouerrha/Sebu Havzası)", area: "123 km²", volume: "3.8 km³", maxDepth: "80 m", avgDepth: "31 m", elevation: "166 m (545 ft)", aliases: ["alwahda", "wahda"] },
+  "Al Massira Reservoir": { tr: "EL-MESİRE BARAJ GÖLÜ", waterType: "Tatlı Su (Ümmü'r-Rebia Nehri - Fas)", area: "137 km²", volume: "2.76 km³", maxDepth: "40 m", avgDepth: "20 m", elevation: "285 m (935 ft)", aliases: ["almassira", "massira"] },
+  "Bin el Ouidane Reservoir": { tr: "BİN EL-VİDANE GÖLÜ", waterType: "Tatlı Su (Yüksek Atlas Dağları Baraj Gölü - Fas)", area: "38 km²", volume: "1.38 km³", maxDepth: "100 m", avgDepth: "36 m", elevation: "810 m (2.657 ft)", aliases: ["binelouidane"] },
+  "Ubari Lakes": { tr: "ÜBARİ (GABEROUN) VAHA GÖLLERİ", waterType: "Aşırı Tuzlu Kalıcı Sahra Vaha Gölleri (İdehan Übari Kumulları - Fizan, Libya)", area: "~5 km² (16 vaha gölü kümesi)", volume: "Yeraltı Nübye Akiferi beslemeli", maxDepth: "32 m (Umm al-Maa & Gaberoun)", avgDepth: "7 m", elevation: "445 m (1.460 ft)", aliases: ["ubari", "gaberoun"] },
+  "Wau an Namus Lakes": { tr: "WAU AN NAMUS KRATER GÖLLERİ", waterType: "Tuzlu / Mineralize Volkanik Kaldera Gölleri (Sahra Çölü - Güney Libya)", area: "~3 km² (Kaldera çapı 4 km)", volume: "Kalıcı yeraltı sızıntısı", maxDepth: "16 m", avgDepth: "5 m", elevation: "430 m (1.411 ft)", aliases: ["wauannamus"] },
+  "Sabkhat Ghuzayyil": { tr: "GUZEYYİL SEBKHASI", waterType: "Mevsimsel Çöküntü Tuz Gölü (Libya'nın deniz seviyesinden en alçak noktası)", area: "420 km²", volume: "Mevsimsel", maxDepth: "1.5 m", avgDepth: "0.4 m", elevation: "-47 m (-154 ft — Deniz seviyesi altı)", aliases: ["ghuzayyil"] },
+  "Lake Fitri": { tr: "FİTRİ GÖLÜ", waterType: "Tatlı Su (UNESCO Biyosfer Rezervi & Kapalı Havza Gölü - Orta Çad)", area: "500 - 1.200 km² (Yağışta 3 kat büyür)", volume: "1.2 km³", maxDepth: "5 m", avgDepth: "2 m", elevation: "286 m (938 ft)", aliases: ["fitri"] },
+  "Lake Iro": { tr: "İRO GÖLÜ", waterType: "Tatlı Su (Bahr Salamat Havzası - Güneydoğu Çad)", area: "110 km²", volume: "0.25 km³", maxDepth: "4.5 m", avgDepth: "2.2 m", elevation: "387 m (1.270 ft)", aliases: ["iro"] },
+  "Ounianga Lakes": { tr: "OUNİANGA VAHA GÖLLERİ", waterType: "Fosil Yeraltı Suyuyla Beslenen 18 Kalıcı Sahra Gölü (UNESCO Dünya Mirası - Kuzey Çad)", area: "20 km² (Yoan, Katam ve Teli gölleri)", volume: "Nübye Kumtaşı Akiferi beslemeli", maxDepth: "27 m (Yoan Gölü)", avgDepth: "10 m", elevation: "380 m (1.247 ft)", aliases: ["ounianga", "yoan"] },
+  "Lake Lere": { tr: "LÉRÉ GÖLÜ", waterType: "Tatlı Su (Mayo Kébbi Havzası - Güneybatı Çad)", area: "41 km²", volume: "0.18 km³", maxDepth: "8 m", avgDepth: "4.5 m", elevation: "230 m (755 ft)", aliases: ["lere"] },
+  "Lake Chad North Basin": { tr: "ÇAD GÖLÜ KUZEY HAVZASI (DİFFA)", waterType: "Mevsimsel Tatlı Su / Sazlık Havzası (Nijer - Çad sınırı)", area: "800 - 2.400 km² (Komadugu Yobe taşkınına bağlı)", volume: "Mevsimsel değişken", maxDepth: "4 m", avgDepth: "1.5 m", elevation: "280 m (919 ft)", aliases: ["chadnorth", "diffa"] },
+  "Mare de Tabalak": { tr: "TABALAK GÖLÜ", waterType: "Tatlı Su (Sahel Kuşağı Ramsar Sulak Alanı - Tahoua, Nijer)", area: "77 km²", volume: "0.12 km³", maxDepth: "4 m", avgDepth: "1.8 m", elevation: "385 m (1.263 ft)", aliases: ["tabalak"] },
+  "Lake Madarounfa": { tr: "MADAROUNFA GÖLÜ", waterType: "Tatlı Su (Güney Nijer'in en önemli doğal gölü - Maradi)", area: "8 - 25 km²", volume: "0.05 km³", maxDepth: "5 m", avgDepth: "2 m", elevation: "355 m (1.165 ft)", aliases: ["madarounfa"] },
+  "Lake Rkiz": { tr: "RKİZ GÖLÜ", waterType: "Tatlı Su (Senegal Nehri Taşkın Havzası - Güneybatı Moritanya)", area: "120 km²", volume: "0.3 km³", maxDepth: "5 m", avgDepth: "2.5 m", elevation: "12 m (39 ft)", aliases: ["rkiz"] },
+  "Lac de Guiers": { tr: "GUİERS GÖLÜ", waterType: "Tatlı Su (Senegal'in en büyük tatlı su gölü - Başkent Dakar'ın su kaynağı)", area: "170 - 300 km²", volume: "0.6 km³", maxDepth: "4 m", avgDepth: "2 m", elevation: "2 m (6.6 ft)", aliases: ["guiers"] },
+  "Lake Debo": { tr: "DÉBO GÖLÜ", waterType: "Tatlı Su (İç Nijer Deltası Merkez Gölü - Mali)", area: "160 - 400 km²", volume: "0.8 km³", maxDepth: "7 m", avgDepth: "2.5 m", elevation: "262 m (860 ft)", aliases: ["debo"] },
+  "Lake Faguibine": { tr: "FAGUİBİNE GÖLÜ", waterType: "Mevsimsel Nijer Taşkın Havzası Gölü (Timbuktu Batısı - Mali)", area: "590 km² (havza)", volume: "Mevsimsel değişken", maxDepth: "10 m (dolu dönemde)", avgDepth: "3 m", elevation: "257 m (843 ft)", aliases: ["faguibine"] },
+  "Manantali Reservoir": { tr: "MANANTALİ BARAJ GÖLÜ", waterType: "Tatlı Su (Bafing / Senegal Nehri - Batı Mali)", area: "477 km²", volume: "11.3 km³", maxDepth: "55 m", avgDepth: "23.6 m", elevation: "208 m (682 ft)", aliases: ["manantali"] },
+  "Lake Bagre": { tr: "BAGRÉ BARAJ GÖLÜ", waterType: "Tatlı Su (Beyaz Volta Nehri - Burkina Faso)", area: "255 km²", volume: "1.7 km³", maxDepth: "30 m", avgDepth: "6.7 m", elevation: "235 m (771 ft)", aliases: ["bagre"] },
+  "Lake Buyo": { tr: "BUYO BARAJ GÖLÜ", waterType: "Tatlı Su (Sassandra Nehri - Batı Fildişi Sahili)", area: "920 km²", volume: "8.3 km³", maxDepth: "36 m", avgDepth: "9 m", elevation: "200 m (656 ft)", aliases: ["buyo"] },
+  "Lake Qarun": { tr: "KARUN (MOERİS) GÖLÜ", waterType: "Tuzlu Su (Tarihi Feyyum Vahası Gölü - Mısır)", area: "202 km²", volume: "1.1 km³", maxDepth: "8.8 m", avgDepth: "4.2 m", elevation: "-43 m (-141 ft — Deniz seviyesi altı)", aliases: ["qarun", "moeris", "karun"] },
+  "Toshka Lakes": { tr: "TOŞKA (YENİ VADİ) GÖLLERİ", waterType: "Tatlı / Hafif Tuzlu Sahra Çöküntü Gölleri (Güney Mısır)", area: "600 - 1.300 km²", volume: "8 - 25 km³", maxDepth: "50 m", avgDepth: "12 m", elevation: "150 m (492 ft)", aliases: ["toshka"] },
+  "Merowe Reservoir": { tr: "MEROVE BARAJ GÖLÜ", waterType: "Tatlı Su (Nil Nehri 4. Çağlayanı - Kuzey Sudan)", area: "476 km²", volume: "12.5 km³", maxDepth: "53 m", avgDepth: "26 m", elevation: "290 m (951 ft)", aliases: ["merowe"] },
+  "Roseires Reservoir": { tr: "ROSEİRES BARAJ GÖLÜ", waterType: "Tatlı Su (Mavi Nil - Güneydoğu Sudan)", area: "680 km²", volume: "7.4 km³", maxDepth: "68 m", avgDepth: "11 m", elevation: "490 m (1.608 ft)", aliases: ["roseires"] },
+  "Lake No": { tr: "NO GÖLÜ (SUDD SULAK ALANI)", waterType: "Tatlı Su (Beyaz Nil & Bahrü'l-Gazal Birleşimi - Güney Sudan)", area: "100 km²", volume: "0.2 km³", maxDepth: "4 m", avgDepth: "1.8 m", elevation: "386 m (1.266 ft)", aliases: ["lakeno"] },
+  "Lake Assal": { tr: "ASSAL KRATER GÖLÜ", waterType: "Aşırı Tuzlu Su (%34.8 tuzluluk — Afrika kıtasının en alçak noktası, Cibuti)", area: "54 km²", volume: "0.4 km³", maxDepth: "40 m", avgDepth: "7.4 m", elevation: "-155 m (-509 ft — Deniz seviyesi altı)", aliases: ["assal"] },
+  "Lake Abaya": { tr: "ABAYA GÖLÜ", waterType: "Tatlı / Hafif Alkali Su (Etiyopya Rift Vadisi'nin en büyük gölü)", area: "1.162 km²", volume: "8.2 km³", maxDepth: "24.5 m", avgDepth: "7.1 m", elevation: "1.175 m (3.855 ft)", aliases: ["abaya"] },
+  "Gariep Reservoir": { tr: "GARİEP BARAJ GÖLÜ", waterType: "Tatlı Su (Güney Afrika Cumhuriyeti'nin en büyük su haznesi - Orange Nehri)", area: "374 km²", volume: "5.34 km³", maxDepth: "75 m", avgDepth: "14.3 m", elevation: "1.258 m (4.127 ft)", aliases: ["gariep"] },
+  "Lake Alaotra": { tr: "ALAOTRA GÖLÜ", waterType: "Tatlı Su (Madagaskar'ın en büyük gölü)", area: "900 km²", volume: "0.95 km³", maxDepth: "4 m", avgDepth: "1.5 m", elevation: "751 m (2.464 ft)", aliases: ["alaotra"] }
 };
 
 function normalizeLakeLookupKey(str) {
@@ -7595,12 +8020,15 @@ async function fetchLiveLakeHydrology(lk) {
 async function updateLakeHudPanel(lk) {
   lastHudContext = { type: "lake", lk };
   const reqId = clearLiveCountryClock();
-  document.getElementById("hudStatusTitle").innerText = "GÖL TIKLANDI • İRTİFA & HİDROGRAFİK VERİLER";
-  document.getElementById("hudName").innerText = `💧 ${lk.trName || "GÖL"}`;
+  const isSaltOrSeasonal = Boolean(lk.isSeasonalLake);
+  document.getElementById("hudStatusTitle").innerText = isSaltOrSeasonal
+    ? "MEVSİMLİK TUZ GÖLÜ / KAPALI HAVZA • HİDROGRAFİK VERİLER"
+    : "GÖL TIKLANDI • İRTİFA & HİDROGRAFİK VERİLER";
+  document.getElementById("hudName").innerText = `${isSaltOrSeasonal ? "🧂" : "💧"} ${lk.trName || "GÖL"}`;
 
   if (lk.hasKnownMeta) {
     document.getElementById("hudInfo").innerHTML = `
-      <div class="source-pill pill-embedded">🟢 Gömülü Resmi Göl Veritabanı • ${getNetworkModeShortTag()}</div>
+      <div class="source-pill pill-embedded">${isSaltOrSeasonal ? "🟡 Gömülü Tuz Gölü & Mevsimlik Havza Veritabanı" : "🟢 Gömülü Resmi Göl Veritabanı"} • ${getNetworkModeShortTag()}</div>
       <div class="hud-country-grid">
         <div>⛰️ <b>İrtifa (Rakım):</b> <span class="hud-route-kpi">${escapeHudHtml(lk.elevationText)}</span></div>
         <div>📐 <b>Yüzölçümü:</b> ${escapeHudHtml(lk.areaText)}</div>
@@ -7898,20 +8326,25 @@ async function fetchLiveRiverHydrology(enName, trName, rvFeature = null) {
 async function updateRiverHudPanel(rv) {
   lastHudContext = { type: "river", rv };
   const reqId = clearLiveCountryClock();
-  document.getElementById("hudStatusTitle").innerText = "NEHİR DAMARI TIKLANDI • HİDROGRAFİK VERİLER";
-  document.getElementById("hudName").innerText = `🏞️ ${rv.trName || "NEHİR"}`;
+  const isWadi = Boolean(rv.isIntermittent);
+  const intlSuffix = /^(wadi|oued|saguia)\b|\briver$/i.test(rv.enName || "") ? "" : " River";
+
+  document.getElementById("hudStatusTitle").innerText = isWadi
+    ? "MEVSİMLİK VADİ (WADİ) • KURAK HAVZA HİDROGRAFİSİ"
+    : "NEHİR DAMARI TIKLANDI • HİDROGRAFİK VERİLER";
+  document.getElementById("hudName").innerText = `${isWadi ? "🏜️" : "🏞️"} ${rv.trName || "NEHİR"}`;
 
   if (rv.hasKnownMeta) {
     document.getElementById("hudInfo").innerHTML = `
-      <div class="source-pill pill-embedded">🟢 Gömülü Resmi Nehir Veritabanı • ${getNetworkModeShortTag()}</div>
+      <div class="source-pill pill-embedded">${isWadi ? "🟡 Gömülü Kurak Havza & Mevsimlik Vadi Veritabanı" : "🟢 Gömülü Resmi Nehir Veritabanı"} • ${getNetworkModeShortTag()}</div>
       <div class="hud-country-grid">
-        <div>💧 <b>Ortalama Debisi:</b> <span class="hud-route-kpi">${escapeHudHtml(rv.dischargeText || "Bilinmiyor")}</span></div>
+        <div>💧 <b>${isWadi ? "Akış Rejimi:" : "Ortalama Debisi:"}</b> <span class="hud-route-kpi">${escapeHudHtml(rv.dischargeText || "Bilinmiyor")}</span></div>
         <div>📏 <b>Toplam Uzunluğu:</b> ${escapeHudHtml(rv.lengthText)}</div>
         <div class="hud-grid-full">🌊 <b>Döküldüğü Havza:</b> ${escapeHudHtml(rv.outflowText)}</div>
         <div class="hud-grid-full">⛰️ <b>Doğduğu Kaynak:</b> ${escapeHudHtml(rv.sourceText)}</div>
         <div class="hud-grid-full">🌡️ <b>Havza Havası:</b> <span id="hudLiveWeatherVal" style="color:#7dd3fc;font-weight:800;">Ölçülüyor...</span></div>
         <div>🗺️ <b>Geçtiği Ülkeler:</b> ${escapeHudHtml(rv.countriesText)}</div>
-        <div>🌐 <b>Uluslararası Adı:</b> ${escapeHudHtml(rv.enName)} River</div>
+        <div>🌐 <b>Uluslararası Adı:</b> ${escapeHudHtml(rv.enName)}${intlSuffix}</div>
       </div>
     `;
     if (typeof updateHudLiveWeather === "function") updateHudLiveWeather(rv.geoCenter);
@@ -8588,29 +9021,52 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
     }
   }
 
-  // 5) Göller ve Nehirler (Tek toplu çizimle)
-  ctx.fillStyle = theme.lakeFill;
-  ctx.strokeStyle = theme.lakeStroke;
-  ctx.lineWidth = 0.45 / Math.pow(k, 0.85);
-  for (let i = 0; i < allLakeFeatures.length; i++) {
-    const lk = allLakeFeatures[i];
-    if (camVec && lk._vec3) {
-      const dot = camVec[0] * lk._vec3[0] + camVec[1] * lk._vec3[1] + camVec[2] * lk._vec3[2];
-      if (dot < (lk._cullDot ?? -2)) continue;
+  // 5) Göller ve Mevsimlik Tuz Gölleri / Şottlar
+  if (showLakes) {
+    ctx.fillStyle = theme.lakeFill;
+    ctx.strokeStyle = theme.lakeStroke;
+    ctx.lineWidth = 0.45 / Math.pow(k, 0.85);
+    for (let i = 0; i < allLakeFeatures.length; i++) {
+      const lk = allLakeFeatures[i];
+      if (lk.isSeasonalLake) continue;
+      if (camVec && lk._vec3) {
+        const dot = camVec[0] * lk._vec3[0] + camVec[1] * lk._vec3[1] + camVec[2] * lk._vec3[2];
+        if (dot < (lk._cullDot ?? -2)) continue;
+      }
+      ctx.beginPath();
+      cPath(lk);
+      ctx.fill();
+      ctx.stroke();
     }
-    ctx.beginPath();
-    cPath(lk);
-    ctx.fill();
-    ctx.stroke();
+    ctx.save();
+    ctx.globalAlpha = 0.74;
+    ctx.lineWidth = 0.58 / Math.pow(k, 0.85);
+    ctx.setLineDash([2.6 / Math.pow(k, 0.78), 1.8 / Math.pow(k, 0.78)]);
+    for (let i = 0; i < allLakeFeatures.length; i++) {
+      const lk = allLakeFeatures[i];
+      if (!lk.isSeasonalLake) continue;
+      if (camVec && lk._vec3) {
+        const dot = camVec[0] * lk._vec3[0] + camVec[1] * lk._vec3[1] + camVec[2] * lk._vec3[2];
+        if (dot < (lk._cullDot ?? -2)) continue;
+      }
+      ctx.beginPath();
+      cPath(lk);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   if (riverDisplayMode !== "off") {
     ctx.strokeStyle = theme.riverStroke;
     ctx.lineWidth = 0.85 / Math.pow(k, 0.72);
-    ctx.beginPath();
     const maxRank = morphState ? 4 : (k < 2.0 ? 4 : 6);
+
+    // 1) Daimi nehirler (kesintisiz düz mavi damar)
+    ctx.beginPath();
     for (let i = 0; i < allRiverFeatures.length; i++) {
       const rv = allRiverFeatures[i];
+      if (rv.isIntermittent) continue;
       if (rv.scalerank > maxRank && !(rv.hasKnownMeta && k >= 1.8)) continue;
       if (!morphState && !isRiverSegmentVisible(rv, k)) continue;
       if (camVec && rv._vec3) {
@@ -8620,6 +9076,25 @@ function renderFastGlobeCanvas(activeProj = projection3D, morphState = null) {
       cPath(rv);
     }
     ctx.stroke();
+
+    // 2) Mevsimlik çöl vadileri / Wadi (kesikli çizgi)
+    ctx.save();
+    ctx.setLineDash([4.2 / Math.pow(k, 0.72), 2.8 / Math.pow(k, 0.72)]);
+    ctx.globalAlpha = 0.86;
+    ctx.beginPath();
+    for (let i = 0; i < allRiverFeatures.length; i++) {
+      const rv = allRiverFeatures[i];
+      if (!rv.isIntermittent) continue;
+      if (rv.scalerank > maxRank && !(rv.hasKnownMeta && k >= 1.8)) continue;
+      if (!morphState && !isRiverSegmentVisible(rv, k)) continue;
+      if (camVec && rv._vec3) {
+        const dot = camVec[0] * rv._vec3[0] + camVec[1] * rv._vec3[1] + camVec[2] * rv._vec3[2];
+        if (dot < (rv._cullDot ?? -2)) continue;
+      }
+      cPath(rv);
+    }
+    ctx.stroke();
+    ctx.restore();
   }
 
   drawCanvasGraticuleExtras(ctx, cPath, activeProj, k, themeKey, morphState, camVec);
@@ -9286,13 +9761,13 @@ function refreshAllProjectedPositions(syncAllSubdivisions = false) {
           this.setAttribute("d", nextD);
         }
       });
-    }
 
-    if (syncAllSubdivisions) {
       riversGroup.selectAll("path.river-hit").each(function(d) {
         const nextD = d._cachedPath || "";
-        this._lastD = nextD;
-        this.setAttribute("d", nextD);
+        if (syncAllSubdivisions || this._lastD !== nextD) {
+          this._lastD = nextD;
+          this.setAttribute("d", nextD);
+        }
       });
     }
   }
@@ -9672,7 +10147,7 @@ function updateDynamicTypography() {
     syncUsStatesPathsAndLabels();
   }
 
-  const stateKey = `${k.toFixed(4)}|${isGlobeMode}|${isDraggingGlobe}|${statesActive}|${trActive}|${riverDisplayMode}|${seaDisplayMode}|${showCapitals}|${showMountains}|${showStraits}|${showAllMicroLabels}|${showDayNightTerminator}|${showCoordGrid}`;
+  const stateKey = `${k.toFixed(4)}|${isGlobeMode}|${isDraggingGlobe}|${statesActive}|${trActive}|${riverDisplayMode}|${seaDisplayMode}|${showCapitals}|${showMountains}|${showStraits}|${showAllMicroLabels}|${showLakes}|${showDayNightTerminator}|${showCoordGrid}`;
   const fullLayoutNeeded = (stateKey !== lastTypographyStateKey);
   lastTypographyStateKey = stateKey;
 
@@ -9722,14 +10197,16 @@ function updateDynamicTypography() {
         setInlineDisplay(this, vis ? "block" : "none");
       });
     }
-    lakeLabelsGroup.selectAll(".lake-label").each(function(d) {
-      let vis = (d._globeVis !== false);
-      if (vis) {
-        const screenPx = Math.min(d.maxFitFont, 11.0 / Math.pow(k, 0.72)) * k;
-        vis = screenPx >= 2.6;
-      }
-      setInlineDisplay(this, vis ? "block" : "none");
-    });
+    if (showLakes) {
+      lakeLabelsGroup.selectAll(".lake-label").each(function(d) {
+        let vis = (d._globeVis !== false);
+        if (vis) {
+          const screenPx = Math.min(d.maxFitFont, 11.0 / Math.pow(k, 0.72)) * k;
+          vis = screenPx >= 2.6;
+        }
+        setInlineDisplay(this, vis ? "block" : "none");
+      });
+    }
     const microLabelZoomOk = showAllMicroLabels && k >= 1.8;
   labelsGroup.selectAll(".micro-label").each(function(d) {
     setInlineDisplay(this, (microLabelZoomOk && d._globeVis !== false) ? "block" : "none");
@@ -9777,12 +10254,34 @@ function updateDynamicTypography() {
 
   riversGroup.style("display", riverDisplayMode === 'off' ? "none" : "block");
   if (riverDisplayMode !== 'off') {
+    if (isGlobeMode && !isDraggingGlobe) {
+      const camVec = getCameraVec3();
+      allRiverFeatures.forEach(rv => {
+        if (!isRiverSegmentVisible(rv, k)) return;
+        if (rv._pgKey === _pathGeomKey && rv._cachedPath) return;
+        if (rv._vec3) {
+          const dot = camVec[0] * rv._vec3[0] + camVec[1] * rv._vec3[1] + camVec[2] * rv._vec3[2];
+          if (dot < (rv._cullDot ?? -2)) return;
+        }
+        rv._cachedPath = pathGenerator(rv) || "";
+        rv._pgKey = _pathGeomKey;
+      });
+      riversGroup.selectAll("path.river-vein, path.river-casing, path.river-hit").each(function(d) {
+        if (d._cachedPath && this._lastD !== d._cachedPath) {
+          this._lastD = d._cachedPath;
+          this.setAttribute("d", d._cachedPath);
+        }
+      });
+    }
+
     riversGroup.selectAll("path.river-casing")
       .attr("stroke-width", d => calcRiverStrokeWidth(d, k) * 1.85)
       .style("display", d => (!isDraggingGlobe && isRiverSegmentVisible(d, k)) ? "block" : "none");
 
     riversGroup.selectAll("path.river-vein")
       .attr("stroke-width", d => calcRiverStrokeWidth(d, k))
+      .attr("stroke-dasharray", d => d.isIntermittent ? `${4.2 / Math.pow(k, 0.72)},${2.8 / Math.pow(k, 0.72)}` : null)
+      .attr("stroke-opacity", d => d.isIntermittent ? 0.86 : 1)
       .style("display", d => isRiverSegmentVisible(d, k) ? "block" : "none");
 
     riversGroup.selectAll("path.river-hit")
@@ -9809,7 +10308,9 @@ function updateDynamicTypography() {
   }
 
   lakesGroup.selectAll("path.lake-shape")
-    .attr("stroke-width", 0.45 / Math.pow(k, 0.85));
+    .attr("stroke-width", d => (d.isSeasonalLake ? 0.58 : 0.45) / Math.pow(k, 0.85))
+    .attr("stroke-dasharray", d => d.isSeasonalLake ? `${2.6 / Math.pow(k, 0.78)},${1.8 / Math.pow(k, 0.78)}` : null)
+    .attr("fill-opacity", d => d.isSeasonalLake ? 0.74 : 1);
 
   capitalsGroup.style("display", showCapitals ? "block" : "none");
   if (showCapitals) {
@@ -9886,21 +10387,25 @@ function updateDynamicTypography() {
       });
   }
 
+  if (lakesGroup) lakesGroup.style("display", showLakes ? null : "none");
+if (lakeLabelsGroup) lakeLabelsGroup.style("display", showLakes ? null : "none");
+
+if (showLakes) {
   lakeLabelsGroup.selectAll(".lake-label")
-    .attr("font-size", d => {
-      const fSize = Math.min(d.maxFitFont, 11.0 / Math.pow(k, 0.72));
-      return fSize + "px";
-    })
-    .attr("stroke-width", d => {
-      const fSize = Math.min(d.maxFitFont, 11.0 / Math.pow(k, 0.72));
-      return (fSize * STD_HALO_RATIO) + "px";
-    })
-    .style("display", d => {
-      if (isGlobeMode && d._globeVis === false) return "none";
-      const fSize = Math.min(d.maxFitFont, 11.0 / Math.pow(k, 0.72));
-      const screenPx = fSize * k;
-      return screenPx >= 2.6 ? "block" : "none";
-    });
+      .attr("font-size", d => {
+        const fSize = Math.min(d.maxFitFont, 15 / k);
+        return fSize + "px";
+      })
+      .attr("stroke-width", d => {
+        const fSize = Math.min(d.maxFitFont, 15 / k);
+        return (fSize * 0.20) + "px";
+      })
+      .style("display", d => {
+        const fSize = Math.min(d.maxFitFont, 15 / k);
+        const screenPx = fSize * k;
+        return screenPx >= 3.0 ? "block" : "none";
+      });
+}
 
 const microLabelZoomOk = showAllMicroLabels && k >= 1.8;
 const microFontPx = 13 / Math.pow(k, 0.85);
@@ -10054,6 +10559,7 @@ function loadAllMapData() {
   });
   _compiledLakeIndex = null;
 
+  // 1) TÜRKİYE ÖZEL GÖLLER KATMANI: 50m Natural Earth ölçeğinde yer almayan Türkiye gölleri
   const CUSTOM_TURKISH_LAKES = [
     { name: "Lake Beyşehir", coords: [[31.36, 37.90], [31.46, 37.93], [31.56, 37.88], [31.65, 37.82], [31.73, 37.74], [31.74, 37.65], [31.66, 37.60], [31.52, 37.59], [31.42, 37.67], [31.38, 37.78], [31.36, 37.90]] },
     { name: "Lake Eğirdir", coords: [[30.76, 38.28], [30.87, 38.28], [30.92, 38.20], [30.89, 38.10], [30.92, 38.01], [30.90, 37.89], [30.84, 37.84], [30.78, 37.90], [30.80, 38.02], [30.75, 38.14], [30.76, 38.28]] },
@@ -10069,6 +10575,59 @@ function loadAllMapData() {
     { name: "Lake Bafa", coords: [[27.38, 37.53], [27.49, 37.54], [27.56, 37.49], [27.53, 37.45], [27.42, 37.46], [27.38, 37.53]] },
     { name: "Lake Köyceğiz", coords: [[28.60, 36.96], [28.69, 36.97], [28.71, 36.89], [28.65, 36.84], [28.59, 36.88], [28.60, 36.96]] },
     { name: "Lake Sapanca", coords: [[30.14, 40.73], [30.25, 40.74], [30.32, 40.72], [30.30, 40.69], [30.18, 40.69], [30.14, 40.73]] }
+  ];
+
+  // 2) KÜRESEL & AFRİKA BÖLGESEL GÖLLER, TUZ GÖLLERİ (ŞOTT / SEBKHA / PAN) VE BARAJ GÖLLERİ KATMANI:
+  // 50m Natural Earth paketinde yer almayan Kuzey Afrika, Sahra, Sahel (Çad, Nijer) ve kıta geneli önemli göller
+  const CUSTOM_REGIONAL_WORLD_LAKES = [
+    // Cezayir ve Tunus Gölleri & Şottları
+    { name: "Chott Melrhir", isSeasonalLake: true, coords: [[5.88, 34.28], [6.05, 34.46], [6.36, 34.48], [6.65, 34.36], [6.68, 34.12], [6.42, 33.96], [6.08, 34.02], [5.88, 34.28]] },
+    { name: "Chott el Hodna", isSeasonalLake: true, coords: [[4.18, 35.44], [4.38, 35.55], [4.72, 35.54], [4.92, 35.42], [4.78, 35.29], [4.42, 35.28], [4.18, 35.44]] },
+    { name: "Chott Ech Chergui", isSeasonalLake: true, coords: [[0.05, 34.22], [0.38, 34.42], [0.78, 34.55], [1.05, 34.48], [0.85, 34.28], [0.42, 34.14], [0.05, 34.22]] },
+    { name: "Sebkha d'Oran", isSeasonalLake: true, coords: [[-1.02, 35.48], [-0.82, 35.60], [-0.58, 35.58], [-0.62, 35.46], [-0.88, 35.43], [-1.02, 35.48]] },
+    { name: "Chott el Djerid", isSeasonalLake: true, coords: [[7.78, 33.68], [8.05, 33.92], [8.55, 33.96], [9.12, 33.90], [9.22, 33.74], [8.75, 33.52], [8.22, 33.42], [7.85, 33.50], [7.78, 33.68]] },
+    { name: "Lake Ichkeul", coords: [[9.58, 37.17], [9.66, 37.21], [9.75, 37.18], [9.73, 37.12], [9.61, 37.12], [9.58, 37.17]] },
+
+    // Fas Baraj Gölleri
+    { name: "Al Wahda Reservoir", coords: [[-5.32, 34.62], [-5.18, 34.68], [-5.00, 34.64], [-5.04, 34.53], [-5.22, 34.52], [-5.32, 34.62]] },
+    { name: "Al Massira Reservoir", coords: [[-7.76, 32.50], [-7.62, 32.55], [-7.48, 32.49], [-7.52, 32.40], [-7.68, 32.41], [-7.76, 32.50]] },
+    { name: "Bin el Ouidane Reservoir", coords: [[-6.54, 32.12], [-6.42, 32.16], [-6.33, 32.11], [-6.38, 32.05], [-6.50, 32.06], [-6.54, 32.12]] },
+
+    // Libya Vaha & Çöküntü Gölleri
+    { name: "Ubari Lakes", coords: [[13.38, 26.82], [13.50, 26.87], [13.64, 26.83], [13.60, 26.74], [13.44, 26.75], [13.38, 26.82]] },
+    { name: "Wau an Namus Lakes", coords: [[17.66, 24.93], [17.76, 24.97], [17.86, 24.92], [17.83, 24.85], [17.70, 24.86], [17.66, 24.93]] },
+    { name: "Sabkhat Ghuzayyil", isSeasonalLake: true, coords: [[19.45, 29.88], [19.72, 29.98], [20.05, 29.92], [20.02, 29.76], [19.68, 29.74], [19.45, 29.88]] },
+
+    // Çad ve Nijer Gölleri
+    { name: "Lake Fitri", coords: [[17.34, 12.84], [17.48, 12.94], [17.68, 12.88], [17.66, 12.70], [17.45, 12.68], [17.34, 12.84]] },
+    { name: "Lake Iro", coords: [[19.32, 10.12], [19.42, 10.18], [19.52, 10.13], [19.50, 10.03], [19.36, 10.04], [19.32, 10.12]] },
+    { name: "Ounianga Lakes", coords: [[20.36, 19.08], [20.49, 19.14], [20.64, 19.09], [20.60, 18.99], [20.42, 19.00], [20.36, 19.08]] },
+    { name: "Lake Lere", coords: [[14.06, 9.66], [14.18, 9.71], [14.30, 9.66], [14.27, 9.58], [14.10, 9.59], [14.06, 9.66]] },
+    { name: "Lake Chad North Basin", isSeasonalLake: true, coords: [[13.45, 13.78], [13.68, 14.12], [14.08, 14.18], [14.28, 13.92], [14.15, 13.58], [13.72, 13.55], [13.45, 13.78]] },
+    { name: "Mare de Tabalak", coords: [[5.51, 15.10], [5.63, 15.16], [5.75, 15.11], [5.71, 15.02], [5.55, 15.03], [5.51, 15.10]] },
+    { name: "Lake Madarounfa", coords: [[7.05, 13.33], [7.15, 13.38], [7.25, 13.33], [7.22, 13.25], [7.08, 13.26], [7.05, 13.33]] },
+
+    // Moritanya, Senegal, Mali, Burkina Faso ve Fildişi Sahili Gölleri
+    { name: "Lake Rkiz", coords: [[-15.42, 16.84], [-15.25, 16.91], [-15.08, 16.86], [-15.12, 16.76], [-15.32, 16.75], [-15.42, 16.84]] },
+    { name: "Lac de Guiers", coords: [[-15.94, 16.42], [-15.82, 16.40], [-15.80, 16.12], [-15.90, 16.08], [-15.95, 16.26], [-15.94, 16.42]] },
+    { name: "Lake Debo", coords: [[-4.32, 15.33], [-4.14, 15.42], [-3.98, 15.34], [-4.02, 15.19], [-4.22, 15.20], [-4.32, 15.33]] },
+    { name: "Lake Faguibine", isSeasonalLake: true, coords: [[-4.18, 16.76], [-3.92, 16.86], [-3.62, 16.80], [-3.68, 16.66], [-4.02, 16.65], [-4.18, 16.76]] },
+    { name: "Manantali Reservoir", coords: [[-10.58, 13.18], [-10.40, 13.24], [-10.26, 13.10], [-10.32, 12.96], [-10.50, 13.00], [-10.58, 13.18]] },
+    { name: "Lake Bagre", coords: [[-0.72, 11.62], [-0.55, 11.66], [-0.45, 11.52], [-0.52, 11.44], [-0.68, 11.48], [-0.72, 11.62]] },
+    { name: "Lake Buyo", coords: [[-7.25, 6.52], [-7.05, 6.56], [-6.92, 6.36], [-6.98, 6.20], [-7.18, 6.26], [-7.25, 6.52]] },
+
+    // Mısır, Sudan, Güney Sudan, Cibuti, Etiyopya, Namibya, Botsvana, G. Afrika ve Madagaskar Gölleri
+    { name: "Lake Qarun", coords: [[30.42, 29.45], [30.62, 29.52], [30.84, 29.50], [30.82, 29.41], [30.56, 29.40], [30.42, 29.45]] },
+    { name: "Toshka Lakes", coords: [[30.28, 23.16], [30.58, 23.26], [30.92, 23.18], [30.88, 22.98], [30.48, 22.96], [30.28, 23.16]] },
+    { name: "Merowe Reservoir", coords: [[31.88, 18.68], [32.12, 18.96], [32.45, 19.12], [32.52, 19.02], [32.22, 18.80], [31.96, 18.60], [31.88, 18.68]] },
+    { name: "Roseires Reservoir", coords: [[34.30, 11.80], [34.48, 11.78], [34.55, 11.48], [34.40, 11.42], [34.28, 11.62], [34.30, 11.80]] },
+    { name: "Lake No", coords: [[30.32, 9.52], [30.46, 9.59], [30.60, 9.53], [30.56, 9.43], [30.38, 9.43], [30.32, 9.52]] },
+    { name: "Lake Assal", coords: [[42.33, 11.67], [42.42, 11.72], [42.51, 11.66], [42.48, 11.59], [42.36, 11.60], [42.33, 11.67]] },
+    { name: "Lake Abaya", coords: [[37.68, 6.58], [37.88, 6.60], [37.95, 6.32], [37.82, 6.05], [37.66, 6.08], [37.68, 6.58]] },
+    { name: "Etosha Pan", isSeasonalLake: true, coords: [[15.75, -18.68], [16.25, -18.56], [16.82, -18.66], [16.88, -18.92], [16.38, -19.04], [15.82, -18.96], [15.75, -18.68]] },
+    { name: "Makgadikgadi Pan", isSeasonalLake: true, coords: [[24.92, -20.52], [25.55, -20.38], [26.18, -20.55], [26.22, -20.98], [25.62, -21.08], [24.98, -20.92], [24.92, -20.52]] },
+    { name: "Gariep Reservoir", coords: [[25.48, -30.62], [25.68, -30.55], [25.90, -30.63], [25.85, -30.75], [25.56, -30.73], [25.48, -30.62]] },
+    { name: "Lake Alaotra", coords: [[48.42, -17.30], [48.58, -17.34], [48.56, -17.68], [48.40, -17.70], [48.38, -17.46], [48.42, -17.30]] }
   ];
 
   let _mapDataFetched = false;
@@ -10348,7 +10907,9 @@ function loadAllMapData() {
       rawLakes.map(lk => ((lk.properties && (lk.properties.name || lk.properties.NAME || lk.properties.name_en)) || "").toLowerCase())
     );
     CUSTOM_TURKISH_LAKES.forEach(trLk => {
-      if (!existingLakeNames.has(trLk.name.toLowerCase())) {
+      const lKey = trLk.name.toLowerCase();
+      if (!existingLakeNames.has(lKey)) {
+        existingLakeNames.add(lKey);
         rawLakes.push(ensureD3GeoWinding({
           type: "Feature",
           properties: { name: trLk.name, name_en: trLk.name, isCustomTrLake: true },
@@ -10356,29 +10917,51 @@ function loadAllMapData() {
         }));
       }
     });
+
+    CUSTOM_REGIONAL_WORLD_LAKES.forEach(regLk => {
+      const lKey = regLk.name.toLowerCase();
+      if (!existingLakeNames.has(lKey)) {
+        existingLakeNames.add(lKey);
+        rawLakes.push(ensureD3GeoWinding({
+          type: "Feature",
+          properties: {
+            name: regLk.name,
+            name_en: regLk.name,
+            isCustomRegionalLake: true,
+            isSeasonalLake: Boolean(regLk.isSeasonalLake)
+          },
+          geometry: { type: "Polygon", coordinates: [regLk.coords] }
+        }));
+      }
+    });
     allLakeFeatures = rawLakes;
 
+    // Baraj göllerinden ve doğal göllerden geçen nehirlerin (Nil, Volga, Dinyeper, Fırat, Angara, Kolumbiya, St. Lawrence vb.)
+    // ortasından kesik görünmemesi için "Lake Centerline" (göl içi nehir geçiş hatları) korunur.
     const rawRivers = (riversGeo.features || []).filter(rv => {
-      const fClass = (rv.properties && rv.properties.featurecla) || "";
-      return !fClass.toLowerCase().includes("lake centerline");
+      return Boolean(rv && rv.geometry && Array.isArray(rv.geometry.coordinates));
     });
 
     const existingRiverNames = new Set(
       rawRivers.map(r => ((r.properties && (r.properties.name || r.properties.name_en)) || "").toLowerCase())
     );
-    CUSTOM_TURKISH_RIVERS.forEach(trRv => {
-      if (!existingRiverNames.has(trRv.name.toLowerCase())) {
+    // Türkiye nehirlerini ve küresel bölgesel nehir/çöl vadilerini ayrı listelerden birleştirerek katmana ekle
+    [...CUSTOM_TURKISH_RIVERS, ...CUSTOM_REGIONAL_WORLD_RIVERS].forEach(customRv => {
+      const lowerKey = customRv.name.toLowerCase();
+      if (!existingRiverNames.has(lowerKey)) {
+        existingRiverNames.add(lowerKey);
         rawRivers.push({
           type: "Feature",
           properties: {
-            name: trRv.name,
-            featurecla: "River",
-            scalerank: trRv.scalerank,
-            strokeweig: trRv.strokeweig
+            name: customRv.name,
+            featurecla: customRv.isIntermittent ? "Wadi" : "River",
+            isIntermittent: Boolean(customRv.isIntermittent),
+            scalerank: customRv.scalerank,
+            strokeweig: customRv.strokeweig
           },
           geometry: {
             type: "LineString",
-            coordinates: trRv.coords
+            coordinates: customRv.coords
           }
         });
       }
@@ -10484,10 +11067,13 @@ function loadAllMapData() {
     });
 
     allLakeFeatures.forEach((lk) => {
-      const rawName = (lk.properties && (lk.properties.name || lk.properties.NAME || lk.properties.name_en)) || "";
+      const props = lk.properties || {};
+      const rawName = props.name || props.NAME || props.name_en || "";
+      const fClass = String(props.featurecla || "").toLowerCase();
       const lakeInfo = findLakeMetadata(rawName);
       lk.enName = rawName || "Lake";
       lk.hasKnownMeta = !!lakeInfo;
+      lk.isSeasonalLake = Boolean(props.isSeasonalLake || fClass.includes("alkaline") || fClass.includes("playa") || fClass.includes("intermittent"));
 
       if (lakeInfo) {
         lk.trName = lakeInfo.tr;
@@ -10502,21 +11088,33 @@ function loadAllMapData() {
         lk.trName = rawName ? (rawName.toLocaleUpperCase('tr-TR') + " GÖLÜ") : "DOĞAL GÖL";
       }
 
-      // Tüm gölleri Türkiye'nin 81 iliyle aynı oranla (4.2, 0.85, 0.56) boyutlandır
+      // Tüm gölleri Türkiye'nin 81 iliyle aynı oranla (4.2, 0.85, 0.56) boyutlandır; küçük vaha göllerinin yakınlaşınca okunabilmesini sağla
       const fit = computeGeometryFit(lk, lk.trName, 4.2, 0.85, 0.56);
       lk.centroid = fit.centroid;
-      lk.maxFitFont = fit.maxFitFont;
+      lk.maxFitFont = props.isCustomRegionalLake ? Math.max(0.28, fit.maxFitFont) : fit.maxFitFont;
     });
 
     const riverLabelTracker = new Map();
+    const riverMinRankByKey = new Map();
+    const riverKnownMetaByKey = new Map();
+
     allRiverFeatures.forEach((rv, idx) => {
       const props = rv.properties || {};
       const rawName = props.name || props.name_en || props.NAME || "";
+      const fClass = String(props.featurecla || "").toLowerCase();
+      rv.isLakeCenterline = fClass.includes("lake centerline");
+      rv.isIntermittent = Boolean(props.isIntermittent || fClass.includes("wadi") || fClass.includes("intermittent"));
+
       const riverInfo = findRiverMetadata(rawName, rv);
 
       rv.enName = rawName || "River";
       rv.scalerank = typeof props.scalerank === "number" ? props.scalerank : 6;
       rv.strokeweig = typeof props.strokeweig === "number" ? props.strokeweig : (rv.scalerank <= 3 ? 0.9 : 0.45);
+      // Moritanya - Senegal sınır çizgisiyle çakışan Senegal Nehri'ni sınır üstünde net görünür yap
+      if (normalizeRiverLookupKey(rawName) === "senegal") {
+        rv.scalerank = Math.min(rv.scalerank, 3);
+        rv.strokeweig = Math.max(rv.strokeweig, 0.88);
+      }
       rv.hasKnownMeta = !!riverInfo;
 
       if (riverInfo) {
@@ -10537,7 +11135,19 @@ function loadAllMapData() {
       rv.midpoint = computeLineMidpoint(rv);
       rv.pathLenEstimate = pathGenerator.measure(rv) || 0;
 
-      if (rv.hasKnownMeta && !isNaN(rv.midpoint[0]) && !isNaN(rv.midpoint[1])) {
+      // Aynı nehre ait parçaların (kollar, göl içi geçişler, orta segmentler) farklı scalerank yüzünden
+      // ortadan kesilmesini önlemek için nehrin en düşük (en görünür) scalerank değerini kaydet
+      if (rawName) {
+        const prevRank = riverMinRankByKey.get(rv.riverKey);
+        if (prevRank === undefined || rv.scalerank < prevRank) {
+          riverMinRankByKey.set(rv.riverKey, rv.scalerank);
+        }
+        if (rv.hasKnownMeta) {
+          riverKnownMetaByKey.set(rv.riverKey, true);
+        }
+      }
+
+      if (rv.hasKnownMeta && !rv.isLakeCenterline && !isNaN(rv.midpoint[0]) && !isNaN(rv.midpoint[1])) {
         const prev = riverLabelTracker.get(rv.trName);
         if (!prev || rv.pathLenEstimate > prev.pathLenEstimate) {
           riverLabelTracker.set(rv.trName, {
@@ -10552,6 +11162,76 @@ function loadAllMapData() {
         }
       }
     });
+
+    // 1. AŞAMA: Aynı isme sahip tüm nehir parçalarının scalerank ve hasKnownMeta bayraklarını eşitle
+    allRiverFeatures.forEach(rv => {
+      if (riverMinRankByKey.has(rv.riverKey)) {
+        rv.scalerank = riverMinRankByKey.get(rv.riverKey);
+      }
+      if (riverKnownMetaByKey.get(rv.riverKey)) {
+        rv.hasKnownMeta = true;
+      }
+    });
+
+    // 2. AŞAMA: İsimsiz "Lake Centerline" veya ara bağlantı parçalarının uç noktaları görünür bir nehre değiyorsa,
+    // nehrin ortasında kopukluk olmaması için o ara parçaya komşu nehrin görünürlük seviyesini (scalerank) aktar!
+    const getRiverEndpoints = (geom) => {
+      const ends = [];
+      if (!geom || !Array.isArray(geom.coordinates)) return ends;
+      if (geom.type === "LineString" && geom.coordinates.length >= 2) {
+        ends.push(geom.coordinates[0], geom.coordinates[geom.coordinates.length - 1]);
+      } else if (geom.type === "MultiLineString") {
+        geom.coordinates.forEach(line => {
+          if (Array.isArray(line) && line.length >= 2) {
+            ends.push(line[0], line[line.length - 1]);
+          }
+        });
+      }
+      return ends;
+    };
+
+    const allEndpointsPerRiver = allRiverFeatures.map(rv => getRiverEndpoints(rv.geometry));
+    for (let pass = 0; pass < 2; pass++) {
+      for (let i = 0; i < allRiverFeatures.length; i++) {
+        const rvA = allRiverFeatures[i];
+        if (!rvA.isLakeCenterline && rvA.enName !== "River" && rvA.scalerank <= 4) continue;
+        const endsA = allEndpointsPerRiver[i];
+        if (!endsA.length) continue;
+
+        for (let j = 0; j < allRiverFeatures.length; j++) {
+          if (i === j) continue;
+          const rvB = allRiverFeatures[j];
+          if (rvB.scalerank >= rvA.scalerank && !rvB.hasKnownMeta) continue;
+          const endsB = allEndpointsPerRiver[j];
+          let connected = false;
+          for (let a = 0; a < endsA.length && !connected; a++) {
+            for (let b = 0; b < endsB.length; b++) {
+              if (Math.hypot(endsA[a][0] - endsB[b][0], endsA[a][1] - endsB[b][1]) < 0.35) {
+                connected = true;
+                break;
+              }
+            }
+          }
+          if (connected) {
+            if (rvB.scalerank < rvA.scalerank) rvA.scalerank = rvB.scalerank;
+            if (rvB.hasKnownMeta) {
+              rvA.hasKnownMeta = true;
+              if (rvA.enName === "River") {
+                rvA.trName = rvB.trName;
+                rvA.enName = rvB.enName;
+                rvA.riverKey = rvB.riverKey;
+                rvA.dischargeText = rvB.dischargeText;
+                rvA.lengthText = rvB.lengthText;
+                rvA.outflowText = rvB.outflowText;
+                rvA.sourceText = rvB.sourceText;
+                rvA.countriesText = rvB.countriesText;
+              }
+            }
+          }
+        }
+      }
+    }
+
     uniqueRiverLabels = Array.from(riverLabelTracker.values());
 
     TURKEY_MOUNTAINS.forEach(m => uniqueNames.add(`${m.name} (${m.searchTag || "TÜRKİYE DAĞI"})`));
@@ -10817,6 +11497,12 @@ function flashRiverFeature(rv, customPoint = null) {
 }
 
 function flashLakeFeature(lk) {
+  if (!showLakes) {
+    showLakes = true;
+    updateLakesButtonUI();
+    lastTypographyStateKey = "";
+    updateDynamicTypography();
+  }
   const targetPaths = lakesGroup.selectAll("path.lake-shape").filter(item => item.trName === lk.trName);
   const theme = THEMES[document.getElementById("themeSelect").value];
   const baseStrokeW = 0.45 / Math.pow(currentZoomK, 0.85);
@@ -11101,8 +11787,8 @@ function renderMap() {
     })
     .append("title")
     .text(d => d.hasKnownMeta
-      ? `🏞️ ${d.trName}\n💧 Ortalama Debi: ${d.dischargeText}\n📏 Uzunluk: ${d.lengthText}\n🌊 Döküldüğü Yer: ${d.outflowText}`
-      : `🏞️ ${d.trName} (${d.enName})`
+      ? `${d.isIntermittent ? "🏜️" : "🏞️"} ${d.trName}\n💧 ${d.isIntermittent ? "Akış Rejimi" : "Ortalama Debi"}: ${d.dischargeText}\n📏 Uzunluk: ${d.lengthText}\n🌊 Döküldüğü Yer: ${d.outflowText}`
+      : `${d.isIntermittent ? "🏜️" : "🏞️"} ${d.trName} (${d.enName})`
     );
 
   lakesGroup.selectAll("path.lake-shape")
@@ -11434,7 +12120,8 @@ function renderMap() {
   lastTypographyStateKey = "";
   updateDynamicTypography();
   labelsGroup.style("display", "block");
-  lakeLabelsGroup.style("display", "block");
+  lakesGroup.style("display", showLakes ? null : "none");
+  lakeLabelsGroup.style("display", showLakes ? "block" : "none");
   updateDayNightTerminator();
   startTerminatorAutoUpdate();
 }
@@ -12986,6 +13673,10 @@ function toggleRiversMode() {
   else if (riverDisplayMode === 'always') riverDisplayMode = 'off';
   else riverDisplayMode = 'auto';
   updateRiverButtonUI();
+  if (riverDisplayMode !== 'off') {
+    refreshAllProjectedPositions(false);
+  }
+  lastTypographyStateKey = "";
   updateDynamicTypography();
 }
 
@@ -13068,13 +13759,35 @@ function toggleUsStatesMode() {
 }
 
 function toggleAllLabels() {
-  showAllMicroLabels = !showAllMicroLabels;
-  const btn = document.getElementById("btnMicroToggle");
-  if (btn) {
-    btn.classList.toggle("active", showAllMicroLabels);
-    btn.innerText = showAllMicroLabels ? "🔎 Mikro Adalar: Açık" : "🔎 Mikro Adalar: Kapalı";
-  }
-  updateDynamicTypography();
+    showAllMicroLabels = !showAllMicroLabels;
+    const btn = document.getElementById("btnMicroToggle");
+    if (btn) {
+        btn.classList.toggle("active", showAllMicroLabels);
+        btn.innerHTML = showAllMicroLabels ? "🔎 Mikro Ada: Açık" : "🔎 Mikro Ada: Kapalı";
+    }
+    updateDynamicTypography();
+}
+
+function updateLakesButtonUI() {
+    const btn = document.getElementById("btnLakesToggle");
+    if (btn) {
+        btn.classList.toggle("active", showLakes);
+        btn.innerHTML = showLakes ? "💧 Göller: Açık" : "💧 Göller: Kapalı";
+    }
+    if (typeof lakesGroup !== "undefined" && lakesGroup) {
+        lakesGroup.style("display", showLakes ? null : "none");
+    }
+    if (typeof lakeLabelsGroup !== "undefined" && lakeLabelsGroup) {
+        lakeLabelsGroup.style("display", showLakes ? null : "none");
+    }
+}
+
+function toggleLakes() {
+    showLakes = !showLakes;
+    updateLakesButtonUI();
+    lastTypographyStateKey = "";
+    updateDynamicTypography();
+    if (isCanvasMotionActive) renderFastGlobeCanvas(projection3D);
 }
 
 const searchInputEl = document.getElementById("searchInput");
@@ -15528,7 +16241,8 @@ function startGeoQuiz(mode) {
       river: riverDisplayMode,
       capitals: showCapitals,
       micro: showAllMicroLabels,
-      mountains: showMountains
+      mountains: showMountains,
+      lakes: showLakes
     };
   }
   setTrDisplayMode("off");
@@ -15536,14 +16250,22 @@ function startGeoQuiz(mode) {
   riverDisplayMode = "off";
   if (typeof ruRegionDisplayMode !== "undefined") ruRegionDisplayMode = "off";
   showCapitals = false;
-  showAllMicroLabels = false;
-  showMountains = false;
+showAllMicroLabels = false;
+showMountains = false;
+showLakes = false;
 
-  updateTrButtonUI();
-  updateStateButtonUI();
-  updateRiverButtonUI();
-  updateCapitalsButtonUI();
-  updateMountainsButtonUI();
+const microBtn = document.getElementById("btnMicroToggle");
+if (microBtn) {
+  microBtn.classList.remove("active");
+  microBtn.innerHTML = "🔎 Mikro Ada: Kapalı";
+}
+
+updateTrButtonUI();
+updateStateButtonUI();
+updateRiverButtonUI();
+updateCapitalsButtonUI();
+updateMountainsButtonUI();
+updateLakesButtonUI();
   if (typeof updateRuButtonUI === "function") updateRuButtonUI();
 
   const shuffled = pool.slice();
@@ -15612,9 +16334,10 @@ function exitGeoQuiz() {
     usStateDisplayMode = quizState.savedLayers.us;
     riverDisplayMode = quizState.savedLayers.river || "off";
     if (typeof ruRegionDisplayMode !== "undefined") ruRegionDisplayMode = quizState.savedLayers.ru;
-    showCapitals = quizState.savedLayers.capitals ?? true;
-    showAllMicroLabels = quizState.savedLayers.micro ?? true;
-    showMountains = quizState.savedLayers.mountains ?? true;
+    showCapitals = quizState.savedLayers.capitals ?? false;
+    showAllMicroLabels = quizState.savedLayers.micro ?? false;
+    showMountains = quizState.savedLayers.mountains ?? false;
+    showLakes = quizState.savedLayers.lakes ?? false;
     quizState.savedLayers = null;
     
     updateTrButtonUI();
@@ -15622,6 +16345,7 @@ function exitGeoQuiz() {
     updateRiverButtonUI();
     updateCapitalsButtonUI();
     updateMountainsButtonUI();
+    updateLakesButtonUI();
     if (typeof updateRuButtonUI === "function") updateRuButtonUI();
   }
 
