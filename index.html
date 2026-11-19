@@ -28,6 +28,7 @@
     <meta name="twitter:image" content="https://secovvv.github.io/beyazkucuk.jpg">
 
     <meta name="theme-color" content="#00ffcc">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Google Botları İçin Yapılandırılmış Veri (Schema.org JSON-LD) -->
@@ -89,7 +90,7 @@
             --primary-color: #00ffcc; /* Neon siberpunk yeşili/mavisi */
             --primary-glow: rgba(0, 255, 204, 0.5);
             --bg-dark: #050505;
-            --card-bg: rgba(22, 22, 22, 0.7);
+            --card-bg: rgba(18, 20, 26, 0.92);
             --text-gray: #a0a0b0;
             --python-color: #3776ab;
             --html-color: #e34c26;
@@ -102,6 +103,11 @@
             box-sizing: border-box;
         }
 
+        html {
+            background-color: #050505;
+            overflow-x: clip;
+        }
+
         body { 
             font-family: 'Inter', 'Segoe UI', sans-serif; 
             margin: 0;
@@ -111,30 +117,47 @@
             align-items: center;
             min-height: 100vh;
             color: #ffffff; 
-            /* Hareketli Arka Plan */
-            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 100%);
-            background-size: 200% 200%;
-            animation: gradientMove 15s ease infinite;
-            overflow-x: hidden;
+            background: transparent;
+            overflow-x: clip;
+        }
+
+        /* Hareketli Lacivert/Koyu Arka Plan (150% katman, harelenme yok, GPU Transform ile repaint yapmaz) */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -25%;
+            left: -25%;
+            width: 150%;
+            height: 150%;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #050505 70%);
+            z-index: -2;
+            pointer-events: none;
+            will-change: transform;
+            animation: gradientMoveGPU 20s ease-in-out infinite;
         }
 
         /* Arka plan ızgara (Grid) deseni */
         body::before {
             content: '';
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
             z-index: -1;
             pointer-events: none;
+            transform: translateZ(0);
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes gradientMoveGPU {
+            0%   { transform: translate3d(-6%, 0, 0); }
+            50%  { transform: translate3d(6%, 0, 0); }
+            100% { transform: translate3d(-6%, 0, 0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            body::after { animation: none; }
         }
 
         /* Özel Kaydırma Çubuğu */
@@ -166,6 +189,7 @@
             height: 100vh;
             pointer-events: none;
             z-index: 9992;
+            display: none;
         }
 
         #heartCanvas {
@@ -184,9 +208,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            background: rgba(10, 14, 18, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(10, 14, 18, 0.94);
             padding: 8px 18px;
             margin-bottom: 24px;
             border-radius: 30px;
@@ -456,7 +478,7 @@
         }
 
         .filter-btn {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(20, 24, 34, 0.85);
             border: 1px solid var(--glass-border);
             color: #fff;
             padding: 10px 24px;
@@ -465,8 +487,7 @@
             font-family: inherit;
             font-weight: 600;
             letter-spacing: 1px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
 
         .filter-btn:hover, .filter-btn.active {
@@ -495,9 +516,8 @@
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            contain: layout style paint;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             opacity: 0;
             transform: translateY(30px);
         }
@@ -622,12 +642,11 @@
             width: 100%;
             max-width: 920px;
             margin-top: 55px;
-            background: rgba(16, 20, 28, 0.82);
+            background: rgba(14, 18, 26, 0.94);
             border: 1px solid rgba(0, 255, 204, 0.35);
             border-radius: 24px;
             padding: 28px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            contain: layout style paint;
             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 204, 0.15);
         }
 
@@ -780,15 +799,15 @@
            SEO & ADSENSE ZENGİN İÇERİK REHBER BLOĞU (SİBERPUNK UYUMLU)
            ========================================================================== */
         .seo-guide-section {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 700px;
             width: 100%;
             max-width: 920px;
             margin-top: 40px;
-            background: rgba(14, 18, 26, 0.72);
+            background: rgba(14, 18, 26, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
             padding: 32px;
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
             color: #cbd5e1;
             line-height: 1.75;
         }
@@ -847,9 +866,8 @@
             color: #555;
             font-size: 0.9rem;
             letter-spacing: 1px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(5, 7, 11, 0.92);
             border-top: 1px solid #111;
-            backdrop-filter: blur(5px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -910,8 +928,7 @@
             font-family: inherit;
             font-weight: 700;
             letter-spacing: 1px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -929,22 +946,25 @@
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.78);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.86);
             z-index: 10005;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.25s ease, visibility 0s linear 0.25s;
             padding: 20px;
         }
 
         .contact-modal-overlay.open {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
+            transition-delay: 0s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .contact-modal-card {
@@ -1091,8 +1111,7 @@
             font-weight: 700;
             letter-spacing: 1px;
             text-decoration: none;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -1458,13 +1477,13 @@
         });
 
         // --- MOUSE EFEKT MOTORU ---
+        const fxCanvasContainer = document.getElementById('fxCanvasContainer');
         const canvas = document.getElementById('heartCanvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
         let fxEnabled = false;
+        let spritesBuilt = false;
+        let fxAnimationId = null;
         let currentShapeMode = 'letterS';
         let lastMatrixSpawnX = null;
         let lastMatrixSpawnY = null;
@@ -1500,11 +1519,25 @@
             powerLabel.textContent = fxEnabled ? '⏻ Açık' : '⏻ Kapalı';
             fxControls.classList.toggle('disabled', !fxEnabled);
 
-            if (!fxEnabled) {
+            if (fxEnabled) {
+                if (!spritesBuilt) {
+                    buildSpriteCache();
+                    spritesBuilt = true;
+                }
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                fxCanvasContainer.style.display = 'block';
+                ensureFxLoop();
+            } else {
+                if (fxAnimationId !== null) {
+                    cancelAnimationFrame(fxAnimationId);
+                    fxAnimationId = null;
+                }
                 particles.length = 0;
                 matrixStreams.length = 0;
                 matrixShockwaves.length = 0;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                fxCanvasContainer.style.display = 'none';
             }
         }
 
@@ -1801,8 +1834,6 @@
             }
         }
 
-        buildSpriteCache();
-
         function getRandomSprite(mode) {
             const list = spriteCache[mode] || spriteCache.heart;
             return list[Math.floor(Math.random() * list.length)];
@@ -2009,6 +2040,7 @@
 
         function createParticles(x, y, count, isBurst = false) {
             if (!fxEnabled) return;
+            ensureFxLoop();
 
             if (currentShapeMode === 'matrix') {
                 if (isBurst) {
@@ -2061,44 +2093,56 @@
             }
         }
 
+        function ensureFxLoop() {
+            if (fxEnabled && !document.hidden && fxAnimationId === null) {
+                fxAnimationId = requestAnimationFrame(animateParticles);
+            }
+        }
+
         function animateParticles() {
+            fxAnimationId = null;
+            if (!fxEnabled) return;
+
             ctx.globalCompositeOperation = 'source-over';
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (fxEnabled) {
-                for (let i = 0; i < matrixStreams.length; i++) {
-                    const stream = matrixStreams[i];
-                    stream.update();
-                    stream.draw();
-                    if (stream.lifetime <= 0) {
-                        matrixStreams[i] = matrixStreams[matrixStreams.length - 1];
-                        matrixStreams.pop();
-                        i--;
-                    }
-                }
-
-                for (let i = 0; i < matrixShockwaves.length; i++) {
-                    const sw = matrixShockwaves[i];
-                    sw.update();
-                    sw.draw();
-                    if (sw.alpha <= 0) {
-                        matrixShockwaves.splice(i, 1);
-                        i--;
-                    }
-                }
-
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    p.update();
-                    p.draw();
-                    if (p.lifetime <= 0) {
-                        particles[i] = particles[particles.length - 1];
-                        particles.pop();
-                        i--;
-                    }
+            for (let i = 0; i < matrixStreams.length; i++) {
+                const stream = matrixStreams[i];
+                stream.update();
+                stream.draw();
+                if (stream.lifetime <= 0) {
+                    matrixStreams[i] = matrixStreams[matrixStreams.length - 1];
+                    matrixStreams.pop();
+                    i--;
                 }
             }
-            requestAnimationFrame(animateParticles);
+
+            for (let i = 0; i < matrixShockwaves.length; i++) {
+                const sw = matrixShockwaves[i];
+                sw.update();
+                sw.draw();
+                if (sw.alpha <= 0) {
+                    matrixShockwaves.splice(i, 1);
+                    i--;
+                }
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.update();
+                p.draw();
+                if (p.lifetime <= 0) {
+                    particles[i] = particles[particles.length - 1];
+                    particles.pop();
+                    i--;
+                }
+            }
+
+            // Çizilecek parçacık varsa ve sekme görünürse devam et; yoksa döngü uyur (0% CPU/GPU)
+            if (fxEnabled && !document.hidden &&
+                (particles.length || matrixStreams.length || matrixShockwaves.length)) {
+                ensureFxLoop();
+            }
         }
 
         window.addEventListener('mousedown', (event) => {
@@ -2133,10 +2177,17 @@
             }
         }, { passive: true });
 
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
+            if (!fxEnabled) return;
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (fxEnabled) {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+            }, 120);
+        }, { passive: true });
 
         // --- SİBERPUNK İLETİŞİM PANELİ VE GOOGLE SCRIPT GÖNDERİMİ ---
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXtJ9GC5n95ZZ7J1m_r3YWlqUmXtA_Xw100-2AB1qC7TdZ26s0afpBKU4E31Szh6eV/exec";
@@ -2395,6 +2446,9 @@
                 document.title = "⚡ Evren Seni Bekliyor... | SECOVVV";
             } else {
                 document.title = "🚀 Hoş Geldin! | SECOVVV";
+                if (fxEnabled && (particles.length || matrixStreams.length || matrixShockwaves.length)) {
+                    ensureFxLoop();
+                }
                 setTimeout(() => {
                     if (!document.hidden) document.title = originalPageTitle;
                 }, 1800);
@@ -2461,7 +2515,6 @@
             });
         })();
 
-        animateParticles();
         initSecovvvAnalytics();
     </script>
 </body>
