@@ -1140,6 +1140,188 @@
             border-color: #34d399;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(16, 185, 129, 0.35);
         }
+
+        /* --- GİZLİ GEÇİT ŞİFRE PANELİ (SİBERPUNK HUD MODAL) --- */
+        .secret-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(2, 4, 8, 0.88);
+            z-index: 10010;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+            padding: 20px;
+        }
+
+        .secret-modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition-delay: 0s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .secret-modal-card {
+            background: rgba(12, 15, 22, 0.97);
+            border: 1.5px solid rgba(255, 215, 0, 0.55);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 360px;
+            padding: 26px 24px 22px 24px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.92), 0 0 28px rgba(255, 215, 0, 0.2);
+            transform: translateY(18px) scale(0.95);
+            transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            text-align: center;
+            font-family: 'Courier New', Consolas, monospace;
+        }
+
+        .secret-modal-overlay.open .secret-modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .secret-modal-card.shake {
+            animation: gateShake 0.38s ease;
+            border-color: rgba(255, 51, 85, 0.85);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.92), 0 0 26px rgba(255, 51, 85, 0.35);
+        }
+
+        .secret-modal-card.granted {
+            border-color: #00ffcc;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.92), 0 0 32px rgba(0, 255, 204, 0.45);
+        }
+
+        @keyframes gateShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        .secret-gate-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+        }
+
+        .secret-gate-title {
+            margin: 0 0 6px 0;
+            font-size: 1.22rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        .secret-gate-sub {
+            margin: 0 0 16px 0;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        .secret-input-wrap {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .secret-pass-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 215, 0, 0.38);
+            border-radius: 12px;
+            padding: 12px 42px 12px 16px;
+            color: #00ffcc;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 1.25rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .secret-pass-input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.25);
+        }
+
+        .secret-pass-input::placeholder {
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .secret-eye-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .secret-eye-btn:hover { color: #ffd700; }
+
+        .secret-status-msg {
+            min-height: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            margin-bottom: 12px;
+            color: #94a3b8;
+        }
+
+        .secret-status-msg.error { color: #ff4d6d; }
+        .secret-status-msg.success { color: #00ffcc; text-shadow: 0 0 10px rgba(0, 255, 204, 0.5); }
+
+        .secret-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #050505;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.92rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.28);
+        }
+
+        .secret-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 26px rgba(255, 215, 0, 0.55);
+        }
+
+        .secret-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -1435,6 +1617,30 @@
 
                 <button type="button" id="cyberSubmitBtn" class="cyber-submit-btn" onclick="sendCyberContactForm(event)">
                     <i class="fa-solid fa-paper-plane"></i> Gönder
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- GİZLİ GEÇİT ŞİFRE DOĞRULAMA PANELİ -->
+    <div class="secret-modal-overlay" id="secretModalOverlay" aria-hidden="true">
+        <div class="secret-modal-card" id="secretModalCard">
+            <button type="button" class="modal-close-btn" id="secretModalCloseBtn" title="Kapat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="secret-gate-badge"><i class="fa-solid fa-shield-halved"></i> SECOVVV GATE</div>
+            <h2 class="secret-gate-title">ERİŞİM DOĞRULAMA</h2>
+            <p class="secret-gate-sub">Gizli geçidi açmak için güvenlik kodunu girin.</p>
+            <form id="secretGateForm" autocomplete="off">
+                <div class="secret-input-wrap">
+                    <input type="password" id="secretPassInput" class="secret-pass-input" inputmode="numeric" maxlength="16" placeholder="KODU GİRİN" autocomplete="new-password" required>
+                    <button type="button" id="secretEyeBtn" class="secret-eye-btn" title="Göster / Gizle" aria-label="Şifreyi Göster veya Gizle">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                <div id="secretStatusMsg" class="secret-status-msg"></div>
+                <button type="submit" id="secretSubmitBtn" class="secret-submit-btn">
+                    <i class="fa-solid fa-unlock-keyhole"></i> GEÇİDİ AÇ
                 </button>
             </form>
         </div>
@@ -2147,7 +2353,7 @@
 
         window.addEventListener('mousedown', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .cyber-analytics-section')) return;
+            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .secret-modal-card, .cyber-analytics-section')) return;
             if (event.button === 0) {
                 createParticles(event.clientX, event.clientY, 26, true);
             }
@@ -2155,13 +2361,13 @@
 
         window.addEventListener('mousemove', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
+            if (event.target.closest('.top-ui-bar, .contact-modal-card, .secret-modal-card')) return;
             createParticles(event.clientX, event.clientY, 2, false);
         });
 
         window.addEventListener('touchstart', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .cyber-analytics-section')) return;
+            if (event.target.closest('.top-ui-bar, .btn, .filter-btn, .contact-trigger-btn, .contact-modal-card, .secret-modal-card, .cyber-analytics-section')) return;
             const touch = event.touches[0];
             if (touch) {
                 createParticles(touch.clientX, touch.clientY, 22, true);
@@ -2170,7 +2376,7 @@
 
         window.addEventListener('touchmove', (event) => {
             if (!fxEnabled) return;
-            if (event.target.closest('.top-ui-bar, .contact-modal-card')) return;
+            if (event.target.closest('.top-ui-bar, .contact-modal-card, .secret-modal-card')) return;
             const touch = event.touches[0];
             if (touch) {
                 createParticles(touch.clientX, touch.clientY, 2, false);
@@ -2455,25 +2661,278 @@
             }
         });
 
-        // --- 3. SİNEMATİK GİZLİ GEÇİT (S HARFİNE 7 TIKLAMA + BOŞLUĞA TIKLAYINCA SIFIRLAMA) ---
+        // --- 3. SİNEMATİK GİZLİ GEÇİT (S HARFİNE 7 TIKLAMA + SHA-256 ŞİFRE & ŞİFRELİ ROTA) ---
         (function initSecretPassage() {
             const secretS = document.getElementById('secretS');
-            if (!secretS) return;
+            const overlay = document.getElementById('secretModalOverlay');
+            const card = document.getElementById('secretModalCard');
+            const form = document.getElementById('secretGateForm');
+            const input = document.getElementById('secretPassInput');
+            const statusMsg = document.getElementById('secretStatusMsg');
+            const submitBtn = document.getElementById('secretSubmitBtn');
+            const closeBtn = document.getElementById('secretModalCloseBtn');
+            const eyeBtn = document.getElementById('secretEyeBtn');
+            if (!secretS || !overlay || !form || !input) return;
+
+            // Tuzlu + 2048 turlu SHA-256 doğrulama özeti ve şifreyle XOR-şifrelenmiş hedef rota
+            const GATE_SALT = "s3c0vvv::gate_v4#9xK";
+            const WARP_SALT = "s3c0vvv::warp_k7#2mQ";
+            const GATE_HASH = "5017016a9ba41e6800d3cac3bf258fbc6a8c9bc041129fb35f5be9339a1cf10a";
+            const WARP_LOAD = "01d832874380979fe98ae8bd2d8c02180f9129f7919d73d04e6b737afa865b7294c886";
+
+            // Yerel file:// ve HTTPS ortamlarında birebir çalışan standart SHA-256 motoru
+            const SHA_K = [
+                0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+                0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+                0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+                0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+                0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+                0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+                0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+                0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+            ];
+            const encoder = new TextEncoder();
+            const decoder = new TextDecoder();
+
+            function sha256Hex(str) {
+                const raw = encoder.encode(str);
+                const bitLen = raw.length * 8;
+                const paddedLen = Math.ceil((raw.length + 9) / 64) * 64;
+                const data = new Uint8Array(paddedLen);
+                data.set(raw);
+                data[raw.length] = 0x80;
+
+                const hi = Math.floor(bitLen / 0x100000000) >>> 0;
+                const lo = bitLen >>> 0;
+                data[paddedLen - 8] = (hi >>> 24) & 0xff;
+                data[paddedLen - 7] = (hi >>> 16) & 0xff;
+                data[paddedLen - 6] = (hi >>> 8) & 0xff;
+                data[paddedLen - 5] = hi & 0xff;
+                data[paddedLen - 4] = (lo >>> 24) & 0xff;
+                data[paddedLen - 3] = (lo >>> 16) & 0xff;
+                data[paddedLen - 2] = (lo >>> 8) & 0xff;
+                data[paddedLen - 1] = lo & 0xff;
+
+                let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a;
+                let h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
+                const W = new Uint32Array(64);
+
+                for (let offset = 0; offset < paddedLen; offset += 64) {
+                    for (let i = 0; i < 16; i++) {
+                        const j = offset + i * 4;
+                        W[i] = ((data[j] << 24) | (data[j + 1] << 16) | (data[j + 2] << 8) | data[j + 3]) >>> 0;
+                    }
+                    for (let i = 16; i < 64; i++) {
+                        const w15 = W[i - 15], w2 = W[i - 2];
+                        const s0 = ((w15 >>> 7) | (w15 << 25)) ^ ((w15 >>> 18) | (w15 << 14)) ^ (w15 >>> 3);
+                        const s1 = ((w2 >>> 17) | (w2 << 15)) ^ ((w2 >>> 19) | (w2 << 13)) ^ (w2 >>> 10);
+                        W[i] = (W[i - 16] + s0 + W[i - 7] + s1) >>> 0;
+                    }
+
+                    let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
+                    for (let i = 0; i < 64; i++) {
+                        const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+                        const ch = (e & f) ^ (~e & g);
+                        const temp1 = (h + S1 + ch + SHA_K[i] + W[i]) >>> 0;
+                        const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+                        const maj = (a & b) ^ (a & c) ^ (b & c);
+                        const temp2 = (S0 + maj) >>> 0;
+
+                        h = g; g = f; f = e;
+                        e = (d + temp1) >>> 0;
+                        d = c; c = b; b = a;
+                        a = (temp1 + temp2) >>> 0;
+                    }
+
+                    h0 = (h0 + a) >>> 0; h1 = (h1 + b) >>> 0; h2 = (h2 + c) >>> 0; h3 = (h3 + d) >>> 0;
+                    h4 = (h4 + e) >>> 0; h5 = (h5 + f) >>> 0; h6 = (h6 + g) >>> 0; h7 = (h7 + h) >>> 0;
+                }
+
+                return [h0, h1, h2, h3, h4, h5, h6, h7]
+                    .map(v => (v >>> 0).toString(16).padStart(8, '0'))
+                    .join('');
+            }
+
+            function stretchHash(secret, salt, rounds) {
+                let h = sha256Hex(salt + ":" + secret);
+                for (let i = 0; i < rounds; i++) {
+                    h = sha256Hex(h + ":" + salt);
+                }
+                return h;
+            }
+
+            function safeEqual(a, b) {
+                if (a.length !== b.length) return false;
+                let diff = 0;
+                for (let i = 0; i < a.length; i++) {
+                    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+                }
+                return diff === 0;
+            }
+
+            function hexToBytes(hex) {
+                const out = new Uint8Array(hex.length / 2);
+                for (let i = 0; i < out.length; i++) {
+                    out[i] = parseInt(hex.substr(i * 2, 2), 16);
+                }
+                return out;
+            }
+
+            function unlockRoute(secret) {
+                const k1 = stretchHash(secret, WARP_SALT, 1024);
+                const k2 = sha256Hex(k1 + ":ext");
+                const keyBytes = hexToBytes(k1 + k2);
+                const cipherBytes = hexToBytes(WARP_LOAD);
+                const plain = new Uint8Array(cipherBytes.length);
+                for (let i = 0; i < cipherBytes.length; i++) {
+                    plain[i] = cipherBytes[i] ^ keyBytes[i];
+                }
+                return decoder.decode(plain);
+            }
+
             let clickCount = 0;
             let resetTimer = null;
             let isTeleporting = false;
+            let isModalOpen = false;
+            let failedAttempts = 0;
+            let lockUntil = 0;
+            let lockInterval = null;
+            let lastTriggerX = window.innerWidth / 2;
+            let lastTriggerY = window.innerHeight / 3;
 
             secretS.style.display = 'inline-block';
             secretS.style.transition = 'all 0.25s ease';
 
             function resetSecretState() {
-                if (isTeleporting || clickCount === 0) return;
+                if (isTeleporting || isModalOpen || clickCount === 0) return;
                 clickCount = 0;
                 clearTimeout(resetTimer);
                 secretS.style.textShadow = 'none';
                 secretS.style.color = '#fff';
                 secretS.style.transform = 'scale(1)';
             }
+
+            function openSecretModal() {
+                isModalOpen = true;
+                overlay.classList.add('open');
+                overlay.setAttribute('aria-hidden', 'false');
+                card.classList.remove('shake', 'granted');
+                input.value = '';
+                input.type = 'password';
+                eyeBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                if (Date.now() < lockUntil) {
+                    updateLockUI();
+                } else {
+                    statusMsg.textContent = '';
+                    statusMsg.className = 'secret-status-msg';
+                    input.disabled = false;
+                    submitBtn.disabled = false;
+                    setTimeout(() => input.focus(), 60);
+                }
+            }
+
+            function closeSecretModal() {
+                if (isTeleporting) return;
+                isModalOpen = false;
+                overlay.classList.remove('open');
+                overlay.setAttribute('aria-hidden', 'true');
+                input.value = '';
+                clickCount = 0;
+                clearTimeout(resetTimer);
+                secretS.style.textShadow = 'none';
+                secretS.style.color = '#fff';
+                secretS.style.transform = 'scale(1)';
+            }
+
+            function updateLockUI() {
+                const remain = Math.ceil((lockUntil - Date.now()) / 1000);
+                if (remain > 0) {
+                    input.disabled = true;
+                    submitBtn.disabled = true;
+                    statusMsg.textContent = `🔒 SİSTEM KİLİTLENDİ (${remain}sn)`;
+                    statusMsg.className = 'secret-status-msg error';
+                } else {
+                    clearInterval(lockInterval);
+                    lockInterval = null;
+                    failedAttempts = 0;
+                    input.disabled = false;
+                    submitBtn.disabled = false;
+                    statusMsg.textContent = '';
+                    statusMsg.className = 'secret-status-msg';
+                    if (isModalOpen) input.focus();
+                }
+            }
+
+            closeBtn.addEventListener('click', closeSecretModal);
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) closeSecretModal();
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isModalOpen) closeSecretModal();
+            });
+
+            eyeBtn.addEventListener('click', () => {
+                const isPwd = input.type === 'password';
+                input.type = isPwd ? 'text' : 'password';
+                eyeBtn.innerHTML = isPwd ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+                input.focus();
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (isTeleporting || Date.now() < lockUntil) return;
+
+                const entered = input.value.trim();
+                if (!entered) return;
+
+                const digest = stretchHash(entered, GATE_SALT, 2048);
+                if (safeEqual(digest, GATE_HASH)) {
+                    const targetUrl = unlockRoute(entered);
+                    if (!targetUrl.startsWith('https://')) return;
+
+                    isTeleporting = true;
+                    failedAttempts = 0;
+                    input.disabled = true;
+                    submitBtn.disabled = true;
+                    card.classList.remove('shake');
+                    card.classList.add('granted');
+                    statusMsg.textContent = '✅ ERİŞİM ONAYLANDI — IŞINLANIYOR...';
+                    statusMsg.className = 'secret-status-msg success';
+
+                    if (typeof fxEnabled !== 'undefined' && fxEnabled) {
+                        createParticles(lastTriggerX, lastTriggerY, 26, true);
+                    }
+
+                    setTimeout(() => {
+                        overlay.classList.remove('open');
+                        document.body.style.transition = 'opacity 0.7s ease, filter 0.7s ease';
+                        document.body.style.opacity = '0';
+                        document.body.style.filter = 'brightness(1.8) blur(6px)';
+                    }, 380);
+
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 1050);
+                } else {
+                    failedAttempts++;
+                    card.classList.remove('shake');
+                    void card.offsetWidth;
+                    card.classList.add('shake');
+                    input.value = '';
+
+                    if (failedAttempts >= 3) {
+                        lockUntil = Date.now() + 10000;
+                        updateLockUI();
+                        clearInterval(lockInterval);
+                        lockInterval = setInterval(updateLockUI, 250);
+                    } else {
+                        const left = 3 - failedAttempts;
+                        statusMsg.textContent = `⛔ HATALI KOD (${left} DENEME KALDI)`;
+                        statusMsg.className = 'secret-status-msg error';
+                        input.focus();
+                    }
+                }
+            });
 
             document.addEventListener('click', (e) => {
                 if (e.target !== secretS && !secretS.contains(e.target)) {
@@ -2483,7 +2942,7 @@
 
             secretS.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (isTeleporting) return;
+                if (isTeleporting || isModalOpen) return;
                 clickCount++;
                 clearTimeout(resetTimer);
 
@@ -2491,26 +2950,13 @@
                     secretS.style.textShadow = `0 0 ${clickCount * 4}px #ffd700`;
                     resetTimer = setTimeout(resetSecretState, 2500);
                 } else {
-                    isTeleporting = true;
                     clickCount = 0;
-
+                    lastTriggerX = e.clientX;
+                    lastTriggerY = e.clientY;
                     secretS.style.color = '#ffd700';
                     secretS.style.textShadow = '0 0 25px #ffd700, 0 0 50px #4bbceb, 0 0 80px #8c1139';
                     secretS.style.transform = 'scale(1.28)';
-
-                    if (typeof fxEnabled !== 'undefined' && fxEnabled) {
-                        createParticles(e.clientX, e.clientY, 26, true);
-                    }
-
-                    document.body.style.transition = 'opacity 0.75s ease, filter 0.75s ease';
-                    setTimeout(() => {
-                        document.body.style.opacity = '0';
-                        document.body.style.filter = 'brightness(1.8) blur(6px)';
-                    }, 180);
-
-                    setTimeout(() => {
-                        window.location.href = "https://secovvv.github.io/secovvv2/";
-                    }, 880);
+                    openSecretModal();
                 }
             });
         })();
