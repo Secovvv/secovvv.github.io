@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>İnteraktif 3D Dünya Haritası & Türkiye 81 İl Coğrafya Atlası | SECOVVV</title>
 
 <!-- Arama Motoru (SEO) Etiketleri -->
@@ -31014,30 +31014,46 @@ function handleVsSelection(kind, feature) {
 
 <script id="responsiveDockModule">
 /* ============================================================================
-   📱 SECOVVV GEO-PRO // ADAPTİF TABLET & KÜÇÜK EKRAN KENAR ÇEKMECESİ (SIDE/BOTTOM DOCK)
-   - Büyük Monitör (>= 1440px): Mevcut serbest & sürüklenebilir köşe panelleri korunur
-   - Yatay Tablet / Laptop (900px – 1439px): Sağdan açılan Kenar Çekmecesi (haritayı kapatmaz, yana iter)
-   - Dikey Tablet / Telefon (< 900px): Alttan açılan Alt Çekmece (Bottom Sheet) + Alt İkon Çubuğu
-   - Üst barda tek tuşla (🗂️ Kenar Paneli) büyük ekranda bile manuel geçiş yapılabilir
+   📱 SECOVVV GEO-PRO // ADAPTİF TABLET & KÜÇÜK EKRAN KENAR ÇEKMECESİ (v14.4)
+   - Büyük Monitör (>= 1440px): Serbest & sürüklenebilir köşe panelleri korunur
+   - Tablet / Laptop (< 1440px): Sağ kenar şeridinde yalnızca 3 ana düğme:
+     1) 🎛️ Katmanlar (Harita Katmanları & Araçlar) — en üstte
+     2) ✈️ Aero (AeroTerminal)
+     3) 📡 Radar (Canlı Rakım Radarı)
+   - Bilgi, Deprem ve Bulut panelleri tetiklendiğinde çekmece içinde otomatik açılır
+   - Yatay/Dikey (Portrait <-> Landscape) tablet döndürme tam uyumlu (100dvh + anlık yeniden çizim)
    ============================================================================ */
 (function () {
   "use strict";
 
   const DESKTOP_BP = 1440;
-  const MOBILE_BP  = 900;
 
-  const TABS = [
-    { id: "info",   panelId: "mainHudCard",        icon: "📍", label: "Bilgi",   title: "Seçili Bölge / Quiz / Rota / VS Kartı" },
-    { id: "aero",   panelId: "aeroTerminalPanel",  icon: "✈️", label: "Aero",    title: "AeroTerminal (METAR / TAF / Pist Analizi)" },
-    { id: "quake",  panelId: "hzQuakePanel",       icon: "🌋", label: "Deprem",  title: "Canlı Deprem Akışı (USGS / EMSC)" },
-    { id: "clouds", panelId: "secovvvCloudsPanel", icon: "☁️", label: "Bulut",   title: "Canlı Uydu Bulut Katmanı" },
-    { id: "radar",  panelId: "coordRadarHud",      icon: "📡", label: "Radar",   title: "Canlı Koordinat, Rakım & Hava Radarı" }
+  // Sağ kenar şeridinde (veya dikeyde alt şeritte) görünecek 3 ana sekme
+  const RAIL_TABS = [
+    { id: "tools", panelId: "toolsDropdownMenu", icon: "🎛️", label: "Katman", title: "Harita Katmanları & Araçlar" },
+    { id: "aero",  panelId: "aeroTerminalPanel", icon: "✈️", label: "Aero",   title: "AeroTerminal (METAR / TAF / Pist Analizi)" },
+    { id: "radar", panelId: "coordRadarHud",     icon: "📡", label: "Radar",  title: "Canlı Koordinat, Rakım & Hava Radarı" }
+  ];
+
+  // Çekmece içinde yönetilen tüm paneller (Bilgi, Deprem, Bulut tetiklendiğinde otomatik açılır)
+  const ALL_TABS = [
+    ...RAIL_TABS,
+    { id: "info",   panelId: "mainHudCard",        icon: "📍", label: "Bilgi",  title: "Seçili Bölge / Quiz / Rota / VS Kartı" },
+    { id: "quake",  panelId: "hzQuakePanel",       icon: "🌋", label: "Deprem", title: "Canlı Deprem Akışı (USGS / EMSC)" },
+    { id: "clouds", panelId: "secovvvCloudsPanel", icon: "☁️", label: "Bulut",  title: "Canlı Uydu Bulut Katmanı" }
   ];
 
   // 1) STİL ENJEKSİYONU
   const style = document.createElement("style");
   style.id = "secovvvResponsiveDockStyles";
   style.textContent = `
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
     #workspaceShell {
       flex: 1 1 auto;
       min-height: 0;
@@ -31070,11 +31086,16 @@ function handleVsSelection(kind, feature) {
       box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
     }
 
+    /* Dock modunda üst bardaki Harita Katmanları & Araçlar düğmesi sağ şeride taşındığı için gizlenir */
+    body.dock-mode #toolsMenuWrap {
+      display: none !important;
+    }
+
     /* Kenar Çekmecesi (Side Dock) */
     #dockDrawer {
       display: none;
       flex-direction: column;
-      width: 345px;
+      width: 350px;
       max-width: 46vw;
       height: 100%;
       background: rgba(9, 14, 26, 0.98);
@@ -31147,14 +31168,14 @@ function handleVsSelection(kind, feature) {
     #dockDrawerBody::-webkit-scrollbar-track { background: rgba(9, 14, 26, 0.85); }
     #dockDrawerBody::-webkit-scrollbar-thumb { background: #38bdf8; border-radius: 6px; }
 
-    /* İkon Şeridi (Rail) */
+    /* Sağ İkon Şeridi (Rail) - 3 Düğme: Katmanlar, Aero, Radar */
     #dockRail {
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      width: 52px;
-      padding: 8px 4px;
+      gap: 8px;
+      width: 56px;
+      padding: 10px 4px;
       background: linear-gradient(180deg, #0d1526 0%, #070b14 100%);
       border-left: 1px solid #1e2d4a;
       z-index: 32;
@@ -31166,10 +31187,10 @@ function handleVsSelection(kind, feature) {
     }
     .dock-rail-btn {
       position: relative;
-      width: 42px;
-      min-height: 44px;
-      border-radius: 9px;
-      background: rgba(15, 23, 42, 0.88);
+      width: 46px;
+      min-height: 48px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.90);
       border: 1px solid #263959;
       color: #cbd5e1;
       display: flex;
@@ -31178,11 +31199,11 @@ function handleVsSelection(kind, feature) {
       justify-content: center;
       gap: 2px;
       cursor: pointer;
-      padding: 4px 2px;
+      padding: 5px 2px;
       transition: 0.14s ease;
       font-family: 'Segoe UI', system-ui, sans-serif;
     }
-    .dock-rail-btn .dr-ico { font-size: 16px; line-height: 1; }
+    .dock-rail-btn .dr-ico { font-size: 17px; line-height: 1; }
     .dock-rail-btn .dr-lbl { font-size: 8.5px; font-weight: 800; letter-spacing: 0.2px; }
     .dock-rail-btn:hover {
       border-color: #38bdf8;
@@ -31194,6 +31215,11 @@ function handleVsSelection(kind, feature) {
       border-color: #7dd3fc;
       color: #ffffff;
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+    }
+    #dockRailBtn_tools {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: linear-gradient(135deg, rgba(2, 132, 199, 0.24), rgba(3, 105, 161, 0.24));
+      color: #e0f2fe;
     }
     .dock-rail-btn .dr-dot {
       position: absolute;
@@ -31223,8 +31249,9 @@ function handleVsSelection(kind, feature) {
     }
 
     /* ============================================================
-       DOCK MODUNDAYKEN İÇERİ ALINAN 5 PANELİN TEMİZ STİL UYARLAMASI
+       DOCK MODUNDAYKEN İÇERİ ALINAN PANELLERİN TEMİZ STİL UYARLAMASI
        ============================================================ */
+    body.dock-mode #dockDrawerBody > #toolsDropdownMenu,
     body.dock-mode #dockDrawerBody > #mainHudCard,
     body.dock-mode #dockDrawerBody > #coordRadarHud,
     body.dock-mode #dockDrawerBody > #hzQuakePanel,
@@ -31247,12 +31274,27 @@ function handleVsSelection(kind, feature) {
       z-index: auto !important;
     }
 
+    body.dock-mode #dockDrawerBody > #toolsDropdownMenu {
+      border: 1px solid rgba(56, 189, 248, 0.35) !important;
+      background: rgba(11, 17, 30, 0.88) !important;
+      padding: 8px !important;
+      animation: none !important;
+      overflow: visible !important;
+    }
+    body.dock-mode #dockDrawerBody > #toolsDropdownMenu .btn {
+      padding: 6px 7px !important;
+      font-size: 10.2px !important;
+    }
+
     /* Dock içinde aktif olmayan sekmeler gizlenir */
     body.dock-mode #dockDrawerBody > .dock-tab-hidden {
       display: none !important;
     }
 
-    /* Dock içinde aktif sekme (ör. radar/mainHudCard) zorla görünür olur */
+    /* Dock içinde aktif sekme görünür olur */
+    body.dock-mode #dockDrawerBody > #toolsDropdownMenu.dock-tab-active {
+      display: grid !important;
+    }
     body.dock-mode #dockDrawerBody > #mainHudCard.dock-tab-active {
       display: block !important;
     }
@@ -31292,7 +31334,8 @@ function handleVsSelection(kind, feature) {
     }
 
     /* ============================================================
-       DİKEY TABLET & TELEFON (< 900px): ALTTAN AÇILAN ALT ÇEKMECE (BOTTOM SHEET)
+       DİKEY TABLET & TELEFON (PORTRAIT): ALTTAN AÇILAN ALT ÇEKMECE
+       YATAY TABLET (LANDSCAPE): SAĞDAN AÇILAN KENAR ÇEKMECESİ
        ============================================================ */
     body.dock-mode.dock-bottom #workspaceShell {
       flex-direction: column;
@@ -31300,8 +31343,8 @@ function handleVsSelection(kind, feature) {
     body.dock-mode.dock-bottom #dockDrawer {
       width: 100% !important;
       max-width: 100% !important;
-      height: 44vh;
-      max-height: 390px;
+      height: 45dvh;
+      max-height: 400px;
       min-height: 190px;
       border-left: none;
       border-top: 1.5px solid rgba(56, 189, 248, 0.65);
@@ -31309,26 +31352,41 @@ function handleVsSelection(kind, feature) {
     }
     body.dock-mode.dock-bottom #dockRail {
       width: 100%;
-      height: 50px;
+      height: 52px;
       flex-direction: row;
       justify-content: space-around;
-      padding: 4px 6px;
+      padding: 4px 8px;
+      padding-bottom: max(4px, env(safe-area-inset-bottom));
       border-left: none;
       border-top: 1px solid #1e2d4a;
     }
     body.dock-mode.dock-bottom .dock-rail-btn {
       flex: 1 1 0;
-      max-width: 90px;
+      max-width: 140px;
       min-height: 40px;
       height: 40px;
       flex-direction: row;
-      gap: 4px;
-      padding: 4px 6px;
+      gap: 6px;
+      padding: 4px 10px;
     }
-    body.dock-mode.dock-bottom .dock-rail-btn .dr-ico { font-size: 14px; }
-    body.dock-mode.dock-bottom .dock-rail-btn .dr-lbl { font-size: 10px; }
+    body.dock-mode.dock-bottom .dock-rail-btn .dr-ico { font-size: 15px; }
+    body.dock-mode.dock-bottom .dock-rail-btn .dr-lbl { font-size: 11px; }
 
-    /* Tablet / Mobil Üst Bar Kompaktlaştırma (Haritaya daha fazla dikey alan bırakır) */
+    /* Yatay (Landscape) Tablet ve Kısa Ekran Optimizasyonu */
+    @media (max-height: 620px) and (orientation: landscape) {
+      .top-bar {
+        padding: 5px 10px !important;
+        gap: 6px !important;
+      }
+      .brand-badge { padding: 3px 7px !important; font-size: 10.5px !important; }
+      .net-badge { display: none !important; }
+      .toolbar .btn { padding: 4px 7px !important; font-size: 10.5px !important; }
+      body.dock-mode #dockDrawer {
+        width: 315px;
+        max-width: 44vw;
+      }
+    }
+
     @media (max-width: 1180px) {
       .top-bar {
         padding: 7px 10px !important;
@@ -31364,7 +31422,7 @@ function handleVsSelection(kind, feature) {
   drawer.setAttribute("aria-label", "Yan Kontrol Paneli");
   drawer.innerHTML = `
     <div class="dock-drawer-head">
-      <span id="dockDrawerTitle">📍 SEÇİLİ BÖLGE BİLGİSİ</span>
+      <span id="dockDrawerTitle">🎛️ HARİTA KATMANLARI &amp; ARAÇLAR</span>
       <div class="dock-drawer-head-actions">
         <button type="button" class="dock-head-btn close" id="btnDockCloseDrawer" title="Çekmeceyi kapat (Harita tam ekran olur)">✕ Kapat</button>
       </div>
@@ -31376,7 +31434,7 @@ function handleVsSelection(kind, feature) {
   const rail = document.createElement("nav");
   rail.id = "dockRail";
   rail.setAttribute("aria-label", "Panel Sekmeleri");
-  TABS.forEach(t => {
+  RAIL_TABS.forEach(t => {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "dock-rail-btn";
@@ -31421,19 +31479,14 @@ function handleVsSelection(kind, feature) {
   const dockState = {
     active: false,
     isBottom: false,
-    override: null,     // null = otomatik ekran genişliğine göre, true/false = manuel
+    override: null,
     drawerOpen: false,
-    activeTab: "info",
+    activeTab: "tools",
     syncing: false
   };
 
-  function getPanelEl(tabId) {
-    const t = TABS.find(x => x.id === tabId);
-    return t ? document.getElementById(t.panelId) : null;
-  }
-
   function isTabFeatureEnabled(tabId) {
-    if (tabId === "info") return true;
+    if (tabId === "tools" || tabId === "info") return true;
     if (tabId === "radar") return (typeof showCoordRadarHud === "undefined") ? true : !!showCoordRadarHud;
     if (tabId === "aero") {
       const p = document.getElementById("aeroTerminalPanel");
@@ -31476,21 +31529,18 @@ function handleVsSelection(kind, feature) {
   }
 
   function updateRailBadgesAndEmptyHint() {
-    TABS.forEach(t => {
+    RAIL_TABS.forEach(t => {
       const btn = document.getElementById("dockRailBtn_" + t.id);
       if (!btn) return;
       const isActiveTab = dockState.drawerOpen && dockState.activeTab === t.id;
       btn.classList.toggle("active", isActiveTab);
-      const live = (t.id === "aero" || t.id === "quake" || t.id === "clouds") && isTabFeatureEnabled(t.id);
+      const live = (t.id === "aero") && isTabFeatureEnabled("aero");
       btn.classList.toggle("has-live", live);
     });
 
-    // Eğer aktif sekmenin özelliği kapalıysa (örn. Deprem veya Bulut kapalıyken sekmesine tıklandıysa) açma düğmesi göster
     let hint = document.getElementById("dockEmptyHintBox");
     const tab = dockState.activeTab;
     const needsEnable = dockState.active && dockState.drawerOpen && (
-      (tab === "quake" && !isTabFeatureEnabled("quake")) ||
-      (tab === "clouds" && !isTabFeatureEnabled("clouds")) ||
       (tab === "aero" && !isTabFeatureEnabled("aero")) ||
       (tab === "radar" && !isTabFeatureEnabled("radar"))
     );
@@ -31507,13 +31557,7 @@ function handleVsSelection(kind, feature) {
       drawerBody.appendChild(hint);
     }
 
-    if (tab === "quake") {
-      hint.innerHTML = `🌋 <b>Canlı Deprem Katmanı</b> şu an kapalı.<br>Son 24 saatteki USGS &amp; EMSC depremlerini açmak için dokunun:<br>
-        <button type="button" class="hud-mini-btn" onclick="window.toggleQuakesMode && window.toggleQuakesMode()">🌐 Deprem Katmanını Aç</button>`;
-    } else if (tab === "clouds") {
-      hint.innerHTML = `☁️ <b>Canlı Uydu Bulut Katmanı</b> şu an kapalı.<br>Gerçek uydu bulut örtüsünü açmak için dokunun:<br>
-        <button type="button" class="hud-mini-btn" onclick="window.toggleSatelliteCloudsMode && window.toggleSatelliteCloudsMode(true)">☁️ Bulut Katmanını Aç</button>`;
-    } else if (tab === "aero") {
+    if (tab === "aero") {
       hint.innerHTML = `✈️ <b>AeroTerminal</b> şu an beklemede.<br>METAR, TAF, aktif pist ve yan rüzgâr analizi için açın:<br>
         <button type="button" class="hud-mini-btn" onclick="window.toggleAeroTerminalPanel && window.toggleAeroTerminalPanel(true)">✈️ AeroTerminal'i Aç</button>`;
     } else if (tab === "radar") {
@@ -31526,18 +31570,19 @@ function handleVsSelection(kind, feature) {
     if (!dockState.active) return;
 
     drawer.classList.toggle("open", dockState.drawerOpen);
-    const activeTabObj = TABS.find(t => t.id === dockState.activeTab) || TABS[0];
+    const activeTabObj = ALL_TABS.find(t => t.id === dockState.activeTab) || ALL_TABS[0];
     if (drawerTitleEl) {
-      drawerTitleEl.textContent = `${activeTabObj.icon} ${activeTabObj.label.toUpperCase()} PANELİ`;
+      drawerTitleEl.textContent = activeTabObj.id === "tools"
+        ? "🎛️ HARİTA KATMANLARI & ARAÇLAR"
+        : `${activeTabObj.icon} ${activeTabObj.label.toUpperCase()} PANELİ`;
     }
 
-    // AeroTerminal veya VS Karşılaştırma açıkken çekmeceyi biraz genişlet
     const mainHud = document.getElementById("mainHudCard");
     const wantWide = (dockState.activeTab === "aero") ||
                      (dockState.activeTab === "info" && mainHud && mainHud.classList.contains("vs-expanded"));
     drawer.classList.toggle("wide-tab", wantWide);
 
-    TABS.forEach(t => {
+    ALL_TABS.forEach(t => {
       const el = document.getElementById(t.panelId);
       if (!el) return;
       const isSel = dockState.drawerOpen && (t.id === dockState.activeTab);
@@ -31558,14 +31603,9 @@ function handleVsSelection(kind, feature) {
   function openDockTab(tabId, autoEnableFeature = false) {
     if (!dockState.active) return;
 
-    // İkon şeridinden tıklandığında ilgili kapalı özellik varsa kullanıcıyı yormadan direkt aç
     if (autoEnableFeature) {
       if (tabId === "aero" && !isTabFeatureEnabled("aero") && typeof window.toggleAeroTerminalPanel === "function") {
         window.toggleAeroTerminalPanel(true);
-      } else if (tabId === "quake" && !isTabFeatureEnabled("quake") && typeof window.toggleQuakesMode === "function") {
-        window.toggleQuakesMode();
-      } else if (tabId === "clouds" && !isTabFeatureEnabled("clouds") && typeof window.toggleSatelliteCloudsMode === "function") {
-        window.toggleSatelliteCloudsMode(true);
       } else if (tabId === "radar" && !isTabFeatureEnabled("radar") && typeof window.toggleCoordRadarHud === "function") {
         window.toggleCoordRadarHud(true);
       } else if (tabId === "info") {
@@ -31598,9 +31638,10 @@ function handleVsSelection(kind, feature) {
   function movePanelsIntoDock() {
     dockState.syncing = true;
     try {
-      TABS.forEach(t => {
+      ALL_TABS.forEach(t => {
         const el = document.getElementById(t.panelId);
         if (!el) return;
+        if (t.id === "tools") el.classList.remove("open");
         clearInlinePositioning(el);
         if (el.parentNode !== drawerBody) {
           drawerBody.appendChild(el);
@@ -31614,12 +31655,19 @@ function handleVsSelection(kind, feature) {
   function movePanelsBackToStage() {
     dockState.syncing = true;
     try {
-      TABS.forEach(t => {
+      ALL_TABS.forEach(t => {
         const el = document.getElementById(t.panelId);
         if (!el) return;
         el.classList.remove("dock-tab-hidden", "dock-tab-active");
         clearInlinePositioning(el);
-        if (el.parentNode !== mapStage) {
+        if (t.id === "tools") {
+          el.classList.remove("open");
+          if (toolsWrap && el.parentNode !== toolsWrap) {
+            toolsWrap.appendChild(el);
+          }
+          const btnTools = document.getElementById("btnToolsDrawer");
+          if (btnTools) btnTools.innerHTML = "🎛️ Harita Katmanları & Araçlar ▾";
+        } else if (el.parentNode !== mapStage) {
           mapStage.appendChild(el);
         }
       });
@@ -31632,13 +31680,18 @@ function handleVsSelection(kind, feature) {
 
   function applyLayoutMode() {
     const vw = window.innerWidth;
-    const isTouchTablet = (navigator.maxTouchPoints > 0 && vw < 1500);
+    const vh = window.innerHeight;
+    const isPortrait = vh > vw;
+    const isTouchTablet = (navigator.maxTouchPoints > 0 && Math.max(vw, vh) < 1500);
     const shouldDock = (dockState.override !== null)
       ? dockState.override
       : (vw < DESKTOP_BP || isTouchTablet);
-    const shouldBottom = shouldDock && (vw < MOBILE_BP);
+
+    // Yatay (Landscape) tablette her zaman SAĞ KENAR ÇEKMECESİ; dikeyde (<1024px) ALT ÇEKMECE
+    const shouldBottom = shouldDock && isPortrait && vw < 1024;
 
     const modeChanged = (shouldDock !== dockState.active);
+    const orientChanged = (shouldBottom !== dockState.isBottom);
     dockState.active = shouldDock;
     dockState.isBottom = shouldBottom;
 
@@ -31653,7 +31706,6 @@ function handleVsSelection(kind, feature) {
     if (modeChanged) {
       if (shouldDock) {
         movePanelsIntoDock();
-        // İlk geçişte haritayı tam temiz göstermek için çekmece kapalı başlasın
         dockState.drawerOpen = false;
         renderDockVisibility();
       } else {
@@ -31664,12 +31716,14 @@ function handleVsSelection(kind, feature) {
       }
     } else if (shouldDock) {
       renderDockVisibility();
+      if (orientChanged) triggerMapResizeSync();
+    } else if (orientChanged) {
+      triggerMapResizeSync();
     }
   }
 
   // 5) MEVCUT PANELLER AÇILDIĞINDA DOCK ÇEKMECESİNİ OTOMATİK AÇAN GÖZLEMCİLER
   function attachAutoOpenObservers() {
-    // A) mainHudCard içeriği değişince (ülke tıklandı, quiz başladı, mesafe ölçer açıldı vb.)
     const hudName = document.getElementById("hudName");
     const hudInfo = document.getElementById("hudInfo");
     const mainHud = document.getElementById("mainHudCard");
@@ -31698,7 +31752,6 @@ function handleVsSelection(kind, feature) {
       }).observe(mainHud, { attributes: true, attributeFilter: ["class"] });
     }
 
-    // B) AeroTerminal açılıp kapanınca
     const aeroPanel = document.getElementById("aeroTerminalPanel");
     if (aeroPanel) {
       let prevAeroOpen = aeroPanel.classList.contains("aero-open");
@@ -31716,7 +31769,6 @@ function handleVsSelection(kind, feature) {
       }).observe(aeroPanel, { attributes: true, attributeFilter: ["class"] });
     }
 
-    // C) Deprem Paneli açılıp kapanınca
     const quakeBtn = document.getElementById("btnQuakesToggle");
     if (quakeBtn) {
       let prevQuakeOn = quakeBtn.classList.contains("active");
@@ -31727,14 +31779,11 @@ function handleVsSelection(kind, feature) {
           openDockTab("quake", false);
         } else if (!nowOn && prevQuakeOn && dockState.activeTab === "quake") {
           closeDockDrawer();
-        } else {
-          updateRailBadgesAndEmptyHint();
         }
         prevQuakeOn = nowOn;
       }).observe(quakeBtn, { attributes: true, attributeFilter: ["class"] });
     }
 
-    // D) Uydu Bulut Paneli açılıp kapanınca
     const cloudBtn = document.getElementById("btnCloudsToggle");
     if (cloudBtn) {
       let prevCloudOn = cloudBtn.classList.contains("clouds-on");
@@ -31745,23 +31794,47 @@ function handleVsSelection(kind, feature) {
           openDockTab("clouds", false);
         } else if (!nowOn && prevCloudOn && dockState.activeTab === "clouds") {
           closeDockDrawer();
-        } else {
-          updateRailBadgesAndEmptyHint();
         }
         prevCloudOn = nowOn;
       }).observe(cloudBtn, { attributes: true, attributeFilter: ["class"] });
     }
   }
 
-  // Pencere boyutu / tablet yatay-dikey çevirme dinleyicisi
+  // 6) TABLET YATAY / DİKEY DÖNDÜRME (ORIENTATION) SENKRONİZASYONU
   let resizeDebounce = null;
-  window.addEventListener("resize", () => {
+  function handleViewportOrOrientationChange() {
     clearTimeout(resizeDebounce);
-    resizeDebounce = setTimeout(applyLayoutMode, 90);
+    resizeDebounce = setTimeout(() => {
+      applyLayoutMode();
+      triggerMapResizeSync();
+    }, 80);
+  }
+
+  window.addEventListener("resize", handleViewportOrOrientationChange);
+  window.addEventListener("orientationchange", () => {
+    applyLayoutMode();
+    triggerMapResizeSync();
+    setTimeout(() => { applyLayoutMode(); triggerMapResizeSync(); }, 180);
+    setTimeout(() => { applyLayoutMode(); triggerMapResizeSync(); }, 420);
   });
+  if (screen.orientation && typeof screen.orientation.addEventListener === "function") {
+    screen.orientation.addEventListener("change", () => {
+      applyLayoutMode();
+      triggerMapResizeSync();
+      setTimeout(() => { applyLayoutMode(); triggerMapResizeSync(); }, 220);
+    });
+  }
+  if (window.visualViewport && typeof window.visualViewport.addEventListener === "function") {
+    window.visualViewport.addEventListener("resize", handleViewportOrOrientationChange);
+  }
 
   // Başlat (AeroTerminal dahil tüm dinamik paneller DOM'a eklendikten sonra)
   function bootResponsiveDock() {
+    try {
+      if (screen.orientation && typeof screen.orientation.unlock === "function") {
+        screen.orientation.unlock();
+      }
+    } catch (_) {}
     setTimeout(() => {
       attachAutoOpenObservers();
       applyLayoutMode();
