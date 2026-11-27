@@ -3,608 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SECOVVV Çok Katmanlı Resim İşleme & AI Arka Plan Silici Stüdyo Pro</title>
+<title>SECOVVV Çok Katmanlı Resim İşleme & AI Arka Plan Silici Stüdyo Pro v2.6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Audiowide&family=Bangers&family=Bebas+Neue&family=Caveat:wght@700&family=Chakra+Petch:wght@700&family=Cinzel:wght@700;900&family=Dancing+Script:wght@700&family=Lobster&family=Montserrat:wght@800;900&family=Orbitron:wght@700;900&family=Oswald:wght@700&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700;900&family=Press+Start+2P&family=Righteous&family=Russo+One&family=Satisfy&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg-deep: #060911;
+    --bg-panel: #0d1526;
+    --bg-card: #131f36;
+    --bg-input: #080d18;
+    --border: #243656;
+    --accent: #38bdf8;
+    --green: #22c55e;
+    --pink: #ec4899;
+    --purple: #a855f7;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+  }
   * { box-sizing: border-box; }
-  body {
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%; width: 100%;
+    background: var(--bg-deep);
+    color: var(--text);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #060911;
-    color: #f8fafc;
-    margin: 0;
-    padding: 16px 12px;
-  }
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
- .main-header {
-    position: relative;
-    text-align: center;
-    padding: 15px 18px;
-    background: linear-gradient(180deg, #111a2e 0%, #0b111e 100%);
-    border-radius: 16px;
-    border: 2px solid #283a5e;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.65);
-  }
-  .home-btn {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #152036, #0b111e);
-    color: #38bdf8;
-    border: 1.5px solid #38bdf8;
-    padding: 9px 16px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
-    letter-spacing: 0.4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 12px rgba(56, 189, 248, 0.18);
-    transition: all 0.2s ease;
-  }
-  .home-btn:hover {
-    background: linear-gradient(135deg, #0284c7, #0369a1);
-    color: #ffffff;
-    border-color: #7dd3fc;
-    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
-    transform: translateY(calc(-50% - 2px));
-  }
-  .home-btn svg {
-    width: 17px;
-    height: 17px;
-    stroke: currentColor;
-    stroke-width: 2.3;
-    fill: none;
-  }
-  @media (max-width: 1180px) {
-    .home-btn {
-      position: static;
-      transform: none;
-      margin-bottom: 10px;
-    }
-    .home-btn:hover {
-      transform: translateY(-2px);
-    }
-  }
-  .main-header h1 {
-    margin: 0;
-    color: #38bdf8;
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 0.3px;
-  }
-  .main-header p {
-    margin: 5px 0 0 0;
-    color: #94a3b8;
-    font-size: 13px;
-  }
-
-  .studio-panel {
-    background: #0e1626;
-    border: 2px solid #2e436e;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow: 0 14px 35px rgba(0,0,0,0.75);
-    position: relative;
-  }
-  .panel-1 { border-top: 4px solid #38bdf8; }
-  .panel-2 { border-top: 4px solid #10b981; }
-
-  .panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 9px;
-    border-bottom: 2px solid #1e2d4a;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .panel-title {
-    font-size: 14px;
-    font-weight: 800;
-    color: #f1f5f9;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .panel-step-badge {
-    background: #1e293b;
-    color: #38bdf8;
-    border: 1px solid #38bdf8;
-    padding: 3px 9px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 800;
-  }
-  .source-info-tag {
-    font-size: 12px;
-    color: #34d399;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-  }
-  .seco-watermark {
-    font-family: monospace, sans-serif;
-    font-weight: 900;
-    font-size: 12.5px;
-    letter-spacing: 1.5px;
-    color: #22c55e;
-    background: rgba(34, 197, 94, 0.1);
-    border: 1px solid rgba(34, 197, 94, 0.35);
-    padding: 4px 10px;
-    border-radius: 8px;
-  }
-
-  .top-export-bar {
-    display: grid;
-    grid-template-columns: 1.15fr 1.35fr 1.15fr;
-    gap: 14px;
-  }
-  @media (max-width: 1100px) {
-    .top-export-bar { grid-template-columns: 1fr; }
-  }
-  .export-card {
-    background: #152036;
-    border: 2px solid #263859;
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  .card-title {
-    font-size: 12.5px;
-    font-weight: 800;
-    color: #38bdf8;
-    border-bottom: 1px solid #263859;
-    padding-bottom: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .source-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: flex-end;
-  }
-  .field-box {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-    min-width: 105px;
-  }
-  .field-title {
-    font-size: 11px;
-    font-weight: 700;
-    color: #cbd5e1;
-  }
-  select, input[type="number"], input[type="text"] {
-    background: #090e1a;
-    padding: 6px 9px;
-    border-radius: 8px;
-    border: 1px solid #3b4f73;
-    color: #fff;
-    font-size: 12px;
-    width: 100%;
-    height: 35px;
-  }
-
-  .btn-group {
-    display: flex;
-    gap: 8px;
-    align-items: stretch;
-    flex-wrap: wrap;
-  }
-  .ergo-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 7px 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-align: center;
-    min-height: 50px;
-    min-width: 105px;
-    color: #fff;
-  }
-  .ergo-btn:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.5); }
-  .ergo-btn .btn-main { font-size: 12px; font-weight: 800; }
-  .ergo-btn .btn-sub { font-size: 10px; font-weight: 500; opacity: 0.92; margin-top: 2px; }
-
-  .btn-add-layer { background: linear-gradient(135deg, #0284c7, #0369a1); border: 1px solid #38bdf8; }
-  .btn-add-layer:hover { background: linear-gradient(135deg, #0369a1, #075985); transform: translateY(-1px); }
-
-  .btn-add-text { background: linear-gradient(135deg, #f59e0b, #d97706); border: 1px solid #fbbf24; }
-  .btn-add-text:hover { background: linear-gradient(135deg, #d97706, #b45309); transform: translateY(-1px); }
-
-  .btn-crop-main { background: linear-gradient(135deg, #10b981, #059669); border: 1px solid #34d399; }
-  .btn-crop-main:hover:not(:disabled) { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-1px); }
-
-  .btn-magic-bg { background: linear-gradient(135deg, #ec4899, #be185d); border: 1px solid #f472b6; }
-  .btn-magic-bg:hover:not(:disabled) { background: linear-gradient(135deg, #db2777, #9d174d); transform: translateY(-1px); }
-
-  .btn-save-folder { background: linear-gradient(135deg, #3b82f6, #2563eb); border: 1px solid #60a5fa; }
-  .btn-save-folder:hover:not(:disabled) { background: linear-gradient(135deg, #2563eb, #1d4ed8); transform: translateY(-1px); }
-
-  .btn-quick-dl { background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: 1px solid #a78bfa; }
-  .btn-quick-dl:hover:not(:disabled) { background: linear-gradient(135deg, #7c3aed, #5b21b6); transform: translateY(-1px); }
-
-  .btn-reset {
-    background: #1e2c46;
-    color: #e2e8f0;
-    padding: 5px 9px;
-    border-radius: 7px;
-    border: 1px solid #3b5078;
-    font-size: 11.5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .btn-reset:hover:not(:disabled) { background: #2d4063; border-color: #38bdf8; }
-  .btn-reset:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-reset.active-ratio { background: #16a34a; border-color: #4ade80; color: #fff; }
-  .btn-reset.active-brush { background: #db2777; border-color: #f472b6; color: #fff; }
-  .btn-reset.active-fx { background: #7c3aed; border-color: #c084fc; color: #fff; }
-
-  .dropdown-wrapper {
-    position: relative;
-    flex: 1;
-    display: flex;
-  }
-  .crop-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    width: 320px;
-    background: #0b111e;
-    border: 2px solid #22c55e;
-    border-radius: 12px;
-    padding: 8px;
-    box-shadow: 0 18px 40px rgba(0,0,0,0.95);
-    z-index: 200;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .crop-dropdown-menu.open { display: flex; }
-  .menu-option-btn {
-    background: #131d31;
-    color: #f1f5f9;
-    border: 1px solid #283a5e;
-    border-radius: 9px;
-    padding: 8px 11px;
-    font-size: 12px;
-    font-weight: 700;
-    text-align: left;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.14s ease;
-  }
-  .menu-option-btn:hover {
-    background: #192a47;
-    border-color: #22c55e;
-    color: #4ade80;
-    transform: translateX(2px);
-  }
-  .menu-option-sub { font-size: 10px; color: #94a3b8; font-weight: 500; }
-
-  .aspect-presets-bar, .crop-action-bar, .magic-bg-bar, .fx-color-bar, .text-editor-bar {
-    display: none;
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin-bottom: 11px;
-    font-size: 12px;
-  }
-  .aspect-presets-bar {
-    flex-wrap: wrap;
-    gap: 7px;
-    align-items: center;
-    background: #111c30;
-    border: 2px solid #10b981;
-  }
-  .aspect-presets-bar.show { display: flex; }
-
-  .crop-action-bar {
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    background: linear-gradient(90deg, #064e3b, #0f172a);
-    border: 2px solid #22c55e;
-  }
-  .crop-action-bar.show { display: flex; }
-  .btn-apply-crop {
-    background: #22c55e;
-    color: #052e16;
-    border: none;
-    padding: 7px 16px;
-    border-radius: 20px;
-    font-weight: 900;
-    font-size: 12px;
-    cursor: pointer;
-  }
-  .btn-cancel-crop {
-    background: transparent;
-    color: #f87171;
-    border: 1px solid #ef4444;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 800;
-    font-size: 12px;
-    cursor: pointer;
-  }
-
-  .magic-bg-bar {
-    flex-direction: column;
-    gap: 9px;
-    background: linear-gradient(180deg, #2e1065 0%, #151c33 100%);
-    border: 2px solid #ec4899;
-  }
-  .magic-bg-bar.show { display: flex; }
-
-  .fx-color-bar {
-    flex-direction: column;
-    gap: 9px;
-    background: linear-gradient(180deg, #1e1b4b 0%, #111827 100%);
-    border: 2px solid #a855f7;
-  }
-  .fx-color-bar.show { display: flex; }
-
-  .text-editor-bar {
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: space-between;
-    background: linear-gradient(90deg, #451a03, #152036);
-    border: 2px solid #f59e0b;
-  }
-  .text-editor-bar.show { display: flex; }
-
-  .magic-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .magic-slider-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #090e1a;
-    padding: 4px 9px;
-    border-radius: 8px;
-    border: 1px solid #4c1d95;
-  }
-
-  .bg-custom-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-    justify-content: space-between;
-    background: #152036;
-    padding: 9px 12px;
-    border-radius: 12px;
-    border: 1px solid #2e436e;
-    margin-bottom: 12px;
-    font-size: 12px;
-  }
-  .bg-section {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .zoom-box {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #0b111e;
-    padding: 4px 8px;
-    border-radius: 8px;
-    border: 1px solid #2e436e;
-  }
-  input[type="range"] { accent-color: #10b981; cursor: pointer; height: 5px; }
-
-  .workspace-grid {
-    display: grid;
-    grid-template-columns: 1fr 330px;
-    gap: 14px;
-    align-items: stretch;
-  }
-  @media (max-width: 1024px) {
-    .workspace-grid { grid-template-columns: 1fr; }
-  }
-
-  .stage {
-    position: relative;
-    width: 100%;
-    height: 550px;
     overflow: hidden;
-    border: 2px solid #263859;
-    border-radius: 12px;
-    background-image: conic-gradient(#1e293b 25%, #0f172a 0 50%, #1e293b 0 75%, #0f172a 0);
-    background-size: 24px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  .app-shell { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+  /* 1. ÜST ÇUBUK */
+  .topbar {
+    height: 52px;
+    background: linear-gradient(180deg, #111b30 0%, #0a101d 100%);
+    border-bottom: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; gap: 10px; flex-shrink: 0; z-index: 120;
+  }
+  .topbar-left, .topbar-center, .topbar-right { display: flex; align-items: center; gap: 7px; }
+  .home-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #132038; color: var(--accent); border: 1px solid var(--accent);
+    padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 800;
+    text-decoration: none; transition: 0.15s;
+  }
+  .home-btn:hover { background: #0284c7; color: #fff; }
+  .brand-title { font-size: 14px; font-weight: 900; color: var(--accent); letter-spacing: 0.4px; white-space: nowrap; }
+  .brand-badge {
+    font-family: monospace; font-size: 10.5px; font-weight: 900; color: var(--green);
+    background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35);
+    padding: 2px 7px; border-radius: 6px;
+  }
+
+  .top-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 10px; border-radius: 8px; border: 1px solid transparent;
+    color: #fff; font-size: 12px; font-weight: 800; cursor: pointer;
+    transition: 0.14s; white-space: nowrap;
+  }
+  .top-btn:disabled { opacity: 0.35; cursor: not-allowed; filter: grayscale(0.6); }
+    .tb-teal { background: linear-gradient(135deg, #0d9488, #0f766e); border-color: #2dd4bf; }
+  .ctx-cyan { border-bottom-color: var(--accent); background: linear-gradient(90deg, #082f49, #0f182b); }
+  .fit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 4px; }
+  .preset-pill-row { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; width: 100%; }
+  .mode-switch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
+  .mode-opt-btn {
+    background: #131e33; color: #cbd5e1; border: 1.5px solid #334155;
+    border-radius: 10px; padding: 8px 6px; font-size: 11.5px; font-weight: 800; cursor: pointer; transition: 0.14s;
+  }
+  .mode-opt-btn.active { background: #052e16; border-color: #22c55e; color: #4ade80; }
+  .tb-blue { background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8; }
+  .tb-amber { background: linear-gradient(135deg, #d97706, #b45309); border-color: #fbbf24; }
+  .tb-pink { background: linear-gradient(135deg, #db2777, #9d174d); border-color: #f472b6; }
+  .tb-green { background: linear-gradient(135deg, #059669, #047857); border-color: #34d399; }
+  .tb-purple { background: linear-gradient(135deg, #7c3aed, #5b21b6); border-color: #a78bfa; }
+  .tb-ghost { background: #17233b; border-color: #31476e; color: #e2e8f0; }
+  .top-btn:hover:not(:disabled) { filter: brightness(1.13); }
+
+  .top-select {
+    background: var(--bg-input); color: #fff; border: 1px solid #354c73;
+    border-radius: 7px; padding: 4px 7px; font-size: 11.5px; font-weight: 700; height: 30px;
+  }
+  .top-select optgroup { background: #0a101d; color: var(--accent); font-weight: 800; }
+  .top-select option { background: #0f182b; color: #f1f5f9; }
+  .info-pill {
+    font-size: 11px; font-weight: 700; color: #34d399;
+    background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.35);
+    padding: 4px 10px; border-radius: 16px; white-space: nowrap;
+  }
+
+  /* AÇILIR KIRPMA MENÜSÜ */
+  .dropdown-wrap { position: relative; }
+  .dropdown-menu {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0;
+    width: 305px; background: #0a101d; border: 2px solid var(--green);
+    border-radius: 12px; padding: 7px; z-index: 500;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.95); flex-direction: column; gap: 5px;
+  }
+  .dropdown-menu.open { display: flex; }
+  .drop-item {
+    background: #131e33; color: #f1f5f9; border: 1px solid #263859;
+    border-radius: 8px; padding: 8px 10px; text-align: left; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; transition: 0.12s;
+  }
+  .drop-item:hover { background: #1a2b4a; border-color: var(--green); color: #4ade80; }
+  .drop-item small { display: block; font-size: 10px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+
+  /* 2. ANA 3 SÜTUNLU ALAN */
+  .main-body {
+    flex: 1; display: grid;
+    grid-template-columns: 62px 1fr 330px;
+    min-height: 0; overflow: hidden;
+  }
+
+  /* SOL DİKEY ARAÇ ŞERİDİ */
+  .tool-rail {
+    background: #0a101e; border-right: 1.5px solid var(--border);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 5px; gap: 6px; overflow-y: auto;
+  }
+  .rail-btn {
+    width: 48px; height: 46px; border-radius: 10px;
+    background: #121c30; border: 1.5px solid #223352; color: #cbd5e1;
+    cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1px;
+    font-size: 16px; transition: 0.13s; position: relative;
+  }
+  .rail-btn span { font-size: 8.5px; font-weight: 800; }
+  .rail-btn em {
+    position: absolute; top: 2px; right: 4px;
+    font-style: normal; font-size: 8px; color: #64748b; font-weight: 800;
+  }
+  .rail-btn:hover:not(:disabled) { border-color: var(--accent); color: #fff; background: #192844; }
+  .rail-btn.active { background: linear-gradient(135deg, #0284c7, #1d4ed8); border-color: #7dd3fc; color: #fff; }
+  .rail-btn.active em, .rail-btn.active-pink em, .rail-btn.active-purple em { color: rgba(255,255,255,0.85); }
+  .rail-btn.active-pink { background: linear-gradient(135deg, #db2777, #9d174d); border-color: #f9a8d4; color: #fff; }
+  .rail-btn.active-purple { background: linear-gradient(135deg, #7c3aed, #5b21b6); border-color: #d8b4fe; color: #fff; }
+  .rail-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .rail-sep { width: 32px; height: 1px; background: #223352; margin: 1px 0; }
+
+  /* ORTA SAHNE SÜTUNU */
+  .center-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: #070b14; }
+
+  /* BAĞLAMSAL ÇUBUKLAR */
+  .context-bar {
+    background: #0f182b; border-bottom: 1.5px solid var(--border);
+    padding: 6px 10px; display: none; flex-wrap: wrap;
+    align-items: center; gap: 7px; font-size: 11.5px; flex-shrink: 0;
+  }
+  .context-bar.show { display: flex; }
+  .ctx-pink { border-bottom-color: var(--pink); background: linear-gradient(90deg, #270e3b, #0f182b); }
+  .ctx-green { border-bottom-color: var(--green); background: linear-gradient(90deg, #063829, #0f182b); }
+  .ctx-purple { border-bottom-color: var(--purple); background: linear-gradient(90deg, #1e1642, #0f182b); }
+  .ctx-amber { border-bottom-color: var(--amber); background: linear-gradient(90deg, #3b1c06, #0f182b); }
+
+  .pill-ctrl {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #080d18; border: 1px solid #2a3e63;
+    padding: 3px 7px; border-radius: 7px; font-size: 11px;
+  }
+  .mini-btn {
+    background: #192742; color: #e2e8f0; border: 1px solid #324a73;
+    border-radius: 7px; padding: 4px 8px; font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: 0.12s; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .mini-btn:hover:not(:disabled) { border-color: var(--accent); background: #23375c; }
+  .mini-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .mini-btn.active { background: #16a34a; border-color: #4ade80; color: #fff; }
+  .mini-btn.active-pink { background: #db2777; border-color: #f472b6; color: #fff; }
+  .mini-btn.active-blue { background: #0284c7; border-color: #38bdf8; color: #fff; }
+
+  input[type="range"] { accent-color: var(--accent); cursor: pointer; height: 4px; }
+  input[type="color"] { cursor: pointer; background: none; border: none; padding: 0; }
+
+  /* SAHNE & ÖNİZLEME ZEMİNLERİ */
+  .stage {
+    flex: 1; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
     user-select: none;
   }
-  .stage.drag-over { border: 3px dashed #22c55e; }
+  .stage.preview-checker {
+    background-image: conic-gradient(#1b263b 25%, #0e1525 0 50%, #1b263b 0 75%, #0e1525 0);
+    background-size: 22px 22px;
+  }
+  .stage.preview-solid { background-image: none; }
+
+  .stage.drag-over { outline: 3px dashed var(--green); outline-offset: -8px; }
   .stage.pan-mode, .stage.pan-mode canvas { cursor: grab !important; }
   .stage.pan-mode:active, .stage.pan-mode canvas:active { cursor: grabbing !important; }
+  .stage.wand-mode canvas { cursor: crosshair !important; }
+
+  .empty-dropzone {
+    text-align: center; padding: 30px 36px;
+    border: 2px dashed #2e456e; border-radius: 18px;
+    background: rgba(13,21,38,0.88); color: #94a3b8; max-width: 470px;
+  }
+  .empty-dropzone h3 { margin: 0 0 8px 0; color: var(--accent); font-size: 17px; }
+  .empty-dropzone p { margin: 4px 0; font-size: 12.5px; line-height: 1.5; }
 
   #canvasWrapper {
-    position: relative;
-    display: inline-block;
-    line-height: 0;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.85);
-    transform-origin: center center;
+    position: relative; display: inline-block; line-height: 0;
+    box-shadow: 0 14px 45px rgba(0,0,0,0.85); transform-origin: center center;
   }
-  canvas {
+  canvas#canvas {
     display: block;
-    max-width: 100%;
-    max-height: 520px;
-    width: auto;
-    height: auto;
-    cursor: grab;
+    max-width: calc(100vw - 435px);
+    max-height: calc(100vh - 185px);
+    width: auto; height: auto; cursor: grab;
   }
-  canvas.brush-cursor { cursor: none !important; }
+  canvas#canvas.brush-cursor { cursor: none !important; }
 
-  .stage-zoom-hud {
-    margin-top: 10px;
-    background: #111a2e;
-    border: 1px solid #2e436e;
-    border-radius: 10px;
-    padding: 7px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 12px;
-  }
-  .crop-size-Floating, .layer-tag-floating, .brush-size-label {
-    line-height: 1.4 !important;
-    padding: 4px 10px !important;
-  }
+  /* MANYETİK HİZALAMA KILAVUZLARI */
+  .snap-line { display: none; position: absolute; pointer-events: none; z-index: 25; }
+  #snapLineX { top: 0; bottom: 0; left: 50%; width: 1.5px; background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+  #snapLineY { left: 0; right: 0; top: 50%; height: 1.5px; background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
 
+  /* FIRÇA İMLECİ */
   #brushCursorPreview {
-    display: none;
-    position: absolute;
-    pointer-events: none;
-    border-radius: 50%;
-    border: 2px solid #ffffff;
-    box-shadow: 0 0 0 1.5px #000000, inset 0 0 12px rgba(255, 255, 255, 0.35);
-    transform: translate(-50%, -50%);
-    z-index: 45;
+    display: none; position: absolute; pointer-events: none;
+    border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1.5px #000;
+    transform: translate(-50%, -50%); z-index: 45;
   }
-  #brushCursorPreview.erase-mode {
-    border-color: #f43f5e;
-    background: rgba(244, 63, 94, 0.18);
-  }
-  #brushCursorPreview.restore-mode {
-    border-color: #10b981;
-    background: rgba(16, 185, 129, 0.20);
-  }
+  #brushCursorPreview.erase-mode { border-color: #f43f5e; background: rgba(244,63,94,0.2); }
+  #brushCursorPreview.restore-mode { border-color: #10b981; background: rgba(16,185,129,0.22); }
   .brush-size-label {
-    position: absolute;
-    bottom: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(9, 14, 26, 0.92);
-    color: #38bdf8;
-    border: 1px solid #38bdf8;
-    border-radius: 6px;
-    padding: 2px 7px;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: rgba(8,13,24,0.95); color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 5px; padding: 2px 6px; font-size: 10.5px; font-weight: 800; white-space: nowrap; line-height: 1.3;
   }
 
+  /* KATMAN SEÇİM KUTUSU + DÖNDÜRME TUTAMACI */
   #layerTransformBox {
-    display: none;
-    position: absolute;
-    border: 2px dashed #38bdf8;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.6);
-    pointer-events: none;
-    z-index: 15;
+    display: none; position: absolute;
+    border: 1.5px dashed var(--accent); box-shadow: 0 0 0 1px rgba(0,0,0,0.65);
+    pointer-events: none; z-index: 15;
   }
+  #layerTransformBox.locked { border-color: #f59e0b; border-style: solid; }
+  #layerTransformBox.locked .layer-handle,
+  #layerTransformBox.locked .rotate-handle,
+  #layerTransformBox.locked .rotate-stem { display: none; }
   .layer-handle {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #38bdf8;
-    border: 2px solid #090e1a;
-    border-radius: 50%;
-    pointer-events: auto;
-    z-index: 18;
+    position: absolute; width: 11px; height: 11px;
+    background: var(--accent); border: 2px solid #060911; border-radius: 50%;
+    pointer-events: auto; z-index: 18;
   }
   .lh-nw { top: -6px; left: -6px; cursor: nwse-resize; }
   .lh-ne { top: -6px; right: -6px; cursor: nesw-resize; }
   .lh-sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
   .lh-se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
+  .rotate-stem {
+    position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 22px; background: var(--accent); pointer-events: none;
+  }
+  .rotate-handle {
+    position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
+    width: 19px; height: 19px; border-radius: 50%;
+    background: #0284c7; border: 2px solid #fff; color: #fff;
+    font-size: 10.5px; line-height: 15px; text-align: center;
+    pointer-events: auto; cursor: grab; z-index: 20;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+  }
+  .rotate-handle:active { cursor: grabbing; background: #22c55e; }
   .layer-tag-floating {
-    position: absolute;
-    top: -26px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #0284c7;
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-size: 10.5px;
-    font-weight: 800;
-    white-space: nowrap;
+    position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%);
+    background: #0284c7; color: #fff; padding: 2px 8px;
+    border-radius: 5px; font-size: 10px; font-weight: 800; white-space: nowrap; line-height: 1.4;
   }
 
+  /* KIRPMA ÇERÇEVESİ */
   #cropOverlay {
-    display: none;
-    position: absolute;
-    border: 2px solid #22c55e;
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.68);
-    cursor: move;
-    z-index: 30;
+    display: none; position: absolute; border: 2px solid var(--green);
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.7); cursor: move; z-index: 30;
   }
   .crop-grid-lines {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    position: absolute; inset: 0; pointer-events: none;
     background-image:
       linear-gradient(to right, rgba(255,255,255,0.28) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255,255,255,0.28) 1px, transparent 1px);
     background-size: 33.333% 33.333%;
   }
-  .crop-size-Floating {
-    position: absolute;
-    top: -28px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #052e16;
-    color: #4ade80;
-    border: 1px solid #22c55e;
-    padding: 2px 9px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-    pointer-events: none;
+  .crop-size-floating {
+    position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+    background: #052e16; color: #4ade80; border: 1px solid var(--green);
+    padding: 2px 8px; border-radius: 5px; font-size: 10.5px; font-weight: 800;
+    white-space: nowrap; pointer-events: none; line-height: 1.4;
   }
   .crop-handle {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #22c55e;
-    border: 2px solid #052e16;
-    border-radius: 3px;
-    z-index: 35;
+    position: absolute; width: 11px; height: 11px;
+    background: var(--green); border: 2px solid #052e16; border-radius: 2px; z-index: 35;
   }
   .handle-nw { top: -6px; left: -6px; cursor: nwse-resize; }
   .handle-ne { top: -6px; right: -6px; cursor: nesw-resize; }
@@ -615,627 +305,482 @@
   .handle-w  { left: -6px; top: calc(50% - 6px); cursor: ew-resize; }
   .handle-e  { right: -6px; top: calc(50% - 6px); cursor: ew-resize; }
 
-  .layers-sidebar {
-    background: #131d31;
-    border: 2px solid #263859;
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    height: 550px;
+  /* ALT DURUM, ÖNİZLEME ZEMİNİ VE BÜYÜTEÇ */
+  .bottom-hud {
+    height: 38px; background: #0a101e; border-top: 1.5px solid var(--border);
+    padding: 0 10px; display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; font-size: 11.5px; flex-shrink: 0;
   }
-  .layers-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #263859;
-    font-size: 13px;
-    font-weight: 800;
-    color: #38bdf8;
+  .status-text { color: var(--accent); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .ai-progress-wrap { display: none; align-items: center; gap: 6px; width: 175px; }
+  .ai-progress-wrap.show { display: flex; }
+  .ai-progress-track { flex: 1; height: 7px; background: #1e293b; border-radius: 6px; overflow: hidden; }
+  .ai-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ec4899, #38bdf8); transition: width 0.15s; }
+  .hud-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .bg-dot {
+    width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid #475569;
+    cursor: pointer; padding: 0;
   }
+
+  /* PRO RENK PALETİ POPOVER */
+  .hud-color-trigger {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 24px; padding: 0 7px 0 4px; border-radius: 6px;
+    background: #142038; border: 1.5px solid #324a73; color: #e2e8f0;
+    font-size: 10.5px; font-weight: 800; cursor: pointer; transition: 0.14s;
+  }
+  .hud-color-trigger:hover { border-color: var(--accent); background: #1c2d4d; }
+  .hud-color-trigger.active { border-color: #38bdf8; box-shadow: 0 0 0 1.5px rgba(56,189,248,0.45); }
+  .hud-swatch-dot {
+    width: 14px; height: 14px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.45); display: inline-block; flex-shrink: 0;
+  }
+  .hud-swatch-dot.checker {
+    background: conic-gradient(#64748b 25%, #1e293b 0 50%, #64748b 0 75%, #1e293b 0);
+    background-size: 8px 8px;
+  }
+  .hud-sep { width: 1px; height: 18px; background: #26395a; margin: 0 3px; }
+
+  #proColorPopover {
+    display: none; position: fixed; z-index: 9500;
+    width: 274px; background: #0a101e; border: 1.5px solid var(--accent);
+    border-radius: 14px; padding: 11px;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.92), 0 0 24px rgba(56,189,248,0.18);
+    user-select: none;
+  }
+  #proColorPopover.open { display: flex; flex-direction: column; gap: 9px; }
+  .pcp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; font-weight: 900; color: var(--accent); letter-spacing: 0.3px;
+  }
+  .pcp-mode-tabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5px;
+    background: #060911; padding: 3px; border-radius: 8px; border: 1px solid #1e2f4d;
+  }
+  .pcp-mode-btn {
+    background: transparent; border: none; color: var(--muted);
+    padding: 5px 4px; border-radius: 6px; font-size: 10.5px; font-weight: 800;
+    cursor: pointer; transition: 0.13s;
+  }
+  .pcp-mode-btn.active { background: #0284c7; color: #fff; }
+  .pcp-mode-btn.active-green { background: #16a34a; color: #fff; }
+
+  .pcp-sv-wrap {
+    position: relative; width: 100%; height: 142px;
+    border-radius: 8px; overflow: hidden; cursor: crosshair;
+    border: 1px solid #2b4066;
+  }
+  #pcpSvCanvas { display: block; width: 100%; height: 100%; }
+  #pcpSvCursor {
+    position: absolute; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 0 0 1.5px #000, 0 2px 6px rgba(0,0,0,0.8);
+    transform: translate(-50%, -50%); pointer-events: none; left: 100%; top: 0%;
+  }
+  .pcp-hue-wrap {
+    position: relative; width: 100%; height: 15px; border-radius: 8px;
+    background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+    cursor: ew-resize; border: 1px solid #2b4066;
+  }
+  #pcpHueThumb {
+    position: absolute; top: -2px; width: 9px; height: 17px; border-radius: 4px;
+    background: #fff; border: 1.5px solid #060911; box-shadow: 0 0 5px rgba(0,0,0,0.85);
+    transform: translateX(-50%); pointer-events: none; left: 0%;
+  }
+  .pcp-input-row { display: flex; align-items: center; gap: 6px; }
+  .pcp-preview-box {
+    width: 30px; height: 28px; border-radius: 7px; border: 1.5px solid #475569; flex-shrink: 0;
+  }
+  .pcp-hex-input {
+    flex: 1; height: 28px; background: #060911; border: 1px solid #324a73;
+    border-radius: 7px; color: #fff; font-family: Consolas, monospace;
+    font-size: 12px; font-weight: 800; padding: 0 8px; text-transform: uppercase; outline: none;
+  }
+  .pcp-hex-input:focus { border-color: var(--accent); }
+  .pcp-rgb-label { font-family: monospace; font-size: 10px; color: var(--muted); text-align: center; }
+  .pcp-swatches { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .pcp-swatch {
+    width: 100%; aspect-ratio: 1; border-radius: 5px;
+    border: 1.5px solid rgba(255,255,255,0.22); cursor: pointer; padding: 0; transition: 0.1s;
+  }
+  .pcp-swatch:hover { transform: scale(1.16); border-color: #fff; }
+  .pcp-actions { display: flex; flex-direction: column; gap: 5px; padding-top: 2px; border-top: 1px solid #1c2c4a; }
+
+  .bg-dot.active { border-color: #38bdf8; box-shadow: 0 0 0 1.5px #38bdf8; }
+
+  /* SAĞ SEKMELİ PANEL */
+  .right-panel {
+    background: var(--bg-panel); border-left: 1.5px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+  }
+  .rp-tabs {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    background: #080d18; border-bottom: 1.5px solid var(--border); flex-shrink: 0;
+  }
+  .rp-tab-btn {
+    background: transparent; border: none; border-bottom: 2.5px solid transparent;
+    color: var(--muted); padding: 10px 6px; font-size: 11.5px; font-weight: 800;
+    cursor: pointer; transition: 0.14s;
+  }
+  .rp-tab-btn:hover { color: #fff; background: rgba(56,189,248,0.06); }
+  .rp-tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: #0d1526; }
+
+  .rp-tab-pane { display: none; flex: 1; flex-direction: column; min-height: 0; overflow-y: auto; }
+  .rp-tab-pane.active { display: flex; }
+
+  .rp-section { padding: 10px 11px; border-bottom: 1px solid #1d2c48; }
+  .rp-title {
+    font-size: 11px; font-weight: 900; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .prop-grid { display: flex; flex-direction: column; gap: 7px; font-size: 11.5px; }
+  .prop-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .prop-row label { color: #cbd5e1; font-weight: 600; white-space: nowrap; }
+  .prop-row input[type="range"] { flex: 1; min-width: 60px; }
+  .prop-val { width: 42px; text-align: right; font-weight: 800; color: var(--accent); font-family: monospace; }
+
+  .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+
+  /* KATMAN LİSTESİ */
   .layers-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    padding-right: 4px;
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 10px 10px 4px;
   }
   .layer-item {
-    background: #0b111e;
-    border: 1.5px solid #223252;
-    border-radius: 9px;
-    padding: 7px 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.14s ease;
+    background: #090e1a; border: 1.5px solid #20304f; border-radius: 9px;
+    padding: 6px 7px; display: flex; align-items: center; gap: 7px; cursor: pointer; transition: 0.12s;
   }
-  .layer-item:hover { border-color: #38bdf8; }
-  .layer-item.active {
-    background: #172554;
-    border-color: #38bdf8;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
-  }
+  .layer-item:hover { border-color: var(--accent); }
+  .layer-item.active { background: #16264d; border-color: var(--accent); box-shadow: 0 0 10px rgba(56,189,248,0.22); }
   .layer-thumb {
-    width: 44px;
-    height: 44px;
-    border-radius: 6px;
-    object-fit: contain;
+    width: 38px; height: 38px; border-radius: 6px; object-fit: contain;
     background-image: conic-gradient(#334155 25%, #1e293b 0 50%, #334155 0 75%, #1e293b 0);
-    background-size: 8px 8px;
-    border: 1px solid #475569;
-    flex-shrink: 0;
+    background-size: 8px 8px; border: 1px solid #475569; flex-shrink: 0;
   }
   .layer-meta { flex: 1; overflow: hidden; }
   .layer-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: #f1f5f9;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11.5px; font-weight: 700; color: #f1f5f9;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .layer-sub { font-size: 10.5px; color: #94a3b8; margin-top: 2px; }
-  .layer-actions { display: flex; gap: 3px; }
-  .layer-icon-btn {
-    background: #1e293b;
-    border: 1px solid #334155;
-    color: #cbd5e1;
-    border-radius: 5px;
-    padding: 3px 6px;
-    font-size: 11px;
-    cursor: pointer;
+  .layer-name-input {
+    width: 100%; background: #060911; color: #fff; border: 1px solid #38bdf8;
+    border-radius: 4px; font-size: 11.5px; padding: 1px 4px; outline: none;
   }
-  .layer-icon-btn:hover { background: #334155; color: #fff; }
+  .layer-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .layer-actions { display: flex; gap: 2px; }
+  .l-icon-btn {
+    background: #1b2842; border: 1px solid #2e4369; color: #cbd5e1;
+    border-radius: 5px; padding: 2px 5px; font-size: 10.5px; cursor: pointer;
+  }
+  .l-icon-btn:hover { background: #2c4169; color: #fff; }
+  .l-icon-btn.locked-on { background: #78350f; border-color: #f59e0b; color: #fde68a; }
 
-  .status-banner {
-    margin-top: 12px;
-    background: #0b111e;
-    border: 1px solid #223252;
-    padding: 10px 14px;
-    border-radius: 10px;
-    text-align: center;
-    font-weight: 600;
-    color: #38bdf8;
-    font-size: 13px;
+  .layers-footer {
+    padding: 8px 10px; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; background: #0a101e;
   }
 
-  /* SECOVVV NEON YEŞİL MODALLAR */
+  .export-big-btn {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid transparent;
+    color: #fff; font-size: 12.5px; font-weight: 800; cursor: pointer; transition: 0.14s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .export-big-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .export-big-btn:hover:not(:disabled) { filter: brightness(1.12); }
+
+  /* MODALLAR */
   .seco-modal-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(3, 6, 12, 0.82);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    display: none; position: fixed; inset: 0;
+    background: rgba(3,6,12,0.84); backdrop-filter: blur(4px);
+    z-index: 9999; align-items: center; justify-content: center; padding: 16px;
   }
   .seco-modal-backdrop.open { display: flex; }
   .seco-modal-card {
-    background: #0c0f0d;
-    border: 2px solid #22c55e;
-    border-radius: 26px;
-    width: 100%;
-    max-width: 410px;
-    padding: 28px 24px 24px 24px;
-    text-align: center;
-    box-shadow: 0 0 35px rgba(34, 197, 94, 0.25), 0 20px 50px rgba(0,0,0,0.95);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
+    background: #0c0f0d; border: 2px solid var(--green); border-radius: 24px;
+    width: 100%; max-width: 400px; padding: 26px 22px 22px; text-align: center;
+    box-shadow: 0 0 35px rgba(34,197,94,0.25), 0 20px 50px rgba(0,0,0,0.95);
+    display: flex; flex-direction: column; align-items: center; gap: 13px;
   }
-  .seco-modal-icon {
-    width: 54px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #22c55e;
-  }
-  .seco-modal-title {
-    font-family: 'Consolas', 'Courier New', monospace;
-    font-size: 25px;
-    font-weight: 900;
-    color: #22c55e;
-    margin: 0;
-    letter-spacing: 0.8px;
-  }
-  .seco-modal-sub {
-    font-family: 'Consolas', 'Courier New', monospace;
-    font-size: 14.5px;
-    color: #94a3b8;
-    margin: -4px 0 6px 0;
-  }
-  .seco-res-inputs-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
-    margin: 4px 0 8px 0;
-  }
-  .seco-outlined-field {
-    position: relative;
-    flex: 1;
-    border: 1.5px solid #475569;
-    border-radius: 8px;
-    padding: 12px 10px 8px 10px;
-    background: #0c0f0d;
-  }
-  .seco-outlined-field:focus-within { border-color: #22c55e; }
-  .seco-outlined-field span {
-    position: absolute;
-    top: -9px;
-    left: 10px;
-    background: #0c0f0d;
-    padding: 0 5px;
-    font-size: 11.5px;
-    color: #94a3b8;
-  }
-  .seco-outlined-field input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700;
-    text-align: center;
-    outline: none;
-    height: 32px;
-    padding: 0;
-  }
-  .seco-lock-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #22c55e;
-    transition: transform 0.15s;
-  }
-  .seco-lock-btn.unlocked { color: #64748b; }
-  .seco-lock-btn:hover { transform: scale(1.12); }
+  .seco-modal-title { font-family: Consolas, monospace; font-size: 22px; font-weight: 900; color: var(--green); margin: 0; }
+  .seco-modal-sub { font-family: Consolas, monospace; font-size: 13px; color: var(--muted); margin: -4px 0 4px; }
+  .seco-res-row { display: flex; align-items: center; gap: 10px; width: 100%; }
+  .seco-field { position: relative; flex: 1; border: 1.5px solid #475569; border-radius: 8px; padding: 10px 8px 6px; }
+  .seco-field span { position: absolute; top: -8px; left: 9px; background: #0c0f0d; padding: 0 4px; font-size: 11px; color: var(--muted); }
+  .seco-field input { width: 100%; background: transparent; border: none; color: #fff; font-size: 19px; font-weight: 700; text-align: center; outline: none; }
+  .seco-lock-btn { background: transparent; border: none; cursor: pointer; font-size: 22px; }
+  .seco-compress-row { display: flex; gap: 10px; width: 100%; }
+  .seco-compress-input { flex: 1.8; background: #0c0f0d; border: 1.5px solid #475569; border-radius: 8px; padding: 10px 12px; color: #fff; font-size: 16px; font-weight: 700; }
+  .seco-unit-btn { flex: 1; background: #334155; border: 1px solid #64748b; border-radius: 9px; color: var(--accent); font-size: 18px; font-weight: 900; cursor: pointer; }
+  .seco-btn-green { width: 100%; height: 48px; border-radius: 26px; border: none; background: #1eff00; color: #051a02; font-size: 15px; font-weight: 900; cursor: pointer; }
+  .seco-btn-cancel { width: 100%; height: 44px; border-radius: 26px; border: 1.5px solid #334155; background: transparent; color: #ff3b3b; font-size: 14px; font-weight: 900; cursor: pointer; }
 
-  .seco-compress-row {
-    display: flex;
-    align-items: stretch;
-    gap: 12px;
-    width: 100%;
-    margin: 4px 0 8px 0;
+  @media (max-width: 980px) {
+    html, body { overflow: auto; }
+    .app-shell { height: auto; min-height: 100vh; }
+    .topbar { height: auto; flex-wrap: wrap; padding: 8px; }
+    .main-body { grid-template-columns: 1fr; }
+    .tool-rail { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1.5px solid var(--border); }
+    .stage { height: 460px; }
+    canvas#canvas { max-width: 94vw; max-height: 430px; }
   }
-  .seco-compress-input {
-    flex: 1.8;
-    background: #0c0f0d;
-    border: 1.5px solid #475569;
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-    height: 54px;
-    outline: none;
-  }
-  .seco-compress-input:focus { border-color: #22c55e; }
-  .seco-unit-btn {
-    flex: 1;
-    background: #424649;
-    border: 1px solid #64748b;
-    border-radius: 10px;
-    color: #38bdf8;
-    font-size: 20px;
-    font-weight: 900;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.15s;
-  }
-  .seco-unit-btn:hover { background: #52575c; border-color: #38bdf8; }
-
-  .seco-btn-green {
-    width: 100%;
-    height: 54px;
-    border-radius: 30px;
-    border: none;
-    background: #1eff00;
-    color: #051a02;
-    font-size: 16px;
-    font-weight: 900;
-    letter-spacing: 0.6px;
-    cursor: pointer;
-    transition: 0.15s;
-    box-shadow: 0 6px 20px rgba(30, 255, 0, 0.3);
-  }
-  .seco-btn-green:hover { background: #4dff33; transform: translateY(-1px); }
-  .seco-btn-cancel {
-    width: 100%;
-    height: 52px;
-    border-radius: 30px;
-    border: 1.5px solid #334155;
-    background: transparent;
-    color: #ff1e1e;
-    font-size: 15.5px;
-    font-weight: 900;
-    letter-spacing: 0.6px;
-    cursor: pointer;
-    transition: 0.15s;
-  }
-  .seco-btn-cancel:hover { border-color: #ef4444; background: rgba(239, 68, 68, 0.08); }
 </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-shell">
 
-  <header class="main-header">
-    <a href="index.html" class="home-btn" title="Ana Sayfaya Dön">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 10.5L12 3l9 7.5"></path>
-        <path d="M5 9.5V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9.5"></path>
-        <path d="M9 21v-6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6"></path>
-      </svg>
-      <span>Ana Sayfa</span>
-    </a>
-    <h1>🖼️ SECOVVV Çok Katmanlı Resim İşleme, AI Kesim, Kontur/Gölge & Yazı Stüdyosu Pro</h1>
-    <p>Katmanlı resim ve yazı ekleyin, <b>Yapay Zeka (AI) + 60 FPS Fırça</b> ile arka planı silin, <b>Kontur/Gölge/Renk</b> verip <b>Otomatik Boşluk Kırpma</b> ile kaydedin</p>
+  
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="home-btn">🏠 Ana Sayfa</a>
+      <span class="brand-title">SECOVVV STÜDYO PRO</span>
+      <span class="brand-badge">v2.6 AI</span>
+    </div>
+
+    <div class="topbar-center">
+      <button class="top-btn tb-teal" onclick="openNewCanvasModal()" title="İstediğin ölçülerde boş/şeffaf tuval oluştur">📄 Yeni Tuval</button>
+      <label class="top-btn tb-blue" for="imageInput" style="cursor:pointer;" title="Resim yükle veya Ctrl+V ile yapıştır">➕ Resim Ekle</label>
+      <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
+      <button class="top-btn tb-amber" onclick="addNewTextLayer()">🔤 Yazı</button>
+
+      <div class="dropdown-wrap" id="cropDropdownWrapper">
+        <button class="top-btn tb-green" id="btnMainCropMenu" onclick="toggleCropMenu()" disabled>✂️ Kırp & Boyut ▾</button>
+        <div class="dropdown-menu" id="cropDropdownMenu">
+          <button class="drop-item" onclick="selectMenuAction('free')">
+            <div><b>1. ✂️ Serbest Kırpma</b><small>Çerçeve ile istediğiniz alanı kesin</small></div><span>➔</span>
+          </button>
+          <button class="drop-item" onclick="selectMenuAction('presets')">
+            <div><b>2. 📱 Sosyal Medya Ölçekleri</b><small>1:1, 9:16, 16:9, 4:5 + Kesmeden Sığdır</small></div><span>➔</span>
+          </button>
+          <button class="drop-item" onclick="selectMenuAction('autotrim')">
+            <div><b>3. 🎯 Şeffaf Boşlukları Kırp</b><small>Objenin etrafındaki boşluğu sıfırlar</small></div><span>⚡</span>
+          </button>
+          <button class="drop-item" onclick="selectMenuAction('resolution')">
+            <div><b>4. 📐 Çözünürlük (WxH)</b><small>Manuel piksel genişlik x yükseklik</small></div><span>➔</span>
+          </button>
+          <button class="drop-item" onclick="selectMenuAction('filesize')">
+            <div><b>5. 🗜️ Özel Boyut (MB / KB)</b><small>Hedef dosya boyutuna akıllı sıkıştır</small></div><span>➔</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="top-btn tb-pink" id="btnAutoBgRemove" onclick="triggerSmartBgRemoval()" disabled>🧠 AI Arka Plan Sil</button>
+      <button class="top-btn tb-ghost" id="btnUndo" onclick="undoLastAction()" disabled title="Geri Al (Ctrl+Z)">↩️</button>
+      <button class="top-btn tb-ghost" id="btnRedo" onclick="redoLastAction()" disabled title="İleri Al (Ctrl+Y)">↪️</button>
+    </div>
+
+    <div class="topbar-right">
+      <span class="info-pill" id="imageInfoBadge">Hazır • Ctrl+V</span>
+      <button class="top-btn tb-ghost" id="btnCopyPngTop" onclick="copyCompositionToClipboard()" disabled title="Panoya Şeffaf PNG Kopyala">📋 PNG Kopyala</button>
+      <button class="top-btn tb-purple" id="btnQuickDownloadTop" onclick="quickDownloadImage()" disabled title="Hızlı İndir">⬇️ İndir</button>
+    </div>
   </header>
-  
-  <section class="studio-panel panel-1">
-    <div class="panel-header">
-      <div class="panel-title">
-        <span class="panel-step-badge">PANEL 1</span>
-        <span>Katman Yükleme, AI Arka Plan Silme & Kaydetme Merkezi</span>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <span class="seco-watermark">Multimedya: SECOVVV</span>
-        <div class="source-info-tag" id="imageInfoBadge">Henüz katman eklenmedi</div>
-      </div>
-    </div>
-
-    <div class="top-export-bar">
-      
-      <div class="export-card">
-        <div class="card-title">
-          <span>📂 1. Sahneye Resim veya Yazı Ekle</span>
-          <span id="layerCountBadge" style="font-size:11px; color:#38bdf8;">0 Katman</span>
-        </div>
-        <div class="btn-group">
-          <label class="ergo-btn btn-add-layer" for="imageInput" style="cursor:pointer;">
-            <span class="btn-main">➕ Resim Ekle</span>
-            <span class="btn-sub">Çoklu Katman</span>
-          </label>
-          <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
-
-          <button class="ergo-btn btn-add-text" onclick="addNewTextLayer()">
-            <span class="btn-main">🔤 Yazı Ekle</span>
-            <span class="btn-sub">Stil & Konturlu Metin</span>
-          </button>
-
-          <div class="field-box" style="max-width:118px;">
-            <span class="field-title">Tuval Zemini:</span>
-            <select id="canvasBgSelect" onchange="onCanvasBgChange()">
-              <option value="transparent" selected>🏁 Şeffaf</option>
-              <option value="#ffffff">⬜ Beyaz</option>
-              <option value="#000000">⬛ Siyah</option>
-              <option value="custom">🎨 Özel Renk</option>
-            </select>
-            <input type="color" id="customBgColorInput" value="#0ea5e9" style="display:none; width:100%; height:24px; border:none; margin-top:3px;" oninput="requestStageRender()">
-          </div>
-        </div>
-      </div>
-
-      
-      <div class="export-card" style="border-color:#10b981;">
-        <div class="card-title" style="color:#34d399;">
-          <span>📐 2. Kırp, Boyutlandır & Pro Arka Plan Sil</span>
-          <span id="currentResBadge" style="font-size:11.5px; color:#6ee7b7;">Tuval: -</span>
-        </div>
-        <div class="btn-group">
-          <div class="dropdown-wrapper" id="cropDropdownWrapper">
-            <button class="ergo-btn btn-crop-main" id="btnMainCropMenu" style="width:100%;" onclick="toggleCropMenu()" disabled>
-              <span class="btn-main">✂️ Kırp & Boyutlandır ▾</span>
-              <span class="btn-sub">Serbest • Ölçek • Boşluk Kırp • WxH • MB</span>
-            </button>
-
-            <div class="crop-dropdown-menu" id="cropDropdownMenu">
-              <button class="menu-option-btn" onclick="selectMenuAction('free')">
-                <div>
-                  <div>1. ✂️ Serbest Kırpma</div>
-                  <div class="menu-option-sub">Fareyle istediğiniz boyutta serbest çerçeve seçin</div>
-                </div>
-                <span>➔</span>
-              </button>
-
-              <button class="menu-option-btn" onclick="selectMenuAction('presets')">
-                <div>
-                  <div>2. 📱 Standart Ölçekler (Sosyal Medya)</div>
-                  <div class="menu-option-sub">1:1 İnsta, 9:16 Reels/TikTok, 16:9 YouTube, 4:5, 4:3, 5:4</div>
-                </div>
-                <span>➔</span>
-              </button>
-
-              <button class="menu-option-btn" onclick="selectMenuAction('autotrim')">
-                <div>
-                  <div>3. 🎯 Şeffaf Boşlukları Otomatik Kırp</div>
-                  <div class="menu-option-sub">Objenin etrafındaki boş şeffaf pikselleri sıfıra sıfır keser</div>
-                </div>
-                <span>⚡</span>
-              </button>
-
-              <button class="menu-option-btn" onclick="selectMenuAction('resolution')">
-                <div>
-                  <div>4. 📐 Çözünürlük (WxH)</div>
-                  <div class="menu-option-sub">Manuel Genişlik x Yükseklik piksel değeri girin</div>
-                </div>
-                <span>➔</span>
-              </button>
-
-              <button class="menu-option-btn" onclick="selectMenuAction('filesize')">
-                <div>
-                  <div>5. 🗜️ Özel Boyut (Sıkıştır - MB / KB)</div>
-                  <div class="menu-option-sub">İstediğiniz hedef MB veya KB dosya boyutuna düşürün</div>
-                </div>
-                <span>➔</span>
-              </button>
-            </div>
-          </div>
-
-          <button class="ergo-btn btn-magic-bg" id="btnAutoBgRemove" onclick="triggerSmartBgRemoval()" disabled>
-            <span class="btn-main">🧠 AI Otomatik Arka Plan Sil</span>
-            <span class="btn-sub">Yapay Zeka + Pürüzsüz Kesim</span>
-          </button>
-        </div>
-      </div>
-
-      
-      <div class="export-card" style="border-color:#3b82f6;">
-        <div class="card-title">
-          <span>💾 3. Çıktı Formatı & Bilgisayara Kaydet</span>
-          <span id="estFileSizeBadge" style="font-size:11.5px; color:#38bdf8;">Boyut: -</span>
-        </div>
-        <div class="source-row">
-          <div class="field-box" style="flex:0.9; min-width:100px;">
-            <span class="field-title">Kayıt Formatı:</span>
-            <select id="exportFormatSelect" onchange="scheduleSizeEstimate()">
-              <option value="image/png" selected>👻 PNG (Şeffaf)</option>
-              <option value="image/webp">⚡ WebP (Şeffaf)</option>
-              <option value="image/jpeg">📸 JPG (.jpg)</option>
-            </select>
-          </div>
-          <div class="btn-group" style="flex:1.5;">
-            <button class="ergo-btn btn-save-folder" id="btnSaveAs" onclick="saveImageWithFolderPicker()" disabled>
-              <span class="btn-main">📂 Klasör Seç & Kaydet</span>
-              <span class="btn-sub">Farklı Kaydet Penceresi</span>
-            </button>
-            <button class="ergo-btn btn-quick-dl" id="btnQuickDownload" onclick="quickDownloadImage()" disabled>
-              <span class="btn-main">⬇️ Hızlı İndir</span>
-              <span class="btn-sub">İndirilenler'e Kaydet</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   
-  <section class="studio-panel panel-2">
-    <div class="panel-header">
-      <div class="panel-title">
-        <span class="panel-step-badge" style="color:#34d399; border-color:#10b981;">PANEL 2</span>
-        <span>Canlı Katman Sahnesi, Büyüteç (Zoom), Kontur/Gölge & 60 FPS Rötuş Fırçası</span>
-      </div>
-      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-        <button class="btn-reset" id="btnToggleFxBar" onclick="toggleFxColorBar()" disabled>✨ Kontur, Gölge & Renk Ayarları</button>
-        <button class="btn-reset" id="btnQuickAutoTrim" onclick="autoTrimTransparentBounds()" disabled title="Objenin etrafındaki şeffaf boşlukları otomatik kırpar">🎯 Boşlukları Kırp</button>
-      </div>
-    </div>
+  <div class="main-body">
 
     
-    <div class="aspect-presets-bar" id="aspectPresetsBar">
-      <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center; width:100%; justify-content:space-between; border-bottom:1px solid #1e3a5f; padding-bottom:7px; margin-bottom:4px;">
-        <strong style="color:#4ade80; font-size:12px;">📱 Sosyal Medya & Standart Ölçekler:</strong>
-        <label style="display:inline-flex; align-items:center; gap:6px; color:#38bdf8; font-weight:700; font-size:11.5px; cursor:pointer;">
-          <input type="checkbox" id="presetExactScaleCheck" checked onchange="renderCropOverlayDOM()" style="accent-color:#22c55e; cursor:pointer;">
-          🎯 Kırpınca Tam Standart Piksele Sabitle (Örn: 1080x1080)
-        </label>
-      </div>
-      <button class="btn-reset" onclick="setCropAspectRatio(null, this, null, null)">🔓 Serbest</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(1, this, 1080, 1080)">1:1 İnsta Kare (1080x1080)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(4/5, this, 1080, 1350)">4:5 Dikey Portre (1080x1350)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(3/4, this, 1080, 1440)">3:4 Yeni Dikey (1080x1440)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(1080/566, this, 1080, 566)">1.91:1 Yatay (1080x566)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(9/16, this, 1080, 1920)">9:16 Reels/TikTok (1080x1920)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(16/9, this, 1920, 1080)">16:9 YouTube (1920x1080)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(4/3, this, 1440, 1080)">4:3 Klasik (1440x1080)</button>
-      <button class="btn-reset" onclick="setCropAspectRatio(5/4, this, 1350, 1080)">5:4 Portre (1350x1080)</button>
-    </div>
+    <aside class="tool-rail">
+      <button class="rail-btn active" id="railMove" onclick="activateTool('move')" title="Taşı & Boyutlandır (V)"><em>V</em>✋<span>Taşı</span></button>
+      <button class="rail-btn" id="railCrop" onclick="selectMenuAction('free')" disabled title="Kırp (C)"><em>C</em>✂️<span>Kırp</span></button>
+      <div class="rail-sep"></div>
+      <button class="rail-btn" id="railBg" onclick="activateTool('bg')" disabled title="AI Kesim Paneli (A)"><em>A</em>🧠<span>AI Sil</span></button>
+      <button class="rail-btn" id="railWand" onclick="activateTool('wand')" disabled title="Sihirli Değnek: Tıklanan Rengi Sil (W)"><em>W</em>🪄<span>Değnek</span></button>
+      <button class="rail-btn" id="railErase" onclick="activateTool('erase')" disabled title="Silgi Fırçası (E)"><em>E</em>🧹<span>Silgi</span></button>
+      <button class="rail-btn" id="railRestore" onclick="activateTool('restore')" disabled title="Geri Getirme Fırçası (B)"><em>B</em>🖌️<span>Onar</span></button>
+      <div class="rail-sep"></div>
+      <button class="rail-btn" id="railText" onclick="activateTool('text')" title="Yazı Aracı (T)"><em>T</em>🔤<span>Yazı</span></button>
+      <button class="rail-btn" id="railFx" onclick="activateTool('fx')" disabled title="Efekt & Filtreler (F)"><em>F</em>✨<span>Efekt</span></button>
+      <div class="rail-sep"></div>
+      <button class="rail-btn" id="railPan" onclick="activateTool('pan')" title="Sahneyi Kaydır (H veya Space)"><em>H</em>🖐️<span>Kaydır</span></button>
+    </aside>
 
     
-    <div class="crop-action-bar" id="cropActionBar">
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <span style="color:#4ade80; font-weight:800; font-size:13px;">✂️ Kırpma Çerçevesi Aktif:</span>
-        <span id="liveCropReadout" style="color:#e2e8f0; font-size:12.5px; font-family:monospace;">Yeşil kutuyu köşelerinden sürükleyin</span>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn-apply-crop" style="background:#38bdf8; color:#082f49;" onclick="fitImageWithoutCropping()" title="Resmin hiçbir yerini kesmeden tuvali seçili ölçeğe (örn: 1080x1080) ayarlar ve resmi içine tam sığdırır">📐 KESMEDEN TAM SIĞDIR</button>
-        <button class="btn-apply-crop" onclick="applyInteractiveCrop()">✅ SEÇİLİ ALANI KIRP</button>
-        <button class="btn-cancel-crop" onclick="cancelInteractiveCrop()">✖ İPTAL</button>
-      </div>
-    </div>
+    <main class="center-col">
 
-    
-    <div class="text-editor-bar" id="textEditorBar">
-      <div class="bg-section" style="flex:1;">
-        <strong style="color:#fbbf24;">🔤 Yazı Katmanı:</strong>
-        <input type="text" id="textLayerContent" placeholder="Metninizi yazın..." style="max-width:240px; height:30px;" oninput="updateSelectedTextLayer()">
-        <select id="textLayerFont" style="width:140px; height:30px; padding:2px 6px;" onchange="updateSelectedTextLayer()">
-          <option value="Impact, sans-serif">Impact (Kalın Başlık)</option>
-          <option value="'Segoe UI', sans-serif" selected>Segoe UI (Modern)</option>
-          <option value="'Arial Black', sans-serif">Arial Black</option>
-          <option value="'Courier New', monospace">Courier (Kod)</option>
-          <option value="Georgia, serif">Georgia (Klasik)</option>
+      
+      <div class="context-bar ctx-pink" id="ctxBgBar">
+        <select id="bgRemoveModeSelect" class="top-select" style="height:27px;" onchange="onBgModeSelectChange()">
+          <option value="rmbg" selected>🤖 AI RMBG-1.4 (Kedi/Hayvan/Obje/İnsan)</option>
+          <option value="modnet">👤 AI MODNet (Hafif İnsan Portre)</option>
+          <option value="wand">🪄 Sihirli Değnek (Bölgesel)</option>
+          <option value="global">🌐 Chroma Key (Tüm Renk)</option>
         </select>
-        <label style="display:flex; align-items:center; gap:4px;">Renk: <input type="color" id="textLayerColor" value="#ffffff" style="width:26px; height:26px; border:none;" oninput="updateSelectedTextLayer()"></label>
-        <label style="display:flex; align-items:center; gap:4px;">Dış Çizgi: <input type="color" id="textLayerStrokeColor" value="#000000" style="width:26px; height:26px; border:none;" oninput="updateSelectedTextLayer()"></label>
-        <div class="magic-slider-box">
-          <span>Çizgi Kalınlığı: <b id="textStrokeVal" style="color:#fbbf24;">6 px</b></span>
-          <input type="range" id="textLayerStrokeWidth" min="0" max="25" value="6" style="width:65px;" oninput="updateSelectedTextLayer()">
-        </div>
-      </div>
-      <button class="btn-reset" onclick="document.getElementById('textEditorBar').classList.remove('show')">✖ Gizle</button>
-    </div>
+        <button class="mini-btn active-pink" onclick="triggerSmartBgRemoval()">⚡ Uygula</button>
+        <button class="mini-btn" onclick="invertSelectedLayerMask()" title="Şeffaf ve görünür alanları ters çevir">🔀 Maskeyi Tersle</button>
 
-    
-    <div class="fx-color-bar" id="fxColorBar">
-      <div class="magic-row">
-        <div class="bg-section">
-          <strong style="color:#c084fc;">✨ Sticker Dış Kontur & Gölge:</strong>
-          <div class="magic-slider-box">
-            <span>Kontur: <b id="fxStrokeVal" style="color:#c084fc;">0 px</b></span>
-            <input type="range" id="fxStrokeWidth" min="0" max="28" value="0" style="width:70px;" oninput="onLayerFxChange()">
-            <input type="color" id="fxStrokeColor" value="#ffffff" style="width:24px; height:22px; border:none;" oninput="onLayerFxChange()">
-          </div>
-          <div class="magic-slider-box">
-            <span>Gölge Bulanıklık: <b id="fxShadowVal" style="color:#c084fc;">0 px</b></span>
-            <input type="range" id="fxShadowBlur" min="0" max="50" value="0" style="width:70px;" oninput="onLayerFxChange()">
-            <input type="color" id="fxShadowColor" value="#000000" style="width:24px; height:22px; border:none;" oninput="onLayerFxChange()">
-          </div>
+        <div class="pill-ctrl">
+          <span>✨ Yumuşat: <b id="bgFeatherVal" style="color:#4ade80;">1.0px</b></span>
+          <input type="range" id="bgFeatherRange" min="0" max="8" step="0.5" value="1.0" style="width:52px;" onpointerdown="saveStateToHistory()" oninput="onFastMattingSliderInput('feather', this.value)">
         </div>
-        <button class="btn-reset" onclick="resetLayerFxAndColor()">🔄 Efektleri Sıfırla</button>
-      </div>
-
-      <div class="magic-row" style="padding-top:6px; border-top:1px dashed rgba(192, 132, 252, 0.3);">
-        <div class="bg-section">
-          <strong style="color:#38bdf8;">🎨 Katman Renk & Işık:</strong>
-          <div class="magic-slider-box">
-            <span>☀️ Parlaklık: <b id="fxBrightVal">100%</b></span>
-            <input type="range" id="fxBrightRange" min="40" max="180" value="100" style="width:65px;" oninput="onLayerFxChange()">
-          </div>
-          <div class="magic-slider-box">
-            <span>🌗 Kontrast: <b id="fxContVal">100%</b></span>
-            <input type="range" id="fxContRange" min="40" max="180" value="100" style="width:65px;" oninput="onLayerFxChange()">
-          </div>
-          <div class="magic-slider-box">
-            <span>🌈 Doygunluk: <b id="fxSatVal">100%</b></span>
-            <input type="range" id="fxSatRange" min="0" max="250" value="100" style="width:65px;" oninput="onLayerFxChange()">
-          </div>
-          <div class="magic-slider-box">
-            <span>🎨 Ton (Hue): <b id="fxHueVal">0°</b></span>
-            <input type="range" id="fxHueRange" min="-180" max="180" value="0" style="width:65px;" oninput="onLayerFxChange()">
-          </div>
+        <div class="pill-ctrl">
+          <span>✂️ Çapak: <b id="bgChokeVal" style="color:#f472b6;">0.0</b></span>
+          <input type="range" id="bgChokeRange" min="-3" max="5" step="0.5" value="0.0" style="width:48px;" onpointerdown="saveStateToHistory()" oninput="onFastMattingSliderInput('choke', this.value)">
         </div>
-        <button class="btn-reset" onclick="toggleFxColorBar()">✖ Kapat</button>
-      </div>
-    </div>
-
-    
-    <div class="magic-bg-bar" id="magicBgBar">
-      <div class="magic-row">
-        <div class="bg-section">
-          <strong style="color:#f472b6;">🧠 Kesim Motoru:</strong>
-          <select id="bgRemoveModeSelect" style="width:230px; height:30px; padding:3px 6px;" onchange="onBgModeSelectChange()">
-            <option value="ai" selected>🤖 Yapay Zeka (AI Kedi/İnsan/Obje Ayırıcı)</option>
-            <option value="wand">🪄 Çoklu Sihirli Değnek (Shift + Tık ile Ekle)</option>
-            <option value="global">🌐 Chroma Key (Kapalı Boşluklar Dahil Tüm Renk)</option>
+        <div class="pill-ctrl">
+          <span>🧹 Güç: <b id="bgTolVal" style="color:#38bdf8;">38</b></span>
+          <input type="range" id="bgTolRange" min="5" max="120" value="38" style="width:48px;" onpointerdown="saveStateToHistory()" oninput="onFastWandTolSliderInput(this.value)">
+        </div>
+        <div class="pill-ctrl" title="Yeşil/Mavi ekran kenar parlamasını bastırır">
+          <span>🟢 Despill:</span>
+          <select id="bgDespillSelect" class="top-select" style="height:22px; font-size:10.5px; padding:0 4px;" onchange="onDespillChange(this.value)">
+            <option value="none">Kapalı</option>
+            <option value="green">Yeşil Bastır</option>
+            <option value="blue">Mavi Bastır</option>
           </select>
-          <button class="btn-reset" style="background:#be185d; border-color:#f472b6; color:#fff;" onclick="triggerSmartBgRemoval()">⚡ Uygula</button>
         </div>
+        <div class="pill-ctrl">
+          <span>📏 Fırça: <b id="brushSizeVal" style="color:#38bdf8;">50px</b></span>
+          <input type="range" id="brushSizeRange" min="5" max="500" value="50" style="width:62px;" oninput="onBrushSizeInput(this.value)">
+        </div>
+        <div class="pill-ctrl" title="0% çok yumuşak, 100% keskin fırça kenarı">
+          <span>🎯 Sertlik: <b id="brushHardVal" style="color:#fbbf24;">40%</b></span>
+          <input type="range" id="brushHardRange" min="0" max="100" value="40" style="width:52px;" oninput="document.getElementById('brushHardVal').innerText=this.value+'%'">
+        </div>
+        <label class="pill-ctrl" style="cursor:pointer;">
+          <input type="checkbox" id="maskOverlayCheck" onchange="requestStageRender()" style="accent-color:#f43f5e;">
+          <span style="color:#fda4af; font-weight:700;">🔴 Maske</span>
+        </label>
+        <button class="mini-btn" onclick="restoreSelectedLayerOriginal()" style="border-color:#f43f5e; color:#fda4af;">🔄 Orijinal</button>
+      </div>
 
-        <div class="bg-section">
-          <div class="magic-slider-box">
-            <span>✨ Kenar Pürüzsüzlüğü: <b id="bgFeatherVal" style="color:#4ade80;">2.0 px</b></span>
-            <input type="range" id="bgFeatherRange" min="0" max="8" step="0.5" value="2.0" style="width:70px;" oninput="onFastMattingSliderInput('feather', this.value)">
-          </div>
-
-          <div class="magic-slider-box">
-            <span>✂️ Çapak Temizleme: <b id="bgChokeVal" style="color:#f472b6;">0.5</b></span>
-            <input type="range" id="bgChokeRange" min="-3" max="5" step="0.5" value="0.5" style="width:60px;" oninput="onFastMattingSliderInput('choke', this.value)">
-          </div>
-
-          <div class="magic-slider-box">
-            <span>🧹 Değnek/Chroma Gücü: <b id="bgTolVal" style="color:#38bdf8;">38</b></span>
-            <input type="range" id="bgTolRange" min="5" max="120" value="38" style="width:65px;" oninput="onFastWandTolSliderInput(this.value)">
-          </div>
+      
+      <div class="context-bar ctx-green" id="ctxCropBar">
+        <div id="aspectPresetsRow" style="display:none; align-items:center; gap:5px; flex-wrap:wrap; width:100%; padding-bottom:5px; border-bottom:1px solid rgba(34,197,94,0.25);">
+          <strong style="color:#4ade80;">📱 Ölçek:</strong>
+          <button class="mini-btn" onclick="setCropAspectRatio(null, this, null, null)">🔓 Serbest</button>
+          <button class="mini-btn" onclick="setCropAspectRatio(1, this, 1080, 1080)">1:1 Kare</button>
+          <button class="mini-btn" onclick="setCropAspectRatio(4/5, this, 1080, 1350)">4:5 Portre</button>
+          <button class="mini-btn" onclick="setCropAspectRatio(9/16, this, 1080, 1920)">9:16 Reels</button>
+          <button class="mini-btn" onclick="setCropAspectRatio(16/9, this, 1920, 1080)">16:9 YouTube</button>
+          <button class="mini-btn" onclick="setCropAspectRatio(4/3, this, 1440, 1080)">4:3</button>
+          <label class="pill-ctrl" style="cursor:pointer;">
+            <input type="checkbox" id="presetExactScaleCheck" checked onchange="renderCropOverlayDOM()" style="accent-color:#22c55e;">
+            <span>Tam Piksel Çıktı</span>
+          </label>
+        </div>
+        <span id="liveCropReadout" style="color:#86efac; font-family:monospace; font-weight:700;">Kırpma alanı seçin</span>
+        <div style="margin-left:auto; display:flex; gap:6px;">
+          <button class="mini-btn active-blue" onclick="fitImageWithoutCropping()">📐 Kesmeden Sığdır</button>
+          <button class="mini-btn active" onclick="applyInteractiveCrop()">✅ Kırp</button>
+          <button class="mini-btn" style="border-color:#ef4444; color:#fca5a5;" onclick="cancelInteractiveCrop()">✖ İptal</button>
         </div>
       </div>
 
-      <div class="magic-row" style="padding-top:8px; border-top:1px dashed rgba(244, 114, 182, 0.3);">
-        <div class="bg-section">
-          <strong style="color:#38bdf8;">🖌️ 60 FPS Fırça:</strong>
-          <button class="btn-reset active-brush" id="btnBrushNone" onclick="setBrushTool('none')">✋ Taşıma Modu</button>
-          <button class="btn-reset" id="btnBrushErase" onclick="setBrushTool('erase')">🧹 Yumuşak Silgi</button>
-          <button class="btn-reset" id="btnBrushRestore" onclick="setBrushTool('restore')">🖌️ Geri Getir</button>
+      
+      <div class="context-bar ctx-purple" id="ctxFxBar">
+        <div class="pill-ctrl">
+          <span>✨ Kontur: <b id="fxStrokeVal" style="color:#c084fc;">0px</b></span>
+          <input type="range" id="fxStrokeWidth" min="0" max="28" value="0" style="width:52px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+          <input type="color" id="fxStrokeColor" value="#ffffff" style="width:20px; height:20px;" oninput="onLayerFxChange()">
+        </div>
+        <div class="pill-ctrl">
+          <span>🌫️ Gölge: <b id="fxShadowVal" style="color:#c084fc;">0px</b></span>
+          <input type="range" id="fxShadowBlur" min="0" max="50" value="0" style="width:52px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+          <input type="color" id="fxShadowColor" value="#000000" style="width:20px; height:20px;" oninput="onLayerFxChange()">
+        </div>
+        <div class="pill-ctrl">
+          <span>☀️ Işık: <b id="fxBrightVal">100%</b></span>
+          <input type="range" id="fxBrightRange" min="40" max="180" value="100" style="width:50px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+        </div>
+        <div class="pill-ctrl">
+          <span>🌗 Kontrast: <b id="fxContVal">100%</b></span>
+          <input type="range" id="fxContRange" min="40" max="180" value="100" style="width:50px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+        </div>
+        <div class="pill-ctrl">
+          <span>🌈 Doygunluk: <b id="fxSatVal">100%</b></span>
+          <input type="range" id="fxSatRange" min="0" max="250" value="100" style="width:50px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+        </div>
+        <div class="pill-ctrl">
+          <span>🎨 Ton: <b id="fxHueVal">0°</b></span>
+          <input type="range" id="fxHueRange" min="-180" max="180" value="0" style="width:50px;" onpointerdown="saveStateToHistory()" oninput="onLayerFxChange()">
+        </div>
+        <button class="mini-btn" onclick="resetLayerFxAndColor()">🔄 Sıfırla</button>
+      </div>
 
-          <div class="magic-slider-box">
-            <span>📏 Boyut: <b id="brushSizeVal" style="color:#38bdf8;">50 px</b></span>
-            <input type="range" id="brushSizeRange" min="5" max="500" value="50" style="width:110px;" oninput="onBrushSizeInput(this.value)">
+      
+      <div class="context-bar ctx-amber" id="ctxTextBar">
+        <strong style="color:#fbbf24;">🔤 Metin:</strong>
+        <input type="text" id="textLayerContent" placeholder="Metin..." style="width:200px; height:27px; background:#080d18; color:#fff; border:1px solid #f59e0b; border-radius:7px; padding:0 8px;" oninput="updateSelectedTextLayer()">
+        <select id="textLayerFont" class="top-select" style="height:27px; max-width:195px;" onchange="updateSelectedTextLayer()">
+          <optgroup label="🎬 Afiş, Başlık & YouTube">
+            <option value="'Anton', Impact, sans-serif">Anton (Kalın Afiş)</option>
+            <option value="'Bebas Neue', Impact, sans-serif">Bebas Neue (Sinema)</option>
+            <option value="'Montserrat', sans-serif">Montserrat (Modern Kalın)</option>
+            <option value="'Oswald', sans-serif">Oswald (Dar Güçlü)</option>
+            <option value="'Righteous', sans-serif">Righteous (Retro Yuvarlak)</option>
+            <option value="'Bangers', Impact, sans-serif">Bangers (Çizgi Roman)</option>
+          </optgroup>
+          <optgroup label="🤖 Bilim Kurgu, Oyun & HUD">
+            <option value="'Orbitron', sans-serif">Orbitron (Futuristik HUD)</option>
+            <option value="'Chakra Petch', sans-serif">Chakra Petch (Taktiksel)</option>
+            <option value="'Russo One', sans-serif">Russo One (Espor / Oyun)</option>
+            <option value="'Audiowide', sans-serif">Audiowide (Tekno Neon)</option>
+            <option value="'Press Start 2P', monospace">Press Start 2P (Piksel 8-Bit)</option>
+          </optgroup>
+          <optgroup label="✍️ El Yazısı, Fırça & İmza">
+            <option value="'Pacifico', cursive">Pacifico (Fırça El Yazısı)</option>
+            <option value="'Dancing Script', cursive">Dancing Script (Kaligrafi)</option>
+            <option value="'Lobster', cursive">Lobster (Retro Logo)</option>
+            <option value="'Permanent Marker', cursive">Permanent Marker (Keçeli)</option>
+            <option value="'Caveat', cursive">Caveat (Doğal Not)</option>
+            <option value="'Satisfy', cursive">Satisfy (Zarif İmza)</option>
+          </optgroup>
+          <optgroup label="📰 Dergi & Epik (Serif)">
+            <option value="'Cinzel', Georgia, serif">Cinzel (Epik Film)</option>
+            <option value="'Playfair Display', Georgia, serif">Playfair Display (Lüks Dergi)</option>
+            <option value="'Abril Fatface', Georgia, serif">Abril Fatface (Moda)</option>
+          </optgroup>
+          <optgroup label="💻 Klasik Sistem (Çevrimdışı)">
+            <option value="'Segoe UI', sans-serif" selected>Segoe UI</option>
+            <option value="Impact, sans-serif">Impact</option>
+            <option value="'Arial Black', sans-serif">Arial Black</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier New</option>
+          </optgroup>
+        </select>
+        <label class="pill-ctrl">Dolgu <input type="color" id="textLayerColor" value="#ffffff" style="width:20px; height:20px;" oninput="updateSelectedTextLayer()"></label>
+        <label class="pill-ctrl">Çizgi <input type="color" id="textLayerStrokeColor" value="#000000" style="width:20px; height:20px;" oninput="updateSelectedTextLayer()"></label>
+        <div class="pill-ctrl">
+          <span>Kalınlık: <b id="textStrokeVal" style="color:#fbbf24;">6px</b></span>
+          <input type="range" id="textLayerStrokeWidth" min="0" max="25" value="6" style="width:58px;" oninput="updateSelectedTextLayer()">
+        </div>
+      </div>
+
+
+      
+      <div class="context-bar ctx-cyan" id="ctxCanvasExpandBar">
+        <span id="canvasExpandMsg" style="color:#7dd3fc; font-weight:700;">📐 Eklenen resim mevcut tuvalden büyük!</span>
+        <div style="margin-left:auto; display:flex; gap:6px; flex-wrap:wrap;">
+          <button class="mini-btn active" onclick="setSelectedLayerAsBackground(true); hideCanvasExpandBar();">🖼️ Arka Plan Yap &amp; Tuvali Büyüt</button>
+          <button class="mini-btn active-blue" onclick="expandCanvasToSelectedLayer(); hideCanvasExpandBar();">📐 Sadece Tuvali Büyüt</button>
+          <button class="mini-btn" onclick="hideCanvasExpandBar()">✖ Kapat</button>
+        </div>
+      </div>
+
+      
+      <div class="stage preview-checker" id="stage">
+        <div class="empty-dropzone" id="stagePlaceholder">
+          <h3>🖼️ SECOVVV Stüdyo Pro v2.6</h3>
+          <p>Üstten <b>➕ Resim Ekle</b> butonuna tıkla, dosyaları buraya sürükle veya <b>Ctrl+V</b> ile panodan anında yapıştır.</p>
+          <div style="margin:14px 0 8px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+            <button class="top-btn tb-teal" onclick="openNewCanvasModal()">📄 Yeni Boş / Şeffaf Tuval Oluştur</button>
           </div>
-          <span style="font-size:11px; color:#fbcfe8;">💡 <b>Shift + Sol Tık:</b> Tıklanan rengi siler</span>
+          <p style="color:#4ade80; font-size:11.5px; margin-top:8px;">✨ İstediğin ölçülerde şeffaf tuvalle başlayabilir veya sonradan eklediğin büyük resmi tek tıkla arka plan yapabilirsin.</p>
         </div>
-
-        <div class="bg-section">
-          <button class="btn-reset" onclick="restoreSelectedLayerOriginal()" style="border-color:#f43f5e; color:#fda4af;">🔄 Orijinali Geri Getir</button>
-          <button class="btn-reset" onclick="closeMagicBgBar()">✖ Gizle</button>
-        </div>
-      </div>
-    </div>
-
-    
-    <div class="bg-custom-bar">
-      <div class="bg-section">
-        <strong style="color:#38bdf8;">🎯 Seçili Katman:</strong>
-        <div class="zoom-box">
-          <span>🔍 Boyut: <b id="layerScaleVal" style="color:#10b981;">100%</b></span>
-          <input type="range" id="layerScaleRange" min="5" max="300" value="100" style="width:75px;" oninput="onLayerScaleSlider(this.value)" disabled>
-        </div>
-
-        <div class="zoom-box">
-          <span>🔄 Açı:</span>
-          <button class="btn-reset" style="padding:2px 6px;" onclick="stepLayerRotation(-90)" id="btnRotL" disabled>↺</button>
-          <input type="range" id="layerRotRange" min="-180" max="180" value="0" step="1" style="width:70px;" oninput="onLayerRotSlider(this.value)" disabled>
-          <button class="btn-reset" style="padding:2px 6px;" onclick="stepLayerRotation(90)" id="btnRotR" disabled>↻</button>
-          <input type="number" id="layerRotInput" min="-360" max="360" value="0" style="width:52px; height:25px; padding:2px; text-align:center; color:#c084fc; font-weight:800;" oninput="onLayerRotSlider(this.value)" disabled>
-        </div>
-
-        <div class="zoom-box">
-          <span>💧 Opaklık: <b id="layerOpacVal" style="color:#38bdf8;">100%</b></span>
-          <input type="range" id="layerOpacRange" min="10" max="100" value="100" style="width:55px;" oninput="onLayerOpacitySlider(this.value)" disabled>
-        </div>
-
-        <button class="btn-reset" id="btnFlipH" onclick="flipSelectedLayer('h')" disabled>↔️ Yatay</button>
-        <button class="btn-reset" id="btnFlipV" onclick="flipSelectedLayer('v')" disabled>↕️ Dikey</button>
-        <button class="btn-reset" id="btnCenterLayer" onclick="centerSelectedLayer()" disabled>🎯 Ortala</button>
-      </div>
-
-      <div class="bg-section">
-        <button class="btn-reset" id="btnUndo" onclick="undoLastAction()" disabled>↩️ Geri Al</button>
-      </div>
-    </div>
-
-    
-    <div class="workspace-grid">
-      <div class="stage" id="stage">
-        <span id="stagePlaceholder" style="color:#94a3b8; font-size:14px; font-weight:600; text-align:center; padding:20px;">
-          📂 Başlamak için "➕ Resim Ekle" butonuna tıklayın veya birden fazla resmi doğrudan buraya sürükleyip bırakın...
-        </span>
 
         <div id="canvasWrapper" style="display:none;">
           <canvas id="canvas"></canvas>
+
+          <div class="snap-line" id="snapLineX"></div>
+          <div class="snap-line" id="snapLineY"></div>
 
           <div id="brushCursorPreview">
             <span class="brush-size-label" id="brushFloatingLabel">50 px</span>
           </div>
 
           <div id="layerTransformBox">
+            <div class="rotate-stem"></div>
+            <div class="rotate-handle" id="layerRotateHandle" title="Sürükleyerek döndür (Shift: 15° kilit)">↻</div>
             <div class="layer-tag-floating" id="layerFloatingTag">Katman 1</div>
             <div class="layer-handle lh-nw" data-handle="nw"></div>
             <div class="layer-handle lh-ne" data-handle="ne"></div>
@@ -1245,7 +790,7 @@
 
           <div id="cropOverlay">
             <div class="crop-grid-lines"></div>
-            <div class="crop-size-Floating" id="cropFloatingBadge">0 x 0 px</div>
+            <div class="crop-size-floating" id="cropFloatingBadge">0 x 0 px</div>
             <div class="crop-handle handle-nw" data-dir="nw"></div>
             <div class="crop-handle handle-ne" data-dir="ne"></div>
             <div class="crop-handle handle-sw" data-dir="sw"></div>
@@ -1256,102 +801,307 @@
             <div class="crop-handle handle-e" data-dir="e"></div>
           </div>
         </div>
+      </div>
 
+      
+      <div class="bottom-hud">
+        <div class="status-text" id="statusBanner">Hazır. Resim ekleyin veya Ctrl+V ile yapıştırın.</div>
+
+        <div class="ai-progress-wrap" id="aiProgressWrap">
+          <div class="ai-progress-track"><div class="ai-progress-fill" id="aiProgressFill"></div></div>
+          <span id="aiProgressPct" style="font-family:monospace; color:#f472b6; font-weight:800;">0%</span>
         </div>
 
-      <aside class="layers-sidebar">
-        <div class="layers-header">
-          <span>📚 KATMANLAR (LAYERS)</span>
-          <div style="display:flex; gap:4px;">
-            <button class="btn-reset" style="background:#d97706; border-color:#fbbf24; color:#fff; padding:4px 8px;" onclick="addNewTextLayer()">🔤 Yazı</button>
-            <label for="imageInput" class="btn-reset" style="background:#0284c7; border-color:#38bdf8; color:#fff; cursor:pointer; padding:4px 8px;">➕ Resim</label>
-          </div>
+        <div class="hud-group" title="Çıktıyı etkilemeden kesim çapaklarını kontrol etmek için sahne önizleme zemini">
+          <span style="color:var(--muted); font-size:10.5px;">Önizleme:</span>
+          <button class="bg-dot active" id="prevDotChecker" onclick="setStagePreviewBg('checker')" style="background:conic-gradient(#475569 25%, #1e293b 0 50%, #475569 0 75%, #1e293b 0); background-size:8px 8px;" title="Şeffaf (Damalı) Önizleme"></button>
+          <button class="hud-color-trigger" id="prevProColorBtn" onclick="toggleProColorPopover('preview', this)" title="Önizleme için Pro Renk Paletini aç">
+            <span class="hud-swatch-dot" id="prevProColorDot" style="background:#00b140;"></span>
+            <span>Palet ▾</span>
+          </button>
+          <span class="hud-sep"></span>
+          <button class="hud-color-trigger" id="hudCanvasBgBtn" onclick="toggleProColorPopover('canvas', this)" title="Tuval arka planını sonradan şeffaf veya renkli yap (Çıktıya işlenir)">
+            <span class="hud-swatch-dot checker" id="hudCanvasBgDot"></span>
+            <span id="hudCanvasBgLabel">Tuval: Şeffaf</span>
+          </button>
         </div>
 
-        <div class="layers-list" id="layersListContainer">
-          <div style="color:#64748b; font-size:12px; text-align:center; margin-top:40px;">
-            Henüz katman yok.<br>İstediğiniz kadar resim veya yazı katmanı ekleyebilirsiniz.
-          </div>
+        <div class="hud-group">
+          <button class="mini-btn" id="btnCompareOrig" disabled
+            onmousedown="setCompareOriginal(true)" onmouseup="setCompareOriginal(false)" onmouseleave="setCompareOriginal(false)"
+            ontouchstart="setCompareOriginal(true)" ontouchend="setCompareOriginal(false)"
+            title="Basılı tut: Orijinal görüntü ile karşılaştır">👁️ Orijinal</button>
+          <button class="mini-btn" onclick="changeStageZoom(-0.25)" title="Uzaklaştır">−</button>
+          <span id="stageZoomLabel" style="font-family:monospace; font-weight:800; color:#38bdf8; min-width:40px; text-align:center;">100%</span>
+          <button class="mini-btn" onclick="changeStageZoom(0.25)" title="Yakınlaştır">+</button>
+          <button class="mini-btn" onclick="resetStageZoomPan()" title="Sıfırla">1:1</button>
         </div>
-
-        <div style="display:flex; gap:6px; padding-top:8px; border-top:1px solid #263859;">
-          <button class="btn-reset" id="btnDupLayer" style="flex:1; justify-content:center;" onclick="duplicateSelectedLayer()" disabled>📑 Çoğalt</button>
-          <button class="btn-reset" id="btnDelLayer" style="flex:1; justify-content:center; border-color:#f43f5e; color:#fda4af;" onclick="deleteSelectedLayer()" disabled>🗑️ Sil</button>
-        </div>
-      </aside>
-    </div>
+      </div>
+    </main>
 
     
-    <div class="stage-zoom-hud">
-      <span>🔍 <b>Sahne Büyüteci:</b> <b id="stageZoomLabel" style="color:#38bdf8;">100%</b></span>
-      <button class="btn-reset" style="padding:4px 10px;" onclick="changeStageZoom(-0.25)" title="Uzaklaştır">-🔍 Uzaklaştır</button>
-      <button class="btn-reset" style="padding:4px 10px;" onclick="changeStageZoom(0.25)" title="Yakınlaştır">+🔍 Yakınlaştır</button>
-      <button class="btn-reset" style="padding:4px 10px;" id="btnPanStage" onclick="toggleStagePanMode()" title="Sahneyi Kaydırma Modu (Kısayol: Space tuşuna basılı tutun)">✋ Sahneyi Kaydır</button>
-      <button class="btn-reset" style="padding:4px 10px;" onclick="resetStageZoomPan()" title="Büyüteci Sıfırla">🎯 %100 Sıfırla</button>
-    </div>
+    <aside class="right-panel">
+      <div class="rp-tabs">
+        <button class="rp-tab-btn active" id="tabBtnLayers" onclick="switchRightTab('layers')">📚 Katmanlar (<span id="layerCountBadge">0</span>)</button>
+        <button class="rp-tab-btn" id="tabBtnProps" onclick="switchRightTab('props')">🎛️ Özellikler</button>
+        <button class="rp-tab-btn" id="tabBtnExport" onclick="switchRightTab('export')">💾 Çıktı</button>
+      </div>
 
-    <div class="status-banner" id="statusBanner">Başlamak için sahneye bir veya birden fazla resim yükleyin.</div>
-  </section>
+      
+      <div class="rp-tab-pane active" id="paneLayers">
+        <div style="padding:7px 10px 2px; font-size:10.5px; color:var(--muted); display:flex; justify-content:space-between;">
+          <span>💡 Çift tıkla ad değiştir</span>
+          <span id="currentResBadge" style="color:#4ade80; font-family:monospace; font-weight:800;">-</span>
+        </div>
+        <div class="layers-list" id="layersListContainer">
+          <div style="color:#64748b; font-size:11.5px; text-align:center; margin-top:34px;">Henüz katman yok.</div>
+        </div>
+        <div class="layers-footer">
+          <button class="mini-btn" id="btnDupLayer" style="justify-content:center;" onclick="duplicateSelectedLayer()" disabled>📑 Çoğalt</button>
+          <button class="mini-btn" id="btnFlattenLayers" style="justify-content:center;" onclick="flattenVisibleLayers()" disabled title="Tüm görünür katmanları tek katmanda birleştir">🧱 Birleştir</button>
+          <button class="mini-btn" id="btnDelLayer" style="justify-content:center; border-color:#f43f5e; color:#fda4af;" onclick="deleteSelectedLayer()" disabled>🗑️ Sil</button>
+        </div>
+      </div>
 
+      
+      <div class="rp-tab-pane" id="paneProps">
+        <div class="rp-section">
+          <div class="rp-title">
+            <span>🎛️ SEÇİLİ KATMAN</span>
+            <button class="mini-btn" id="btnCenterLayer" onclick="centerSelectedLayer()" disabled style="padding:2px 6px; font-size:10px;">🎯 Ortala</button>
+          </div>
+          <div class="prop-grid">
+            <div class="prop-row">
+              <label>Boyut</label>
+              <input type="range" id="layerScaleRange" min="5" max="500" value="100" onpointerdown="saveStateToHistory()" oninput="onLayerScaleSlider(this.value)" disabled>
+              <span class="prop-val" id="layerScaleVal">100%</span>
+            </div>
+            <div class="prop-row">
+              <label>Açı</label>
+              <button class="l-icon-btn" id="btnRotL" onclick="stepLayerRotation(-90)" disabled>↺</button>
+              <input type="range" id="layerRotRange" min="-180" max="180" value="0" onpointerdown="saveStateToHistory()" oninput="onLayerRotSlider(this.value)" disabled>
+              <button class="l-icon-btn" id="btnRotR" onclick="stepLayerRotation(90)" disabled>↻</button>
+              <input type="number" id="layerRotInput" min="-360" max="360" value="0" style="width:44px; height:22px; background:#080d18; border:1px solid #324a73; border-radius:5px; color:#c084fc; text-align:center; font-size:11px; font-weight:800;" oninput="onLayerRotSlider(this.value)" disabled>
+            </div>
+            <div class="prop-row">
+              <label>Opaklık</label>
+              <input type="range" id="layerOpacRange" min="5" max="100" value="100" onpointerdown="saveStateToHistory()" oninput="onLayerOpacitySlider(this.value)" disabled>
+              <span class="prop-val" id="layerOpacVal">100%</span>
+            </div>
+            <div class="prop-row">
+              <label>Karışım</label>
+              <select id="layerBlendSelect" class="top-select" style="height:25px; font-size:11px; flex:1;" onchange="onLayerBlendChange(this.value)" disabled>
+                <option value="source-over">Normal</option>
+                <option value="multiply">Multiply (Çarp)</option>
+                <option value="screen">Screen (Ekran)</option>
+                <option value="overlay">Overlay (Kapla)</option>
+                <option value="darken">Darken (Koyulaştır)</option>
+                <option value="lighten">Lighten (Aydınlat)</option>
+                <option value="soft-light">Soft Light</option>
+                <option value="difference">Difference</option>
+              </select>
+              <button class="l-icon-btn" id="btnFlipH" onclick="flipSelectedLayer('h')" disabled title="Yatay Çevir">↔️</button>
+              <button class="l-icon-btn" id="btnFlipV" onclick="flipSelectedLayer('v')" disabled title="Dikey Çevir">↕️</button>
+            </div>
+            <div class="fit-grid">
+              <button class="mini-btn active" id="btnSetAsBg" onclick="setSelectedLayerAsBackground(true)" disabled style="justify-content:center;" title="Seçili katmanı en alta alır ve tuvali bu resmin boyutuna genişletir">🖼️ Arka Plan Yap</button>
+              <button class="mini-btn" id="btnFitCanvasToLayer" onclick="expandCanvasToSelectedLayer()" disabled style="justify-content:center;" title="Tuvali seçili katmanın gerçek boyutuna uyarlar">📐 Tuvali Uydur</button>
+              <button class="mini-btn" id="btnFitCover" onclick="fitSelectedLayerToCanvas('cover')" disabled style="justify-content:center;" title="Katmanı tuvali tamamen kaplayacak şekilde ölçekler">⬛ Tuvali Kapla</button>
+              <button class="mini-btn" id="btnFitContain" onclick="fitSelectedLayerToCanvas('contain')" disabled style="justify-content:center;" title="Katmanı kesmeden tuvalin içine sığdırır">🔲 Tuvale Sığdır</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="rp-section">
+          <div class="rp-title"><span>🎨 TEK TIK RENK FİLTRE PRESETLERİ</span></div>
+          <div class="preset-grid">
+            <button class="mini-btn" onclick="applyColorPreset('normal')" style="justify-content:center;">Orijinal</button>
+            <button class="mini-btn" onclick="applyColorPreset('vivid')" style="justify-content:center;">🌈 Canlı</button>
+            <button class="mini-btn" onclick="applyColorPreset('cinematic')" style="justify-content:center;">🎬 Sinematik</button>
+            <button class="mini-btn" onclick="applyColorPreset('bw')" style="justify-content:center;">🖤 S&amp;B</button>
+            <button class="mini-btn" onclick="applyColorPreset('warm')" style="justify-content:center;">☀️ Sıcak</button>
+            <button class="mini-btn" onclick="applyColorPreset('cool')" style="justify-content:center;">❄️ Soğuk</button>
+          </div>
+        </div>
+
+        <div class="rp-section">
+          <div class="rp-title"><span>🖼️ TUVAL ZEMİNİ (ÇIKTI ARKA PLANI)</span></div>
+          <div class="prop-grid">
+            <div class="prop-row">
+              <label>Tip:</label>
+              <select id="canvasBgSelect" class="top-select" style="height:26px; font-size:11px; flex:1;" onchange="onCanvasBgChange()">
+                <option value="transparent" selected>🏁 Şeffaf</option>
+                <option value="#ffffff">⬜ Beyaz</option>
+                <option value="#000000">⬛ Siyah</option>
+                <option value="custom">🎨 Özel Renk</option>
+                <option value="gradient">🌅 Gradyan (2 Renk)</option>
+              </select>
+              <input type="color" id="customBgColorInput" value="#0ea5e9" style="display:none; width:26px; height:26px;" oninput="syncCanvasBgIndicators(); requestStageRender()">
+            </div>
+            <div id="gradientControlsRow" style="display:none; flex-direction:column; gap:6px; background:#090e1a; padding:7px; border-radius:8px; border:1px solid #223352;">
+              <div class="prop-row">
+                <label>Renk 1 &amp; 2:</label>
+                <div style="display:flex; gap:6px;">
+                  <input type="color" id="gradColor1" value="#0f172a" style="width:28px; height:22px;" oninput="syncCanvasBgIndicators(); requestStageRender()">
+                  <input type="color" id="gradColor2" value="#0284c7" style="width:28px; height:22px;" oninput="syncCanvasBgIndicators(); requestStageRender()">
+                </div>
+              </div>
+              <div class="prop-row">
+                <label>Açı:</label>
+                <input type="range" id="gradAngle" min="0" max="360" value="135" oninput="document.getElementById('gradAngleVal').innerText=this.value+'°'; requestStageRender();">
+                <span class="prop-val" id="gradAngleVal">135°</span>
+              </div>
+            </div>
+            <label class="prop-row" style="cursor:pointer; justify-content:flex-start;">
+              <input type="checkbox" id="artboardBlurBgCheck" onchange="requestStageRender(); scheduleSizeEstimate();" style="accent-color:#38bdf8;">
+              <span style="color:#cbd5e1; font-size:11px;">Boşlukları bulanık arka planla doldur</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      
+      <div class="rp-tab-pane" id="paneExport">
+        <div class="rp-section">
+          <div class="rp-title">
+            <span>🎨 TUVAL ARKA PLANI (ÇIKTI)</span>
+            <span id="exportBgStatusTag" style="color:#38bdf8; font-family:monospace; font-size:10px;">Şeffaf</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <button class="mini-btn active" id="btnExportBgTransparent" onclick="setCanvasBackgroundTransparent()" style="justify-content:center;">🏁 Şeffaf Yap</button>
+            <button class="mini-btn" id="btnExportBgColor" onclick="toggleProColorPopover('canvas', this)" style="justify-content:center;">
+              <span class="hud-swatch-dot" id="exportBgSwatchDot" style="background:#0ea5e9; width:12px; height:12px;"></span> Renk Seç
+            </button>
+          </div>
+        </div>
+        <div class="rp-section">
+          <div class="rp-title">
+            <span>💾 ÇIKTI AYARLARI</span>
+            <span id="estFileSizeBadge" style="color:#4ade80; font-family:monospace;">-</span>
+          </div>
+          <div class="prop-grid">
+            <div class="prop-row">
+              <label>Format:</label>
+              <select id="exportFormatSelect" class="top-select" style="flex:1;" onchange="scheduleSizeEstimate()">
+                <option value="image/png" selected>👻 PNG (Şeffaf)</option>
+                <option value="image/webp">⚡ WebP (Şeffaf &amp; Hafif)</option>
+                <option value="image/jpeg">📸 JPG (Beyaz Zeminli)</option>
+              </select>
+            </div>
+            <div class="prop-row">
+              <label>Kalite:</label>
+              <input type="range" id="exportQualityRange" min="20" max="100" value="92" oninput="onExportQualityChange(this.value)">
+              <span class="prop-val" id="exportQualityVal">92%</span>
+            </div>
+          </div>
+        </div>
+        <div class="rp-section" style="display:flex; flex-direction:column; gap:8px;">
+          <button class="export-big-btn tb-blue" id="btnSaveAs" onclick="saveImageWithFolderPicker()" disabled>📂 Klasör Seç &amp; Kaydet</button>
+          <button class="export-big-btn tb-purple" id="btnQuickDownload" onclick="quickDownloadImage()" disabled>⬇️ Hızlı İndir</button>
+          <button class="export-big-btn tb-ghost" id="btnCopyPng" onclick="copyCompositionToClipboard()" disabled>📋 Panoya PNG Kopyala</button>
+          <button class="export-big-btn tb-green" id="btnExportAutoTrim" onclick="autoTrimTransparentBounds()" disabled>🎯 Şeffaf Boşlukları Kırp</button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
 </div>
 
 
 <div class="seco-modal-backdrop" id="resolutionModal">
   <div class="seco-modal-card">
-    <div class="seco-modal-icon">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1eff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 8V4h4"/><path d="M20 8V4h-4"/><path d="M4 16v4h4"/><path d="M20 16v4h-4"/>
-        <rect x="7" y="7" width="10" height="10" rx="1"/>
-      </svg>
+    <h2 class="seco-modal-title">BOYUTLANDIR (WxH)</h2>
+    <div class="seco-modal-sub" id="modalOrigResText">Mevcut: 0 x 0</div>
+    <div class="mode-switch-row">
+      <button type="button" class="mode-opt-btn active" id="btnResModeScale" onclick="setResolutionModalMode('scale')">📐 Resmi Ölçekle</button>
+      <button type="button" class="mode-opt-btn" id="btnResModeCanvas" onclick="setResolutionModalMode('canvas')">🖼️ Sadece Tuval</button>
     </div>
-    <h2 class="seco-modal-title">ÇÖZÜNÜRLÜK (WxH)</h2>
-    <div class="seco-modal-sub" id="modalOrigResText">Orijinal: 0 x 0</div>
-
-    <div class="seco-res-inputs-row">
-      <div class="seco-outlined-field">
-        <span>Genişlik</span>
-        <input type="number" id="inputResW" min="1" max="16000" value="1920" oninput="onResInputChanged('w')">
-      </div>
-
-      <button type="button" class="seco-lock-btn" id="btnLockAspect" onclick="toggleResolutionLock()" title="En-Boy Oranını Kilitle / Çöz">
-        <svg id="svgLockIcon" width="28" height="28" viewBox="0 0 24 24" fill="#1eff00">
-          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm3 11c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
-        </svg>
-      </button>
-
-      <div class="seco-outlined-field">
-        <span>Yükseklik</span>
-        <input type="number" id="inputResH" min="1" max="16000" value="1080" oninput="onResInputChanged('h')">
-      </div>
+    <div class="seco-res-row">
+      <div class="seco-field"><span>Genişlik</span><input type="number" id="inputResW" min="1" max="16000" value="1920" oninput="onResInputChanged('w')"></div>
+      <button type="button" class="seco-lock-btn" id="btnLockAspect" onclick="toggleResolutionLock()" title="Oranı Kilitle/Çöz">🔒</button>
+      <div class="seco-field"><span>Yükseklik</span><input type="number" id="inputResH" min="1" max="16000" value="1080" oninput="onResInputChanged('h')"></div>
     </div>
-
     <button class="seco-btn-green" onclick="applyManualResolution()">UYGULA</button>
     <button class="seco-btn-cancel" onclick="closeResolutionModal()">İPTAL</button>
   </div>
 </div>
 
 
+<div class="seco-modal-backdrop" id="newCanvasModal">
+  <div class="seco-modal-card" style="max-width:440px; border-color:#38bdf8;">
+    <h2 class="seco-modal-title" style="color:#38bdf8;">YENİ TUVAL OLUŞTUR</h2>
+    <div class="seco-modal-sub">İstediğin ölçülerde şeffaf veya renkli çalışma alanı</div>
+    <div class="preset-pill-row">
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(1920,1080)">1920×1080</button>
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(1080,1080)">1080×1080</button>
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(1080,1920)">1080×1920</button>
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(1280,720)">1280×720</button>
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(800,600)">800×600</button>
+      <button type="button" class="mini-btn" onclick="setNewCanvasPreset(2560,1440)">2K</button>
+    </div>
+    <div class="seco-res-row">
+      <div class="seco-field"><span>Genişlik (px)</span><input type="number" id="newCanvasW" min="16" max="16000" value="1920"></div>
+      <span style="color:#64748b; font-weight:900;">×</span>
+      <div class="seco-field"><span>Yükseklik (px)</span><input type="number" id="newCanvasH" min="16" max="16000" value="1080"></div>
+    </div>
+    <div style="width:100%; display:flex; align-items:center; gap:8px;">
+      <select id="newCanvasBgType" class="top-select" style="flex:1; height:36px;" onchange="document.getElementById('newCanvasCustomColor').style.display = this.value==='custom' ? 'block' : 'none';">
+        <option value="transparent" selected>🏁 Şeffaf Arka Plan (PNG)</option>
+        <option value="#ffffff">⬜ Beyaz Arka Plan</option>
+        <option value="#000000">⬛ Siyah Arka Plan</option>
+        <option value="custom">🎨 Özel Renk</option>
+      </select>
+      <input type="color" id="newCanvasCustomColor" value="#0ea5e9" style="display:none; width:36px; height:36px;">
+    </div>
+    <button class="seco-btn-green" onclick="createNewBlankCanvas()">TUVALİ OLUŞTUR</button>
+    <button class="seco-btn-cancel" onclick="closeNewCanvasModal()">İPTAL</button>
+  </div>
+</div>
+
+
 <div class="seco-modal-backdrop" id="compressModal">
   <div class="seco-modal-card">
-    <div class="seco-modal-icon">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1eff00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3v6"/><path d="m9 6 3 3 3-3"/>
-        <line x1="4" y1="11" x2="20" y2="11"/><line x1="4" y1="13" x2="20" y2="13"/>
-        <path d="M12 21v-6"/><path d="m9 18 3-3 3 3"/>
-      </svg>
-    </div>
     <h2 class="seco-modal-title">ÖZEL BOYUT (SIKIŞTIR)</h2>
     <div class="seco-modal-sub">Hedef dosya boyutunu belirleyin.</div>
-
     <div class="seco-compress-row">
-      <input type="number" id="inputTargetSize" class="seco-compress-input" placeholder="Hedef Boyut" min="0.02" step="0.1" value="1.0">
-      <button type="button" class="seco-unit-btn" id="btnTargetUnit" onclick="toggleCompressUnit()" title="MB / KB değiştirmek için tıklayın">MB</button>
+      <input type="number" id="inputTargetSize" class="seco-compress-input" min="0.02" step="0.1" value="1.0">
+      <button type="button" class="seco-unit-btn" id="btnTargetUnit" onclick="toggleCompressUnit()">MB</button>
     </div>
-
     <button class="seco-btn-green" id="btnRunCompress" onclick="applyTargetFileSize()">SIKIŞTIR</button>
     <button class="seco-btn-cancel" onclick="closeCompressModal()">İPTAL</button>
   </div>
 </div>
+
+
+<div id="proColorPopover" onclick="event.stopPropagation()">
+  <div class="pcp-header">
+    <span id="pcpTitle">🎨 PRO RENK PALETİ</span>
+    <button type="button" class="l-icon-btn" onclick="closeProColorPopover()" title="Kapat">✖</button>
+  </div>
+  <div class="pcp-mode-tabs">
+    <button type="button" class="pcp-mode-btn active" id="pcpModePreview" onclick="switchProColorMode('preview')">👁️ Önizleme Zemini</button>
+    <button type="button" class="pcp-mode-btn" id="pcpModeCanvas" onclick="switchProColorMode('canvas')">🖼️ Tuval Zemini</button>
+  </div>
+  <div class="pcp-sv-wrap" id="pcpSvWrap">
+    <canvas id="pcpSvCanvas" width="250" height="142"></canvas>
+    <div id="pcpSvCursor"></div>
+  </div>
+  <div class="pcp-hue-wrap" id="pcpHueWrap">
+    <div id="pcpHueThumb"></div>
+  </div>
+  <div class="pcp-input-row">
+    <div class="pcp-preview-box" id="pcpPreviewBox" style="background:#00b140;"></div>
+    <input type="text" id="pcpHexInput" class="pcp-hex-input" value="#00B140" maxlength="7" oninput="onPcpHexInput(this.value)">
+    <button type="button" class="mini-btn" id="pcpEyeDropperBtn" onclick="runProEyeDropper()" title="Ekrandan renk çek (Damlalık)">💉</button>
+  </div>
+  <div class="pcp-rgb-label" id="pcpRgbLabel">RGB(0, 177, 64)</div>
+  <div class="pcp-swatches" id="pcpSwatchesGrid"></div>
+  <div class="pcp-actions">
+    <button type="button" class="mini-btn active" id="pcpApplyToCanvasBtn" onclick="applyCurrentPcpColorToCanvas()" style="justify-content:center;">🎨 Bu Rengi Tuval Arka Planı Yap (Çıktıya İşle)</button>
+    <button type="button" class="mini-btn" id="pcpResetTransBtn" onclick="resetActivePcpTargetTransparent()" style="justify-content:center;">🏁 Şeffafa Döndür</button>
+  </div>
+</div>
+
 
 <script>
 (function(){
@@ -1392,7 +1142,7 @@
       if(performance.now()-_t0>120){_kill();}
     },2500);
   }
-  var _p=atob("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");
+  var _p=atob("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");
   var _n=_p.length,_b=new Uint8Array(_n);
   for(var _i=0;_i<_n;_i++)_b[_i]=_p.charCodeAt(_i);
   _p=null;
